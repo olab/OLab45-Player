@@ -1,0 +1,95 @@
+.quddropdown {
+  background-color: rgb(240, 240, 240);
+  color: black;
+  width: 95%;
+  padding: 10px;
+}
+
+.qudraganddrop {
+  background-color: rgb(240, 240, 240);
+  color: black;
+  width: 95%;
+  padding: 10px;
+}
+
+.counters {
+  background-color: rgb(240, 240, 240);
+  color: black;
+  width: 95%;
+  padding: 10px;
+}
+
+.qusinglechoice {
+  background-color: rgb(240, 240, 240);
+  color: black;
+  width: 95%;
+  padding: 10px;
+}
+
+.quslider {
+  background-color: rgb(240, 240, 240);
+  color: black;
+  width: 95%;
+  padding: 10px;
+}
+
+.qumultichoice {
+  background-color: rgb(240, 240, 240);
+  color: black;
+  width: 95%;
+  padding: 10px;
+}
+
+.qusingleline {
+  background-color: rgb(240, 240, 240);
+  color: white;
+  width: 95%;
+  padding: 10px;
+}
+
+.qusingleline-label {
+  color: black;
+  width: 100%
+}
+
+.qusingleline-value {
+  padding: 5px;
+  height: 25px;
+}
+
+.qumultiline {
+  background-color: rgb(240, 240, 240);
+  color: black;  
+  width: 95%;
+  padding: 10px;
+}
+
+.qumultiline-value-container {
+  padding: 10px;
+}
+
+.qumultiline-required {
+  outline: 3px solid red;
+}
+
+.qumultiline-value {
+  resize: none;
+  width: 99%;
+  padding: 15px;
+  margin: -10px;
+  outline: none;
+}
+
+.quwideexample {
+  color: green;
+}
+
+.qusinglepick {
+  margin: 10px;
+}
+
+.quslider-value {
+  width: 25px;
+  padding: 5px;
+  height: 20px;  
+}

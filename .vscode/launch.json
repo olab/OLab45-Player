@@ -1,0 +1,19 @@
+{
+  "configurations": [
+    {
+      "type": "firefox",
+      "request": "launch",
+      "reAttach": true,
+      "name": "Launch index.html",
+      "url": "http://localhost:3000/player/home",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Launch Chrome",
+      "request": "launch",
+      "type": "pwa-chrome",
+      "url": "http://localhost:3000/player/home",
+      "webRoot": "${workspaceFolder}"
+    }
+  ]
+}

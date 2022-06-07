@@ -1,0 +1,14 @@
+.qu-bigmultitext {
+  font-family: 'Courier New', Courier, monospace;
+  width: 100%;
+  background-color: #006699;
+  border: 0px solid #006699;
+}
+
+.qu-userforename { 
+  display: inline-block;
+}
+
+.qu-userfamilyname { 
+  display: inline-block;
+}
