@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Chat from '../../Chat/Chat'
 import Turkee from '../../../services/turkee';
 import styles from '../styles.module.css';
+const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabAttendeeTag extends React.Component {
 
@@ -17,7 +18,7 @@ class OlabAttendeeTag extends React.Component {
             connectionStatus: '',
             localInfo: { Name: '', ConnectionId: '' },
             maxHeight: 200,
-            remoteInfo:  { Name: '', ConnectionId: '', RoomName: null },
+            remoteInfo: { Name: '', ConnectionId: '', RoomName: props.name },
             userName: props.props.authActions.getUserName(),
             width: '100%',
             id: this.props.name,
@@ -32,7 +33,7 @@ class OlabAttendeeTag extends React.Component {
 
         this.setState({
             connectionStatus: connectionInfo.connectionStatus,
-            localInfo: connectionInfo   
+            localInfo: connectionInfo
         });
     }
 
@@ -58,19 +59,23 @@ class OlabAttendeeTag extends React.Component {
 
         log.debug(`OlabTurkeeTag render '${userName}'`);
 
-        const divLayout = { width: width, border: '1px solid black', backgroundColor: '#3333' };
-
         try {
 
+            if (persistantStorage.get('dbg-disableWikiRendering')) {
+                return (
+                    <>
+                        [[ATTENDEE:{remoteInfo.RoomName}]]
+                    </>
+                );
+            }
+
             return (
-                <div style={divLayout}>
-                    <Chat
-                        connection={this.turkee.connection}
-                        connectionStatus={connectionStatus}
-                        localInfo={localInfo}
-                        remoteInfo={remoteInfo}
-                        playerProps={this.props.props} />
-                </div>
+                <Chat
+                    connection={this.turkee.connection}
+                    connectionStatus={connectionStatus}
+                    localInfo={localInfo}
+                    remoteInfo={remoteInfo}
+                    playerProps={this.props.props} />
             );
 
         } catch (error) {

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import {
-    Button, Table, TableBody,
+    Button, Table, TableBody, Grid,
     TableCell, Paper, TableContainer,
     TableHead, TableRow, TextField
 } from '@material-ui/core';
@@ -168,12 +168,7 @@ class Chat extends React.Component {
         let roomString = '';
 
         if (this.props.remoteInfo.RoomName) {
-            let room = this.props.remoteInfo.RoomName.replace("//", "|");
-            const roomParts = room.split("|");
-            const mapName = roomParts[0];
-            const roomName = roomParts[1];
-            const roomIndex = roomParts[2];
-            roomString = `Case: ${mapName}. Room: ${roomName}:${roomIndex}`;
+            roomString = `Room: ${this.props.remoteInfo.RoomName}`;
         }
 
         if ((ConnectionId) && (ConnectionId.length > 0)) {
@@ -205,12 +200,12 @@ class Chat extends React.Component {
             width,
         } = this.state;
 
-        const divLayout = { width: width, border: '1px solid black', backgroundColor: '#3333' };
+        const divLayout = { width: width, border: '2px solid black', backgroundColor: '#3333' };
         const tableContainerStyle = { height: '100%', maxHeight: maxHeight, backgroundColor: '#DDDDDD' };
 
         const statusRightString = this.generateRightStatusString();
         const statusLeftString = this.generateLeftStatusString();
-        const statusCenterString  = this.generateCenterStatusString();
+        const statusCenterString = this.generateCenterStatusString();
 
         const disabled = ((this.props.remoteInfo.ConnectionId === '') ||
             (this.props.connectionStatus !== HubConnectionState.Connected));
@@ -219,7 +214,6 @@ class Chat extends React.Component {
 
             return (
                 <div style={divLayout}>
-
                     <TableContainer component={Paper} style={tableContainerStyle}>
                         <Table stickyHeader size="small">
                             <TableHead>
@@ -292,23 +286,17 @@ class Chat extends React.Component {
                         </Table>
                     </TableContainer>
 
-                    <TableContainer component={Paper}>
-                        <Table className={'TurkeeStatusBar'} style={{ border: '1px solid black', backgroundColor: '#3333' }} size="small" aria-label="a dense table">
-                            <TableBody sx={{ border: 1 }}>
-                                <TableRow sx={{ border: 0, background: 'grey' }}>
-                                    <TableCell>
-                                        <div style={{ color: 'black' }}>{statusLeftString}</div>
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <div style={{ color: 'black' }}>{statusCenterString}</div>
-                                    </TableCell>                                    
-                                    <TableCell align="right">
-                                        <div style={{ color: 'black' }}>{statusRightString}</div>
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                    <Grid container className={'TurkeeStatusBar'} style={{  fontWeight: 'bold', borderTop: '1px solid black', backgroundColor: '#grey' }}>
+                        <Grid item xs={4}>
+                            <div style={{ marginLeft: '10px', textAlign: 'left' }}>{statusLeftString}</div>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <div style={{ textAlign: 'center' }}>{statusCenterString}</div>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <div style={{ marginRight: '10px', textAlign: 'right' }}>{statusRightString}&nbsp;</div>
+                        </Grid>
+                    </Grid>
 
                 </div>
             );
