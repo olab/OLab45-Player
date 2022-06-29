@@ -14,6 +14,7 @@ import Turker from '../../../services/turker';
 import styles from '../styles.module.css';
 import PropManager from './PropManager'
 import TurkerChatStatusBar from './TurkerChatStatusBar';
+import TurkeeChatStatusBar from './TurkeeChatStatusBar';
 
 class OlabModeratorTag extends React.Component {
 
@@ -200,6 +201,11 @@ class OlabModeratorTag extends React.Component {
                             localInfo={connectionInfos[rowIndex + columnIndex].localInfo}
                             remoteInfo={connectionInfos[rowIndex + columnIndex].remoteInfo}
                             playerProps={this.props.props} />
+                        <TurkeeChatStatusBar
+                            connection={this.turker.connection}
+                            connectionStatus={connectionStatus}
+                            localInfo={connectionInfos[rowIndex + columnIndex].localInfo}
+                            remoteInfo={connectionInfos[rowIndex + columnIndex].remoteInfo} />
                     </TableCell>
                 );
             }
@@ -223,7 +229,7 @@ class OlabModeratorTag extends React.Component {
             userName,
             connectionStatus,
             localInfo,
-            remoteInfo,            
+            remoteInfo,
         } = this.state;
 
         log.debug(`OlabTurkerTag render '${userName}'`);
@@ -261,8 +267,8 @@ class OlabModeratorTag extends React.Component {
                                     <em>--Select--</em>
                                 </MenuItem>
                                 {unassignedTurkeeList.map((turkee) => (
-                                    <MenuItem 
-                                        key={turkee.PartnerId} 
+                                    <MenuItem
+                                        key={turkee.PartnerId}
                                         value={turkee.PartnerId}>{turkee.PartnerName} ({turkee.PartnerId.substring(0, 3)})
                                     </MenuItem>
                                 ))}

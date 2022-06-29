@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import {
-    Button, Table, TableBody, Grid,
+    Button, Table, TableBody,
     TableCell, Paper, TableContainer,
     TableHead, TableRow, TextField
 } from '@material-ui/core';
@@ -143,54 +143,6 @@ class Chat extends React.Component {
         event.preventDefault();
     }
 
-    generateRightStatusString() {
-
-        const {
-            ConnectionId,
-            Name
-        } = this.props.remoteInfo;
-
-        if ((ConnectionId) && (ConnectionId.length > 0)) {
-            return `${Name} (Id: ${ConnectionId.substring(0, 3)})`;
-        }
-        else {
-            return 'Waiting';
-        }
-
-    }
-
-    generateCenterStatusString() {
-
-        const {
-            ConnectionId,
-        } = this.props.localInfo;
-
-        let roomString = '';
-
-        if (this.props.remoteInfo.RoomName) {
-            roomString = `Room: ${this.props.remoteInfo.RoomName}`;
-        }
-
-        if ((ConnectionId) && (ConnectionId.length > 0)) {
-            return roomString;
-        }
-    }
-
-    generateLeftStatusString() {
-
-        const {
-            ConnectionId,
-        } = this.props.localInfo;
-
-        if ((ConnectionId) && (ConnectionId.length > 0)) {
-            return `${this.props.connectionStatus} (Id: ${ConnectionId.substring(0, 3)})`;
-        }
-        else {
-            return this.props.connectionStatus;
-        }
-
-    }
-
     render() {
 
         let {
@@ -202,10 +154,6 @@ class Chat extends React.Component {
 
         const divLayout = { width: width, border: '2px solid black', backgroundColor: '#3333' };
         const tableContainerStyle = { height: '100%', maxHeight: maxHeight, backgroundColor: '#DDDDDD' };
-
-        const statusRightString = this.generateRightStatusString();
-        const statusLeftString = this.generateLeftStatusString();
-        const statusCenterString = this.generateCenterStatusString();
 
         const disabled = ((this.props.remoteInfo.ConnectionId === '') ||
             (this.props.connectionStatus !== HubConnectionState.Connected));

@@ -53,7 +53,6 @@ class OlabAttendeeTag extends React.Component {
             id,
             localInfo,
             remoteInfo,
-            width,
             connectionStatus,
             userName,
         } = this.state;
