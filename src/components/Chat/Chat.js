@@ -111,6 +111,7 @@ class Chat extends React.Component {
                     envelope: {
                         fromId: this.props.localInfo.ConnectionId,
                         toId: this.props.remoteInfo.ConnectionId,
+                        roomName: this.props.remoteInfo.RoomName
                     },
                     Data: message
                 };
