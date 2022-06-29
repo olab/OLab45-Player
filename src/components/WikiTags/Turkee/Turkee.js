@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Chat from '../../Chat/Chat'
 import Turkee from '../../../services/turkee';
 import styles from '../styles.module.css';
+import TurkeeChatStatusBar from './TurkeeChatStatusBar';
 const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabAttendeeTag extends React.Component {
@@ -70,12 +71,19 @@ class OlabAttendeeTag extends React.Component {
             }
 
             return (
-                <Chat
-                    connection={this.turkee.connection}
-                    connectionStatus={connectionStatus}
-                    localInfo={localInfo}
-                    remoteInfo={remoteInfo}
-                    playerProps={this.props.props} />
+                <>
+                    <Chat
+                        connection={this.turkee.connection}
+                        connectionStatus={connectionStatus}
+                        localInfo={localInfo}
+                        remoteInfo={remoteInfo}
+                        playerProps={this.props.props} />
+                    <TurkeeChatStatusBar
+                        connection={this.turkee.connection}
+                        connectionStatus={connectionStatus}
+                        localInfo={localInfo}
+                        remoteInfo={remoteInfo} />
+                </>
             );
 
         } catch (error) {

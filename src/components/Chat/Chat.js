@@ -257,9 +257,9 @@ class Chat extends React.Component {
                     </TableContainer>
 
                     <TableContainer component={Paper}>
-                        <Table style={{ border: '0px solid black' }} size="small" aria-label="a dense table">
-                            <TableBody sx={{ border: 1 }}>
-                                <TableRow sx={{ border: 0, background: 'grey' }}>
+                        <Table size="small" aria-label="a dense table">
+                            <TableBody>
+                                <TableRow sx={{ background: 'grey' }}>
                                     <TableCell>
                                         <TextField
                                             id="message"
@@ -286,7 +286,7 @@ class Chat extends React.Component {
                         </Table>
                     </TableContainer>
 
-                    <Grid container className={'TurkeeStatusBar'} style={{  fontWeight: 'bold', borderTop: '1px solid black', backgroundColor: '#grey' }}>
+                    {/* <Grid container className={'TurkeeStatusBar'} style={{  fontWeight: 'bold', borderTop: '1px solid black', backgroundColor: '#grey' }}>
                         <Grid item xs={4}>
                             <div style={{ marginLeft: '10px', textAlign: 'left' }}>{statusLeftString}</div>
                         </Grid>
@@ -296,7 +296,7 @@ class Chat extends React.Component {
                         <Grid item xs={4}>
                             <div style={{ marginRight: '10px', textAlign: 'right' }}>{statusRightString}&nbsp;</div>
                         </Grid>
-                    </Grid>
+                    </Grid> */}
 
                 </div>
             );

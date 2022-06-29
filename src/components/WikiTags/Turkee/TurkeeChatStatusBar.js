@@ -1,9 +1,7 @@
 // @flow
 import * as React from 'react';
 import {
-    Table, TableBody,
-    TableCell, Paper, TableContainer,
-    TableRow
+    Grid
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import log from 'loglevel';
@@ -21,56 +19,82 @@ class TurkeeChatStatusBar extends React.Component {
 
     }
 
+    generateRightStatusString() {
+
+        const {
+            ConnectionId,
+            Name
+        } = this.props.remoteInfo;
+
+        if ((ConnectionId) && (ConnectionId.length > 0)) {
+            return `${Name} (Id: ${ConnectionId.substring(0, 3)})`;
+        }
+        else {
+            return 'Waiting';
+        }
+
+    }
+
+    generateCenterStatusString() {
+
+        const {
+            ConnectionId,
+        } = this.props.localInfo;
+
+        let roomString = '';
+
+        if (this.props.remoteInfo.RoomName) {
+            roomString = `Room: ${this.props.remoteInfo.RoomName}`;
+        }
+
+        if ((ConnectionId) && (ConnectionId.length > 0)) {
+            return roomString;
+        }
+    }
+
+    generateLeftStatusString() {
+
+        const {
+            ConnectionId,
+        } = this.props.localInfo;
+
+        if ((ConnectionId) && (ConnectionId.length > 0)) {
+            return `${this.props.connectionStatus} (Id: ${ConnectionId.substring(0, 3)})`;
+        }
+        else {
+            return this.props.connectionStatus;
+        }
+
+    }
+
     render() {
-
-        const {
-            InSession,
-            IsConnected
-        } = this.props.props;
-
-        const {
-            width
-        } = this.state;
-
-        let sessionName = "";
-        let status = "";
 
         log.debug(`TurkeeChatStatusBar render. state = ${JSON.stringify(this.state)}`);
 
+        let {
+            width,
+        } = this.state;
+
         try {
 
-            if (IsConnected) {
-                status = 'Connected';
-                if (InSession) {
-                    sessionName = "Online";
-                }
-                else {
-                    sessionName = "Waiting for moderator";
-                }
-            }
-            else {
-                status = 'Disconnected';
-                sessionName = "";
-            }
-
-            const divLayout = { width: width, border: '1px solid black', backgroundColor: '#3333' };
+            const statusRightString = this.generateRightStatusString();
+            const statusLeftString = this.generateLeftStatusString();
+            const statusCenterString = this.generateCenterStatusString();
+            const divLayout = { width: width, border: '2px solid black', backgroundColor: '#3333', borderTop: '0px solid black' };
 
             return (
                 <div style={divLayout}>
-                    <TableContainer component={Paper}>
-                        <Table className={'TurkeeStatusBar'} style={{ border: '1px solid black', backgroundColor: '#3333' }} size="small" aria-label="a dense table">
-                            <TableBody sx={{ border: 1 }}>
-                                <TableRow sx={{ border: 0, background: 'grey' }}>
-                                    <TableCell>
-                                        <div style={{ color: 'black' }}>{status}</div>
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        <div style={{ color: 'black' }}>{sessionName}</div>
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                    <Grid container className={'TurkeeStatusBar'} style={{ fontWeight: 'bold', backgroundColor: '#grey' }}>
+                        <Grid item xs={4}>
+                            <div style={{ marginLeft: '10px', textAlign: 'left' }}>{statusLeftString}</div>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <div style={{ textAlign: 'center' }}>{statusCenterString}</div>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <div style={{ marginRight: '10px', textAlign: 'right' }}>{statusRightString}&nbsp;</div>
+                        </Grid>
+                    </Grid>
                 </div>
             );
 

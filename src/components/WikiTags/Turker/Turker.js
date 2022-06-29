@@ -13,6 +13,7 @@ import Chat from '../../Chat/Chat'
 import Turker from '../../../services/turker';
 import styles from '../styles.module.css';
 import PropManager from './PropManager'
+import TurkerChatStatusBar from './TurkerChatStatusBar';
 
 class OlabModeratorTag extends React.Component {
 
@@ -28,6 +29,10 @@ class OlabModeratorTag extends React.Component {
             unassignedTurkeeList: [],
             userName: props.props.authActions.getUserName(),
             width: '100%',
+            numRows: 2,
+            numColumns: 4,
+            localInfo: { Name: '', ConnectionId: '' },
+            remoteInfo: { Name: '', ConnectionId: '', RoomName: props.name },
         };
 
         this.onUpdateUnassignedList = this.onUpdateUnassignedList.bind(this);
@@ -172,106 +177,77 @@ class OlabModeratorTag extends React.Component {
 
     }
 
-    generateLeftStatusString() {
+    generateChatGrid() {
 
-        if (this.turker.connection._connectionState === HubConnectionState.Connected) {
-            return `${this.state.connectionStatus} (Id: ${this.turker.connection.connectionId.substring(0, 3)})`;
+        const {
+            connectionInfos,
+            connectionStatus,
+            numRows,
+            numColumns
+        } = this.state;
+
+        const cellStyling = { padding: 7 }
+
+        let rows = [];
+        for (var rowIndex = 0; rowIndex < numRows; rowIndex++) {
+            let columns = [];
+            for (let columnIndex = 0; columnIndex < numColumns; columnIndex++) {
+                columns.push(
+                    <TableCell style={cellStyling}>
+                        <Chat
+                            connectionStatus={connectionStatus}
+                            connection={this.turker.connection}
+                            localInfo={connectionInfos[rowIndex + columnIndex].localInfo}
+                            remoteInfo={connectionInfos[rowIndex + columnIndex].remoteInfo}
+                            playerProps={this.props.props} />
+                    </TableCell>
+                );
+            }
+
+            rows.push(
+                <TableRow>
+                    {columns}
+                </TableRow>
+            );
         }
 
-        return this.state.connectionStatus;
+        return rows;
 
     }
 
     render() {
 
         const {
-            connectionInfos,
-            connectionStatus,
             unassignedTurkeeList,
             selectedUnassignedTurkee,
-            userName
+            userName,
+            connectionStatus,
+            localInfo,
+            remoteInfo,            
         } = this.state;
 
         log.debug(`OlabTurkerTag render '${userName}'`);
 
-        const tableLayout = { border: '1px solid black', backgroundColor: '#3333' };
-        const cellStyling = { padding: 7 }
+        const tableLayout = { border: '2px solid black', backgroundColor: '#3333' };
+        let chatRows = this.generateChatGrid();
 
         try {
             return (
                 <Grid container item xs={12}>
+
                     <Table style={tableLayout}>
                         <TableBody>
-                            <TableRow>
-                                <TableCell style={cellStyling}>
-                                    <Chat
-                                        connectionStatus={connectionStatus}
-                                        connection={this.turker.connection}
-                                        localInfo={connectionInfos[0].localInfo}
-                                        remoteInfo={connectionInfos[0].remoteInfo}
-                                        playerProps={this.props.props} />
-                                </TableCell>
-                                <TableCell style={cellStyling}>
-                                    <Chat
-                                        connectionStatus={connectionStatus}
-                                        connection={this.turker.connection}
-                                        localInfo={connectionInfos[1].localInfo}
-                                        remoteInfo={connectionInfos[1].remoteInfo}
-                                        playerProps={this.props.props} />
-                                </TableCell>
-                                <TableCell style={cellStyling}>
-                                    <Chat
-                                        connectionStatus={connectionStatus}
-                                        connection={this.turker.connection}
-                                        localInfo={connectionInfos[2].localInfo}
-                                        remoteInfo={connectionInfos[2].remoteInfo}
-                                        playerProps={this.props.props} />
-                                </TableCell>
-                                <TableCell style={cellStyling}>
-                                    <Chat
-                                        connectionStatus={connectionStatus}
-                                        connection={this.turker.connection}
-                                        localInfo={connectionInfos[3].localInfo}
-                                        remoteInfo={connectionInfos[3].remoteInfo}
-                                        playerProps={this.props.props} />
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell style={cellStyling}>
-                                    <Chat
-                                        connectionStatus={connectionStatus}
-                                        connection={this.turker.connection}
-                                        localInfo={connectionInfos[4].localInfo}
-                                        remoteInfo={connectionInfos[4].remoteInfo}
-                                        playerProps={this.props.props} />
-                                </TableCell>
-                                <TableCell style={cellStyling}>
-                                    <Chat
-                                        connectionStatus={connectionStatus}
-                                        connection={this.turker.connection}
-                                        localInfo={connectionInfos[5].localInfo}
-                                        remoteInfo={connectionInfos[5].remoteInfo}
-                                        playerProps={this.props.props} />
-                                </TableCell>
-                                <TableCell style={cellStyling}>
-                                    <Chat
-                                        connectionStatus={connectionStatus}
-                                        connection={this.turker.connection}
-                                        localInfo={connectionInfos[6].localInfo}
-                                        remoteInfo={connectionInfos[6].remoteInfo}
-                                        playerProps={this.props.props} />
-                                </TableCell>
-                                <TableCell style={cellStyling}>
-                                    <Chat
-                                        connectionStatus={connectionStatus}
-                                        connection={this.turker.connection}
-                                        localInfo={connectionInfos[7].localInfo}
-                                        remoteInfo={connectionInfos[7].remoteInfo}
-                                        playerProps={this.props.props} />
-                                </TableCell>
-                            </TableRow>
+                            {chatRows}
                         </TableBody>
                     </Table>
+
+                    <TurkerChatStatusBar
+                        connection={this.turker.connection}
+                        connectionStatus={connectionStatus}
+                        localInfo={localInfo}
+                        remoteInfo={remoteInfo} />
+
+                    &nbsp;
 
                     <Grid container>
                         <Grid container item xs={3}>
@@ -285,7 +261,10 @@ class OlabModeratorTag extends React.Component {
                                     <em>--Select--</em>
                                 </MenuItem>
                                 {unassignedTurkeeList.map((turkee) => (
-                                    <MenuItem key={turkee.PartnerId} value={turkee.PartnerId}>{turkee.PartnerName} ({turkee.PartnerId.substring(0, 3)})</MenuItem>
+                                    <MenuItem 
+                                        key={turkee.PartnerId} 
+                                        value={turkee.PartnerId}>{turkee.PartnerName} ({turkee.PartnerId.substring(0, 3)})
+                                    </MenuItem>
                                 ))}
                             </Select>
                         </Grid>
