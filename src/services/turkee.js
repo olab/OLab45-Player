@@ -131,24 +131,6 @@ class Turkee extends TurkTalk {
 
   }
 
-  // sendMessage(senderInfo, message) {
-
-  //   log.debug(`sendMessage: '${message}' sendInfo = ${JSON.stringify(senderInfo)}`);
-
-  //   if (senderInfo.InSession) {
-
-  //     const payload = {
-  //       senderInfo: senderInfo,
-  //       message: message
-  //     };
-
-  //     this.connection.send(constants.SIGNALCMD_MESSAGE, payload);
-  //   }
-  //   else {
-  //     log.error(`sendMessage: not connected.  Send ignored.`);
-  //   }
-  // }
-
 };
 
 export default Turkee;
