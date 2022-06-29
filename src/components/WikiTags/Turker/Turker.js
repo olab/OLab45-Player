@@ -49,7 +49,7 @@ class OlabModeratorTag extends React.Component {
         this.MAX_TURKEES = 8;
         this.NUM_ROWS = 2;
 
-        this.propManager = new PropManager(this.MAX_TURKEES, { Name: this.state.userName, ConnectionId: '' });
+        this.propManager = new PropManager(this.state.numRows * this.state.numColumns, { Name: this.state.userName, ConnectionId: '' });
         this.state.connectionInfos = this.propManager.getProps();
 
     }
@@ -65,10 +65,17 @@ class OlabModeratorTag extends React.Component {
         }
 
         let {
-            connectionInfos
+            connectionInfos,
+            remoteInfo
         } = this.state;
 
+        remoteInfo.RoomName = connectionInfo.RoomName;
         connectionInfos = this.propManager.getProps();
+
+        // set the remote room name for each chat
+        for (const connectionInfo of connectionInfos) {
+            connectionInfo.remoteInfo.RoomName = remoteInfo.RoomName;
+        }
 
         this.setState({
             connectionInfos: connectionInfos,
@@ -76,7 +83,8 @@ class OlabModeratorTag extends React.Component {
             localInfo: {
                 ConnectionId: connectionInfo.ConnectionId,
                 Name: connectionInfo.Name
-            }
+            },
+            remoteInfo: remoteInfo
         });
     }
 

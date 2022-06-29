@@ -54,7 +54,8 @@ class Turker extends TurkTalk {
       this.component.onConnectionChanged({
         connectionStatus: this.connection._connectionState,
         ConnectionId: this.connectionId,
-        Name: this.username
+        Name: this.username,
+        RoomName: this.penName
       });
     }
 
@@ -144,22 +145,6 @@ class Turker extends TurkTalk {
 
   }
 
-  // sendMessage(senderInfo, message) {
-
-  //   log.debug(`sendMessage: '${message}' sendInfo = ${JSON.stringify(senderInfo)}`);
-
-  //   if (senderInfo.InSession) {
-
-  //     const payload = {
-  //       senderInfo: senderInfo,
-  //       message: message
-  //     };
-
-  //     this.connection.send(constants.SIGNALCMD_MESSAGE, payload);
-  //   }
-  //   else {
-  //     log.error(`sendMessage: not connected.  Send ignored.`);
-  //   }
   // }
 
 };

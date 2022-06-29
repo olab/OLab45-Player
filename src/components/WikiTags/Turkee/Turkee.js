@@ -32,9 +32,16 @@ class OlabAttendeeTag extends React.Component {
     // applies changes to connection status
     onConnectionChanged(connectionInfo) {
 
+        let {
+            remoteInfo
+        } = this.state;
+
+        remoteInfo.RoomName = connectionInfo.RoomName;
+
         this.setState({
             connectionStatus: connectionInfo.connectionStatus,
-            localInfo: connectionInfo
+            localInfo: connectionInfo,
+            remoteInfo: remoteInfo
         });
     }
 
