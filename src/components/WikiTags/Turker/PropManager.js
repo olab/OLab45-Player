@@ -23,7 +23,7 @@ class ChatPropManager {
   }
 
   getProps() {
-    log.debug(`getProps: ${JSON.stringify(this.connectionInfos, null, 1)}`);
+    // log.debug(`getProps: ${JSON.stringify(this.connectionInfos, null, 1)}`);
     return this.connectionInfos;
   }
 

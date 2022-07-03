@@ -39,6 +39,7 @@ class OlabModeratorTag extends React.Component {
         this.onUpdateUnassignedList = this.onUpdateUnassignedList.bind(this);
         this.onTurkeeSelected = this.onTurkeeSelected.bind(this);
         this.onAssignClicked = this.onAssignClicked.bind(this);
+        this.onRoomAssigned = this.onRoomAssigned.bind(this);
         this.onConnectionChanged = this.onConnectionChanged.bind(this);
 
         this.turker = new Turker(this);
@@ -54,6 +55,29 @@ class OlabModeratorTag extends React.Component {
 
     }
 
+    onRoomAssigned(roomName) {
+
+        log.debug(`onRoomAssigned: setting room: '${roomName}'`);
+
+        let {
+            connectionInfos,
+            remoteInfo
+        } = this.state;
+       
+        remoteInfo.RoomName = roomName;        
+        connectionInfos = this.propManager.getProps();
+
+        // set the remote room name for each chat
+        for (const connectionInfo of connectionInfos) {
+            connectionInfo.remoteInfo.RoomName = remoteInfo.RoomName;
+        }
+        
+        this.setState({
+            connectionInfos: connectionInfos,
+            remoteInfo: remoteInfo
+        });        
+    }
+
     // applies changes to connection status
     onConnectionChanged(connectionInfo) {
 
@@ -64,27 +88,12 @@ class OlabModeratorTag extends React.Component {
             this.propManager.setConnectionId('');
         }
 
-        let {
-            connectionInfos,
-            remoteInfo
-        } = this.state;
-
-        remoteInfo.RoomName = connectionInfo.RoomName;
-        connectionInfos = this.propManager.getProps();
-
-        // set the remote room name for each chat
-        for (const connectionInfo of connectionInfos) {
-            connectionInfo.remoteInfo.RoomName = remoteInfo.RoomName;
-        }
-
         this.setState({
-            connectionInfos: connectionInfos,
             connectionStatus: connectionInfo.connectionStatus,
             localInfo: {
                 ConnectionId: connectionInfo.ConnectionId,
                 Name: connectionInfo.Name
-            },
-            remoteInfo: remoteInfo
+            }
         });
     }
 

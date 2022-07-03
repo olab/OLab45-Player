@@ -9,8 +9,9 @@ class Turker extends TurkTalk {
 
     super(component);
 
-    const { onUpdateUnassignedList, onAddTurkee, onRemoveTurkey } = component;
+    const { onUpdateUnassignedList, onAddTurkee, onRemoveTurkey, onRoomAssigned } = component;
     this.onUpdateUnassignedList = onUpdateUnassignedList;
+    this.onRoomAssigned = onRoomAssigned;
     this.onAddTurkee = onAddTurkee;
     this.onRemoveTurkey = onRemoveTurkey;
     this.playerState = component.props.props;
@@ -54,8 +55,7 @@ class Turker extends TurkTalk {
       this.component.onConnectionChanged({
         connectionStatus: this.connection._connectionState,
         ConnectionId: this.connectionId,
-        Name: this.username,
-        RoomName: this.penName
+        Name: this.username
       });
     }
 
@@ -130,6 +130,10 @@ class Turker extends TurkTalk {
       // test if command NOT handled in base class
       if (super.onCommandCallback(payload)) {
         return;
+      }
+
+      if (payload.Command === constants.SIGNALCMD_CONNECTIONSTATUS) {
+        this.component.onRoomAssigned(payload.Data.RoomName);
       }
 
       if (payload.Command === constants.SIGNALCMD_TURKEES) {
