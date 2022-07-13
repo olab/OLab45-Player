@@ -1,7 +1,9 @@
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import log from 'loglevel';
+import { config } from '../config';
 
 var constants = require('./constants');
+const persistantStorage = require('../utils/StateStorage').PersistantStateStorage;
 
 class TurkTalk {
 
@@ -9,15 +11,13 @@ class TurkTalk {
   constructor(component) {
 
     this.component = component;
-
-    // const { onConnectionStatusChange } = component;
-    // this.onConnectionStatusChange = onConnectionStatusChange;
     this.type = this.constructor.name;
+    const url = config.TTALK_HUB_URL;
 
     this.connection = new HubConnectionBuilder()
-      .withUrl('https://localhost:5001/turktalk')
+      .withUrl(url)
       // .withAutomaticReconnect()
-      .configureLogging(LogLevel.Critical)
+      .configureLogging(LogLevel.Error)
       .build();
 
     this.connections = [];
@@ -47,6 +47,19 @@ class TurkTalk {
   }
 
   onCommandCallback(payload) {
+
+    if (payload.Command === constants.SIGNALCMD_CONNECTIONSTATUS) {
+      const { SessionId } = payload.Data;
+      log.debug(`sessionId: ${SessionId}`);      
+
+      if ( this.component.onSessionIdChanged ) {
+        this.component.onSessionIdChanged( SessionId );
+      }
+
+      persistantStorage.save('ttalk_sessionId', SessionId );
+      return true;
+    }
+
     return false;
   }
 

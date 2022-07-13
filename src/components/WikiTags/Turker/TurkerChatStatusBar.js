@@ -39,14 +39,15 @@ class TurkerChatStatusBar extends React.Component {
     generateLeftStatusString() {
 
         const {
-            ConnectionId,
-        } = this.props.localInfo;
+            sessionId,
+            connectionStatus,
+        } = this.props;
 
-        if ((ConnectionId) && (ConnectionId.length > 0)) {
-            return `${this.props.connectionStatus} (Id: ${ConnectionId.substring(0, 3)})`;
+        if ((sessionId) && (sessionId.length > 0)) {
+            return `${connectionStatus} (Id: ${sessionId.substring(0, 3)})`;
         }
         else {
-            return this.props.connectionStatus;
+            return connectionStatus;
         }
 
     }

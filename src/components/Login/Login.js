@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core';
 import log from 'loglevel';
 import styles from './styles';
-import { config } from '../../constants';
+import { config } from '../../config';
 
 async function loginUser(credentials) {
 

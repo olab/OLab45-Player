@@ -1,5 +1,5 @@
 import log from 'loglevel';
-import { config } from '../constants';
+import { config } from '../config';
 const persistantStorage = require('../utils/StateStorage').PersistantStateStorage;
 
 async function importer(props, fileName) {

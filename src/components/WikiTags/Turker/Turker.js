@@ -34,6 +34,7 @@ class OlabModeratorTag extends React.Component {
             numColumns: 4,
             localInfo: { Name: '', ConnectionId: '' },
             remoteInfo: { Name: '', ConnectionId: '', RoomName: props.name },
+            sessionId: '',
         };
 
         this.onUpdateUnassignedList = this.onUpdateUnassignedList.bind(this);
@@ -50,61 +51,90 @@ class OlabModeratorTag extends React.Component {
         this.MAX_TURKEES = 8;
         this.NUM_ROWS = 2;
 
-        this.propManager = new PropManager(this.state.numRows * this.state.numColumns, { Name: this.state.userName, ConnectionId: '' });
+        this.propManager = new PropManager(
+            this.state.numRows * this.state.numColumns,
+            { Name: this.state.userName, ConnectionId: '' });
         this.state.connectionInfos = this.propManager.getProps();
 
     }
 
     onRoomAssigned(roomName) {
 
-        log.debug(`onRoomAssigned: setting room: '${roomName}'`);
+        try {
+            log.debug(`onRoomAssigned: setting room: '${roomName}'`);
 
-        let {
-            connectionInfos,
-            remoteInfo
-        } = this.state;
-       
-        remoteInfo.RoomName = roomName;        
-        connectionInfos = this.propManager.getProps();
+            let {
+                connectionInfos,
+                remoteInfo
+            } = this.state;
 
-        // set the remote room name for each chat
-        for (const connectionInfo of connectionInfos) {
-            connectionInfo.remoteInfo.RoomName = remoteInfo.RoomName;
+            remoteInfo.RoomName = roomName;
+            connectionInfos = this.propManager.getProps();
+
+            // set the remote room name for each chat
+            for (const connectionInfo of connectionInfos) {
+                connectionInfo.remoteInfo.RoomName = remoteInfo.RoomName;
+            }
+
+            this.setState({
+                connectionInfos: connectionInfos,
+                remoteInfo: remoteInfo
+            });
+
+        } catch (error) {
+            log.error(`onRoomAssigned exception: ${error.message}`);
         }
-        
+
+    }
+
+    // the sessionId has changed
+    onSessionIdChanged(sessionId) {
         this.setState({
-            connectionInfos: connectionInfos,
-            remoteInfo: remoteInfo
-        });        
+            sessionId: sessionId
+        });
     }
 
     // applies changes to connection status
     onConnectionChanged(connectionInfo) {
 
-        if (connectionInfo.connectionStatus === HubConnectionState.Connected) {
-            this.propManager.setConnectionId(connectionInfo.ConnectionId);
-        }
-        else {
-            this.propManager.setConnectionId('');
+        try {
+
+            if (connectionInfo.connectionStatus === HubConnectionState.Connected) {
+                this.propManager.setConnectionId(connectionInfo.ConnectionId);
+            }
+            else {
+                this.propManager.setConnectionId('');
+            }
+
+            this.setState({
+                connectionStatus: connectionInfo.connectionStatus,
+                localInfo: {
+                    ConnectionId: connectionInfo.ConnectionId,
+                    Name: connectionInfo.Name
+                }
+            });
+
+        } catch (error) {
+            log.error(`onConnectionChanged exception: ${error.message}`);
         }
 
-        this.setState({
-            connectionStatus: connectionInfo.connectionStatus,
-            localInfo: {
-                ConnectionId: connectionInfo.ConnectionId,
-                Name: connectionInfo.Name
-            }
-        });
     }
 
     onTurkeeSelected(event) {
 
-        // test for valid turkee selected from available list
-        if (event.target.value !== '0') {
+        try {
 
-            log.debug(`onTurkeeSelected: ${event.target.value}`);
-            this.setState({ selectedUnassignedTurkee: event.target.value });
+            // test for valid turkee selected from available list
+            if (event.target.value !== '0') {
+
+                log.debug(`onTurkeeSelected: ${event.target.value}`);
+                this.setState({ selectedUnassignedTurkee: event.target.value });
+            }
+
+        } catch (error) {
+            log.error(`onTurkeeSelected exception: ${error.message}`);
         }
+
     }
 
     onAssignClicked(event) {
@@ -180,7 +210,7 @@ class OlabModeratorTag extends React.Component {
             // add a 'key' property so unassignedTurkeeList plays nicely with
             // javascript .map()
             unassignedTurkeeList.forEach((element, index) => {
-                unassignedTurkeeList[index].key = element.PartnerId;
+                unassignedTurkeeList[index].key = element.PartnerSessionId;
             });
 
             log.debug(`onUpdateUnassignedList: ${JSON.stringify(unassignedTurkeeList, null, 2)}`);
@@ -201,7 +231,8 @@ class OlabModeratorTag extends React.Component {
             connectionInfos,
             connectionStatus,
             numRows,
-            numColumns
+            numColumns,
+            sessionId
         } = this.state;
 
         const cellStyling = { padding: 7 }
@@ -219,6 +250,7 @@ class OlabModeratorTag extends React.Component {
                             remoteInfo={connectionInfos[rowIndex + columnIndex].remoteInfo}
                             playerProps={this.props.props} />
                         <TurkeeChatStatusBar
+                            sessionId={sessionId}
                             connection={this.turker.connection}
                             connectionStatus={connectionStatus}
                             localInfo={connectionInfos[rowIndex + columnIndex].localInfo}
@@ -247,6 +279,7 @@ class OlabModeratorTag extends React.Component {
             connectionStatus,
             localInfo,
             remoteInfo,
+            sessionId,
         } = this.state;
 
         log.debug(`OlabTurkerTag render '${userName}'`);
@@ -265,6 +298,7 @@ class OlabModeratorTag extends React.Component {
                     </Table>
 
                     <TurkerChatStatusBar
+                        sessionId={sessionId}
                         connection={this.turker.connection}
                         connectionStatus={connectionStatus}
                         localInfo={localInfo}
@@ -285,8 +319,8 @@ class OlabModeratorTag extends React.Component {
                                 </MenuItem>
                                 {unassignedTurkeeList.map((turkee) => (
                                     <MenuItem
-                                        key={turkee.PartnerId}
-                                        value={turkee.PartnerId}>{turkee.PartnerName} ({turkee.PartnerId.substring(0, 3)})
+                                        key={turkee.PartnerSessionId}
+                                        value={turkee.PartnerSessionId}>{turkee.PartnerName} ({turkee.SessionId.substring(0, 3)})
                                     </MenuItem>
                                 ))}
                             </Select>

@@ -23,10 +23,18 @@ class OlabAttendeeTag extends React.Component {
             userName: props.props.authActions.getUserName(),
             width: '100%',
             id: this.props.name,
+            sessionId: '',
         };
 
         this.turkee = new Turkee(this);
         this.turkee.connect(this.state.userName);
+    }
+
+    // the sessionId has changed
+    onSessionIdChanged( sessionId ) {
+        this.setState({
+            sessionId: sessionId
+        });        
     }
 
     // applies changes to connection status
@@ -62,6 +70,7 @@ class OlabAttendeeTag extends React.Component {
             remoteInfo,
             connectionStatus,
             userName,
+            sessionId
         } = this.state;
 
         log.debug(`OlabTurkeeTag render '${userName}'`);
@@ -85,6 +94,7 @@ class OlabAttendeeTag extends React.Component {
                         remoteInfo={remoteInfo}
                         playerProps={this.props.props} />
                     <TurkeeChatStatusBar
+                        sessionId={sessionId}
                         connection={this.turkee.connection}
                         connectionStatus={connectionStatus}
                         localInfo={localInfo}

@@ -1,6 +1,7 @@
 import TurkTalk from './turktalk';
 import log from 'loglevel';
 var constants = require('./constants');
+const persistantStorage = require('../utils/StateStorage').PersistantStateStorage;
 
 class Turker extends TurkTalk {
 
@@ -59,7 +60,13 @@ class Turker extends TurkTalk {
       });
     }
 
-    clientObject.connection.send(constants.SIGNALCMD_REGISTERTURKER, clientObject.username, this.penName);
+    const sessionId = persistantStorage.get('ttalk_sessionId');
+
+    clientObject.connection.send(
+      constants.SIGNALCMD_REGISTERTURKER,
+      clientObject.username,
+      this.penName,
+      sessionId);
 
   }
 

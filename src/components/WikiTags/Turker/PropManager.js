@@ -89,6 +89,8 @@ class ChatPropManager {
       throw new Error(`No available slots to assign turkee ${turkeeInfo.Name} `);
     }
 
+    log.debug(`assigning ${turkeeInfo.Name} to chat slot ${index}`);
+    
     this.connectionInfos[index].remoteInfo.Name = turkeeInfo.PartnerName;
     this.connectionInfos[index].remoteInfo.ConnectionId = turkeeInfo.PartnerId;
 
