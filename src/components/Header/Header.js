@@ -19,7 +19,6 @@ const Header = ({ authActions, isScreenBusy }) => (
       </CenterPlaceholder>
       <VersionWrapper>
         User: {authActions.getUserName()}
-        <small>{JSON.stringify(process.env, null, 2)}</small>
       </VersionWrapper>
       <Button
         variant="outlined"
