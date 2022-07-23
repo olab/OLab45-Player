@@ -82,6 +82,8 @@ class Player extends PureComponent {
       alert('Back button disabled during map play.');
     });
 
+    console.log(`Cookie: ${document.cookie}`);    
+
   }
 
   lookupTheme = () => {
