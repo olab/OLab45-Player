@@ -10,6 +10,8 @@ import useToken from './useToken';
 
 function App() {
 
+  const { authActions } = useToken();
+
   // test for cookie that contains an
   // externally issued bearer token
   const externalToken = processExternalToken(document.cookie);
@@ -18,7 +20,6 @@ function App() {
     authActions.setToken(authInfo);
   }
   else {
-    const { authActions } = useToken();
     const params = queryString.parse(window.location.search);
     let token = authActions.getToken();
 
