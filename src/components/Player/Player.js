@@ -90,17 +90,22 @@ class Player extends PureComponent {
 
   processExternalToken = ( cookieStr ) => {
 
-    const parseCookie = str =>
-    str
-      .split(';')
-      .map(v => v.split('='))
-      .reduce((acc, v) => {
-        acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
-        return acc;
-      }, {});
-
-    let cookies = parseCookie( cookieStr );
-    console.log(`Cookie: ${JSON.stringify( cookies, null, 2 )}`);    
+    try {
+      const parseCookie = str =>
+      str
+        .split(';')
+        .map(v => v.split('='))
+        .reduce((acc, v) => {
+          acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+          return acc;
+        }, {});
+  
+      let cookies = parseCookie( cookieStr );
+      console.log(`Cookie: ${JSON.stringify( cookies, null, 2 )}`);    
+        
+    } catch (error) {
+      log.error(error);      
+    }
   }
 
   lookupTheme = () => {
