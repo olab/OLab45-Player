@@ -10,17 +10,22 @@ import useToken from './useToken';
 
 function App() {
 
-  // test for an externally issued cookie that
-  // contains a bearer token
-  processExternalToken( document.cookie );
-
-  const { authActions } = useToken();
-  const params = queryString.parse(window.location.search);
-  let token = authActions.getToken();
-
-  if (params.id_token && !token) {
-    let authInfo = { token: params.id_token };
+  // test for cookie that contains an
+  // externally issued bearer token
+  const externalToken = processExternalToken(document.cookie);
+  if (externalToken) {
+    let authInfo = { token: externalToken };
     authActions.setToken(authInfo);
+  }
+  else {
+    const { authActions } = useToken();
+    const params = queryString.parse(window.location.search);
+    let token = authActions.getToken();
+
+    if (params.id_token && !token) {
+      let authInfo = { token: params.id_token };
+      authActions.setToken(authInfo);
+    }
   }
 
   const isExpired = authActions.isExpiredSession();
@@ -56,28 +61,30 @@ function App() {
   );
 }
 
-function processExternalToken( cookieStr ) {
+function processExternalToken(cookieStr) {
 
   try {
     const parseCookie = str =>
-    str
-      .split(';')
-      .map(v => v.split('='))
-      .reduce((acc, v) => {
-        acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
-        return acc;
-      }, {});
+      str
+        .split(';')
+        .map(v => v.split('='))
+        .reduce((acc, v) => {
+          acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+          return acc;
+        }, {});
 
-    let cookies = parseCookie( cookieStr );
-    console.log(`Cookie: ${JSON.stringify( cookies, null, 2 )}`);    
+    let cookies = parseCookie(cookieStr);
+    console.log(`Cookie: ${JSON.stringify(cookies, null, 2)}`);
 
-    if ( 'external_token' in cookies ) {
-      console.log(`Bearer token: ${cookies.external_token}`);   
-       
+    if ('external_token' in cookies) {
+      console.log(`External token: ${cookies.external_token}`);
+      return cookies.external_token;
     }
-      
+
+    return null;
+
   } catch (error) {
-    console.log.error(error);      
+    console.log.error(error);
   }
 }
 
