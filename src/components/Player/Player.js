@@ -102,6 +102,10 @@ class Player extends PureComponent {
   
       let cookies = parseCookie( cookieStr );
       console.log(`Cookie: ${JSON.stringify( cookies, null, 2 )}`);    
+
+      if ( 'external_token' in cookies ) {
+        console.log(`Bearer token: ${cookies.external_token}`);    
+      }
         
     } catch (error) {
       log.error(error);      
