@@ -12,7 +12,7 @@ function App() {
 
   // test for an externally issued cookie that
   // contains a bearer token
-  // processExternalToken( document.cookie );
+  processExternalToken( document.cookie );
 
   const { authActions } = useToken();
   const params = queryString.parse(window.location.search);
@@ -77,7 +77,7 @@ function processExternalToken( cookieStr ) {
     }
       
   } catch (error) {
-    log.error(error);      
+    console.log.error(error);      
   }
 }
 
