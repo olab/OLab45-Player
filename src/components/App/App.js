@@ -30,7 +30,7 @@ function App() {
   }
 
   const isExpired = authActions.isExpiredSession();
-  token = authActions.getToken();
+  let token = authActions.getToken();
 
   if (!token || isExpired) {
     return <Login authActions={authActions} />
