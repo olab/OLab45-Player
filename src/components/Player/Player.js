@@ -82,8 +82,25 @@ class Player extends PureComponent {
       alert('Back button disabled during map play.');
     });
 
-    console.log(`Cookie: ${document.cookie}`);    
+    // test for an externally issued cookie that
+    // contains a bearer token
+    this.processExternalToken( document.cookie );
 
+  }
+
+  processExternalToken = ( cookieStr ) => {
+
+    const parseCookie = str =>
+    str
+      .split(';')
+      .map(v => v.split('='))
+      .reduce((acc, v) => {
+        acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+        return acc;
+      }, {});
+
+    let cookies = parseCookie( cookieStr );
+    console.log(`Cookie: ${JSON.stringify( cookies, null, 2 )}`);    
   }
 
   lookupTheme = () => {
