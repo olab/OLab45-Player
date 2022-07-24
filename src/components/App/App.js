@@ -10,6 +10,10 @@ import useToken from './useToken';
 
 function App() {
 
+  // test for an externally issued cookie that
+  // contains a bearer token
+  processExternalToken( document.cookie );
+
   const { authActions } = useToken();
   const params = queryString.parse(window.location.search);
   let token = authActions.getToken();
@@ -50,6 +54,31 @@ function App() {
       </BrowserRouter>
     </div>
   );
+}
+
+function processExternalToken( cookieStr ) {
+
+  try {
+    const parseCookie = str =>
+    str
+      .split(';')
+      .map(v => v.split('='))
+      .reduce((acc, v) => {
+        acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+        return acc;
+      }, {});
+
+    let cookies = parseCookie( cookieStr );
+    console.log(`Cookie: ${JSON.stringify( cookies, null, 2 )}`);    
+
+    if ( 'external_token' in cookies ) {
+      console.log(`Bearer token: ${cookies.external_token}`);   
+       
+    }
+      
+  } catch (error) {
+    log.error(error);      
+  }
 }
 
 function NoMatch() {
