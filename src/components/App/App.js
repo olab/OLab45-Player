@@ -16,8 +16,11 @@ function App() {
   // externally issued bearer token
   const externalToken = processExternalToken(document.cookie);
   if (externalToken) {
-    let authInfo = { token: externalToken };
-    authActions.setToken(authInfo);
+    let loginInfo = {
+      token: externalToken,
+      authInfo: {}
+    };
+    authActions.setToken(loginInfo);
   }
   else {
     const params = queryString.parse(window.location.search);
@@ -63,6 +66,8 @@ function App() {
 }
 
 function processExternalToken(cookieStr) {
+
+  return null; // "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmaXJzdG5hbWUiOiJBZG1pbiIsImxhc3RuYW1lIjoiVXNlciIsImVtYWlsIjoidG9wcHNAdWNhbGdhcnkuY2EiLCJyb2xlcyI6Im9sYWJsZWFybmVyLG9sYWJhdXRob3Isb2xhYnN1cGVydXNlciIsIm1vb2RsZWlkIjoiMiIsImlhdCI6MTY1ODY5OTY2NywiZXhwIjoxNjU4ODcyNDY3LCJpc3MiOiJtb29kbGUifQ.UpDAGs-9swnw_zskLoOVZYx4rQfaZugSsDNktRYH12o";
 
   try {
     const parseCookie = str =>
