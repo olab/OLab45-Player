@@ -67,8 +67,6 @@ function App() {
 
 function processExternalToken(cookieStr) {
 
-  return null; // "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmaXJzdG5hbWUiOiJBZG1pbiIsImxhc3RuYW1lIjoiVXNlciIsImVtYWlsIjoidG9wcHNAdWNhbGdhcnkuY2EiLCJyb2xlcyI6Im9sYWJsZWFybmVyLG9sYWJhdXRob3Isb2xhYnN1cGVydXNlciIsIm1vb2RsZWlkIjoiMiIsImlhdCI6MTY1ODY5OTY2NywiZXhwIjoxNjU4ODcyNDY3LCJpc3MiOiJtb29kbGUifQ.UpDAGs-9swnw_zskLoOVZYx4rQfaZugSsDNktRYH12o";
-
   try {
     const parseCookie = str =>
       str
@@ -84,6 +82,8 @@ function processExternalToken(cookieStr) {
 
     if ('external_token' in cookies) {
       console.log(`External token: ${cookies.external_token}`);
+      // DEBUG
+      return null;
       return cookies.external_token;
     }
 
