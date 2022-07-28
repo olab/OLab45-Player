@@ -100,6 +100,8 @@ function extractExternalToken(cookieStr) {
 
   try {
 
+    log.debug(`parsing: '${cookieStr}')`);
+
     const parseCookie = str =>
       str
         .split(';')
