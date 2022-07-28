@@ -35,7 +35,6 @@ export default function useToken() {
     let sessionInfo = persistantStorage.get('sessionInfo');
     sessionInfo = loginInfo;
 
-    // sessionInfo.authInfo = authInfo;
     const expiry = new Date(decoded.exp * 1000);
     sessionInfo.authInfo.expires = expiry;
 
