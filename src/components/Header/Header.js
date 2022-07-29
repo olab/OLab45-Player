@@ -20,7 +20,7 @@ const Header = ({ authActions, isScreenBusy }) => (
       <VersionWrapper>
         User: {authActions.getUserName()}
       </VersionWrapper>
-      {authActions.isExternalToken() &&
+      {!authActions.isExternalToken() &&
         <Button
           variant="outlined"
           color="primary"
