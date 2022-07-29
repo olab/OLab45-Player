@@ -37,7 +37,10 @@ function App() {
           if (tokenResponse) {
             authActions.setToken(tokenResponse, true);
             authActions.setUserName(tokenResponse.userName);
+            // set the token in the component state
             setToken(authActions.getToken());
+            // delete the external cookie
+            document.cookie = `external_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
           }
         }).catch(e => {
           console.log(e)
