@@ -45,7 +45,7 @@ function App() {
       }
     }
 
-  }, [token]);
+  }, [token, authActions]);
 
   const isExpired = authActions.isExpiredSession();
 
