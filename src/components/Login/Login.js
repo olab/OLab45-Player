@@ -44,7 +44,7 @@ const Login = ({ authActions, classes }) => {
       password
     });    
 
-    authActions.setToken(response);
+    authActions.setToken(response, false);
     authActions.setUserName(username);
   }
 

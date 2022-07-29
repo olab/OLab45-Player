@@ -35,7 +35,7 @@ function App() {
       else {
         processCookieAsync(document.cookie).then(tokenResponse => {
           if (tokenResponse) {
-            authActions.setToken(tokenResponse);
+            authActions.setToken(tokenResponse, true);
             authActions.setUserName(tokenResponse.userName);
             setToken(authActions.getToken());
           }
