@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Switch, Redirect, useLocation } from 'react-router-dom';
 import './App.css';
-import queryString from 'query-string';
 import Home from '../Home/Home';
 import Header from '../Header/Header';
 import Login from '../Login/Login';
@@ -13,30 +12,49 @@ import { config } from '../../constants';
 function App() {
 
   const { authActions } = useToken();
-  const params = queryString.parse(window.location.search);
-  let token = authActions.getToken();
+  const [token, setToken] = useState(0);
 
-  if (params.id_token && !token) {
-    let authInfo = { token: params.id_token };
-    authActions.setToken(authInfo);
+  useEffect(() => {
+
+    async function processCookieAsync(cookies) {
+
+      if (!cookies) {
+        return null;
+      }
+      return await processCookieForTokenAsync(cookies);
+    }
+
+    if (!token) {
+
+      log.debug(`useEffect: token: ${token}`);
+
+      const localToken = authActions.getToken();
+      if (localToken) {
+        setToken(localToken);
+      }
+      else {
+        processCookieAsync(document.cookie).then(tokenResponse => {
+          if (tokenResponse) {
+            authActions.setToken(tokenResponse);
+            authActions.setUserName(tokenResponse.userName);
+            setToken(authActions.getToken());
+          }
+        }).catch(e => {
+          console.log(e)
+        });
+      }
+    }
+
+  }, [token]);
+
+  const isExpired = authActions.isExpiredSession();
+
+  log.debug(`render: token: ${token}`);
+
+  if (!token || isExpired) {
+    return <Login authActions={authActions} />
   }
 
-  // test for external login
-  let externalLoginResponse = loginExternalAsync( document.cookie );
-
-  if ( externalLoginResponse ) {
-    authActions.setToken(externalLoginResponse);
-    authActions.setUserName(externalLoginResponse.userName);    
-  }
-  else {
-    const isExpired = authActions.isExpiredSession();
-    token = authActions.getToken();
-
-    if (!token || isExpired) {
-      return <Login authActions={authActions} />
-    }    
-  }
- 
   return (
     <div className="wrapper">
       <BrowserRouter>
@@ -63,15 +81,15 @@ function App() {
   );
 }
 
-function loginExternalAsync( cookieString ) {
+function processCookieForTokenAsync(cookieString) {
 
-  if ( !cookieString ) {
+  if (!cookieString) {
     log.debug(`No external cookies set`);
     return null;
   }
 
-  var token = extractExternalToken( cookieString );
-  if ( !token ) {
+  var token = extractExternalToken(cookieString);
+  if (!token) {
     return null;
   }
 
@@ -93,7 +111,7 @@ function loginExternalAsync( cookieString ) {
     .then(
       data => data.json()
     )
-  
+
 }
 
 function extractExternalToken(cookieStr) {
