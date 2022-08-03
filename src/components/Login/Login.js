@@ -9,7 +9,7 @@ import log from 'loglevel';
 import styles from './styles';
 import { config } from '../../config';
 
-async function loginUser(credentials) {
+async function loginUserAsync(credentials) {
 
   var creds = {
     "UserName": credentials.username,
@@ -39,12 +39,12 @@ const Login = ({ authActions, classes }) => {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    const response = await loginUser({
+    const response = await loginUserAsync({
       username,
       password
     });    
 
-    authActions.setToken(response);
+    authActions.setToken(response, false);
     authActions.setUserName(username);
   }
 

@@ -20,12 +20,17 @@ export default function useToken() {
     return sessionInfo?.userName
   }
 
+  const isExternalToken = () => {
+    const sessionInfo = persistantStorage.get('sessionInfo');
+    return sessionInfo?.isExternalToken;
+  };
+
   const getToken = () => {
     const sessionInfo = persistantStorage.get('sessionInfo');
     return sessionInfo?.authInfo.token
   };
 
-  const saveToken = loginInfo => {
+  const saveToken = ( loginInfo, isExternalToken ) => {
 
     let authInfo = loginInfo.authInfo;
 
@@ -35,9 +40,9 @@ export default function useToken() {
     let sessionInfo = persistantStorage.get('sessionInfo');
     sessionInfo = loginInfo;
 
-    // sessionInfo.authInfo = authInfo;
     const expiry = new Date(decoded.exp * 1000);
     sessionInfo.authInfo.expires = expiry;
+    sessionInfo.isExternalToken = isExternalToken;
 
     persistantStorage.save('sessionInfo', sessionInfo);
 
@@ -99,6 +104,7 @@ export default function useToken() {
     token,
     authActions: {
       isExpiredSession: isExpiredSession,
+      isExternalToken: isExternalToken,
       setToken: saveToken,
       getToken: getToken,
       getRole: getRole,
