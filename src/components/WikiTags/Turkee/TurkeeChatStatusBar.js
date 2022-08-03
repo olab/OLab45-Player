@@ -57,14 +57,16 @@ class TurkeeChatStatusBar extends React.Component {
         const {
             sessionId,
             connectionStatus,
+            localInfo,
         } = this.props;
 
-        if ((sessionId) && (sessionId.length > 0)) {
-            return `${connectionStatus} (Id: ${sessionId.substring(0, 3)})`;
+        if (localInfo.connectionStatus) {
+            if (localInfo.connectionStatus == "Connected") {
+                return `${localInfo.connectionStatus} (Id: ${localInfo.ConnectionId.substring(0, 3)})`;
+            }
         }
-        else {
-            return connectionStatus;
-        }
+
+        return localInfo.connectionStatus;
 
     }
 
