@@ -72,12 +72,7 @@ class Chat extends React.Component {
         try {
 
             let payload = JSON.parse(payloadJson);
-            log.info(`onEchoCallback (${this.props.localInfo.ConnectionId}): ${JSON.stringify(payload, null, 1)}`);
-
-            if ((payload.Envelope.ToId !== this.props.localInfo.ConnectionId)
-                || (payload.Envelope.FromId !== this.props.remoteInfo.ConnectionId)) {
-                return;
-            }
+            log.info(`onEchoCallback: ${JSON.stringify(payload, null, 1)}`);
 
             let { conversation } = this.state;
 
@@ -109,12 +104,14 @@ class Chat extends React.Component {
 
                 const messagePayload = {
                     envelope: {
-                        fromId: this.props.localInfo.ConnectionId,
-                        toId: this.props.remoteInfo.ConnectionId,
-                        roomName: this.props.remoteInfo.RoomName
+                        fromId: this.props.localInfo.Id,
+                        toConnectionId: this.props.remoteInfo.SessionId,
+                        roomName: this.props.remoteInfo.RoomName                        
                     },
                     Data: message
                 };
+
+                log.debug(`onSendClicked: ${JSON.stringify(messagePayload, null, 2)}]`);
 
                 this.connection.send(constants.SIGNALCMD_MESSAGE, messagePayload);
             }
