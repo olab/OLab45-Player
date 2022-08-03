@@ -30,7 +30,7 @@ class TurkeeChatStatusBar extends React.Component {
             return `${Name} (Id: ${ConnectionId.substring(0, 3)})`;
         }
         else {
-            return 'Waiting';
+            return 'Waiting for Moderator';
         }
 
     }
@@ -55,14 +55,12 @@ class TurkeeChatStatusBar extends React.Component {
     generateLeftStatusString() {
 
         const {
-            sessionId,
-            connectionStatus,
             localInfo,
         } = this.props;
 
-        if (localInfo.connectionStatus) {
-            if (localInfo.connectionStatus == "Connected") {
-                return `${localInfo.connectionStatus} (Id: ${localInfo.ConnectionId.substring(0, 3)})`;
+        if (localInfo.connectionStatus && localInfo.Id && localInfo.ConnectionId ) {
+            if (localInfo.connectionStatus === "Connected") {
+                return `${localInfo.connectionStatus} (Id: ${localInfo.Id.substring(0, 3)}${localInfo.ConnectionId.substring(0, 3)})`;
             }
         }
 

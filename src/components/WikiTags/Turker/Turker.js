@@ -147,7 +147,7 @@ class OlabModeratorTag extends React.Component {
             // get unassigned turkee from list
             for (let index = 0; index < this.state.unassignedTurkeeList.length; index++) {
                 const element = this.state.unassignedTurkeeList[index];
-                if (element.PartnerId === selectedUnassignedTurkee) {
+                if (element.SessionId === selectedUnassignedTurkee) {
                     selectedTurkeeInfo = element;
                 }
             }
@@ -158,6 +158,7 @@ class OlabModeratorTag extends React.Component {
 
             // signal server with assignment of turkee to turker
             this.turker.onAssignTurkee(selectedTurkeeInfo);
+            
             // add turkee to chat component
             this.assignTurkeeToChat(selectedTurkeeInfo);
 
@@ -319,8 +320,9 @@ class OlabModeratorTag extends React.Component {
                                 </MenuItem>
                                 {unassignedTurkeeList.map((turkee) => (
                                     <MenuItem
-                                        key={turkee.PartnerSessionId}
-                                        value={turkee.PartnerSessionId}>{turkee.PartnerName} ({turkee.SessionId.substring(0, 3)})
+                                        key={turkee.SessionId}
+                                        value={turkee.SessionId}>
+                                            {turkee.PartnerName} ({turkee.SessionId.substring(0, 3)})
                                     </MenuItem>
                                 ))}
                             </Select>

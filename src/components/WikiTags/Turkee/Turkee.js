@@ -31,9 +31,16 @@ class OlabAttendeeTag extends React.Component {
     }
 
     // the sessionId has changed
-    onSessionIdChanged( sessionId ) {
+    onSessionIdChanged( Id ) {
+
+        let {
+            localInfo
+        } = this.state;
+
+        localInfo.Id = Id;
+
         this.setState({
-            sessionId: sessionId
+            localInfo: localInfo
         });        
     }
 

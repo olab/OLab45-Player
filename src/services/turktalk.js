@@ -49,14 +49,14 @@ class TurkTalk {
   onCommandCallback(payload) {
 
     if (payload.Command === constants.SIGNALCMD_CONNECTIONSTATUS) {
-      const { SessionId } = payload.Data;
-      log.debug(`sessionId: ${SessionId}`);      
+      const { Id } = payload.Data;
+      log.debug(`Id: ${Id}`);      
 
       if ( this.component.onSessionIdChanged ) {
-        this.component.onSessionIdChanged( SessionId );
+        this.component.onSessionIdChanged( Id );
       }
 
-      persistantStorage.save('ttalk_sessionId', SessionId );
+      persistantStorage.save('ttalk_sessionId', Id );
       return true;
     }
 

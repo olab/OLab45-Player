@@ -66,8 +66,8 @@ class Turker extends TurkTalk {
       constants.SIGNALCMD_REGISTERTURKER,
       clientObject.username,
       this.penName,
-      sessionId);
-
+      sessionId,
+      false);
   }
 
   onReconnecting(error) {
@@ -106,6 +106,10 @@ class Turker extends TurkTalk {
     try {
       log.debug(`onDisconnected`);
       if (this.component.onConnectionChanged) {
+
+        // clear out session id
+        persistantStorage.save('ttalk_sessionId');
+        
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
           ConnectionId: '',
@@ -122,7 +126,9 @@ class Turker extends TurkTalk {
   onAssignTurkee(turkeeInfo) {
 
     log.debug(`onAssignTurkee: turkee = '${JSON.stringify(turkeeInfo, null, 2)}' `);
-    this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, turkeeInfo, this.penName);
+    const sessionId = persistantStorage.get('ttalk_sessionId');
+
+    this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, sessionId, turkeeInfo, this.penName);
   }
 
   // *****

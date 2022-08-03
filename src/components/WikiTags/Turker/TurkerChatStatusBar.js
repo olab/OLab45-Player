@@ -41,10 +41,11 @@ class TurkerChatStatusBar extends React.Component {
         const {
             sessionId,
             connectionStatus,
+            localInfo
         } = this.props;
 
-        if ((sessionId) && (sessionId.length > 0)) {
-            return `${connectionStatus} (Id: ${sessionId.substring(0, 3)})`;
+        if ((sessionId) && (sessionId.length > 0) && (localInfo.ConnectionId.length > 0)) {
+            return `${connectionStatus} (Id: ${sessionId.substring(0, 3)}${localInfo.ConnectionId.substring(0, 3)})`;
         }
         else {
             return connectionStatus;

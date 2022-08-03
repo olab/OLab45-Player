@@ -94,6 +94,10 @@ class Turkee extends TurkTalk {
     try {
       log.debug(`onDisconnected`);
       if (this.component.onConnectionChanged) {
+
+        // clear out session id
+        persistantStorage.save('ttalk_sessionId');
+
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
           ConnectionId: '',
