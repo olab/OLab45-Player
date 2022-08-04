@@ -147,7 +147,7 @@ class OlabModeratorTag extends React.Component {
             // get unassigned turkee from list
             for (let index = 0; index < this.state.unassignedTurkeeList.length; index++) {
                 const element = this.state.unassignedTurkeeList[index];
-                if (element.SessionId === selectedUnassignedTurkee) {
+                if (element.Id === selectedUnassignedTurkee) {
                     selectedTurkeeInfo = element;
                 }
             }
@@ -211,7 +211,7 @@ class OlabModeratorTag extends React.Component {
             // add a 'key' property so unassignedTurkeeList plays nicely with
             // javascript .map()
             unassignedTurkeeList.forEach((element, index) => {
-                unassignedTurkeeList[index].key = element.PartnerSessionId;
+                unassignedTurkeeList[index].key = element.Id;
             });
 
             log.debug(`onUpdateUnassignedList: ${JSON.stringify(unassignedTurkeeList, null, 2)}`);
@@ -305,7 +305,7 @@ class OlabModeratorTag extends React.Component {
                         localInfo={localInfo}
                         remoteInfo={remoteInfo} />
 
-                    &nbsp;
+                    &nbsp; 
 
                     <Grid container>
                         <Grid container item xs={3}>
@@ -320,9 +320,9 @@ class OlabModeratorTag extends React.Component {
                                 </MenuItem>
                                 {unassignedTurkeeList.map((turkee) => (
                                     <MenuItem
-                                        key={turkee.SessionId}
-                                        value={turkee.SessionId}>
-                                            {turkee.PartnerName} ({turkee.SessionId.substring(0, 3)})
+                                        key={turkee.Id}
+                                        value={turkee.Id}>
+                                            {turkee.Name} ({turkee.Id.substring(0, 3)}{turkee.ConnectionId.substring(0, 3)})
                                     </MenuItem>
                                 ))}
                             </Select>

@@ -57,7 +57,6 @@ class TurkTalk {
       }
 
       persistantStorage.save('ttalk_sessionId', Id );
-      return true;
     }
 
     return false;

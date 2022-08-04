@@ -91,8 +91,9 @@ class ChatPropManager {
 
     log.debug(`assigning ${turkeeInfo.Name} to chat slot ${index}`);
     
-    this.connectionInfos[index].remoteInfo.Name = turkeeInfo.PartnerName;
-    this.connectionInfos[index].remoteInfo.ConnectionId = turkeeInfo.PartnerId;
+    this.connectionInfos[index].remoteInfo.Name = turkeeInfo.Name;
+    this.connectionInfos[index].remoteInfo.ConnectionId = turkeeInfo.ConnectionId;
+    this.connectionInfos[index].remoteInfo.Id = turkeeInfo.Id;
 
     log.debug(`assignTurkee: ${JSON.stringify(this.connectionInfos[index], null, 2)}`);
 

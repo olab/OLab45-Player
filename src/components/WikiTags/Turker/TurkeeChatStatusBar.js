@@ -31,7 +31,7 @@ class TurkeeChatStatusBar extends React.Component {
     generateRightStatusString() {
 
         if ((this.props.remoteInfo.ConnectionId) && (this.props.remoteInfo.ConnectionId.length > 0)) {
-            return `${this.props.remoteInfo.Name} (Id: ${this.props.remoteInfo.ConnectionId.substring(0, 3)})`;
+            return `${this.props.remoteInfo.Name} (Id: ${this.props.remoteInfo.Id.substring(0, 3)}${this.props.remoteInfo.ConnectionId.substring(0, 3)})`;
         }
     }
 
@@ -55,10 +55,10 @@ class TurkeeChatStatusBar extends React.Component {
                         <Grid item xs={4}>
                             <div style={{ marginLeft: '10px', textAlign: 'left' }}>{statusLeftString}</div>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={3}>
                             &nbsp;
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={5}>
                             <div style={{ marginRight: '10px', textAlign: 'right' }}>{statusRightString}&nbsp;</div>
                         </Grid>
                     </Grid>

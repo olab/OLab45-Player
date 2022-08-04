@@ -48,7 +48,7 @@ class Chat extends React.Component {
             let payload = JSON.parse(payloadJson);
             log.info(`onMessageCallback (${this.props.localInfo.ConnectionId}): ${JSON.stringify(payload, null, 1)}`);
 
-            if ((payload.Envelope.ToId !== this.props.localInfo.ConnectionId)
+            if ((payload.Envelope.ToConnectionId !== this.props.localInfo.ConnectionId)
                 || (payload.Envelope.FromId !== this.props.remoteInfo.ConnectionId)) {
                 return;
             }
@@ -74,6 +74,11 @@ class Chat extends React.Component {
             let payload = JSON.parse(payloadJson);
             log.info(`onEchoCallback: ${JSON.stringify(payload, null, 1)}`);
 
+            if ((payload.Envelope.ToConnectionId !== this.props.localInfo.ConnectionId)
+                || (payload.Envelope.FromId !== this.props.remoteInfo.ConnectionId)) {
+                return;
+            }
+                        
             let { conversation } = this.state;
 
             conversation.push(this.createData(conversation.length, payload.Data, true));
@@ -104,8 +109,8 @@ class Chat extends React.Component {
 
                 const messagePayload = {
                     envelope: {
-                        fromId: this.props.localInfo.Id,
-                        toConnectionId: this.props.remoteInfo.SessionId,
+                        fromId: this.props.localInfo.ConnectionId,
+                        toConnectionId: this.props.remoteInfo.ConnectionId,
                         roomName: this.props.remoteInfo.RoomName                        
                     },
                     Data: message
