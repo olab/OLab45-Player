@@ -14,6 +14,8 @@ class TurkTalk {
     this.type = this.constructor.name;
     const url = config.TTALK_HUB_URL;
 
+    log.debug(`turk talk url: ${url}`);
+
     this.connection = new HubConnectionBuilder()
       .withUrl(url)
       // .withAutomaticReconnect()
