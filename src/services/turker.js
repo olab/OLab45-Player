@@ -149,6 +149,10 @@ class Turker extends TurkTalk {
         this.component.onRoomAssigned(payload.Data.RoomName);
       }
 
+      if (payload.Command === constants.SIGNALCMD_UNASSIGNED) {
+        // TODO: finish this
+      }
+
       if (payload.Command === constants.SIGNALCMD_TURKEES) {
 
         if (this.onUpdateUnassignedList) {
