@@ -93,3 +93,7 @@
   padding: 5px;
   height: 20px;  
 }
+
+.MuiTableCell-root {
+  border-bottom: 0px !important;
+}

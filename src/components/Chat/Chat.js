@@ -33,10 +33,12 @@ class Chat extends React.Component {
         this.onSendClicked = this.onSendClicked.bind(this);
         this.onMessageCallback = this.onMessageCallback.bind(this);
         this.onEchoCallback = this.onEchoCallback.bind(this);
+        this.scrollToBottom = this.scrollToBottom.bind(this);
 
         var self = this;
         this.connection.on(constants.SIGNALCMD_MESSAGE, (payload) => { self.onMessageCallback(payload) });
         this.connection.on(constants.SIGNALCMD_ECHO, (payload) => { self.onEchoCallback(payload) });
+        this.messageRef = React.createRef();
 
         log.debug(`Chat initialized.  id = '${this.props.localInfo.Name}(${this.props.localInfo.ConnectionId})'`);
     }
@@ -60,6 +62,8 @@ class Chat extends React.Component {
             this.setState({
                 conversation: conversation
             });
+
+            this.scrollToBottom();
 
         } catch (error) {
             log.error(`onMessageCallback exception: ${error.message}`);
@@ -86,6 +90,8 @@ class Chat extends React.Component {
             this.setState({
                 conversation: conversation
             });
+
+            this.scrollToBottom();
 
         } catch (error) {
             log.error(`onEchoCallback exception: ${error.message}`);
@@ -118,7 +124,7 @@ class Chat extends React.Component {
 
                 log.debug(`onSendClicked: ${JSON.stringify(messagePayload, null, 2)}]`);
 
-                this.connection.send(constants.SIGNALCMD_MESSAGE, messagePayload);
+                this.connection.send(constants.SIGNALCMD_MESSAGE, messagePayload);                
             }
 
             // clear out sent message
@@ -136,6 +142,13 @@ class Chat extends React.Component {
         return { key, message, isLocalMessage };
     }
 
+    onMessageKeyDown = (event) => {
+        if ( event.key === 'Enter' ) {
+            this.onSendClicked(null);
+            event.preventDefault();
+        }
+    }
+
     onMessageTextChanged = (event) => {
         let message = this.state.message;
 
@@ -144,6 +157,11 @@ class Chat extends React.Component {
             return ({ message });
         });
         event.preventDefault();
+    }
+
+    scrollToBottom = () => {
+        let t = this.messageRef;
+        this.messageRef.current.scrollTop = this.messageRef.current.scrollHeight;
     }
 
     render() {
@@ -156,7 +174,7 @@ class Chat extends React.Component {
         } = this.state;
 
         const divLayout = { width: width, border: '2px solid black', backgroundColor: '#3333' };
-        const tableContainerStyle = { height: '100%', maxHeight: maxHeight, backgroundColor: '#DDDDDD' };
+        const tableContainerStyle = { height: '100%', maxHeight: maxHeight };
 
         const disabled = ((this.props.remoteInfo.ConnectionId === '') ||
             (this.props.connectionStatus !== HubConnectionState.Connected));
@@ -164,41 +182,49 @@ class Chat extends React.Component {
         try {
 
             return (
-                <div style={divLayout}>
-                    <TableContainer component={Paper} style={tableContainerStyle}>
+                <div name="chat" style={divLayout}>
+                    <TableContainer ref={this.messageRef} name="conversation" component={Paper} style={tableContainerStyle}>
                         <Table stickyHeader size="small">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell><center><b>Conversation</b></center></TableCell>
+                                    <TableCell><center><b></b></center></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {conversation.map((conversationItem) => (
-                                    <TableRow key={conversationItem.key}>
+                                    <TableRow style={{bottomBorder: '0px;'}} key={conversationItem.key}>
                                         {conversationItem.isLocalMessage && (
-                                            <TableCell align="left" style={{ paddingBottom: 0, paddingTop: 0 }}>
-                                                <div
+                                            <TableCell  style={{borderBottom:"none"}} align="left">
+                                                <b>You::&nbsp;</b>
+                                                <span
                                                     style={{
-                                                        paddingRight: '10px',
-                                                        color: 'green',
-                                                        borderRadius: '5px'
+                                                        border: 'none',                                                        
+                                                        backgroundColor: 'blue', 
+                                                        color: 'white',
+                                                        borderRadius: '25px', 
+                                                        fontSize: '16px',
+                                                        padding: '10px'
                                                     }}
                                                 >
-                                                    {conversationItem.message}
-                                                </div>
+                                                   {conversationItem.message}
+                                                </span>
                                             </TableCell>
                                         )}
-                                        {!conversationItem.isLocalMessage && (
-                                            <TableCell align="right" style={{ paddingBottom: 0, paddingTop: 0 }}>
-                                                <div
+                                        {!conversationItem.isLocalMessage && ( 
+                                            <TableCell  style={{borderBottom:"none"}} align="right">
+                                                <b>Them:&nbsp;</b>
+                                                <span
                                                     style={{
-                                                        paddingLeft: '10px',
-                                                        color: 'blue',
-                                                        borderRadius: '5px'
+                                                        border: 'none',                                                        
+                                                        backgroundColor: 'green', 
+                                                        color: 'white',
+                                                        borderRadius: '25px', 
+                                                        fontSize: '16px',
+                                                        padding: '10px'
                                                     }}
                                                 >
-                                                    {conversationItem.message}
-                                                </div>
+                                                   {conversationItem.message}
+                                                </span>
                                             </TableCell>
                                         )}
                                     </TableRow>
@@ -207,7 +233,7 @@ class Chat extends React.Component {
                         </Table>
                     </TableContainer>
 
-                    <TableContainer component={Paper}>
+                    <TableContainer name="textentry" component={Paper}>
                         <Table size="small" aria-label="a dense table">
                             <TableBody>
                                 <TableRow sx={{ background: 'grey' }}>
@@ -221,9 +247,10 @@ class Chat extends React.Component {
                                             fullWidth
                                             disabled={disabled}
                                             onChange={this.onMessageTextChanged}
+                                            onKeyDown={this.onMessageKeyDown}                                          
                                         />
                                     </TableCell>
-                                    <TableCell align="right">
+                                    {/* <TableCell align="right">
                                         <Button
                                             variant="contained"
                                             disabled={disabled}
@@ -231,7 +258,7 @@ class Chat extends React.Component {
                                             color="primary">
                                             Send
                                         </Button>
-                                    </TableCell>
+                                    </TableCell> */}
                                 </TableRow>
                             </TableBody>
                         </Table>
