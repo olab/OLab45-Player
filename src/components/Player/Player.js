@@ -441,6 +441,9 @@ class Player extends PureComponent {
         var newNodesVisited = [ ...new Set(nodesVisited) ];        
         this.setState({ nodesVisited: newNodesVisited });
         
+        log.debug(`saving visited node id: ${this.state.node.id}`);
+        persistantStorage.save('visit-once-nodes', newNodesVisited);
+
         log.debug(`Added node id ${this.state.node.id} to visitOnce list`);
       }
 

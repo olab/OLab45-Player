@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import {
-    Button, Table, TableBody,
+    Table, TableBody,
     TableCell, Paper, TableContainer,
     TableHead, TableRow, TextField
 } from '@material-ui/core';

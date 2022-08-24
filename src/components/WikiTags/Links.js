@@ -21,12 +21,12 @@ class OlabLinksTag extends React.Component {
 
     // save visited node to list so 'visit-once' nodes can be 
     // suppressed later.
-    var visitedNodes = persistantStorage.get('visit-once-nodes', []);
-    if (!visitedNodes.includes(nodeId)) {
-      visitedNodes.push(nodeId);
-      log.debug(`saving visited node id: ${nodeId}`);
-      persistantStorage.save('visit-once-nodes', visitedNodes);
-    }
+    // var visitedNodes = persistantStorage.get('visit-once-nodes', []);
+    // if (!visitedNodes.includes(nodeId)) {
+    //   visitedNodes.push(nodeId);
+    //   log.debug(`saving visited node id: ${nodeId}`);
+    //   persistantStorage.save('visit-once-nodes', visitedNodes);
+    // }
 
     window.location.href = url;
   }
