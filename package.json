@@ -1,6 +1,6 @@
 {
   "name": "olab45player",
-  "homepage": "/player",
+  "homepage": ".",
   "version": "2022.8.24-2",
   "private": true,
   "dependencies": {
