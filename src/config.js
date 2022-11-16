@@ -5,7 +5,7 @@ const prod = {
 };
 
 const dev = {
-    API_URL: 'https://localhost:5001/olab/api/v3',
+    API_URL: 'http://localhost:7071/olab/api/v3',
     TTALK_HUB_URL: 'https://localhost:5001/turktalk'
 };
 

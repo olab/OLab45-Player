@@ -56,6 +56,7 @@ function App() {
   const isExpired = authActions.isExpiredSession();
 
   log.debug(`render: token: ${token}`);
+  log.debug(`useLocation: ${JSON.stringify(useLocation)}`);
 
   if (!token || isExpired) {
     return <Login authActions={authActions} />
@@ -72,10 +73,10 @@ function App() {
             )
           }}
           />
-          <Route path={`${process.env.PUBLIC_URL}/home`}>
+          <Route exact path={`${process.env.PUBLIC_URL}/home`}>
             <Home authActions={authActions} />
           </Route>
-          <Route path={`${process.env.PUBLIC_URL}/player/:mapId/:nodeId/:param?`}>
+          <Route exact path={`${process.env.PUBLIC_URL}/player/:mapId/:nodeId/:param?`}>
             <Player authActions={authActions} />
           </Route>
           <Route path="*">
