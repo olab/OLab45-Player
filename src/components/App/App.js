@@ -75,7 +75,7 @@ function App() {
           <Route path={`${process.env.PUBLIC_URL}/home`}>
             <Home authActions={authActions} />
           </Route>
-          <Route path={`${process.env.PUBLIC_URL}/:mapId/:nodeId/:param?`}>
+          <Route path={`/player/:mapId/:nodeId/:param?`}>
             <Player authActions={authActions} />
           </Route>
           <Route path="*">
