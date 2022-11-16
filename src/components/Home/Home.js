@@ -86,7 +86,8 @@ class Home extends PureComponent {
 
   handleMapPlayClick = (map, nodeId) => {
     this.setState({ mapId: map.id, nodeId: nodeId });
-    window.location.href = `/player/${map.id}/${nodeId}`;
+    const url = `/player/${map.id}/${nodeId}`;
+    window.location.href = url;
   }
 
   handleMapInfoClick = async map => {
