@@ -8,12 +8,15 @@ import log from 'loglevel';
 import Player from '../Player/Player';
 import useToken from './useToken';
 import { config } from '../../constants';
+import { ConsoleLogger } from '@microsoft/signalr/dist/esm/Utils';
 
 function App() {
 
   const { authActions } = useToken();
   const [token, setToken] = useState(0);
 
+  console.log(JSON.stringify(process.env));
+  
   useEffect(() => {
 
     async function processCookieAsync(cookies) {
