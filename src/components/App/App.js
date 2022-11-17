@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Route, Switch, Redirect, useLocation } from 'react-router-dom';
+import { Route, Switch, Redirect, useLocation } from 'react-router-dom';
 import './App.css';
 import Home from '../Home/Home';
 import Header from '../Header/Header';
@@ -75,7 +75,7 @@ function App() {
         <Route exact path={`/home`}>
           <Home authActions={authActions} />
         </Route>
-        <Route path={`/player/:mapId/:nodeId/:param?`}>
+        <Route exact path={`/player/:mapId/:nodeId/:param?`}>
           <Player authActions={authActions} />
         </Route>
         <Route path="*">
