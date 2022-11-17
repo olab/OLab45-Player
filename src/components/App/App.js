@@ -16,7 +16,7 @@ function App() {
   const [token, setToken] = useState(0);
 
   console.log(JSON.stringify(process.env));
-  
+
   useEffect(() => {
 
     async function processCookieAsync(cookies) {
@@ -64,26 +64,24 @@ function App() {
 
   return (
     <div className="wrapper">
-      <BrowserRouter>
-        <Header authActions={authActions} />
-        <Switch>
-          <Route exact path={`${process.env.PUBLIC_URL}/`} render={() => {
-            return (
-              <Redirect to={`${process.env.PUBLIC_URL}/home`} />
-            )
-          }}
-          />
-          <Route exact path={`${process.env.PUBLIC_URL}/home`}>
-            <Home authActions={authActions} />
-          </Route>
-          <Route exact path={`${process.env.PUBLIC_URL}/player/:mapId/:nodeId/:param?`}>
-            <Player authActions={authActions} />
-          </Route>
-          <Route path="*">
-            <NoMatch />
-          </Route>
-        </Switch>
-      </BrowserRouter>
+      <Header authActions={authActions} />
+      <Switch>
+        <Route exact path={`/`} render={() => {
+          return (
+            <Redirect to={`/home`} />
+          )
+        }}
+        />
+        <Route exact path={`/home`}>
+          <Home authActions={authActions} />
+        </Route>
+        <Route path={`/player/:mapId/:nodeId/:param?`}>
+          <Player authActions={authActions} />
+        </Route>
+        <Route path="*">
+          <NoMatch />
+        </Route>
+      </Switch>
     </div>
   );
 }
