@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import { withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { FormControl } from '@material-ui/core';
 import JsxParser from 'react-jsx-parser';
@@ -13,6 +12,7 @@ import OlabMediaResourceTag from '../WikiTags/MediaResource/MediaResource';
 import OlabQuestionTag from '../WikiTags/Question/Question';
 import OlabAttendeeTag from '../WikiTags/Turkee/Turkee';
 import OlabModeratorTag from '../WikiTags/Turker/Turker';
+import { withParams } from "../ComponentWrapper";
 
 import styles from './styles';
 import {
@@ -32,8 +32,8 @@ class Player extends PureComponent {
 
     log.enableAll();
 
-    const { params: { mapId, nodeId, param } } = this.props.match;
-    log.info(`playing map ${mapId}, node ${nodeId}, param ${param}`);
+    const { mapId, nodeId } = arguments[0].params;
+    log.info(`playing map ${mapId}, node ${nodeId}`);
 
     this.state = {
       scopedObjects: {
@@ -53,7 +53,7 @@ class Player extends PureComponent {
       node: null,
       nodesVisited: [],
       nodeId: Number(nodeId),
-      urlParam: param,
+      // urlParam: param,
       sessionId: null,
       signalRConnection: null
     };
@@ -82,6 +82,17 @@ class Player extends PureComponent {
       alert('Back button disabled during map play.');
     });
 
+  }
+
+  async componentDidMount() {
+
+    this.setState({ mapId: this.props.params.mapId });    
+    this.setState({ nodeId: this.props.params.nodeId });    
+
+    await this.getServer(this.props, 1);
+    await this.getMap(this.props, this.state.mapId);
+    await this.getNode(this.props, this.state.mapId, this.state.nodeId);
+    await this.getDynamic(this.props, this.state);
   }
 
   lookupTheme = () => {
@@ -304,13 +315,6 @@ class Player extends PureComponent {
     window.location.href = url;
   }
 
-  async componentDidMount() {
-    await this.getServer(this.props, 1);
-    await this.getMap(this.props, this.state.mapId);
-    await this.getNode(this.props, this.state.mapId, this.state.nodeId);
-    await this.getDynamic(this.props, this.state);
-  }
-
   onUpdateDynamicObjects = (dynamicObjects) => {
     this.setState({ dynamicObjects: dynamicObjects });
     persistantStorage.save('dynamic-so', this.state.dynamicObjects);
@@ -489,5 +493,4 @@ class Player extends PureComponent {
   }
 }
 
-// export default withStyles(styles)(Player);
-export default withRouter((withStyles(styles)(Player)))
+export default withParams((withStyles(styles)(Player)));

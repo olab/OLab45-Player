@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Route, Switch, Redirect, useLocation } from 'react-router-dom';
+import { Routes, Route, useParams, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import Home from '../Home/Home';
 import Header from '../Header/Header';
@@ -9,6 +9,14 @@ import Player from '../Player/Player';
 import useToken from './useToken';
 import { config } from '../../constants';
 import { ConsoleLogger } from '@microsoft/signalr/dist/esm/Utils';
+
+function WrapperPlayer( props ) {
+  const params = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  return <Player navigate={navigate} params={params} location={location} {...props} />
+}
 
 function App() {
 
@@ -56,7 +64,6 @@ function App() {
   const isExpired = authActions.isExpiredSession();
 
   log.debug(`render: token: ${token}`);
-  log.debug(`useLocation: ${JSON.stringify(useLocation)}`);
 
   if (!token || isExpired) {
     return <Login authActions={authActions} />
@@ -65,23 +72,12 @@ function App() {
   return (
     <div className="wrapper">
       <Header authActions={authActions} />
-      <Switch>
-        <Route exact path={`/`} render={() => {
-          return (
-            <Redirect to={`/home`} />
-          )
-        }}
-        />
-        <Route exact path={`/home`}>
-          <Home authActions={authActions} />
-        </Route>
-        <Route exact path={`/player/:mapId/:nodeId/:param?`}>
-          <Player authActions={authActions} />
-        </Route>
-        <Route path="*">
-          <NoMatch />
-        </Route>
-      </Switch>
+      <Routes>
+        <Route path={`/`} element={<Home authActions={authActions} />} />
+        <Route path={`/home`} element={<Home authActions={authActions} />} />
+        <Route path={`/player/:mapId/:nodeId`} element={<Player authActions={authActions} />} />
+        <Route path="*" element={<NoMatch />} />
+      </Routes>
     </div>
   );
 }
