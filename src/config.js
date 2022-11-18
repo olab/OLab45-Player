@@ -1,6 +1,6 @@
 // Constants.js
 const prod = {
-    API_URL: 'https://olabapi.azurewebsites.net/olab/api/v3',
+    API_URL: 'https://olabprdapi.azurewebsites.net/olab/api/v3',
     TTALK_HUB_URL: 'https://dev.olab.ca/olab/turktalk'
 };
 
