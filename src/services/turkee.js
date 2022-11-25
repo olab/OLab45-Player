@@ -53,9 +53,7 @@ class Turkee extends TurkTalk {
 
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKEE,
-      clientObject.username,
-      this.penName,
-      sessionId);
+      this.penName);
   }
 
   onReconnecting(error) {
@@ -112,13 +110,11 @@ class Turkee extends TurkTalk {
   }
 
   // *****
-  onCommandCallback(payloadJson) {
+  onCommandCallback(payload) {
 
     try {
 
-      let payload = JSON.parse(payloadJson);
-
-      log.debug(`onCommandCallback: ${payload.Command}, ${JSON.stringify(payload.Data, null, 2)}]`);
+      log.debug(`onCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}]`);
 
       // test if command NOT handled in base class
       if (super.onCommandCallback(payload)) {
@@ -126,10 +122,19 @@ class Turkee extends TurkTalk {
       }
 
 
-      if (payload.Command === constants.SIGNALCMD_ASSIGNED) {
+      if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
 
-        if (this.component.onAssigned) {
-          this.component.onAssigned(payload.Data);
+        if (this.component.onRoomAssigned) {
+          this.component.onRoomAssigned(payload.data);
+        }
+
+        return true;
+      }
+
+      else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
+
+        if (this.component.onAtriumAssigned) {
+          this.component.onAtriumAssigned(payload.data);
         }
 
         return true;

@@ -12,7 +12,6 @@ class TurkeeChatStatusBar extends React.Component {
     constructor(props) {
 
         super(props);
-
         this.state = {
             width: '100%',
         };

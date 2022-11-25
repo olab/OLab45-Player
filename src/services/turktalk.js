@@ -16,8 +16,12 @@ class TurkTalk {
 
     log.debug(`turk talk url: ${url}`);
 
+    const sessionInfo = persistantStorage.get('sessionInfo');
+    const token = `${sessionInfo?.authInfo.token}`;
+
     this.connection = new HubConnectionBuilder()
-      .withUrl(url)
+      .withUrl(`${url}?access_token=${token}`)
+      // .withUrl(url, { accessTokenFactory: () => this.token })
       // .withAutomaticReconnect()
       .configureLogging(LogLevel.Error)
       .build();

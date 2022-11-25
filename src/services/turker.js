@@ -10,8 +10,8 @@ class Turker extends TurkTalk {
 
     super(component);
 
-    const { onUpdateUnassignedList, onAddTurkee, onRemoveTurkey, onRoomAssigned } = component;
-    this.onUpdateUnassignedList = onUpdateUnassignedList;
+    const { onAtriumUpdate, onAddTurkee, onRemoveTurkey, onRoomAssigned } = component;
+    this.onAtriumUpdate = onAtriumUpdate;
     this.onRoomAssigned = onRoomAssigned;
     this.onAddTurkee = onAddTurkee;
     this.onRemoveTurkey = onRemoveTurkey;
@@ -64,7 +64,6 @@ class Turker extends TurkTalk {
 
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKER,
-      clientObject.username,
       this.penName,
       sessionId,
       false);
@@ -132,32 +131,34 @@ class Turker extends TurkTalk {
   }
 
   // *****
-  onCommandCallback(payloadJson) {
+  onCommandCallback(payload) {
 
     try {
 
-      let payload = JSON.parse(payloadJson);
-
-      log.debug(`onCommandCallback: ${payload.Command}, ${JSON.stringify(payload.Data, null, 2)}]`);
+      log.debug(`onCommandCallback: ${payload.Command}, ${JSON.stringify(payload.data, null, 2)}]`);
 
       // test if command NOT handled in base class
       if (super.onCommandCallback(payload)) {
         return;
       }
 
-      if (payload.Command === constants.SIGNALCMD_CONNECTIONSTATUS) {
-        this.component.onRoomAssigned(payload.Data.RoomName);
+      if (payload.command === constants.SIGNALCMD_CONNECTIONSTATUS) {
+        this.component.onRoomAssigned(payload.data.RoomName);
       }
 
-      if (payload.Command === constants.SIGNALCMD_UNASSIGNED) {
+      else if (payload.command === constants.SIGNALCMD_UNASSIGNED) {
         // TODO: finish this
       }
 
-      if (payload.Command === constants.SIGNALCMD_TURKEES) {
+      else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
 
-        if (this.onUpdateUnassignedList) {
-          this.onUpdateUnassignedList(payload.Data);
+        if (this.onAtriumUpdate) {
+          this.onAtriumUpdate(payload.data);
         }
+      }
+
+      else {
+        log.error(`onCommandCallback unknown command: '${payload.command}'`);
       }
 
     } catch (error) {
