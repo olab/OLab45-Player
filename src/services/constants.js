@@ -8,9 +8,9 @@ module.exports = Object.freeze({
 
     SIGNALCMD_REGISTERTURKEE: 'registerAttendee',
     SIGNALCMD_REGISTERTURKER: 'registerModerator',
-    SIGNALCMD_ASSIGNTURKEE: 'assignAttendee',
+    SIGNALCMD_ASSIGNTURKEE: 'assignattendee',
     SIGNALCMD_MESSAGE: 'message',
-    SIGNALCMD_ROOMASSIGNED: 'ASSIGNED',
+    SIGNALCMD_ROOMASSIGNED: 'roomassignment',
     SIGNALCMD_ATRIUMASSIGNED: 'atriumassignment',
     SIGNALCMD_UNASSIGNED: 'UNASSIGNED',
     SIGNALCMD_ATRIUMUPDATE: 'atriumupdate',

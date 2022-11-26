@@ -3,61 +3,53 @@ import log from 'loglevel';
 class ChatPropManager {
 
   // *****
-  constructor(count, localInfoTemplate) {
+  constructor(count) {
 
     this.connectionInfos = [];
 
     // initialize local/remote info arrays for every chat box
     for (let index = 0; index < count; index++) {
+      
       this.connectionInfos.push({
         key: index,
-        localInfo: {
-          Name: localInfoTemplate.Name, ConnectionId: localInfoTemplate.ConnectionId
-        },
-        remoteInfo: {
-          Name: '', ConnectionId: ''
+        learnerInfo: {
+          NickName: null,
+          GroupName: null
         }
       });
     }
 
   }
 
-  getProps() {
-    // log.debug(`getProps: ${JSON.stringify(this.connectionInfos, null, 1)}`);
-    return this.connectionInfos;
-  }
-
   // *****
-  createData(key, message, isLocalMessage) {
-    return { key, message, isLocalMessage };
-  }
-
-  setConnectionId( connectionId )
-  {
-    for (let index = 0; index < this.connectionInfos.length; index++) {
-      this.connectionInfos[index].localInfo.ConnectionId = connectionId;
-    }
+  getProps() {
+    return this.connectionInfos;
   }
 
   // *****
   getPropByKey(key) {
 
-    for (let index = 0; index < this.connectionInfos.length; index++) {
-      const element = this.connectionInfos[index];
-      if (element.key === key)
-        return element;
+    try {
+
+      for (let item of this.getProps()) {
+        if (item.key === key)
+          return item;
+      }
+
+    } catch (error) {
+      log.error(`getPropByKey exception: ${error.message}`);
     }
 
     return null;
   }
 
+  // *****
   getOpenInfoSlot() {
 
     try {
 
-      for (let index = 0; index < this.connectionInfos.length; index++) {
-        const element = this.connectionInfos[index];
-        if (element.remoteInfo.ConnectionId === '') {
+      for (let item of this.getProps()) {
+        if (item.learnerInfo.NickName == null) {
           return index;
         }
       }
@@ -70,51 +62,22 @@ class ChatPropManager {
   }
 
   // *****
-  getPropByConnectionId(connectionId) {
-
-    for (let index = 0; index < this.connectionInfos.length; index++) {
-      const element = this.connectionInfos[index];
-      if (element.remoteInfo.ConnectionId === connectionId) {
-        return element;
-      }
-    }
-
-    return null;
-  }
-
-  assignTurkee(turkeeInfo) {
+  assignLearner(learnerInfo) {
 
     const index = this.getOpenInfoSlot();
     if (index == null) {
-      throw new Error(`No available slots to assign turkee ${turkeeInfo.Name} `);
+      throw new Error(`No available slots to assign learner ${learnerInfo.Name} `);
     }
 
-    log.debug(`assigning ${turkeeInfo.Name} to chat slot ${index}`);
-    
-    this.connectionInfos[index].remoteInfo.Name = turkeeInfo.Name;
-    this.connectionInfos[index].remoteInfo.ConnectionId = turkeeInfo.ConnectionId;
-    this.connectionInfos[index].remoteInfo.Id = turkeeInfo.Id;
+    log.debug(`assigning ${learnerInfo.Name} to chat slot ${index}`);
 
-    log.debug(`assignTurkee: ${JSON.stringify(this.connectionInfos[index], null, 2)}`);
+    getProps()[index].remoteInfo.Name = learnerInfo.Name;
+    getProps()[index].remoteInfo.ConnectionId = learnerInfo.ConnectionId;
+    getProps()[index].remoteInfo.Id = learnerInfo.Id;
 
-    return this.connectionInfos[index];
-  }
+    log.debug(`assignTurkee: ${JSON.stringify(getProps()[index], null, 2)}`);
 
-  // ***** 
-  assignMessage(envelope, message, isEchoMessage) {
-
-    var turkeeProp = this.getPropByConnectionId(envelope.ToId);
-
-    if (!turkeeProp) {
-      throw new Error(`Cannot find turkee '${envelope.Name}' in active list`)
-    }
-
-    turkeeProp.conversation.push(this.createData(turkeeProp.conversation.length, message, isEchoMessage));
-
-    log.debug(`assignMessage: ${JSON.stringify(turkeeProp)}`);
-
-    return turkeeProp;
-
+    return getProps()[index];
   }
 
 };

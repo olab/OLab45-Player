@@ -61,11 +61,15 @@ class Turker extends TurkTalk {
     }
 
     const sessionId = persistantStorage.get('ttalk_sessionId');
+    let penName = this.penName;
+    const remoteInfo = persistantStorage.get('connectionInfo');
+    if ( remoteInfo != null ) {
+      penName = remoteInfo.groupName;
+    }
 
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKER,
-      this.penName,
-      sessionId,
+      penName,
       false);
   }
 
@@ -124,10 +128,8 @@ class Turker extends TurkTalk {
 
   onAssignTurkee(turkeeInfo) {
 
-    log.debug(`onAssignTurkee: turkee = '${JSON.stringify(turkeeInfo, null, 2)}' `);
-    const sessionId = persistantStorage.get('ttalk_sessionId');
-
-    this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, sessionId, turkeeInfo, this.penName);
+    log.debug(`onAssignTurkee: learner = '${JSON.stringify(turkeeInfo, null, 2)}' `);
+    // this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, turkeeInfo, this.penName);
   }
 
   // *****
@@ -135,21 +137,22 @@ class Turker extends TurkTalk {
 
     try {
 
-      log.debug(`onCommandCallback: ${payload.Command}, ${JSON.stringify(payload.data, null, 2)}]`);
+      log.debug(`onCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}]`);
 
       // test if command NOT handled in base class
       if (super.onCommandCallback(payload)) {
         return;
       }
 
-      if (payload.command === constants.SIGNALCMD_CONNECTIONSTATUS) {
-        this.component.onRoomAssigned(payload.data.RoomName);
+      if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+        this.component.onRoomAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_UNASSIGNED) {
         // TODO: finish this
       }
 
+      
       else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
 
         if (this.onAtriumUpdate) {

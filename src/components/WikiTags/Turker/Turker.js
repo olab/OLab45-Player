@@ -38,7 +38,7 @@ class OlabModeratorTag extends React.Component {
     };
 
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
-    this.onTurkeeSelected = this.onTurkeeSelected.bind(this);
+    this.onTurkeeSelected = this.onAtriumLearnerSelected.bind(this);
     this.onAssignClicked = this.onAssignClicked.bind(this);
     this.onRoomAssigned = this.onRoomAssigned.bind(this);
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
@@ -69,15 +69,14 @@ class OlabModeratorTag extends React.Component {
       } = this.state;
 
       remoteInfo.RoomName = roomName;
-      connectionInfos = this.propManager.getProps();
 
       // set the remote room name for each chat
-      for (const connectionInfo of connectionInfos) {
+      for (const connectionInfo of this.propManager.getProps()) {
         connectionInfo.remoteInfo.RoomName = remoteInfo.RoomName;
       }
 
       this.setState({
-        connectionInfos: connectionInfos,
+        connectionInfos: this.propManager.getProps(),
         remoteInfo: remoteInfo
       });
 
@@ -85,13 +84,6 @@ class OlabModeratorTag extends React.Component {
       log.error(`onRoomAssigned exception: ${error.message}`);
     }
 
-  }
-
-  // the sessionId has changed
-  onSessionIdChanged(sessionId) {
-    this.setState({
-      sessionId: sessionId
-    });
   }
 
   // applies changes to connection status
@@ -120,19 +112,19 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  onTurkeeSelected(event) {
+  onAtriumLearnerSelected(event) {
 
     try {
 
       // test for valid turkee selected from available list
       if (event.target.value !== '0') {
 
-        log.debug(`onTurkeeSelected: ${event.target.value}`);
+        log.debug(`onAtriumLearnerSelected: ${event.target.value}`);
         this.setState({ selectedAtriumItem: event.target.value });
       }
 
     } catch (error) {
-      log.error(`onTurkeeSelected exception: ${error.message}`);
+      log.error(`onAtriumLearnerSelected exception: ${error.message}`);
     }
 
   }
@@ -142,25 +134,24 @@ class OlabModeratorTag extends React.Component {
     try {
 
       const { selectedAtriumItem } = this.state;
-      let selectedTurkeeInfo = null;
+      let selectedLearnerInfo = null;
 
-      // get unassigned turkee from list
-      for (let index = 0; index < this.state.atriumContents.length; index++) {
-        const element = this.state.atriumContents[index];
-        if (element.Id === selectedAtriumItem) {
-          selectedTurkeeInfo = element;
+      // get unassigned atrium learner from list
+      for (let item of this.state.atriumContents) {
+        if (item.value === selectedAtriumItem) {
+          selectedLearnerInfo = item;
         }
       }
 
-      if (!selectedTurkeeInfo) {
-        throw new Error(`Unable to find unassigned turkee ${selectedAtriumItem}`);
+      if (!selectedLearnerInfo) {
+        throw new Error(`Unable to find unassigned learner ${selectedAtriumItem}`);
       }
 
       // signal server with assignment of turkee to turker
-      this.turker.onAssignTurkee(selectedTurkeeInfo);
+      this.turker.onAssignTurkee(selectedLearnerInfo);
 
       // add turkee to chat component
-      this.assignTurkeeToChat(selectedTurkeeInfo);
+      this.assignTurkeeToChat(selectedLearnerInfo);
 
     } catch (error) {
       log.error(`onAssignClicked exception: ${error.message}`);
@@ -217,7 +208,7 @@ class OlabModeratorTag extends React.Component {
           // add a 'key' property so atriumContents plays nicely with
           // javascript .map()
           atriumContents.push({
-            key: groupNameParts[2],
+            key: groupNameParts[3],
             value: atriumItem.groupName,
             nickName: atriumItem.nickName
           });
@@ -322,7 +313,7 @@ class OlabModeratorTag extends React.Component {
               <FormLabel>Unassigned Learners ({atriumContents.length} waiting)</FormLabel>
               <Select
                 value={selectedAtriumItem}
-                onChange={this.onTurkeeSelected}
+                onChange={this.onAtriumLearnerSelected}
                 style={{ width: '100%' }}
               >
                 <MenuItem key="0" value="0">

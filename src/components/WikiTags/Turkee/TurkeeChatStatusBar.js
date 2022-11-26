@@ -21,16 +21,18 @@ class TurkeeChatStatusBar extends React.Component {
     generateRightStatusString() {
 
         const {
-            ConnectionId,
-            Name
+            assignedTo,
         } = this.props.remoteInfo;
 
-        if ((ConnectionId) && (ConnectionId.length > 0)) {
-            return `${Name} (Id: ${ConnectionId.substring(0, 3)})`;
+        if (assignedTo === "room") {
+            return `Room`;
         }
-        else {
+        
+        else if (assignedTo === "atrium") {
             return 'Waiting for Moderator';
         }
+
+        return "Waiting";
 
     }
 

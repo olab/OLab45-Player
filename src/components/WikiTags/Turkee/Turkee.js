@@ -66,6 +66,7 @@ class OlabAttendeeTag extends React.Component {
   // applies changes to remote info for conversation
   onRoomAssigned(remoteInfo) {
 
+    remoteInfo.assignedTo = "room";
     this.setState({
       remoteInfo: remoteInfo
     });
@@ -74,6 +75,7 @@ class OlabAttendeeTag extends React.Component {
 
   onAtriumAssigned(remoteInfo) {
 
+    remoteInfo.assignedTo = "atrium";
     persistantStorage.save('connectionInfo', remoteInfo);
     this.setState({
       remoteInfo: remoteInfo
