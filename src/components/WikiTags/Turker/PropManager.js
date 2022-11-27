@@ -3,20 +3,15 @@ import log from 'loglevel';
 class ChatPropManager {
 
   // *****
-  constructor(count) {
+  constructor(count, infoTemplate) {
 
     this.connectionInfos = [];
 
     // initialize local/remote info arrays for every chat box
-    for (let index = 0; index < count; index++) {
-      
-      this.connectionInfos.push({
-        key: index,
-        learnerInfo: {
-          NickName: null,
-          GroupName: null
-        }
-      });
+    for (let index = 0; index < count; index++) {  
+      var item = Object.assign({}, infoTemplate);
+      item.key = index;   
+      this.connectionInfos.push(item);
     }
 
   }

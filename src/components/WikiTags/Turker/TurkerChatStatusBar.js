@@ -27,13 +27,13 @@ class TurkerChatStatusBar extends React.Component {
 
         let roomString = '';
 
-        if (this.props.remoteInfo.RoomName) {
-            roomString = `Room: ${this.props.remoteInfo.RoomName}`;
-        }
+        // if (this.props.remoteInfo.RoomName) {
+        //     roomString = `Room: ${this.props.remoteInfo.RoomName}`;
+        // }
 
-        if ((ConnectionId) && (ConnectionId.length > 0)) {
-            return roomString;
-        }
+        // if ((ConnectionId) && (ConnectionId.length > 0)) {
+        //     return roomString;
+        // }
     }
 
     generateLeftStatusString() {
@@ -55,7 +55,7 @@ class TurkerChatStatusBar extends React.Component {
 
     render() {
 
-        log.debug(`TurkeeChatStatusBar render. state = ${JSON.stringify(this.state)}`);
+        log.debug(`TurkerChatStatusBar render. state = ${JSON.stringify(this.state)}`);
 
         let {
             width,

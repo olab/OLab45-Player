@@ -20,17 +20,17 @@ class TurkeeChatStatusBar extends React.Component {
 
     generateRightStatusString() {
 
-        const {
-            assignedTo,
-        } = this.props.remoteInfo;
+        // const {
+        //     assignedTo,
+        // } = this.props.remoteInfo;
 
-        if (assignedTo === "room") {
-            return `Room`;
-        }
+        // if (assignedTo === "room") {
+        //     return `Room`;
+        // }
         
-        else if (assignedTo === "atrium") {
-            return 'Waiting for Moderator';
-        }
+        // else if (assignedTo === "atrium") {
+        //     return 'Waiting for Moderator';
+        // }
 
         return "Waiting";
 
@@ -44,13 +44,13 @@ class TurkeeChatStatusBar extends React.Component {
 
         let roomString = '';
 
-        if (this.props.remoteInfo.RoomName) {
-            roomString = `Room: ${this.props.remoteInfo.RoomName}`;
-        }
+        // if (this.props.remoteInfo.RoomName) {
+        //     roomString = `Room: ${this.props.remoteInfo.RoomName}`;
+        // }
 
-        if ((ConnectionId) && (ConnectionId.length > 0)) {
-            return roomString;
-        }
+        // if ((ConnectionId) && (ConnectionId.length > 0)) {
+        //     return roomString;
+        // }
     }
 
     generateLeftStatusString() {

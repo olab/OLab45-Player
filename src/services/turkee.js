@@ -125,7 +125,6 @@ class Turkee extends TurkTalk {
         return;
       }
 
-
       if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
 
         if (this.component.onRoomAssigned) {
@@ -142,6 +141,10 @@ class Turkee extends TurkTalk {
         }
 
         return true;
+      }
+
+      else {
+        log.error(`onCommandCallback unknown command: '${payload.command}'`);
       }
 
     } catch (error) {

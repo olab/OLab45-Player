@@ -15,6 +15,7 @@ import styles from '../styles.module.css';
 import PropManager from './PropManager'
 import TurkerChatStatusBar from './TurkerChatStatusBar';
 import TurkeeChatStatusBar from './TurkeeChatStatusBar';
+const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabModeratorTag extends React.Component {
 
@@ -30,10 +31,7 @@ class OlabModeratorTag extends React.Component {
       atriumContents: [],
       userName: props.props.authActions.getUserName(),
       width: '100%',
-      numRows: 2,
-      numColumns: 4,
-      localInfo: { Name: '', ConnectionId: '' },
-      remoteInfo: { Name: '', ConnectionId: '', RoomName: props.name },
+      localInfo: { Name: null, ConnectionId: null, RoomName: null },
       sessionId: '',
     };
 
@@ -50,60 +48,37 @@ class OlabModeratorTag extends React.Component {
     // for the turker
     this.MAX_TURKEES = 8;
     this.NUM_ROWS = 2;
+    this.numColumns = this.MAX_TURKEES / this.NUM_ROWS;
 
     this.propManager = new PropManager(
-      this.state.numRows * this.state.numColumns,
-      { Name: this.state.userName, ConnectionId: '' });
+      this.MAX_TURKEES,
+      {
+        key: null,
+        NickName: null,
+        GroupName: null
+      });
+
     this.state.connectionInfos = this.propManager.getProps();
 
   }
 
-  onRoomAssigned(roomName) {
+  // applies changes to connection status
+  onConnectionChanged(connectionData) {
+
+    log.debug(`onConnectionChanged: ${connectionData.connection._connectionState}, id: ${connectionData.connection.connectionId}`);
 
     try {
-      log.debug(`onRoomAssigned: setting room: '${roomName}'`);
 
       let {
-        connectionInfos,
-        remoteInfo
+        localInfo
       } = this.state;
 
-      remoteInfo.RoomName = roomName;
-
-      // set the remote room name for each chat
-      for (const connectionInfo of this.propManager.getProps()) {
-        connectionInfo.remoteInfo.RoomName = remoteInfo.RoomName;
-      }
+      localInfo.ConnectionId = connectionData.connection.connectionId;
+      localInfo.Name = connectionData.Name;
 
       this.setState({
-        connectionInfos: this.propManager.getProps(),
-        remoteInfo: remoteInfo
-      });
-
-    } catch (error) {
-      log.error(`onRoomAssigned exception: ${error.message}`);
-    }
-
-  }
-
-  // applies changes to connection status
-  onConnectionChanged(connectionInfo) {
-
-    try {
-
-      if (connectionInfo.connectionStatus === HubConnectionState.Connected) {
-        this.propManager.setConnectionId(connectionInfo.ConnectionId);
-      }
-      else {
-        this.propManager.setConnectionId('');
-      }
-
-      this.setState({
-        connectionStatus: connectionInfo.connectionStatus,
-        localInfo: {
-          ConnectionId: connectionInfo.ConnectionId,
-          Name: connectionInfo.Name
-        }
+        localInfo: localInfo,
+        connectionStatus: connectionData.connection._connectionState
       });
 
     } catch (error) {
@@ -125,6 +100,39 @@ class OlabModeratorTag extends React.Component {
 
     } catch (error) {
       log.error(`onAtriumLearnerSelected exception: ${error.message}`);
+    }
+
+  }
+
+  onRoomAssigned(payloadData) {
+
+    try {
+      log.debug(`onRoomAssigned: setting room: '${payloadData}'`);
+
+      let {
+        localInfo        
+      } = this.state;
+
+      localInfo.RoomName = payloadData;
+
+      this.setState({
+        localInfo: localInfo
+      });
+
+      let connectionInfo = persistantStorage.get('connectionInfo');
+      if ( connectionInfo != null ) {
+        roomName = connectionInfo.RoomName
+      }
+      else {
+        connectionInfo = {
+          RoomName: payloadData
+        };
+      }
+
+      persistantStorage.save('connectionInfo', connectionInfo);
+  
+    } catch (error) {
+      log.error(`onRoomAssigned exception: ${error.message}`);
     }
 
   }
@@ -178,16 +186,18 @@ class OlabModeratorTag extends React.Component {
   }
 
   // handle atrium contents updated
-  onAtriumUpdate(atriumData) {
+  onAtriumUpdate(payloadData) {
 
     try {
+
+      log.debug(`onAtriumUpdate: refreshing: '${JSON.stringify(payloadData)}'`);
 
       let {
         atriumContents
       } = this.state;
 
       // handle no atrium contents waiting when moderator connects
-      if (Array.isArray(atriumData) && (atriumData.length === 0)) {
+      if (Array.isArray(payloadData) && (payloadData.length === 0)) {
         this.setState({
           atriumContents: [],
           selectedAtriumItem: '0'
@@ -197,11 +207,11 @@ class OlabModeratorTag extends React.Component {
 
       // handle atrium items already waiting when moderator connects
       // reset the atrium list and rebuild it
-      else if (Array.isArray(atriumData) && (atriumData.length >= 0)) {
+      else if (Array.isArray(payloadData) && (payloadData.length >= 0)) {
 
         atriumContents = [];
 
-        for (const atriumItem of atriumData) {
+        for (const atriumItem of payloadData) {
 
           var groupNameParts = atriumItem.groupName.split("/");
 
@@ -232,31 +242,24 @@ class OlabModeratorTag extends React.Component {
     const {
       connectionInfos,
       connectionStatus,
-      numRows,
-      numColumns,
-      sessionId
     } = this.state;
 
     const cellStyling = { padding: 7 }
 
     let rows = [];
-    for (var rowIndex = 0; rowIndex < numRows; rowIndex++) {
+    for (var rowIndex = 0; rowIndex < this.NUM_ROWS; rowIndex++) {
       let columns = [];
-      for (let columnIndex = 0; columnIndex < numColumns; columnIndex++) {
+      for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {
+        const connectionInfo = connectionInfos[(rowIndex * this.numColumns) + columnIndex];
         columns.push(
           <TableCell style={cellStyling}>
             <Chat
-              connectionStatus={connectionStatus}
               connection={this.turker.connection}
-              localInfo={connectionInfos[rowIndex + columnIndex].localInfo}
-              remoteInfo={connectionInfos[rowIndex + columnIndex].remoteInfo}
+              localInfo={connectionInfo}
               playerProps={this.props.props} />
             <TurkeeChatStatusBar
-              sessionId={sessionId}
               connection={this.turker.connection}
-              connectionStatus={connectionStatus}
-              localInfo={connectionInfos[rowIndex + columnIndex].localInfo}
-              remoteInfo={connectionInfos[rowIndex + columnIndex].remoteInfo} />
+              localInfo={connectionInfo} />
           </TableCell>
         );
       }
@@ -280,7 +283,6 @@ class OlabModeratorTag extends React.Component {
       userName,
       connectionStatus,
       localInfo,
-      remoteInfo,
       sessionId,
     } = this.state;
 
@@ -303,8 +305,7 @@ class OlabModeratorTag extends React.Component {
             sessionId={sessionId}
             connection={this.turker.connection}
             connectionStatus={connectionStatus}
-            localInfo={localInfo}
-            remoteInfo={remoteInfo} />
+            localInfo={localInfo} />
 
           &nbsp;
 

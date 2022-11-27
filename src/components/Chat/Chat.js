@@ -40,7 +40,7 @@ class Chat extends React.Component {
         this.connection.on(constants.SIGNALCMD_ECHO, (payload) => { self.onEchoCallback(payload) });
         this.messageRef = React.createRef();
 
-        log.debug(`Chat initialized.  id = '${this.props.localInfo.Name}(${this.props.localInfo.ConnectionId})'`);
+        log.debug(`Chat component initialized.  group = '${this.props.localInfo.GroupName}'`);
     }
 
     onMessageCallback(payloadJson) {
@@ -176,8 +176,9 @@ class Chat extends React.Component {
         const divLayout = { width: width, border: '2px solid black', backgroundColor: '#3333' };
         const tableContainerStyle = { height: '100%', maxHeight: maxHeight };
 
-        const disabled = ((this.props.remoteInfo.ConnectionId === '') ||
-            (this.props.connectionStatus !== HubConnectionState.Connected));
+        const disabled = true;
+        // const disabled = ((this.props.remoteInfo.ConnectionId === '') ||
+        //     (this.props.connectionStatus !== HubConnectionState.Connected));
 
         try {
 
@@ -263,18 +264,6 @@ class Chat extends React.Component {
                             </TableBody>
                         </Table>
                     </TableContainer>
-
-                    {/* <Grid container className={'TurkeeStatusBar'} style={{  fontWeight: 'bold', borderTop: '1px solid black', backgroundColor: '#grey' }}>
-                        <Grid item xs={4}>
-                            <div style={{ marginLeft: '10px', textAlign: 'left' }}>{statusLeftString}</div>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <div style={{ textAlign: 'center' }}>{statusCenterString}</div>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <div style={{ marginRight: '10px', textAlign: 'right' }}>{statusRightString}&nbsp;</div>
-                        </Grid>
-                    </Grid> */}
 
                 </div>
             );

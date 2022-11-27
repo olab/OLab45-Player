@@ -1,11 +1,18 @@
 {
   "configurations": [
     {
-      "name": "Launch Chrome",
+      "name": "Moderator",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:3000/home",
+      "url": "http://localhost:3000/player/1649/32062",
       "webRoot": "${workspaceFolder}"
-    }
+    },
+    {
+      "name": "Learner",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost:3000/player/1649/32069",
+      "webRoot": "${workspaceFolder}"
+    }    
   ]
 }

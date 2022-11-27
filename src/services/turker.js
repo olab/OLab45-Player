@@ -54,22 +54,22 @@ class Turker extends TurkTalk {
 
     if (this.component.onConnectionChanged) {
       this.component.onConnectionChanged({
-        connectionStatus: this.connection._connectionState,
-        ConnectionId: this.connectionId,
+        connection: this.connection.connection,
         Name: this.username
       });
     }
 
-    const sessionId = persistantStorage.get('ttalk_sessionId');
-    let penName = this.penName;
-    const remoteInfo = persistantStorage.get('connectionInfo');
-    if ( remoteInfo != null ) {
-      penName = remoteInfo.groupName;
+    // save room name to persistant storage in case 
+    // user refreshes the window
+    let roomName = this.penName;
+    let connectionInfo = persistantStorage.get('connectionInfo');
+    if ( connectionInfo != null ) {
+      roomName = connectionInfo.RoomName
     }
 
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKER,
-      penName,
+      roomName,
       false);
   }
 
@@ -145,20 +145,24 @@ class Turker extends TurkTalk {
       }
 
       if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-        this.component.onRoomAssigned(payload.data);
+
+        if (this.component.onRoomAssigned) {
+          this.component.onRoomAssigned(payload.data);
+        }
+
+        return true;
+      }
+     
+      else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
+
+        if (this.component.onAtriumUpdate) {
+          this.component.onAtriumUpdate(payload.data);
+        }
       }
 
       else if (payload.command === constants.SIGNALCMD_UNASSIGNED) {
         // TODO: finish this
-      }
-
-      
-      else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
-
-        if (this.onAtriumUpdate) {
-          this.onAtriumUpdate(payload.data);
-        }
-      }
+      }      
 
       else {
         log.error(`onCommandCallback unknown command: '${payload.command}'`);

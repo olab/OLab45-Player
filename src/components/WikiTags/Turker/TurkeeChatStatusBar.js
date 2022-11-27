@@ -20,19 +20,16 @@ class TurkeeChatStatusBar extends React.Component {
     }
 
     generateLeftStatusString() {
-        if ((this.props.remoteInfo.ConnectionId) && (this.props.remoteInfo.ConnectionId.length > 0)) {
+        if (this.props.localInfo.GroupName != null) {
             return 'Connected';
         }
         else {
-            return 'Idle';
+            return 'Waiting';
         }
     }
 
     generateRightStatusString() {
-
-        if ((this.props.remoteInfo.ConnectionId) && (this.props.remoteInfo.ConnectionId.length > 0)) {
-            return `${this.props.remoteInfo.Name} (Id: ${this.props.remoteInfo.Id.substring(0, 3)}${this.props.remoteInfo.ConnectionId.substring(0, 3)})`;
-        }
+        return '';
     }
 
     render() {
