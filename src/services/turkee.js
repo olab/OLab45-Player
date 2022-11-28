@@ -49,15 +49,17 @@ class Turkee extends TurkTalk {
       });
     }
 
-    let penName = this.penName;
-    const remoteInfo = persistantStorage.get('connectionInfo');
-    if ( remoteInfo != null ) {
-      penName = remoteInfo.groupName;
+    // save room name to persistant storage in case 
+    // user refreshes the window    
+    let roomName = this.penName;
+    const connectionInfo = persistantStorage.get('connectionInfo');
+    if ( connectionInfo != null ) {
+      roomName = connectionInfo.roomName;
     }
 
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKEE,
-      penName);
+      roomName);
   }
 
   onReconnecting(error) {

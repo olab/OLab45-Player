@@ -3,12 +3,20 @@ import log from 'loglevel';
 class ChatPropManager {
 
   // *****
-  constructor(count, infoTemplate) {
+  constructor(count) {
 
     this.connectionInfos = [];
+    const infoTemplate = {
+      key: null,
+      nickName: null,
+      groupName: null,
+      learner: {}
+    };
 
     // initialize local/remote info arrays for every chat box
-    for (let index = 0; index < count; index++) {  
+    for (let index = 0; index < count; index++) {
+
+      // make a copy of the object so it can be modified  
       var item = Object.assign({}, infoTemplate);
       item.key = index;   
       this.connectionInfos.push(item);
@@ -43,9 +51,11 @@ class ChatPropManager {
 
     try {
 
-      for (let item of this.getProps()) {
-        if (item.learnerInfo.NickName == null) {
-          return index;
+      const connectionInfos = this.getProps();
+
+      for (let item of connectionInfos) {
+        if (!item.NickName) {
+          return item.key;
         }
       }
 
@@ -57,22 +67,23 @@ class ChatPropManager {
   }
 
   // *****
-  assignLearner(learnerInfo) {
+  assignLearner(roomInfo, learner) {
 
     const index = this.getOpenInfoSlot();
     if (index == null) {
-      throw new Error(`No available slots to assign learner ${learnerInfo.Name} `);
+      throw new Error(`No available slots to assign learner ${learner.userId} `);
     }
 
-    log.debug(`assigning ${learnerInfo.Name} to chat slot ${index}`);
+    log.debug(`assigning '${learner.nickName}' to chat slot ${index}`);
 
-    getProps()[index].remoteInfo.Name = learnerInfo.Name;
-    getProps()[index].remoteInfo.ConnectionId = learnerInfo.ConnectionId;
-    getProps()[index].remoteInfo.Id = learnerInfo.Id;
+    let chatInfo = this.getProps()[index];
+    chatInfo.learner = learner;
+    chatInfo.nickName = learner.nickName;
+    chatInfo.groupName = learner.commandChannel;
 
-    log.debug(`assignTurkee: ${JSON.stringify(getProps()[index], null, 2)}`);
+    log.debug(`assignLearner: ${JSON.stringify(this.getProps()[index], null, 2)}` );
 
-    return getProps()[index];
+    return chatInfo;
   }
 
 };

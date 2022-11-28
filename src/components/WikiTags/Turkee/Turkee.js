@@ -17,13 +17,13 @@ class OlabAttendeeTag extends React.Component {
 
     this.state = {
       connectionStatus: '',
-      localInfo: { Name: '', ConnectionId: '' },
+      localInfo: { Name: null, ConnectionId: null, RoomName: null },
       maxHeight: 200,
       remoteInfo: { Name: '', ConnectionId: '', RoomName: props.name },
       userName: props.props.authActions.getUserName(),
       width: '100%',
       id: this.props.name,
-      sessionId: '',
+      sessionId: ''
     };
 
     this.turkee = new Turkee(this);
@@ -73,12 +73,12 @@ class OlabAttendeeTag extends React.Component {
 
   }
 
-  onAtriumAssigned(remoteInfo) {
+  onAtriumAssigned(learner) {
 
-    remoteInfo.assignedTo = "atrium";
-    persistantStorage.save('connectionInfo', remoteInfo);
+    learner.assignedTo = "atrium";
+    persistantStorage.save('connectionInfo', learner);
     this.setState({
-      remoteInfo: remoteInfo
+      remoteInfo: learner
     });
   }
 

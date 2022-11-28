@@ -40,6 +40,8 @@ class OlabModeratorTag extends React.Component {
     this.onAssignClicked = this.onAssignClicked.bind(this);
     this.onRoomAssigned = this.onRoomAssigned.bind(this);
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
+    this.onAtriumLearnerSelected = this.onAtriumLearnerSelected.bind(this);
+    this.assignTurkeeToChat = this.assignTurkeeToChat.bind(this);  
 
     this.turker = new Turker(this);
     this.turker.connect(this.state.userName);
@@ -50,13 +52,7 @@ class OlabModeratorTag extends React.Component {
     this.NUM_ROWS = 2;
     this.numColumns = this.MAX_TURKEES / this.NUM_ROWS;
 
-    this.propManager = new PropManager(
-      this.MAX_TURKEES,
-      {
-        key: null,
-        NickName: null,
-        GroupName: null
-      });
+    this.propManager = new PropManager(this.MAX_TURKEES );
 
     this.state.connectionInfos = this.propManager.getProps();
 
@@ -121,11 +117,11 @@ class OlabModeratorTag extends React.Component {
 
       let connectionInfo = persistantStorage.get('connectionInfo');
       if ( connectionInfo != null ) {
-        roomName = connectionInfo.RoomName
+        localInfo.RoomName = connectionInfo.RoomName
       }
       else {
         connectionInfo = {
-          RoomName: payloadData
+          RoomName: localInfo.RoomName
         };
       }
 
@@ -155,11 +151,11 @@ class OlabModeratorTag extends React.Component {
         throw new Error(`Unable to find unassigned learner ${selectedAtriumItem}`);
       }
 
-      // signal server with assignment of turkee to turker
-      this.turker.onAssignTurkee(selectedLearnerInfo);
-
       // add turkee to chat component
-      this.assignTurkeeToChat(selectedLearnerInfo);
+      const slotInfo = this.assignTurkeeToChat(selectedLearnerInfo);
+
+      // signal server with assignment of turkee to turker
+      this.turker.onAssignLearner(slotInfo, selectedLearnerInfo);
 
     } catch (error) {
       log.error(`onAssignClicked exception: ${error.message}`);
@@ -167,18 +163,21 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  assignTurkeeToChat(turkeeInfo) {
+  assignTurkeeToChat(learner) {
 
     try {
 
       let {
-        connectionInfos
+        connectionInfos,
+        localInfo
       } = this.state;
 
-      this.propManager.assignTurkee(turkeeInfo);
+      const slotInfo = this.propManager.assignLearner(localInfo, learner);
       connectionInfos = this.propManager.getProps();
 
       this.setState({ connectionInfos: connectionInfos });
+
+      return slotInfo;
 
     } catch (error) {
       log.error(`assignTurkeeToChat exception: ${error.message}`);
@@ -186,49 +185,34 @@ class OlabModeratorTag extends React.Component {
   }
 
   // handle atrium contents updated
-  onAtriumUpdate(payloadData) {
+  onAtriumUpdate(payloadArray) {
 
     try {
 
-      log.debug(`onAtriumUpdate: refreshing: '${JSON.stringify(payloadData)}'`);
+      let atriumContents = [];
 
-      let {
-        atriumContents
-      } = this.state;
+      // save atrium contents if array passed in
+      if (Array.isArray(payloadArray) && (payloadArray.length >= 0)) {
+        let key = 1;
+        for (const payloadItem of payloadArray) {
 
-      // handle no atrium contents waiting when moderator connects
-      if (Array.isArray(payloadData) && (payloadData.length === 0)) {
-        this.setState({
-          atriumContents: [],
-          selectedAtriumItem: '0'
-        });
-        return;
-      }
-
-      // handle atrium items already waiting when moderator connects
-      // reset the atrium list and rebuild it
-      else if (Array.isArray(payloadData) && (payloadData.length >= 0)) {
-
-        atriumContents = [];
-
-        for (const atriumItem of payloadData) {
-
-          var groupNameParts = atriumItem.groupName.split("/");
-
-          // add a 'key' property so atriumContents plays nicely with
+          // make a copy of the object so it can be modified  
+          var item = Object.assign({}, payloadItem);
+          
+          // add a 'key/value' properties so atriumContents plays nicely with
           // javascript .map()
-          atriumContents.push({
-            key: groupNameParts[3],
-            value: atriumItem.groupName,
-            nickName: atriumItem.nickName
-          });
+          item.key = `${key++}`;
+          item.value = item.userId;
+
+          atriumContents.push(item);
         }
       }
 
-      log.debug(`onAtriumUpdate: ${JSON.stringify(atriumContents, null, 2)}`);
+      log.debug(`onAtriumUpdate: refreshing: '${JSON.stringify(atriumContents)}'`);
 
       this.setState({
         atriumContents: atriumContents,
+        selectedAtriumItem: '0'
       });
 
     } catch (error) {
@@ -241,7 +225,6 @@ class OlabModeratorTag extends React.Component {
 
     const {
       connectionInfos,
-      connectionStatus,
     } = this.state;
 
     const cellStyling = { padding: 7 }

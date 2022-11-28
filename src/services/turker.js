@@ -18,7 +18,7 @@ class Turker extends TurkTalk {
     this.playerState = component.props.props;
     this.penName = `${component.props.props.map.name}|${component.props.name}`;
 
-    this.onAssignTurkee = this.onAssignTurkee.bind(this);
+    this.onAssignTurkee = this.onAssignLearner.bind(this);
     this.onCommandCallback = this.onCommandCallback.bind(this);
     this.onDisconnected = this.onDisconnected.bind(this);
 
@@ -126,12 +126,6 @@ class Turker extends TurkTalk {
 
   }
 
-  onAssignTurkee(turkeeInfo) {
-
-    log.debug(`onAssignTurkee: learner = '${JSON.stringify(turkeeInfo, null, 2)}' `);
-    // this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, turkeeInfo, this.penName);
-  }
-
   // *****
   onCommandCallback(payload) {
 
@@ -173,6 +167,13 @@ class Turker extends TurkTalk {
     }
 
   }
+
+  onAssignLearner(slotInfo, learnerInfo) {
+
+    log.debug(`onAssignLearner: learner = '${JSON.stringify(learnerInfo, null, 2)}' `);
+    log.debug(`onAssignLearner:           '${JSON.stringify(slotInfo, null, 2)}' `);
+    // this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, turkeeInfo, this.penName);
+  }  
 
   // }
 
