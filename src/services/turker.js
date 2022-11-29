@@ -152,6 +152,7 @@ class Turker extends TurkTalk {
         if (this.component.onAtriumUpdate) {
           this.component.onAtriumUpdate(payload.data);
         }
+
       }
 
       else if (payload.command === constants.SIGNALCMD_UNASSIGNED) {
@@ -168,11 +169,11 @@ class Turker extends TurkTalk {
 
   }
 
-  onAssignLearner(slotInfo, learnerInfo) {
-
-    log.debug(`onAssignLearner: learner = '${JSON.stringify(learnerInfo, null, 2)}' `);
-    log.debug(`onAssignLearner:           '${JSON.stringify(slotInfo, null, 2)}' `);
-    // this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, turkeeInfo, this.penName);
+  onAssignLearner(learner) {
+    log.debug(`onAssignLearner: learner = '${JSON.stringify(learner, null, 2)}' `);
+    delete learner.key;
+    delete learner.value;
+    this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, learner, this.penName);
   }  
 
   // }
