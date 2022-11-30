@@ -113,11 +113,12 @@ class Turker extends TurkTalk {
         // clear out session id
         persistantStorage.save('ttalk_sessionId');
         
-        this.component.onConnectionChanged({
-          connectionStatus: this.connection._connectionState,
-          ConnectionId: '',
-          Name: this.username
-        });
+        if (this.component.onConnectionChanged) {
+          this.component.onConnectionChanged({
+            connection: this.connection.connection,
+            Name: this.username
+          });
+        }
       }
 
     } catch (error) {
@@ -171,8 +172,6 @@ class Turker extends TurkTalk {
 
   onAssignLearner(learner) {
     log.debug(`onAssignLearner: learner = '${JSON.stringify(learner, null, 2)}' `);
-    delete learner.key;
-    delete learner.value;
     this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, learner, this.penName);
   }  
 

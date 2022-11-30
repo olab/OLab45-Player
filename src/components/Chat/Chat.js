@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import {
-    Table, TableBody,
+    Table, TableBody, Button,
     TableCell, Paper, TableContainer,
     TableHead, TableRow, TextField
 } from '@material-ui/core';
@@ -43,21 +43,20 @@ class Chat extends React.Component {
         log.debug(`Chat component initialized.  group = '${this.props.localInfo.GroupName}'`);
     }
 
-    onMessageCallback(payloadJson) {
+    onMessageCallback(payload) {
 
         try {
 
-            let payload = JSON.parse(payloadJson);
-            log.info(`onMessageCallback (${this.props.localInfo.ConnectionId}): ${JSON.stringify(payload, null, 1)}`);
+            log.info(`onMessageCallback (${JSON.stringify(payload, null, 1)})`);
 
-            if ((payload.Envelope.ToConnectionId !== this.props.localInfo.ConnectionId)
-                || (payload.Envelope.FromId !== this.props.remoteInfo.ConnectionId)) {
+            // test if the message was for this learner
+            if (payload.recipientGroupName !== this.props.localInfo.groupName) {
                 return;
             }
 
             let { conversation } = this.state;
 
-            conversation.push(this.createData(conversation.length, payload.Data, false));
+            conversation.push(this.createData(conversation.length, payload.data, false));
 
             this.setState({
                 conversation: conversation
@@ -104,20 +103,14 @@ class Chat extends React.Component {
         try {
 
             const { message } = this.state;
-            const { ConnectionId } = this.props.remoteInfo;
-
-            if (ConnectionId === '') {
-                log.error(`Nobody set to send to.`);
-                return;
-            }
+            const { connectionId } = this.props.localInfo;
 
             if (message.length > 0) {
 
                 const messagePayload = {
                     envelope: {
-                        fromId: this.props.localInfo.ConnectionId,
-                        toConnectionId: this.props.remoteInfo.ConnectionId,
-                        roomName: this.props.remoteInfo.RoomName                        
+                        to: this.props.localInfo.groupName,
+                        from: this.props.localInfo.learner
                     },
                     Data: message
                 };
@@ -176,9 +169,11 @@ class Chat extends React.Component {
         const divLayout = { width: width, border: '2px solid black', backgroundColor: '#3333' };
         const tableContainerStyle = { height: '100%', maxHeight: maxHeight };
 
-        const disabled = true;
-        // const disabled = ((this.props.remoteInfo.ConnectionId === '') ||
-        //     (this.props.connectionStatus !== HubConnectionState.Connected));
+        // disable entry if do not have a group name assigned or not connected to hub
+        const disabled = (
+            (this.props.localInfo.groupName === '') ||
+            !this.props.localInfo.connected 
+        );
 
         try {
 
@@ -251,7 +246,7 @@ class Chat extends React.Component {
                                             onKeyDown={this.onMessageKeyDown}                                          
                                         />
                                     </TableCell>
-                                    {/* <TableCell align="right">
+                                    <TableCell align="right">
                                         <Button
                                             variant="contained"
                                             disabled={disabled}
@@ -259,7 +254,7 @@ class Chat extends React.Component {
                                             color="primary">
                                             Send
                                         </Button>
-                                    </TableCell> */}
+                                    </TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>

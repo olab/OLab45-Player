@@ -20,12 +20,16 @@ class TurkeeChatStatusBar extends React.Component {
   }
 
   generateLeftStatusString() {
-    if (this.props.localInfo.groupName != null) {
-      return 'Connected';
-    }
-    else {
-      return 'Waiting';
-    }
+
+    const {
+      connection,
+    } = this.props;
+
+    if (this.props.localInfo.nickName)
+      return `Assigned`;
+
+    return '';
+
   }
 
   generateRightStatusString() {
@@ -49,10 +53,10 @@ class TurkeeChatStatusBar extends React.Component {
       return (
         <div style={divLayout}>
           <Grid container className={'TurkeeStatusBar'} style={{ fontWeight: 'bold', backgroundColor: '#grey' }}>
-            <Grid item xs={4}>
+            <Grid item xs={5}>
               <div style={{ marginLeft: '10px', textAlign: 'left' }}>{statusLeftString}</div>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               &nbsp;
             </Grid>
             <Grid item xs={5}>

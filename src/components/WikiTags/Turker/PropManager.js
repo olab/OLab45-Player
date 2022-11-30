@@ -10,7 +10,8 @@ class ChatPropManager {
       key: null,
       nickName: null,
       groupName: null,
-      learner: {}
+      learner: {},
+      connected: false
     };
 
     // initialize local/remote info arrays for every chat box
@@ -80,6 +81,7 @@ class ChatPropManager {
     chatInfo.learner = learner;
     chatInfo.nickName = learner.nickName;
     chatInfo.groupName = learner.commandChannel;
+    chatInfo.connected = true;
 
     log.debug(`assignLearner: ${JSON.stringify(this.getProps()[index], null, 2)}` );
 
