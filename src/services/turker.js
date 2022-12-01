@@ -59,12 +59,12 @@ class Turker extends TurkTalk {
       });
     }
 
-    // save room name to persistant storage in case 
+    // get room name to persistant storage in case 
     // user refreshes the window
     let roomName = this.penName;
-    let connectionInfo = persistantStorage.get('connectionInfo');
-    if ( connectionInfo != null ) {
-      roomName = connectionInfo.RoomName
+    let moderator = persistantStorage.get('connectionInfo');
+    if ( moderator != null ) {
+      roomName = moderator.roomName
     }
 
     clientObject.connection.send(

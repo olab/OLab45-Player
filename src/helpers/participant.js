@@ -16,7 +16,7 @@ class Participant {
     }
   }
 
-  toString(log) {
+  toString() {
     return `${this.userId} ${this.connectionId?.split(-3)}`;
   }
 }

@@ -8,6 +8,7 @@ import Turkee from '../../../services/turkee';
 import styles from '../styles.module.css';
 import TurkeeChatStatusBar from './TurkeeChatStatusBar';
 const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
+import Participant from '../../../helpers/participant';
 
 class OlabAttendeeTag extends React.Component {
 
@@ -17,7 +18,7 @@ class OlabAttendeeTag extends React.Component {
 
     this.state = {
       connectionStatus: '',
-      localInfo: { Name: null, ConnectionId: null, RoomName: null },
+      localInfo: new Participant(),
       maxHeight: 200,
       remoteInfo: { Name: '', ConnectionId: '', RoomName: props.name },
       userName: props.props.authActions.getUserName(),
@@ -64,34 +65,19 @@ class OlabAttendeeTag extends React.Component {
   }
 
   // applies changes to remote info for conversation
-  onRoomAssigned(payloadData) {
+  onRoomAssigned(payload) {
 
     try {
-      log.debug(`onRoomAssigned: setting room: '${payloadData}'`);
+      let learner = new Participant(payload);
+      
+      log.debug(`onRoomAssigned: setting room: '${learner.toString()}'`);
 
-      let {
-        localInfo        
-      } = this.state;
-
-      localInfo.RoomName = payloadData;
-      localInfo.groupName = payloadData;
-      localInfo.connected = true;
+      learner.connected = true;
+      persistantStorage.save('connectionInfo', learner);
 
       this.setState({
-        localInfo: localInfo
+        localInfo: learner
       });
-
-      let connectionInfo = persistantStorage.get('connectionInfo');
-      if ( connectionInfo != null ) {
-        localInfo.RoomName = connectionInfo.RoomName
-      }
-      else {
-        connectionInfo = {
-          RoomName: localInfo.RoomName
-        };
-      }
-
-      persistantStorage.save('connectionInfo', connectionInfo);
   
     } catch (error) {
       log.error(`onRoomAssigned exception: ${error.message}`);

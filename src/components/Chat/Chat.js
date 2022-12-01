@@ -49,7 +49,7 @@ class Chat extends React.Component {
       log.info(`onMessageCallback (${JSON.stringify(payload, null, 1)})`);
 
       // test if the message was for this learner
-      if (payload.recipientGroupName !== this.props.learnerInfo.groupName) {
+      if (payload.recipientGroupName !== this.props.learnerInfo.commandChannel) {
         return;
       }
 
@@ -59,10 +59,10 @@ class Chat extends React.Component {
 
       // test if this is a moderator-hosted component
       if ( this.props.moderatorInfo ) {
-        isLocal = this.props.moderatorInfo.Name == payload.from;
+        isLocal = this.props.moderatorInfo.userId == payload.from;
       } 
       else {
-        isLocal = this.props.learnerInfo.Name == payload.from;
+        isLocal = this.props.learnerInfo.userId == payload.from;
       }
 
       conversation.push(this.createData(conversation.length, payload.data, isLocal));
@@ -93,9 +93,7 @@ class Chat extends React.Component {
         // if component has moderator, then reflect
         // that in the message sender        
         if (this.props.moderatorInfo) {
-          from = Object.assign({}, this.props.learnerInfo.learner);
-          from.userId = this.props.moderatorInfo.Name;
-          from.nickName = "moderator";
+          from = Object.assign({}, this.props.moderatorInfo);
         }
         else {
           from = this.props.learnerInfo;
@@ -103,7 +101,7 @@ class Chat extends React.Component {
 
         const messagePayload = {
           envelope: {
-            to: this.props.learnerInfo.groupName,
+            to: this.props.learnerInfo.commandChannel,
             from: from
           },
           Data: message
@@ -165,7 +163,7 @@ class Chat extends React.Component {
 
     // disable entry if do not have a group name assigned or not connected to hub
     const disabled = (
-      (this.props.learnerInfo.groupName === '') ||
+      (this.props.learnerInfo.commandChannel === '') ||
       !this.props.learnerInfo.connected
     );
 

@@ -69,13 +69,14 @@ class ChatPropManager {
       throw new Error(`No available slots to assign learner ${learner.userId} `);
     }
 
-    log.debug(`assigning '${learner.userId}' to slot ${index}`);
+    log.debug(`assigning '${newLearner.userId}' to slot ${index}`);
 
-    let learner = this.Slots()[index];
+    let learner = new Participant( newLearner );
     learner.connected = true;
-    learner = new Participant( newLearner );
 
-    log.debug(`assignLearner: ${JSON.stringify(this.Slots()[index], null, 2)}` );
+    this.Slots()[index] = learner;
+
+    log.debug(`assignLearner: ${learner.toString()}` );
 
     return this.Slots()[index];
   }
