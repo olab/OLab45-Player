@@ -1,41 +1,35 @@
 import log from 'loglevel';
+import Participant from '../../../helpers/participant';
 
 class ChatPropManager {
 
   // *****
   constructor(count) {
 
-    this.connectionInfos = [];
-    const infoTemplate = {
-      key: null,
-      nickName: null,
-      groupName: null,
-      learner: {},
-      connected: false
-    };
+    this.slots = [];
 
-    // initialize local/remote info arrays for every chat box
     for (let index = 0; index < count; index++) {
 
-      // make a copy of the object so it can be modified  
-      var item = Object.assign({}, infoTemplate);
+      var item = new Participant();
+
       item.key = index;   
-      this.connectionInfos.push(item);
+      item.connected = false;   
+      this.slots.push(item);
     }
 
   }
 
   // *****
-  getProps() {
-    return this.connectionInfos;
+  Slots() {
+    return this.slots;
   }
 
   // *****
-  getPropByKey(key) {
+  getSlotByKey(key) {
 
     try {
 
-      for (let item of this.getProps()) {
+      for (let item of this.Slots()) {
         if (item.key === key)
           return item;
       }
@@ -47,15 +41,15 @@ class ChatPropManager {
     return null;
   }
 
-  // *****
-  getOpenInfoSlot() {
+  /// Get index of next open chat control
+  getOpenSlot() {
 
     try {
 
-      const connectionInfos = this.getProps();
+      const learners = this.Slots();
 
-      for (let item of connectionInfos) {
-        if (!item.NickName) {
+      for (let item of learners) {
+        if (!item.connected) {
           return item.key;
         }
       }
@@ -68,24 +62,22 @@ class ChatPropManager {
   }
 
   // *****
-  assignLearner(roomInfo, learner) {
+  assignLearner(newLearner) {
 
-    const index = this.getOpenInfoSlot();
+    const index = this.getOpenSlot();
     if (index == null) {
       throw new Error(`No available slots to assign learner ${learner.userId} `);
     }
 
-    log.debug(`assigning '${learner.nickName}' to chat slot ${index}`);
+    log.debug(`assigning '${learner.userId}' to slot ${index}`);
 
-    let chatInfo = this.getProps()[index];
-    chatInfo.learner = learner;
-    chatInfo.nickName = learner.nickName;
-    chatInfo.groupName = learner.commandChannel;
-    chatInfo.connected = true;
+    let learner = this.Slots()[index];
+    learner.connected = true;
+    learner = new Participant( newLearner );
 
-    log.debug(`assignLearner: ${JSON.stringify(this.getProps()[index], null, 2)}` );
+    log.debug(`assignLearner: ${JSON.stringify(this.Slots()[index], null, 2)}` );
 
-    return chatInfo;
+    return this.Slots()[index];
   }
 
 };

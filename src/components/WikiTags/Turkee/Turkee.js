@@ -64,12 +64,38 @@ class OlabAttendeeTag extends React.Component {
   }
 
   // applies changes to remote info for conversation
-  onRoomAssigned(remoteInfo) {
+  onRoomAssigned(payloadData) {
 
-    remoteInfo.assignedTo = "room";
-    this.setState({
-      remoteInfo: remoteInfo
-    });
+    try {
+      log.debug(`onRoomAssigned: setting room: '${payloadData}'`);
+
+      let {
+        localInfo        
+      } = this.state;
+
+      localInfo.RoomName = payloadData;
+      localInfo.groupName = payloadData;
+      localInfo.connected = true;
+
+      this.setState({
+        localInfo: localInfo
+      });
+
+      let connectionInfo = persistantStorage.get('connectionInfo');
+      if ( connectionInfo != null ) {
+        localInfo.RoomName = connectionInfo.RoomName
+      }
+      else {
+        connectionInfo = {
+          RoomName: localInfo.RoomName
+        };
+      }
+
+      persistantStorage.save('connectionInfo', connectionInfo);
+  
+    } catch (error) {
+      log.error(`onRoomAssigned exception: ${error.message}`);
+    }
 
   }
 
@@ -78,7 +104,7 @@ class OlabAttendeeTag extends React.Component {
     learner.assignedTo = "atrium";
     persistantStorage.save('connectionInfo', learner);
     this.setState({
-      remoteInfo: learner
+      learnerInfo: learner
     });
   }
 
@@ -109,9 +135,7 @@ class OlabAttendeeTag extends React.Component {
         <>
           <Chat
             connection={this.turkee.connection}
-            connectionStatus={connectionStatus}
-            localInfo={localInfo}
-            remoteInfo={remoteInfo}
+            learnerInfo={localInfo}
             playerProps={this.props.props} />
           <TurkeeChatStatusBar
             sessionId={sessionId}

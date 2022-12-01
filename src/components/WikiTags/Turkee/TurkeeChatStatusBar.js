@@ -31,8 +31,13 @@ class TurkeeChatStatusBar extends React.Component {
     // else if (assignedTo === "atrium") {
     //     return 'Waiting for Moderator';
     // }
+    if ( this.props.localInfo.RoomName == null) {
+      return "Waiting";
+    }
+    else {
+      return "Assigned";
+    }
 
-    return "Waiting";
 
   }
 
@@ -60,7 +65,7 @@ class TurkeeChatStatusBar extends React.Component {
     } = this.props;
 
     if ( connection.connectionId && (connection.connectionId.length > 0) )
-      return `${connection._connectionState} (Id: ${connection.connectionId.substring(0, 3)})`;
+      return `${connection._connectionState} (Id: ${connection.connectionId.slice(-3)})`;
 
     return 'Not Connected';
   }

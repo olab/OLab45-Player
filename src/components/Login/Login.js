@@ -80,7 +80,7 @@ const Login = ({ authActions, classes }) => {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        { inProgress && <p><CircularProgress color="inherit" /></p>}        
+        { inProgress && <div><br/><CircularProgress color="inherit" /></div>}        
         { !inProgress && <form onSubmit={handleSubmit}>
           <FormControl margin="normal" required fullWidth>
             <InputLabel htmlFor="username">Username</InputLabel>

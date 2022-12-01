@@ -15,6 +15,7 @@ import styles from '../styles.module.css';
 import PropManager from './PropManager'
 import TurkerChatStatusBar from './TurkerChatStatusBar';
 import TurkeeChatStatusBar from './TurkeeChatStatusBar';
+import Participant from '../../../helpers/participant';
 const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabModeratorTag extends React.Component {
@@ -23,12 +24,21 @@ class OlabModeratorTag extends React.Component {
 
     super(props);
 
+    // this defines the max number of turkees
+    // for the turker
+    this.MAX_TURKEES = 8;
+    this.NUM_ROWS = 2;
+    this.numColumns = this.MAX_TURKEES / this.NUM_ROWS;
+
+    // initialize property manager with array of Participant objects
+    this.propManager = new PropManager(this.MAX_TURKEES );
+
     this.state = {
-      connectionInfos: [],
+      connectionInfos: this.propManager.Slots(),
       connectionStatus: '',
       maxHeight: 200,
-      selectedAtriumItem: '0',
-      atriumContents: [],
+      selectedLearnerIndex: '0',
+      atriumLearners: [],
       userName: props.props.authActions.getUserName(),
       width: '100%',
       localInfo: { Name: null, ConnectionId: null, RoomName: null },
@@ -41,20 +51,10 @@ class OlabModeratorTag extends React.Component {
     this.onRoomAssigned = this.onRoomAssigned.bind(this);
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
     this.onAtriumLearnerSelected = this.onAtriumLearnerSelected.bind(this);
-    this.assignTurkeeToChat = this.assignTurkeeToChat.bind(this);  
+    this.assignTurkeeToChat = this.assignLearnerToChat.bind(this);  
 
     this.turker = new Turker(this);
     this.turker.connect(this.state.userName);
-
-    // this defines the max number of turkees
-    // for the turker
-    this.MAX_TURKEES = 8;
-    this.NUM_ROWS = 2;
-    this.numColumns = this.MAX_TURKEES / this.NUM_ROWS;
-
-    this.propManager = new PropManager(this.MAX_TURKEES );
-
-    this.state.connectionInfos = this.propManager.getProps();
 
   }
 
@@ -100,20 +100,18 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  onRoomAssigned(payloadData) {
+  onRoomAssigned(moderatorInfo) {
 
     try {
-      log.debug(`onRoomAssigned: setting room: '${payloadData}'`);
+
+      let moderator = new Participant(moderatorInfo);
+      log.debug(`onRoomAssigned: setting room: '${moderator.toString(log)}'`);
 
       let {
         localInfo        
       } = this.state;
 
-      localInfo.RoomName = payloadData;
-
-      this.setState({
-        localInfo: localInfo
-      });
+      localInfo = moderatorInfo;
 
       let connectionInfo = persistantStorage.get('connectionInfo');
       if ( connectionInfo != null ) {
@@ -121,12 +119,16 @@ class OlabModeratorTag extends React.Component {
       }
       else {
         connectionInfo = {
-          RoomName: localInfo.RoomName
+          roomName: localInfo.roomName
         };
       }
 
       persistantStorage.save('connectionInfo', connectionInfo);
-  
+
+      this.setState({
+        localInfo: localInfo
+      });
+
     } catch (error) {
       log.error(`onRoomAssigned exception: ${error.message}`);
     }
@@ -138,24 +140,24 @@ class OlabModeratorTag extends React.Component {
     try {
 
       const { selectedAtriumItem } = this.state;
-      let selectedLearnerInfo = null;
+      let selectedLearner = null;
 
       // get unassigned atrium learner from list
-      for (let item of this.state.atriumContents) {
+      for (let item of this.state.atriumLearners) {
         if (item.value === selectedAtriumItem) {
-          selectedLearnerInfo = item;
+          selectedLearner = item;
         }
       }
 
-      if (!selectedLearnerInfo) {
+      if (!selectedLearner) {
         throw new Error(`Unable to find unassigned learner ${selectedAtriumItem}`);
       }
 
       // add turkee to chat component
-      const slotInfo = this.assignTurkeeToChat(selectedLearnerInfo);
+      const slotInfo = this.assignLearnerToChat(selectedLearner);
 
       // signal server with assignment of turkee to turker
-      this.turker.onAssignLearner(selectedLearnerInfo);
+      this.turker.onAssignLearner(selectedLearner);
 
     } catch (error) {
       log.error(`onAssignClicked exception: ${error.message}`);
@@ -163,7 +165,7 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  assignTurkeeToChat(learner) {
+  assignLearnerToChat(learner) {
 
     try {
 
@@ -172,15 +174,15 @@ class OlabModeratorTag extends React.Component {
         localInfo
       } = this.state;
 
-      const slotInfo = this.propManager.assignLearner(localInfo, learner);
-      connectionInfos = this.propManager.getProps();
+      learner = this.propManager.assignLearner(learner);
+      connectionInfos = this.propManager.Slots();
 
       this.setState({ connectionInfos: connectionInfos });
 
-      return slotInfo;
+      return learner;
 
     } catch (error) {
-      log.error(`assignTurkeeToChat exception: ${error.message}`);
+      log.error(`assignLearnerToChat exception: ${error.message}`);
     }
   }
 
@@ -189,7 +191,7 @@ class OlabModeratorTag extends React.Component {
 
     try {
 
-      let atriumContents = [];
+      let atriumLearners = [];
 
       // save atrium contents if array passed in
       if (Array.isArray(payloadArray) && (payloadArray.length >= 0)) {
@@ -197,22 +199,22 @@ class OlabModeratorTag extends React.Component {
         for (const payloadItem of payloadArray) {
 
           // make a copy of the object so it can be modified  
-          var item = Object.assign({}, payloadItem);
+          var learner = Object.assign({}, payloadItem);
           
           // add a 'key/value' properties so atriumContents plays nicely with
           // javascript .map()
-          item.key = `${key++}`;
-          item.value = item.userId;
+          learner.key = `${key++}`;
+          learner.value = learner.userId;
 
-          atriumContents.push(item);
+          atriumLearners.push(learner);
         }
       }
 
-      log.debug(`onAtriumUpdate: refreshing: '${JSON.stringify(atriumContents)}'`);
+      log.debug(`onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
 
       this.setState({
-        atriumContents: atriumContents,
-        selectedAtriumItem: '0'
+        atriumLearners: atriumLearners,
+        selectedLearnerIndex: '0'
       });
 
     } catch (error) {
@@ -225,6 +227,7 @@ class OlabModeratorTag extends React.Component {
 
     const {
       connectionInfos,
+      localInfo
     } = this.state;
 
     const cellStyling = { padding: 7 }
@@ -232,17 +235,19 @@ class OlabModeratorTag extends React.Component {
     let rows = [];
     for (var rowIndex = 0; rowIndex < this.NUM_ROWS; rowIndex++) {
       let columns = [];
-      for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {
+      for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {                
         const connectionInfo = connectionInfos[(rowIndex * this.numColumns) + columnIndex];
+
         columns.push(
           <TableCell style={cellStyling}>
             <Chat
               connection={this.turker.connection}
-              localInfo={connectionInfo}
+              moderatorInfo={localInfo}
+              learnerInfo={connectionInfo}
               playerProps={this.props.props} />
             <TurkeeChatStatusBar
               connection={this.turker.connection}
-              localInfo={connectionInfo} />
+              learnerInfo={connectionInfo} />
           </TableCell>
         );
       }
@@ -261,8 +266,8 @@ class OlabModeratorTag extends React.Component {
   render() {
 
     const {
-      atriumContents,
-      selectedAtriumItem,
+      atriumLearners,
+      selectedLearnerIndex,
       userName,
       connectionStatus,
       localInfo,
@@ -294,16 +299,16 @@ class OlabModeratorTag extends React.Component {
 
           <Grid container>
             <Grid container item xs={3}>
-              <FormLabel>Unassigned Learners ({atriumContents.length} waiting)</FormLabel>
+              <FormLabel>Unassigned Learners ({atriumLearners.length} waiting)</FormLabel>
               <Select
-                value={selectedAtriumItem}
+                value={selectedLearnerIndex}
                 onChange={this.onAtriumLearnerSelected}
                 style={{ width: '100%' }}
               >
                 <MenuItem key="0" value="0">
                   <em>--Select--</em>
                 </MenuItem>
-                {atriumContents.map((item) => (
+                {atriumLearners.map((item) => (
                   <MenuItem
                     key={item.key}
                     value={item.value}>

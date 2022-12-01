@@ -43,7 +43,7 @@ class TurkerChatStatusBar extends React.Component {
     } = this.props;
 
     if (connection.connectionId && (connection.connectionId.length > 0))
-      return `${connection._connectionState} (Id: ${connection.connectionId.substring(0, 3)})`;
+      return `${connection._connectionState} (Id: ${connection.connectionId.slice(-3)})`;
 
     return 'Not Connected';
   }
@@ -66,10 +66,10 @@ class TurkerChatStatusBar extends React.Component {
         <div style={divLayout}>
           <Grid container className={'TurkeeStatusBar'} style={{ fontWeight: 'bold', backgroundColor: '#grey' }}>
             <Grid item xs={4}>
-              <div style={{ marginLeft: '10px', textAlign: 'left' }}>{statusLeftString}</div>
+              <span style={{ marginLeft: '10px', textAlign: 'left' }}>{statusLeftString}</span>
             </Grid>
             <Grid item xs={4}>
-              <div style={{ textAlign: 'center' }}>{statusCenterString}</div>
+              <span style={{ textAlign: 'center' }}>{statusCenterString}</span>
             </Grid>
             <Grid item xs={4}>
               &nbsp;

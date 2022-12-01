@@ -54,7 +54,7 @@ class Turkee extends TurkTalk {
     let roomName = this.penName;
     const connectionInfo = persistantStorage.get('connectionInfo');
     if ( connectionInfo != null ) {
-      roomName = connectionInfo.roomName;
+      roomName = connectionInfo.RoomName;
     }
 
     clientObject.connection.send(
