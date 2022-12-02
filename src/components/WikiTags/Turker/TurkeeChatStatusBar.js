@@ -25,8 +25,15 @@ class TurkeeChatStatusBar extends React.Component {
       connection,
     } = this.props;
 
-    if (this.props.learnerInfo.nickName)
-      return `Assigned`;
+    if (this.props.learnerInfo.nickName) {
+
+      if (this.props.learnerInfo.connected) {
+        return "Assigned";
+      }
+      else {
+        return "Disconnected";
+      }
+    }
 
     return '';
 

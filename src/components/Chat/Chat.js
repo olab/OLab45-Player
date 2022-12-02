@@ -59,9 +59,11 @@ class Chat extends React.Component {
 
       // test if this is a moderator-hosted component
       if ( this.props.moderatorInfo ) {
+        log.info(`moderator msg locality: ('${this.props.moderatorInfo.userId}' == '${payload.from}'?)`);        
         isLocal = this.props.moderatorInfo.userId == payload.from;
       } 
       else {
+        log.info(`learner msg locality: ('${this.props.learnerInfo.userId}' == '${payload.from}'?)`);        
         isLocal = this.props.learnerInfo.userId == payload.from;
       }
 

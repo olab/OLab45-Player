@@ -13,7 +13,8 @@ class ChatPropManager {
       var item = new Participant();
 
       item.key = index;   
-      item.connected = false;   
+      item.connected = false; 
+      item.show = false;  
       this.slots.push(item);
     }
 
@@ -73,6 +74,7 @@ class ChatPropManager {
 
     let learner = new Participant( newLearner );
     learner.connected = true;
+    learner.show = true;
 
     this.Slots()[index] = learner;
 

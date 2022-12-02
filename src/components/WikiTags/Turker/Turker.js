@@ -34,7 +34,7 @@ class OlabModeratorTag extends React.Component {
     this.propManager = new PropManager(this.MAX_TURKEES);
 
     this.state = {
-      connectionInfos: this.propManager.Slots(),
+      chatInfos: this.propManager.Slots(),
       connectionStatus: '',
       maxHeight: 200,
       selectedLearnerUserId: '0',
@@ -42,7 +42,7 @@ class OlabModeratorTag extends React.Component {
       userName: props.props.authActions.getUserName(),
       width: '100%',
       localInfo: { Name: null, ConnectionId: null, RoomName: null },
-      sessionId: '',
+      sessionId: ''
     };
 
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
@@ -83,6 +83,35 @@ class OlabModeratorTag extends React.Component {
 
   }
 
+  onRoomUnassigned(payload) {
+
+    try {
+
+      log.debug(`onRoomUnassigned: connectionId '${payload}'`);
+
+      let {
+        chatInfos
+      } = this.state;
+
+      // loop thru all the chats and look for a matching
+      // connection id.  when found mark the chat
+      // as disconnected.
+      for (const chatInfo of chatInfos) {
+        if ( chatInfo.connectionId === payload ) {
+          log.debug(`found chat to disconnect for user '${chatInfo.userId}'`);
+          chatInfo.connected = false;
+        }
+      }
+
+      this.setState({
+        chatInfos: chatInfos
+      });
+
+    } catch (error) {
+      log.error(`onRoomUnassigned exception: ${error.message}`);      
+    }
+  }
+  
   onRoomAssigned(payload) {
 
     try {
@@ -170,14 +199,13 @@ class OlabModeratorTag extends React.Component {
     try {
 
       let {
-        connectionInfos,
-        localInfo
+        chatInfos,
       } = this.state;
 
       learner = this.propManager.assignLearner(learner);
-      connectionInfos = this.propManager.Slots();
+      chatInfos = this.propManager.Slots();
 
-      this.setState({ connectionInfos: connectionInfos });
+      this.setState({ chatInfos: chatInfos });
 
       return learner;
 
@@ -225,30 +253,34 @@ class OlabModeratorTag extends React.Component {
   generateChatGrid() {
 
     const {
-      connectionInfos,
+      chatInfos,
       localInfo
     } = this.state;
 
     const cellStyling = { padding: 7 }
+    let foundConnectedChat = false;
 
     let rows = [];
     for (var rowIndex = 0; rowIndex < this.NUM_ROWS; rowIndex++) {
       let columns = [];
       for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {
-        const connectionInfo = connectionInfos[(rowIndex * this.numColumns) + columnIndex];
 
-        columns.push(
-          <TableCell style={cellStyling}>
-            <Chat
-              connection={this.turker.connection}
-              moderatorInfo={localInfo}
-              learnerInfo={connectionInfo}
-              playerProps={this.props.props} />
-            <TurkeeChatStatusBar
-              connection={this.turker.connection}
-              learnerInfo={connectionInfo} />
-          </TableCell>
-        );
+        const chatInfo = chatInfos[(rowIndex * this.numColumns) + columnIndex];
+        if (chatInfo.show) {
+          foundConnectedChat = true;
+          columns.push(
+            <TableCell style={cellStyling}>
+              <Chat
+                connection={this.turker.connection}
+                moderatorInfo={localInfo}
+                learnerInfo={chatInfo}
+                playerProps={this.props.props} />
+              <TurkeeChatStatusBar
+                connection={this.turker.connection}
+                learnerInfo={chatInfo} />
+            </TableCell>
+          );
+        }
       }
 
       rows.push(
@@ -256,9 +288,10 @@ class OlabModeratorTag extends React.Component {
           {columns}
         </TableRow>
       );
+
     }
 
-    return rows;
+    return { rows, foundConnectedChat };
 
   }
 
@@ -276,17 +309,28 @@ class OlabModeratorTag extends React.Component {
     log.debug(`OlabTurkerTag render '${userName}'`);
 
     const tableLayout = { border: '2px solid black', backgroundColor: '#3333' };
-    let chatRows = this.generateChatGrid();
+    const emptyTableLayout = { border: '2px solid black' };
+    let { rows: chatRows, foundConnectedChat } = this.generateChatGrid();
 
     try {
       return (
         <Grid container item xs={12}>
 
-          <Table style={tableLayout}>
-            <TableBody>
-              {chatRows}
-            </TableBody>
-          </Table>
+          {foundConnectedChat &&
+            <Table style={tableLayout}>
+              <TableBody>
+                {chatRows}
+              </TableBody>
+            </Table>
+          }
+
+          {!foundConnectedChat &&
+            <Table style={emptyTableLayout} >
+              <TableBody>
+                <center><h3>Waiting for learners</h3></center>
+              </TableBody>
+            </Table>
+          }
 
           <TurkerChatStatusBar
             sessionId={sessionId}

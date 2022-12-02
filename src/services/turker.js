@@ -63,7 +63,7 @@ class Turker extends TurkTalk {
     // user refreshes the window
     let roomName = this.penName;
     let moderator = persistantStorage.get('connectionInfo');
-    if ( moderator != null ) {
+    if (moderator != null) {
       roomName = moderator.roomName
     }
 
@@ -112,7 +112,7 @@ class Turker extends TurkTalk {
 
         // clear out session id
         persistantStorage.save('ttalk_sessionId');
-        
+
         if (this.component.onConnectionChanged) {
           this.component.onConnectionChanged({
             connection: this.connection.connection,
@@ -147,7 +147,16 @@ class Turker extends TurkTalk {
 
         return true;
       }
-     
+
+      else if (payload.command === constants.SIGNALCMD_ROOMUNASSIGNED) {
+
+        if (this.component.onRoomUnassigned) {
+          this.component.onRoomUnassigned(payload.data);
+        }
+
+        return true;
+      }
+
       else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
 
         if (this.component.onAtriumUpdate) {
@@ -158,7 +167,7 @@ class Turker extends TurkTalk {
 
       else if (payload.command === constants.SIGNALCMD_UNASSIGNED) {
         // TODO: finish this
-      }      
+      }
 
       else {
         log.error(`onCommandCallback unknown command: '${payload.command}'`);
@@ -173,7 +182,7 @@ class Turker extends TurkTalk {
   onAssignLearner(learner) {
     log.debug(`onAssignLearner: learner = '${JSON.stringify(learner, null, 2)}' `);
     this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, learner, this.penName);
-  }  
+  }
 
   // }
 
