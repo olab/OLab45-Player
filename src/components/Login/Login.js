@@ -26,6 +26,7 @@ async function loginUserAsync(credentials) {
   log.debug(`loginUser(${credentials.username}) url: ${url})`);
 
   return fetch(url, {
+    signal: AbortSignal.timeout(7500) ,    
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -42,6 +43,7 @@ const Login = ({ authActions, classes }) => {
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
   const [open, setOpen] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState(false);
   const [inProgress, setInProgress] = React.useState(false);
 
   const handleClose = (event, reason) => {
@@ -59,18 +61,27 @@ const Login = ({ authActions, classes }) => {
 
     setInProgress(true);
 
-    const response = await loginUserAsync({
-      username,
-      password
-    });
-
-    if (response.statusCode != 200) {
-      setOpen(true);
+    try {
+      const response = await loginUserAsync({
+        username,
+        password
+      });
+  
+      if (response.statusCode != 200) {
+        setErrorMessage("Invalid username/password");
+        setOpen(true);
+      }
+  
+      authActions.setToken(response, false);
+      authActions.setUserName(username);
+        
+    } catch (error) {
+      log.error(`loginUser() error: ${JSON.stringify(error, null, 2)})`);
+      setErrorMessage(`Login error: server not responding.`);
+      setOpen(true);      
     }
 
     setInProgress(false);
-    authActions.setToken(response, false);
-    authActions.setUserName(username);
 
   }
 
@@ -111,7 +122,7 @@ const Login = ({ authActions, classes }) => {
         </form>}
         <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
           <Alert onClose={handleClose} severity="error">
-            Login error!
+            {errorMessage}
           </Alert>
         </Snackbar>
       </Paper>}
