@@ -85,6 +85,21 @@ class OlabAttendeeTag extends React.Component {
 
   }
 
+  onModeratorRemoved() {
+
+    let {
+      localInfo
+    } = this.state;    
+
+    log.debug(`onModeratorRemoved: signaling`);
+
+    localInfo.connected = false;
+
+    this.setState({
+      localInfo: localInfo
+    });    
+  }
+
   onAtriumAssigned(learner) {
 
     learner.assignedTo = "atrium";

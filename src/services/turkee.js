@@ -136,6 +136,15 @@ class Turkee extends TurkTalk {
         return true;
       }
 
+      if (payload.command === constants.SIGNALCMD_MODERATOR_REMOVED) {
+
+        if (this.component.onModeratorRemoved) {
+          this.component.onModeratorRemoved(payload.data);
+        }
+
+        return true;
+      }
+
       else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
 
         if (this.component.onAtriumAssigned) {

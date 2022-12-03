@@ -13,6 +13,7 @@ module.exports = Object.freeze({
     SIGNALCMD_ROOMASSIGNED: 'roomassignment',
     SIGNALCMD_ROOMUNASSIGNED: 'roomunassignment',
     SIGNALCMD_ATRIUMASSIGNED: 'atriumassignment',
+    SIGNALCMD_MODERATOR_REMOVED: 'moderatorremoved',
     SIGNALCMD_UNASSIGNED: 'UNASSIGNED',
     SIGNALCMD_ATRIUMUPDATE: 'atriumupdate',
     SIGNALCMD_CONNECTIONSTATUS: 'CONNECTSTATUS',

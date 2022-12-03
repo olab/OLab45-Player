@@ -179,9 +179,9 @@ class Turker extends TurkTalk {
 
   }
 
-  onAssignLearner(learner) {
+  onAssignLearner(learner, roomName) {
     log.debug(`onAssignLearner: learner = '${JSON.stringify(learner, null, 2)}' `);
-    this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, learner, this.penName);
+    this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, learner, roomName);
   }
 
   // }

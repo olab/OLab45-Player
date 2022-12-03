@@ -185,8 +185,12 @@ class OlabModeratorTag extends React.Component {
       // add turkee to chat component
       const slotInfo = this.assignLearnerToChat(selectedLearner);
 
+      let {
+        localInfo
+      } = this.state;
+
       // signal server with assignment of turkee to turker
-      this.turker.onAssignLearner(selectedLearner);
+      this.turker.onAssignLearner(selectedLearner, localInfo.roomName);
 
     } catch (error) {
       log.error(`onAssignClicked exception: ${error.message}`);
