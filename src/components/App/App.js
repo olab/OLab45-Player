@@ -73,9 +73,9 @@ function App() {
     <div className="wrapper">
       <Header authActions={authActions} />
       <Routes>
-        <Route path={`/`} element={<Home authActions={authActions} />} />
-        <Route path={`/home`} element={<Home authActions={authActions} />} />
-        <Route path={`/player/:mapId/:nodeId`} element={<Player authActions={authActions} />} />
+        <Route path={`/player`} element={<Home authActions={authActions} />} />
+        <Route path={`/player/home`} element={<Home authActions={authActions} />} />
+        <Route path={`/player/player/:mapId/:nodeId`} element={<Player authActions={authActions} />} />
         <Route path="*" element={<NoMatch />} />
       </Routes>
     </div>

@@ -5,8 +5,8 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "latest",
-    "@material-ui/lab": "latest",    
     "@material-ui/icons": "latest",
+    "@material-ui/lab": "latest",
     "@material-ui/styles": "latest",
     "@microsoft/signalr": "^6.0.2",
     "@testing-library/react": "^11.2.7",
@@ -39,9 +39,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build:dev": "dotenv -e .env.development react-scripts build",
+    "build:prod": "dotenv -e .env.production react-scripts build",
+    "build": "echo \"Please use build:dev or build:prod \" && exit 1"
   },
   "eslintConfig": {
     "extends": []
@@ -57,5 +59,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "dotenv-cli": "^6.0.0"
   }
 }
