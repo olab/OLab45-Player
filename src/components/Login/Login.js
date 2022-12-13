@@ -9,6 +9,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 import log from 'loglevel';
 import styles from './styles';
 import { config } from '../../config';
+import { ReactComponent as LogoIcon } from '../../shared/assets/icons/olab4_logo.svg';
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -88,9 +89,7 @@ const Login = ({ authActions, classes }) => {
   return (
     <main className={classes.main}>
       {<Paper className={classes.paper}>
-        <Typography component="h1" variant="h5">
-          Sign in
-        </Typography>
+        <div style={{display: 'block', marginBottom: '-20px', fontWeight: 'bolder', fontSize: '18pt', color: 'rgb(0, 137, 236)'}}><center><LogoIcon/></center>OLab4</div>
         { inProgress && <div><br/><CircularProgress color="inherit" /></div>}        
         { !inProgress && <form onSubmit={handleSubmit}>
           <FormControl margin="normal" required fullWidth>
