@@ -68,15 +68,20 @@ const Login = ({ authActions, classes }) => {
         password
       });
 
-      if (response.statusCode != 200) {
+      if (response.statusCode == 401) {
         setErrorMessage("Invalid username/password");
         setOpen(true);
       }
       else {
-        authActions.setToken(response, false);
-        authActions.setUserName(username);
+        if (response.authInfo) {
+          authActions.setToken(response, false);
+          authActions.setUserName(username);
+        }
+        else {
+          throw JSON.stringify( response, null, 2);
+        }
       }
-      
+
     } catch (error) {
       log.error(`loginUser() error: ${JSON.stringify(error, null, 2)})`);
       setErrorMessage(`Login error: server not responding.`);
