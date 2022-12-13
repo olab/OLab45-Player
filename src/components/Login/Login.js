@@ -27,7 +27,7 @@ async function loginUserAsync(credentials) {
   log.debug(`loginUser(${credentials.username}) url: ${url})`);
 
   return fetch(url, {
-    signal: AbortSignal.timeout(7500) ,    
+    signal: AbortSignal.timeout(7500),
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -67,19 +67,20 @@ const Login = ({ authActions, classes }) => {
         username,
         password
       });
-  
+
       if (response.statusCode != 200) {
         setErrorMessage("Invalid username/password");
         setOpen(true);
       }
-  
-      authActions.setToken(response, false);
-      authActions.setUserName(username);
-        
+      else {
+        authActions.setToken(response, false);
+        authActions.setUserName(username);
+      }
+      
     } catch (error) {
       log.error(`loginUser() error: ${JSON.stringify(error, null, 2)})`);
       setErrorMessage(`Login error: server not responding.`);
-      setOpen(true);      
+      setOpen(true);
     }
 
     setInProgress(false);
@@ -89,12 +90,12 @@ const Login = ({ authActions, classes }) => {
   return (
     <main className={classes.main}>
       {<Paper className={classes.paper}>
-        <div style={{display: 'block', marginBottom: '-20px', fontWeight: 'bolder', fontSize: '18pt', color: 'rgb(0, 137, 236)'}}>
-          <center><LogoIcon/></center>
+        <div style={{ display: 'block', marginBottom: '-20px', fontWeight: 'bolder', fontSize: '18pt', color: 'rgb(0, 137, 236)' }}>
+          <center><LogoIcon /></center>
           OLab4
         </div>
-        { inProgress && <div><br/><CircularProgress color="inherit" /></div>}        
-        { !inProgress && <form onSubmit={handleSubmit}>
+        {inProgress && <div><br /><CircularProgress color="inherit" /></div>}
+        {!inProgress && <form onSubmit={handleSubmit}>
           <FormControl margin="normal" required fullWidth>
             <InputLabel htmlFor="username">Username</InputLabel>
             <Input
