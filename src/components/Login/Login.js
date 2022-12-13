@@ -89,7 +89,10 @@ const Login = ({ authActions, classes }) => {
   return (
     <main className={classes.main}>
       {<Paper className={classes.paper}>
-        <div style={{display: 'block', marginBottom: '-20px', fontWeight: 'bolder', fontSize: '18pt', color: 'rgb(0, 137, 236)'}}><center><LogoIcon/></center>OLab4</div>
+        <div style={{display: 'block', marginBottom: '-20px', fontWeight: 'bolder', fontSize: '18pt', color: 'rgb(0, 137, 236)'}}>
+          <center><LogoIcon/></center>
+          OLab4
+        </div>
         { inProgress && <div><br/><CircularProgress color="inherit" /></div>}        
         { !inProgress && <form onSubmit={handleSubmit}>
           <FormControl margin="normal" required fullWidth>
