@@ -1,7 +1,7 @@
 // Constants.js
 const prod = {
     API_URL: 'https://logan.cardinalcreek.ca/olab/api/v3',
-    TTALK_HUB_URL: 'https://logan.cardinalcreek.ca/olab/turktalk'
+    TTALK_HUB_URL: 'https://logan.cardinalcreek.ca/turktalk'
 };
 
 const dev = {
