@@ -42,7 +42,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "build:dev": "npm --no-git-tag-version version prerelease && dotenv -e .env.development react-scripts build",
-    "build:prod": "npm --no-git-tag-version version `date +%Y.%m.%d-0` && dotenv -e .env.production react-scripts build",
+    "build:prod": "npm --no-git-tag-version version `date +%y.%m.%d-0` && dotenv -e .env.production react-scripts build",
     "build": "echo \"Please use build:dev or build:prod \" && exit 1"
   },
   "eslintConfig": {
