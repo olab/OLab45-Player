@@ -34,6 +34,22 @@ class OlabAttendeeTag extends React.Component {
 
   }
 
+  componentDidMount() { 
+    this.componentMounted = true;
+  }
+
+  async componentWillUnmount() {
+
+    log.debug(`OlabAttendeeTag unmounting`);
+
+    this.componentMounted = false;
+
+    if ( this.turkee ) {
+      await this.turkee.disconnect();
+      this.turkee = null;
+    }
+  }
+
   // the sessionId has changed
   onSessionIdChanged(Id) {
 
@@ -69,7 +85,7 @@ class OlabAttendeeTag extends React.Component {
 
     try {
       let learner = new Participant(payload);
-      
+
       log.debug(`onRoomAssigned: setting room: '${learner.toString()}'`);
 
       learner.connected = true;
@@ -78,7 +94,7 @@ class OlabAttendeeTag extends React.Component {
       this.setState({
         localInfo: learner
       });
-  
+
     } catch (error) {
       log.error(`onRoomAssigned exception: ${error.message}`);
     }
@@ -89,7 +105,7 @@ class OlabAttendeeTag extends React.Component {
 
     let {
       localInfo
-    } = this.state;    
+    } = this.state;
 
     log.debug(`onModeratorRemoved: signaling`);
 
@@ -97,7 +113,7 @@ class OlabAttendeeTag extends React.Component {
 
     this.setState({
       localInfo: localInfo
-    });    
+    });
   }
 
   onAtriumAssigned(learner) {

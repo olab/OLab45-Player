@@ -38,14 +38,22 @@ class TurkTalk {
     log.debug(`broadcastMessageCallback:`);
   }
 
+  async disconnect() {
+    await this.connection.stop();
+    console.log('disconnection');
+  }
+
   // *****
   connect(clientObject) {
 
-    // var self = this;
     this.connection.start()
       .then(function () {
-        // call onConnected method on 'derived' class
-        clientObject.onConnected(clientObject);
+
+        if (clientObject?.onConnected) {
+          // call onConnected method on 'derived' class
+          clientObject.onConnected(clientObject);
+        }
+        
       })
       .catch(function (error) {
         console.error(error.message);
@@ -56,13 +64,13 @@ class TurkTalk {
 
     if (payload.Command === constants.SIGNALCMD_CONNECTIONSTATUS) {
       const { Id } = payload.Data;
-      log.debug(`Id: ${Id}`);      
+      log.debug(`Id: ${Id}`);
 
-      if ( this.component.onSessionIdChanged ) {
-        this.component.onSessionIdChanged( Id );
+      if (this.component.onSessionIdChanged) {
+        this.component.onSessionIdChanged(Id);
       }
 
-      persistantStorage.save('ttalk_sessionId', Id );
+      persistantStorage.save('ttalk_sessionId', Id);
     }
 
     return false;
