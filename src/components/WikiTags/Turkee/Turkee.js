@@ -152,7 +152,7 @@ class OlabAttendeeTag extends React.Component {
         <>
           <Chat
             connection={this.turkee.connection}
-            learnerInfo={localInfo}
+            chatInfo={localInfo}
             playerProps={this.props.props} />
           <TurkeeChatStatusBar
             sessionId={sessionId}
