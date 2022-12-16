@@ -297,7 +297,7 @@ class OlabModeratorTag extends React.Component {
               <Chat
                 connection={this.turker.connection}
                 moderatorInfo={localInfo}
-                learnerInfo={chatInfo}
+                chatInfo={chatInfo}
                 playerProps={this.props.props} />
               <TurkeeChatStatusBar
                 connection={this.turker.connection}

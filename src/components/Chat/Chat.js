@@ -24,7 +24,8 @@ class Chat extends React.Component {
       maxHeight: 200,
       message: '',
       width: '100%',
-      playerProps: this.props.playerProps
+      playerProps: this.props.playerProps,
+      chatInfo: this.props.chatInfo
     };
 
     this.connection = this.props.connection;
@@ -39,7 +40,7 @@ class Chat extends React.Component {
     this.connection.on(constants.SIGNALCMD_MESSAGE, (payload) => { self.onMessageCallback(payload) });
     this.messageRef = React.createRef();
 
-    log.debug(`Chat component initialized.  group = '${this.props.learnerInfo.GroupName}'`);
+    log.debug(`Chat component initialized.  group = '${this.props.chatInfo.GroupName}'`);
   }
 
   onMessageCallback(payload) {
@@ -48,8 +49,10 @@ class Chat extends React.Component {
 
       log.info(`onMessageCallback (${JSON.stringify(payload, null, 1)})`);
 
+      const { chatInfo } = this.state;
+
       // test if the message was for this learner
-      if (payload.recipientGroupName !== this.props.learnerInfo.commandChannel) {
+      if (payload.recipientGroupName !== this.props.chatInfo.commandChannel) {
         return;
       }
 
@@ -63,15 +66,13 @@ class Chat extends React.Component {
         isLocal = this.props.moderatorInfo.userId == payload.from;
       } 
       else {
-        log.info(`learner msg locality: ('${this.props.learnerInfo.userId}' == '${payload.from}'?)`);        
-        isLocal = this.props.learnerInfo.userId == payload.from;
+        log.info(`learner msg locality: ('${this.props.chatInfo.userId}' == '${payload.from}'?)`);        
+        isLocal = this.props.chatInfo.userId == payload.from;
       }
 
       conversation.push(this.createData(conversation.length, payload.data, isLocal));
 
-      this.setState({
-        conversation: conversation
-      });
+      this.setState({ conversation: conversation });
 
       this.scrollToBottom();
 
@@ -86,7 +87,7 @@ class Chat extends React.Component {
     try {
 
       const { message } = this.state;
-      const { connectionId } = this.props.learnerInfo;
+      const { connectionId } = this.props.chatInfo;
 
       if (message.length > 0) {
 
@@ -98,12 +99,12 @@ class Chat extends React.Component {
           from = Object.assign({}, this.props.moderatorInfo);
         }
         else {
-          from = this.props.learnerInfo;
+          from = this.props.chatInfo;
         }
 
         const messagePayload = {
           envelope: {
-            to: this.props.learnerInfo.commandChannel,
+            to: this.props.chatInfo.commandChannel,
             from: from
           },
           Data: message
@@ -165,8 +166,8 @@ class Chat extends React.Component {
 
     // disable entry if do not have a group name assigned or not connected to hub
     const disabled = (
-      (this.props.learnerInfo.commandChannel === '') ||
-      !this.props.learnerInfo.connected
+      (this.props.chatInfo.commandChannel === '') ||
+      !this.props.chatInfo.connected
     );
 
     try {
