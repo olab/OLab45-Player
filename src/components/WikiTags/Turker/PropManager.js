@@ -15,6 +15,7 @@ class ChatPropManager {
       item.key = index;   
       item.connected = false; 
       item.show = false;  
+      item.lastMessageTime = '-';
       this.slots.push(item);
     }
 
@@ -26,6 +27,44 @@ class ChatPropManager {
   }
 
   // *****
+  getSlotByConnectionId(connectionId) {
+
+    try {
+
+      for (let item of this.Slots()) {
+        if (item.connectionId === connectionId)
+          return item;
+      }
+
+      log.error(`could not find chat info for connection Id ${connectionId}`);
+
+    } catch (error) {
+      log.error(`getSlotByConnectionId exception: ${error.message}`);
+    }
+
+    return null;    
+  }
+
+  // *****
+  getSlotByUserId(userId) {
+
+    try {
+
+      for (let item of this.Slots()) {
+        if (item.userId === userId)
+          return item;
+      }
+
+      log.error(`could not find chat info for userId ${userId}`);
+
+    } catch (error) {
+      log.error(`getSlotByUserId exception: ${error.message}`);
+    }
+
+    return null;    
+  }
+
+  // *****
   getSlotByKey(key) {
 
     try {
@@ -34,6 +73,8 @@ class ChatPropManager {
         if (item.key === key)
           return item;
       }
+
+      log.error(`could not find chat info for key ${key}`);
 
     } catch (error) {
       log.error(`getPropByKey exception: ${error.message}`);

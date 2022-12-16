@@ -93,25 +93,45 @@ class OlabModeratorTag extends React.Component {
         chatInfos
       } = this.state;
 
-      // loop thru all the chats and look for a matching
-      // connection id.  when found mark the chat
+      // get chat for connection id.  when found, mark the chat
       // as disconnected.
-      for (const chatInfo of chatInfos) {
-        if ( chatInfo.connectionId === payload ) {
-          log.debug(`found chat to disconnect for user '${chatInfo.userId}'`);
-          chatInfo.connected = false;
-        }
+      let chatInfo = this.propManager.getSlotByConnectionId(payload);
+      if ( chatInfo ) {
+        chatInfo.connected = false;
+        this.setState({ chatInfos: chatInfos });        
       }
-
-      this.setState({
-        chatInfos: chatInfos
-      });
 
     } catch (error) {
       log.error(`onRoomUnassigned exception: ${error.message}`);      
     }
   }
   
+  onRoomRejoined(payload) {
+
+    try {
+
+      let {
+        chatInfos,
+      } = this.state;
+      
+      let learner = new Participant(payload);
+      log.debug(`onRoomRejoined: setting room: '${learner.toString()}'`);
+
+      // get chat for learner.  when found, mark the chat
+      // as (re)connected).
+      let chatInfo = this.propManager.getSlotByUserId(learner.userId);
+      if ( chatInfo ) {
+        chatInfo.connected = true;
+        chatInfos = this.propManager.Slots();
+        this.setState({ chatInfos: chatInfos });
+      }
+
+    } catch (error) {
+      log.error(`onRoomRejoined exception: ${error.message}`);
+    }
+
+  }
+
   onRoomAssigned(payload) {
 
     try {
