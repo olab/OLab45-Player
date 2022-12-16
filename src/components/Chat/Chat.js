@@ -72,6 +72,10 @@ class Chat extends React.Component {
 
       conversation.push(this.createData(conversation.length, payload.data, isLocal));
 
+      if ( this.props.onMessageReceived ) {
+        this.props.onMessageReceived(payload);
+      }
+      
       this.setState({ conversation: conversation });
 
       this.scrollToBottom();

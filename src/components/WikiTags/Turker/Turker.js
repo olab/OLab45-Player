@@ -9,12 +9,11 @@ import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
 import { HubConnectionState } from '@microsoft/signalr';
 
-import Chat from '../../Chat/Chat'
 import Turker from '../../../services/turker';
 import styles from '../styles.module.css';
 import PropManager from './PropManager'
+import TurkerChatCell from './TurkerChatCell';
 import TurkerChatStatusBar from './TurkerChatStatusBar';
-import TurkeeChatStatusBar from './TurkeeChatStatusBar';
 import Participant from '../../../helpers/participant';
 const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
 
@@ -293,16 +292,12 @@ class OlabModeratorTag extends React.Component {
         if (chatInfo.show) {
           foundConnectedChat = true;
           columns.push(
-            <TableCell style={cellStyling}>
-              <Chat
+            <TurkerChatCell
                 connection={this.turker.connection}
                 moderatorInfo={localInfo}
                 chatInfo={chatInfo}
-                playerProps={this.props.props} />
-              <TurkeeChatStatusBar
-                connection={this.turker.connection}
+                playerProps={this.props.props}
                 learnerInfo={chatInfo} />
-            </TableCell>
           );
         }
       }

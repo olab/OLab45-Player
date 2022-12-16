@@ -39,6 +39,10 @@ class TurkeeChatStatusBar extends React.Component {
 
   }
 
+  generateCenterStatusString() {
+    return this.props.learnerInfo.lastMessageTime;
+  }
+
   generateRightStatusString() {
     return this.props.learnerInfo.nickName;
   }
@@ -54,6 +58,7 @@ class TurkeeChatStatusBar extends React.Component {
     try {
 
       const statusLeftString = this.generateLeftStatusString();
+      const statusCenterString = this.generateCenterStatusString();
       const statusRightString = this.generateRightStatusString();
       const divLayout = { width: width, border: '2px solid black', backgroundColor: '#3333', borderTop: '0px solid black' };
 
@@ -64,7 +69,7 @@ class TurkeeChatStatusBar extends React.Component {
               <div style={{ marginLeft: '10px', textAlign: 'left' }}>{statusLeftString}</div>
             </Grid>
             <Grid item xs={2}>
-              &nbsp;
+              <div style={{ textAlign: 'center' }}>{statusCenterString}</div>
             </Grid>
             <Grid item xs={5}>
               <div style={{ marginRight: '10px', textAlign: 'right' }}>{statusRightString}&nbsp;</div>
