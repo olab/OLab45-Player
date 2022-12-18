@@ -137,6 +137,15 @@ class Turker extends TurkTalk {
       // test if command NOT handled in base class
       if (super.onCommandCallback(payload)) {
         return;
+      }      
+
+      if (payload.command === constants.SIGNALCMD_LEARNER_LIST) {
+
+        if (this.component.onLearnerList) {
+          this.component.onLearnerList(payload.data);
+        }
+
+        return true;
       }
 
       if (payload.command === constants.SIGNALCMD_ROOMREJOINED) {
@@ -179,7 +188,7 @@ class Turker extends TurkTalk {
       }
 
       else {
-        log.error(`onCommandCallback unknown command: '${payload.command}'`);
+        log.debug(`onCommandCallback unknown command: '${payload.command}'`);
       }
 
     } catch (error) {

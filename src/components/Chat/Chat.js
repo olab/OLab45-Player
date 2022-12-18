@@ -9,7 +9,6 @@ import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
 import styles from '../WikiTags/styles.module.css';
 import { HubConnectionState } from '@microsoft/signalr';
-import { PlaylistPlayOutlined } from '@material-ui/icons';
 
 var constants = require('../../services/constants');
 
@@ -25,7 +24,9 @@ class Chat extends React.Component {
       message: '',
       width: '100%',
       playerProps: this.props.playerProps,
-      chatInfo: this.props.chatInfo
+      chatInfo: this.props.chatInfo,
+      isModerated: null,
+      isModerator: this.props.moderatorInfo?.isModerator ?? this.props.moderatorInfo?.isModerator
     };
 
     this.connection = this.props.connection;
@@ -33,55 +34,144 @@ class Chat extends React.Component {
     // Binding this keyword  
     this.onMessageTextChanged = this.onMessageTextChanged.bind(this);
     this.onSendClicked = this.onSendClicked.bind(this);
+    this.onChatCommandCallback = this.onChatCommandCallback.bind(this);
     this.onMessageCallback = this.onMessageCallback.bind(this);
+    this.onSystemMessageCallback = this.onSystemMessageCallback.bind(this);
+    this.onRoomAssigned = this.onRoomAssigned.bind(this);
+    this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
+    this.onModeratorDisconnected = this.onModeratorDisconnected.bind(this);
     this.scrollToBottom = this.scrollToBottom.bind(this);
 
     var self = this;
-    this.connection.on(constants.SIGNALCMD_MESSAGE, (payload) => { self.onMessageCallback(payload) });
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onChatCommandCallback(payload) });
+    this.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => { self.onMessageCallback(payload) });
+    this.connection.on(constants.SIGNALMETHOD_SYSTEM_MESSAGE, (payload) => { self.onSystemMessageCallback(payload) });
+
     this.messageRef = React.createRef();
 
     log.debug(`Chat component initialized.  group = '${this.props.chatInfo.GroupName}'`);
   }
 
+  // command method listener
+  onChatCommandCallback(payload) {
+
+    log.debug(`onChatCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}`);
+
+    if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
+      this.onAtriumAssigned(payload);
+    }
+
+    else if (payload.command === constants.SIGNALCMD_TURKER_DISCONNECTED) {
+      this.onModeratorDisconnected(payload);
+    }
+
+    else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+      this.onRoomAssigned(payload.data);
+    }
+
+    else {
+      log.debug(`onChatCommandCallback unknown command: '${payload.command}'`);
+    }    
+
+  }
+  
+  onRoomAssigned(payload) {
+
+    log.info(`onRoomAssigned (${JSON.stringify(payload, null, 1)})`);
+    this.setState({ chatInfo: payload, isModerated: true });
+
+    const { chatInfo } = this.state;
+    this.onSystemMessageCallback({
+      recipientGroupName: chatInfo.commandChannel,
+      data: "Moderator Connected"
+    });    
+  }
+
+  onModeratorDisconnected(payload) {
+
+    const { chatInfo } = this.state;
+    this.onSystemMessageCallback({
+      recipientGroupName: chatInfo.commandChannel,
+      data: "Moderator Disconnected"
+    });
+
+    this.setState({ isModerated: false });
+
+  }
+
+  // chat participant has been assigned to a room atrium
+  onAtriumAssigned(payload) {
+
+    log.info(`onAtriumAssigned (${JSON.stringify(payload, null, 1)})`);
+
+    const { chatInfo } = this.state;
+    this.onSystemMessageCallback({
+      recipientGroupName: chatInfo.commandChannel,
+      data: "Waiting for Room"
+    });
+  }
+
+  // system message method listener
+  onSystemMessageCallback(payload) {
+
+    try {
+      payload.isSystemMessage = true;
+      this.onMessageCallback(payload);
+    } catch (error) {
+      log.error(`onSystemMessage exception: ${error.message}`);
+    }
+
+  }
+
+  // chat message method listener
   onMessageCallback(payload) {
 
     try {
 
-      log.info(`onMessageCallback (${JSON.stringify(payload, null, 1)})`);
+      log.info(`onMessage (${JSON.stringify(payload, null, 1)})`);
 
-      const { chatInfo } = this.state;
+      const { 
+        conversation, 
+        chatInfo 
+      } = this.state;
 
-      // test if the message was for this learner
-      if (payload.recipientGroupName !== this.props.chatInfo.commandChannel) {
+      // ensure the message was for this learner
+      if (payload.recipientGroupName !== chatInfo.commandChannel) {
         return;
       }
 
-      let { conversation } = this.state;
+      // tri-ary flag: 
+      //  true = local message (echo), 
+      //  false = remote message
+      //  null - system message
+      let isLocal = null;
 
-      let isLocal = true;
-
-      // test if this is a moderator-hosted component
-      if ( this.props.moderatorInfo ) {
-        log.info(`moderator msg locality: ('${this.props.moderatorInfo.userId}' == '${payload.from}'?)`);        
-        isLocal = this.props.moderatorInfo.userId == payload.from;
-      } 
-      else {
-        log.info(`learner msg locality: ('${this.props.chatInfo.userId}' == '${payload.from}'?)`);        
-        isLocal = this.props.chatInfo.userId == payload.from;
+      // if not system message, determine locality
+      // of message
+      if (!payload.isSystemMessage) {
+        // test if this is a moderator-hosted component
+        if (this.props.moderatorInfo) {
+          log.info(`moderator msg locality: ('${this.props.moderatorInfo.userId}' == '${payload.from}'?)`);
+          isLocal = this.props.moderatorInfo.userId == payload.from;
+        }
+        else {
+          log.info(`learner msg locality: ('${chatInfo.userId}' == '${payload.from}'?)`);
+          isLocal = chatInfo.userId == payload.from;
+        }
       }
 
       conversation.push(this.createData(conversation.length, payload.data, isLocal));
 
-      if ( this.props.onMessageReceived ) {
+      if (this.props.onMessageReceived) {
         this.props.onMessageReceived(payload);
       }
-      
+
       this.setState({ conversation: conversation });
 
       this.scrollToBottom();
 
     } catch (error) {
-      log.error(`onMessageCallback exception: ${error.message}`);
+      log.error(`onMessage exception: ${error.message}`);
     }
 
   }
@@ -90,8 +180,8 @@ class Chat extends React.Component {
 
     try {
 
-      const { message } = this.state;
-      const { connectionId } = this.props.chatInfo;
+      const { message, chatInfo } = this.state;
+      const { connectionId } = chatInfo;
 
       if (message.length > 0) {
 
@@ -103,12 +193,12 @@ class Chat extends React.Component {
           from = Object.assign({}, this.props.moderatorInfo);
         }
         else {
-          from = this.props.chatInfo;
+          from = chatInfo;
         }
 
         const messagePayload = {
           envelope: {
-            to: this.props.chatInfo.commandChannel,
+            to: chatInfo.commandChannel,
             from: from
           },
           Data: message
@@ -116,7 +206,7 @@ class Chat extends React.Component {
 
         log.debug(`onSendClicked: ${JSON.stringify(messagePayload, null, 2)}]`);
 
-        this.connection.send(constants.SIGNALCMD_MESSAGE, messagePayload);
+        this.connection.send(constants.SIGNALMETHOD_MESSAGE, messagePayload);
       }
 
       // clear out sent messages
@@ -163,15 +253,21 @@ class Chat extends React.Component {
       maxHeight,
       message,
       width,
+      isModerated,
+      isModerator,
+      chatInfo
     } = this.state;
 
     const divLayout = { width: width, border: '2px solid black', backgroundColor: '#3333' };
     const tableContainerStyle = { height: '100%', maxHeight: maxHeight };
 
-    // disable entry if do not have a group name assigned or not connected to hub
+    // disable entry if:
+    //  1) not have a group name assigned
+    //  2) not connected to hub
     const disabled = (
-      (this.props.chatInfo.commandChannel === '') ||
-      !this.props.chatInfo.connected
+      (chatInfo.commandChannel === '') ||
+      !this.connection.connectionId ||
+      ( !isModerated && !isModerator )
     );
 
     try {
@@ -188,7 +284,23 @@ class Chat extends React.Component {
               <TableBody>
                 {conversation.map((conversationItem) => (
                   <TableRow style={{ bottomBorder: '0px' }} key={conversationItem.key}>
-                    {conversationItem.isLocalMessage && (
+                    {(conversationItem.isLocalMessage == null) && (
+                      <TableCell style={{ borderBottom: "none" }} align="center">
+                        <span
+                          style={{
+                            border: 'none',
+                            backgroundColor: 'grey',
+                            color: 'white',
+                            borderRadius: '25px',
+                            fontSize: '16px',
+                            padding: '10px'
+                          }}
+                        >
+                          {conversationItem.message}
+                        </span>
+                      </TableCell>
+                    )}
+                    {(conversationItem.isLocalMessage === true) && (
                       <TableCell style={{ borderBottom: "none" }} align="left">
                         <b>You::&nbsp;</b>
                         <span
@@ -205,9 +317,9 @@ class Chat extends React.Component {
                         </span>
                       </TableCell>
                     )}
-                    {!conversationItem.isLocalMessage && (
+                    {(conversationItem.isLocalMessage === false) && (
                       <TableCell style={{ borderBottom: "none" }} align="right">
-                        <b>Them:&nbsp;</b>
+                        <b>Moderator:&nbsp;</b>
                         <span
                           style={{
                             border: 'none',

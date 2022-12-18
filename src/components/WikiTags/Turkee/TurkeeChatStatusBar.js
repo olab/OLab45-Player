@@ -20,24 +20,14 @@ class TurkeeChatStatusBar extends React.Component {
 
   generateRightStatusString() {
 
-    // const {
-    //     assignedTo,
-    // } = this.props.remoteInfo;
-
-    // if (assignedTo === "room") {
-    //     return `Room`;
+    // if ( this.props.localInfo.roomName == null) {
+    //   return "Waiting";
+    // }
+    // else {
+    //   return "Assigned";
     // }
 
-    // else if (assignedTo === "atrium") {
-    //     return 'Waiting for Moderator';
-    // }
-    if ( this.props.localInfo.RoomName == null) {
-      return "Waiting";
-    }
-    else {
-      return "Assigned";
-    }
-
+    return "";
 
   }
 

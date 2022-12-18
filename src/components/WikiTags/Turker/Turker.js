@@ -1,9 +1,8 @@
 // @flow
 import * as React from 'react';
 import {
-  Button, Grid, FormLabel, Table, TableBody, MenuItem,
-  TableCell, Select,
-  TableRow
+  Button, Grid, FormLabel, Table,
+  TableBody, MenuItem, Select, TableRow
 } from '@material-ui/core';
 import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
@@ -95,16 +94,16 @@ class OlabModeratorTag extends React.Component {
       // get chat for connection id.  when found, mark the chat
       // as disconnected.
       let chatInfo = this.propManager.getSlotByConnectionId(payload);
-      if ( chatInfo ) {
+      if (chatInfo) {
         chatInfo.connected = false;
-        this.setState({ chatInfos: chatInfos });        
+        this.setState({ chatInfos: chatInfos });
       }
 
     } catch (error) {
-      log.error(`onRoomUnassigned exception: ${error.message}`);      
+      log.error(`onRoomUnassigned exception: ${error.message}`);
     }
   }
-  
+
   onRoomRejoined(payload) {
 
     try {
@@ -112,14 +111,14 @@ class OlabModeratorTag extends React.Component {
       let {
         chatInfos,
       } = this.state;
-      
+
       let learner = new Participant(payload);
       log.debug(`onRoomRejoined: setting room: '${learner.toString()}'`);
 
       // get chat for learner.  when found, mark the chat
       // as (re)connected).
       let chatInfo = this.propManager.getSlotByUserId(learner.userId);
-      if ( chatInfo ) {
+      if (chatInfo) {
         chatInfo.connected = true;
         chatInfos = this.propManager.Slots();
         this.setState({ chatInfos: chatInfos });
@@ -136,6 +135,8 @@ class OlabModeratorTag extends React.Component {
     try {
 
       let moderator = new Participant(payload);
+      moderator.isModerator = true;
+
       log.debug(`onRoomAssigned: setting room: '${moderator.toString()}'`);
 
       let connectionInfo = persistantStorage.get('connectionInfo');
@@ -237,6 +238,49 @@ class OlabModeratorTag extends React.Component {
     }
   }
 
+  // handle learner list (for rebuilding
+  // chat cells after a disconnect)
+  onLearnerList(payloadArray) {
+
+    try {
+
+      let learners = [];
+
+      // save atrium contents if array passed in
+      if (Array.isArray(payloadArray) && (payloadArray.length >= 0)) {
+        let key = 1;
+        for (const payloadItem of payloadArray) {
+
+          // make a copy of the object so it can be modified  
+          var learner = Object.assign({}, payloadItem);
+
+          // add a 'key/value' properties so atriumContents plays nicely with
+          // javascript .map()
+          learner.key = `${key++}`;
+
+          learners.push(learner);
+        }
+      }
+
+      log.debug(`onLearnerList: refreshing: '${JSON.stringify(learners)}'`);
+
+      // re-initialize property manager with array of Participant objects
+      this.propManager = new PropManager(this.MAX_TURKEES);
+      for (const learner of learners) {
+        this.assignLearnerToChat(learner);       
+      }
+
+      learner = this.propManager.assignLearner(learner);
+      chatInfos = this.propManager.Slots();
+
+      this.setState({ chatInfos: chatInfos });   
+
+    } catch (error) {
+      log.error(`onLearnerList exception: ${error.message}`);
+    }
+
+  }
+
   // handle atrium contents updated
   onAtriumUpdate(payloadArray) {
 
@@ -293,11 +337,11 @@ class OlabModeratorTag extends React.Component {
           foundConnectedChat = true;
           columns.push(
             <TurkerChatCell
-                connection={this.turker.connection}
-                moderatorInfo={localInfo}
-                chatInfo={chatInfo}
-                playerProps={this.props.props}
-                learnerInfo={chatInfo} />
+              connection={this.turker.connection}
+              moderatorInfo={localInfo}
+              chatInfo={chatInfo}
+              playerProps={this.props.props}
+              learnerInfo={chatInfo} />
           );
         }
       }

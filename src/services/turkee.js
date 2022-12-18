@@ -126,7 +126,7 @@ class Turkee extends TurkTalk {
 
     try {
 
-      log.debug(`onCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}]`);
+      log.debug(`onCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}`);
 
       // test if command NOT handled in base class
       if (super.onCommandCallback(payload)) {
@@ -142,10 +142,10 @@ class Turkee extends TurkTalk {
         return true;
       }
 
-      if (payload.command === constants.SIGNALCMD_MODERATOR_REMOVED) {
+      if (payload.command === constants.SIGNALCMD_MODERATOR_STATUS) {
 
-        if (this.component.onModeratorRemoved) {
-          this.component.onModeratorRemoved(payload.data);
+        if (this.component.onModeratorStatus) {
+          this.component.onModeratorStatus(payload.data);
         }
 
         return true;
@@ -161,7 +161,7 @@ class Turkee extends TurkTalk {
       }
 
       else {
-        log.error(`onCommandCallback unknown command: '${payload.command}'`);
+        log.debug(`onCommandCallback unknown command: '${payload.command}'`);
       }
 
     } catch (error) {

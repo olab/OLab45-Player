@@ -25,7 +25,7 @@ class ChatPropManager {
   Slots() {
     return this.slots;
   }
-
+  
   // *****
   getSlotByConnectionId(connectionId) {
 

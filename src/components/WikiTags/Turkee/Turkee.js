@@ -85,15 +85,16 @@ class OlabAttendeeTag extends React.Component {
 
     try {
       let learner = new Participant(payload);
+      learner.isModerator = false;
 
       log.debug(`onRoomAssigned: setting room: '${learner.toString()}'`);
 
       learner.connected = true;
       persistantStorage.save('connectionInfo', learner);
 
-      this.setState({
-        localInfo: learner
-      });
+      // this.setState({
+      //   localInfo: learner
+      // });
 
     } catch (error) {
       log.error(`onRoomAssigned exception: ${error.message}`);
@@ -101,21 +102,7 @@ class OlabAttendeeTag extends React.Component {
 
   }
 
-  onModeratorRemoved() {
-
-    let {
-      localInfo
-    } = this.state;
-
-    log.debug(`onModeratorRemoved: signaling`);
-
-    localInfo.connected = false;
-
-    this.setState({
-      localInfo: localInfo
-    });
-  }
-
+  // learner has been assigned to an atrium
   onAtriumAssigned(learner) {
 
     learner.assignedTo = "atrium";
