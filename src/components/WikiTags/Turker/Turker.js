@@ -10,7 +10,7 @@ import { HubConnectionState } from '@microsoft/signalr';
 
 import Turker from '../../../services/turker';
 import styles from '../styles.module.css';
-import PropManager from './PropManager'
+import SlotManager from './SlotManager'
 import TurkerChatCell from './TurkerChatCell';
 import TurkerChatStatusBar from './TurkerChatStatusBar';
 import Participant from '../../../helpers/participant';
@@ -29,7 +29,7 @@ class OlabModeratorTag extends React.Component {
     this.numColumns = this.MAX_TURKEES / this.NUM_ROWS;
 
     // initialize property manager with array of Participant objects
-    this.propManager = new PropManager(this.MAX_TURKEES);
+    this.propManager = new SlotManager(this.MAX_TURKEES);
 
     this.state = {
       chatInfos: this.propManager.Slots(),
@@ -265,7 +265,7 @@ class OlabModeratorTag extends React.Component {
       log.debug(`onLearnerList: refreshing: '${JSON.stringify(learners)}'`);
 
       // re-initialize property manager with array of Participant objects
-      this.propManager = new PropManager(this.MAX_TURKEES);
+      this.propManager = new SlotManager(this.MAX_TURKEES);
       for (const learner of learners) {
         this.assignLearnerToChat(learner);       
       }

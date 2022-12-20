@@ -26,7 +26,7 @@ class Chat extends React.Component {
       playerProps: this.props.playerProps,
       chatInfo: this.props.chatInfo,
       isModerated: null,
-      isModerator: this.props.moderatorInfo?.isModerator ?? this.props.moderatorInfo?.isModerator
+      isModerator: this.props.moderatorInfo ? true : false
     };
 
     this.connection = this.props.connection;
@@ -39,7 +39,7 @@ class Chat extends React.Component {
     this.onSystemMessageCallback = this.onSystemMessageCallback.bind(this);
     this.onRoomAssigned = this.onRoomAssigned.bind(this);
     this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
-    this.onModeratorDisconnected = this.onModeratorDisconnected.bind(this);
+    this.onRemoteDisconnected = this.onRemoteDisconnected.bind(this);
     this.scrollToBottom = this.scrollToBottom.bind(this);
 
     var self = this;
@@ -62,7 +62,7 @@ class Chat extends React.Component {
     }
 
     else if (payload.command === constants.SIGNALCMD_TURKER_DISCONNECTED) {
-      this.onModeratorDisconnected(payload);
+      this.onRemoteDisconnected(payload);
     }
 
     else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
@@ -78,21 +78,26 @@ class Chat extends React.Component {
   onRoomAssigned(payload) {
 
     log.info(`onRoomAssigned (${JSON.stringify(payload, null, 1)})`);
+
+    const { isModerator } = this.state;
+
     this.setState({ chatInfo: payload, isModerated: true });
 
     const { chatInfo } = this.state;
+
     this.onSystemMessageCallback({
       recipientGroupName: chatInfo.commandChannel,
-      data: "Moderator Connected"
+      data: isModerator ? "Learner Connected" : "Moderator Connected"
     });    
   }
 
-  onModeratorDisconnected(payload) {
+  onRemoteDisconnected(payload) {
 
-    const { chatInfo } = this.state;
+    const { isModerator, chatInfo } = this.state;
+
     this.onSystemMessageCallback({
       recipientGroupName: chatInfo.commandChannel,
-      data: "Moderator Disconnected"
+      data: isModerator ? "Learner Disconnected" : "Moderator Disconnected"
     });
 
     this.setState({ isModerated: false });
@@ -267,7 +272,7 @@ class Chat extends React.Component {
     const disabled = (
       (chatInfo.commandChannel === '') ||
       !this.connection.connectionId ||
-      ( !isModerated && !isModerator )
+      !isModerated
     );
 
     try {

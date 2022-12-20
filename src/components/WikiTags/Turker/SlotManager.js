@@ -1,7 +1,8 @@
 import log from 'loglevel';
 import Participant from '../../../helpers/participant';
+import SlotInfo from '../../../helpers/SlotInfo';
 
-class ChatPropManager {
+class SlotManager {
 
   // *****
   constructor(count) {
@@ -10,13 +11,8 @@ class ChatPropManager {
 
     for (let index = 0; index < count; index++) {
 
-      var item = new Participant();
-
-      item.key = index;   
-      item.connected = false; 
-      item.show = false;  
-      item.lastMessageTime = '-';
-      this.slots.push(item);
+      var slot = new SlotInfo( { key: index });
+      this.slots.push(slot);
     }
 
   }
@@ -25,7 +21,7 @@ class ChatPropManager {
   Slots() {
     return this.slots;
   }
-  
+
   // *****
   getSlotByConnectionId(connectionId) {
 
@@ -42,7 +38,7 @@ class ChatPropManager {
       log.error(`getSlotByConnectionId exception: ${error.message}`);
     }
 
-    return null;    
+    return null;
   }
 
   // *****
@@ -61,7 +57,7 @@ class ChatPropManager {
       log.error(`getSlotByUserId exception: ${error.message}`);
     }
 
-    return null;    
+    return null;
   }
 
   // *****
@@ -83,16 +79,15 @@ class ChatPropManager {
     return null;
   }
 
-  /// Get index of next open chat control
-  getOpenSlot() {
+  // Get index of next open chat control or
+  // find one user was already in
+  getOpenSlotIndex() {
 
     try {
 
-      const learners = this.Slots();
-
-      for (let item of learners) {
-        if (!item.connected) {
-          return item.key;
+      for (let slot of this.Slots()) {
+        if (slot.isOpen()) {
+          return slot.key;
         }
       }
 
@@ -106,24 +101,25 @@ class ChatPropManager {
   // *****
   assignLearner(newLearner) {
 
-    const index = this.getOpenSlot();
+    let index = this.getOpenSlotIndex();
     if (index == null) {
       throw new Error(`No available slots to assign learner ${learner.userId} `);
     }
 
-    log.debug(`assigning '${newLearner.userId}' to slot ${index}`);
+    log.debug(`assigning '${newLearner.userId}' to slot ${index.key}`);
 
-    let learner = new Participant( newLearner );
-    learner.connected = true;
-    learner.show = true;
+    let slot = this.Slots()[index];
+    let learner = new Participant(newLearner);
 
-    this.Slots()[index] = learner;
+    slot.assigned = true;
+    slot.show = true;
+    slot.SetParticipant(learner);
 
-    log.debug(`assignLearner: ${learner.toString()}` );
+    log.debug(`assignLearner: ${learner.toString()}`);
 
     return this.Slots()[index];
   }
 
 };
 
-export default ChatPropManager;
+export default SlotManager;

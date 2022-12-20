@@ -13,6 +13,7 @@ import log from 'loglevel';
 import styles from '../../styles.module.css';
 import siteStyles from '../../site.module.css';
 import Spinner from '../../../../shared/assets/loading_med.gif';
+const persistantStorage = require('../../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabSinglePickQuestion extends React.Component {
 
@@ -76,12 +77,14 @@ class OlabSinglePickQuestion extends React.Component {
   transmitResponse() {
 
     const { onSubmitResponse, authActions, map, node } = this.props.props;
+    let sessionId = persistantStorage.get('sessionId');
 
     let responseState = {
       ...this.state,
       authActions,
       map,
       node,
+      sessionId,
       setInProgress: this.setInProgress,
       setIsDisabled: this.setIsDisabled
     };

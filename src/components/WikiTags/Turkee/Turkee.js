@@ -8,7 +8,8 @@ import Turkee from '../../../services/turkee';
 import styles from '../styles.module.css';
 import TurkeeChatStatusBar from './TurkeeChatStatusBar';
 const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
-import Participant from '../../../helpers/participant';
+// import Participant from '../../../helpers/participant';
+import SlotInfo from '../../../helpers/SlotInfo';
 
 class OlabAttendeeTag extends React.Component {
 
@@ -18,7 +19,7 @@ class OlabAttendeeTag extends React.Component {
 
     this.state = {
       connectionStatus: '',
-      localInfo: new Participant(),
+      chatInfo: new SlotInfo(),
       maxHeight: 200,
       remoteInfo: { Name: '', ConnectionId: '', RoomName: props.name },
       userName: props.props.authActions.getUserName(),
@@ -53,15 +54,11 @@ class OlabAttendeeTag extends React.Component {
   // the sessionId has changed
   onSessionIdChanged(Id) {
 
-    let {
-      localInfo
-    } = this.state;
+    let { chatInfo } = this.state;
 
-    localInfo.Id = Id;
+    chatInfo.Id = Id;
 
-    this.setState({
-      localInfo: localInfo
-    });
+    this.setState({ chatInfo });
   }
 
   // applies changes to connection status
@@ -84,17 +81,17 @@ class OlabAttendeeTag extends React.Component {
   onRoomAssigned(payload) {
 
     try {
-      let learner = new Participant(payload);
-      learner.isModerator = false;
 
-      log.debug(`onRoomAssigned: setting room: '${learner.toString()}'`);
+      log.debug(`onRoomAssigned: setting room: '${[payload]}'`);
 
-      learner.connected = true;
-      persistantStorage.save('connectionInfo', learner);
+      let slot = new SlotInfo( { assigned: true, show: true });
+      slot.SetParticipant(payload);
 
       // this.setState({
-      //   localInfo: learner
+      //   slotInfo: slot
       // });
+
+      persistantStorage.save('connectionInfo', slot);
 
     } catch (error) {
       log.error(`onRoomAssigned exception: ${error.message}`);
@@ -116,7 +113,7 @@ class OlabAttendeeTag extends React.Component {
 
     const {
       id,
-      localInfo,
+      chatInfo,
       remoteInfo,
       connectionStatus,
       userName,
@@ -139,13 +136,13 @@ class OlabAttendeeTag extends React.Component {
         <>
           <Chat
             connection={this.turkee.connection}
-            chatInfo={localInfo}
+            chatInfo={chatInfo}
             playerProps={this.props.props} />
           <TurkeeChatStatusBar
             sessionId={sessionId}
             connection={this.turkee.connection}
             connectionStatus={connectionStatus}
-            localInfo={localInfo}
+            localInfo={chatInfo}
             remoteInfo={remoteInfo} />
         </>
       );
