@@ -87,7 +87,7 @@ class Chat extends React.Component {
 
     this.onSystemMessageCallback({
       recipientGroupName: chatInfo.commandChannel,
-      data: isModerator ? "Learner Connected" : "Moderator Connected"
+      data: isModerator ? `Learner Connected ${chatInfo.commandChannel}` : `Moderator Connected ${chatInfo.commandChannel}`
     });    
   }
 
