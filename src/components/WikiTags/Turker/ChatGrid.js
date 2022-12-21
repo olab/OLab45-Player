@@ -43,14 +43,40 @@ class ChatGrid extends React.Component {
   // *****
   onChatGridCommandCallback(payload) {
 
+    log.debug(`onChatGridCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}`);
+
     if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-      log.debug(`onChatGridCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}`);
-      this.onRoomAssigned(payload.data);
+      this.onCommandRoomAssigned(payload.data);
     }
 
     else {
       log.debug(`onChatGridCommandCallback ignoring command: '${payload.command}'`);
     }   
+
+  }
+
+  onCommandRoomAssigned(payload) {
+
+    try {
+
+      let moderator = new Participant(payload);
+      moderator.isModerator = true;
+
+      log.debug(`onCommandRoomAssigned: setting room: '${moderator.toString()}'`);
+
+      let connectionInfo = persistantStorage.get('connectionInfo');
+      if (connectionInfo == null) {
+        connectionInfo = moderator;
+        persistantStorage.save('connectionInfo', connectionInfo);
+      }
+
+      this.setState({
+        localInfo: connectionInfo
+      });
+
+    } catch (error) {
+      log.error(`onCommandRoomAssigned exception: ${error.message}`);
+    }
 
   }
 

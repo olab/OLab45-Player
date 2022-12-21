@@ -14,6 +14,7 @@ import SlotManager from './SlotManager'
 import TurkerChatCell from './TurkerChatCell';
 import TurkerChatStatusBar from './TurkerChatStatusBar';
 import Participant from '../../../helpers/participant';
+var constants = require('../../../services/constants');
 const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabModeratorTag extends React.Component {
@@ -44,15 +45,120 @@ class OlabModeratorTag extends React.Component {
     };
 
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
+    this.onRoomAssigned = this.onRoomAssigned.bind(this);
+
+
     this.onTurkeeSelected = this.onAtriumLearnerSelected.bind(this);
     this.onAssignClicked = this.onAssignClicked.bind(this);
-    this.onRoomAssigned = this.onRoomAssigned.bind(this);
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
     this.onAtriumLearnerSelected = this.onAtriumLearnerSelected.bind(this);
     this.assignTurkeeToChat = this.assignLearnerToChat.bind(this);
 
     this.turker = new Turker(this);
     this.turker.connect(this.state.userName);
+    this.connection = this.turker.connection;
+
+    var self = this;
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
+  }
+
+  onCommandCallback(payload) {
+
+    try {
+
+      log.debug(`onTurkerCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}]`);
+
+      if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+        this.onRoomAssigned(payload.data);
+      }
+
+      else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
+        this.onAtriumUpdate(payload.data);
+      }
+
+      else if (payload.command === constants.SIGNALCMD_LEARNER_LIST) {
+        this.onLearnerList(payload.data);
+      }
+
+      else {
+        log.debug(`onTurkerCommandCallback unknown command: '${payload.command}'`);
+      }
+
+    } catch (error) {
+      log.error(`onTurkerCommandCallback exception: ${error.message}`);
+    }
+
+  }
+
+  onRoomAssigned(payload) {
+
+    try {
+
+      let {
+        userName
+      } = this.state;
+
+      // ignore any messages not to me
+      if (userName !== payload.userId) {
+        return false;
+      }
+
+      let moderator = new Participant(payload);
+      moderator.isModerator = true;
+
+      log.debug(`onRoomAssigned: setting room: '${moderator.toString()}'`);
+
+      let connectionInfo = persistantStorage.get('connectionInfo');
+      if (connectionInfo == null) {
+        connectionInfo = moderator;
+        persistantStorage.save('connectionInfo', connectionInfo);
+      }
+
+      this.setState({
+        localInfo: connectionInfo
+      });
+
+    } catch (error) {
+      log.error(`onRoomAssigned exception: ${error.message}`);
+    }
+
+  }
+
+  // handle atrium contents updated
+  onAtriumUpdate(payloadArray) {
+
+    try {
+
+      let atriumLearners = [];
+
+      // save atrium contents if array passed in
+      if (Array.isArray(payloadArray) && (payloadArray.length >= 0)) {
+
+        let key = 1;
+        for (const payloadItem of payloadArray) {
+
+          // make a copy of the object so it can be modified  
+          var learner = Object.assign({}, payloadItem);
+
+          // add a 'key/value' properties so atriumContents plays nicely with
+          // javascript .map()
+          learner.key = `${key++}`;
+
+          atriumLearners.push(learner);
+        }
+
+        log.debug(`onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
+
+        this.setState({
+          atriumLearners: atriumLearners,
+          selectedLearnerUserId: '0'
+        });
+
+      }
+
+    } catch (error) {
+      log.error(`onAtriumUpdate exception: ${error.message}`);
+    }
 
   }
 
@@ -126,31 +232,6 @@ class OlabModeratorTag extends React.Component {
 
     } catch (error) {
       log.error(`onRoomRejoined exception: ${error.message}`);
-    }
-
-  }
-
-  onRoomAssigned(payload) {
-
-    try {
-
-      let moderator = new Participant(payload);
-      moderator.isModerator = true;
-
-      log.debug(`onRoomAssigned: setting room: '${moderator.toString()}'`);
-
-      let connectionInfo = persistantStorage.get('connectionInfo');
-      if (connectionInfo == null) {
-        connectionInfo = moderator;
-        persistantStorage.save('connectionInfo', connectionInfo);
-      }
-
-      this.setState({
-        localInfo: connectionInfo
-      });
-
-    } catch (error) {
-      log.error(`onRoomAssigned exception: ${error.message}`);
     }
 
   }
@@ -282,42 +363,6 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  // handle atrium contents updated
-  onAtriumUpdate(payloadArray) {
-
-    try {
-
-      let atriumLearners = [];
-
-      // save atrium contents if array passed in
-      if (Array.isArray(payloadArray) && (payloadArray.length >= 0)) {
-        let key = 1;
-        for (const payloadItem of payloadArray) {
-
-          // make a copy of the object so it can be modified  
-          var learner = Object.assign({}, payloadItem);
-
-          // add a 'key/value' properties so atriumContents plays nicely with
-          // javascript .map()
-          learner.key = `${key++}`;
-
-          atriumLearners.push(learner);
-        }
-      }
-
-      log.debug(`onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
-
-      this.setState({
-        atriumLearners: atriumLearners,
-        selectedLearnerUserId: '0'
-      });
-
-    } catch (error) {
-      log.error(`onAtriumUpdate exception: ${error.message}`);
-    }
-
-  }
-
   generateChatGrid() {
 
     const {
@@ -372,7 +417,7 @@ class OlabModeratorTag extends React.Component {
 
     log.debug(`OlabTurkerTag render '${userName}'`);
 
-    const tableLayout = { border: '2px solid black', backgroundColor: '#3333',  width: '100%' };
+    const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
     const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
     let { rows: chatRows, foundConnectedChat } = this.generateChatGrid();
 

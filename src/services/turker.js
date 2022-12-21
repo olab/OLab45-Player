@@ -159,14 +159,14 @@ class Turker extends TurkTalk {
         return true;
       }
 
-      else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+      // else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
 
-        if (this.component.onRoomAssigned) {
-          this.component.onRoomAssigned(payload.data);
-        }
+      //   if (this.component.onRoomAssigned) {
+      //     this.component.onRoomAssigned(payload.data);
+      //   }
 
-        return true;
-      }
+      //   return true;
+      // }
 
       else if (payload.command === constants.SIGNALCMD_ROOMUNASSIGNED) {
 
