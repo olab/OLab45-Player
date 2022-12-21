@@ -25,9 +25,9 @@ class TurkeeChatStatusBar extends React.Component {
       connection,
     } = this.props;
 
-    if (this.props.learnerInfo.nickName) {
+    if (this.props.chatInfo.nickName) {
 
-      if (this.props.learnerInfo.connected) {
+      if (this.props.chatInfo.assigned) {
         return "Assigned";
       }
       else {
@@ -40,11 +40,11 @@ class TurkeeChatStatusBar extends React.Component {
   }
 
   generateCenterStatusString() {
-    return this.props.learnerInfo.lastMessageTime;
+    return this.props.chatInfo.lastMessageTime;
   }
 
   generateRightStatusString() {
-    return this.props.learnerInfo.nickName;
+    return this.props.chatInfo.nickName;
   }
 
   render() {

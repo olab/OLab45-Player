@@ -106,7 +106,7 @@ class SlotManager {
       throw new Error(`No available slots to assign learner ${learner.userId} `);
     }
 
-    log.debug(`assigning '${newLearner.userId}' to slot ${index.key}`);
+    log.debug(`assigning '${newLearner.userId}' to slot ${index}`);
 
     let slot = this.Slots()[index];
     let learner = new Participant(newLearner);

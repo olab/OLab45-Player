@@ -57,6 +57,8 @@ class Turkee extends TurkTalk {
       roomName = connectionInfo.roomName;
     }
 
+    log.debug(`registering learner for room name: ${roomName}`);
+
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKEE,
       roomName);

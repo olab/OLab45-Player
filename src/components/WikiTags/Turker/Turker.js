@@ -202,7 +202,7 @@ class OlabModeratorTag extends React.Component {
         throw new Error(`Unable to find unassigned learner ${selectedLearnerUserId}`);
       }
 
-      // add turkee to chat component
+      // add learner to chat component
       const slotInfo = this.assignLearnerToChat(selectedLearner);
 
       let {
@@ -226,12 +226,12 @@ class OlabModeratorTag extends React.Component {
         chatInfos,
       } = this.state;
 
-      learner = this.propManager.assignLearner(learner);
+      var slot = this.propManager.assignLearner(learner);
       chatInfos = this.propManager.Slots();
 
       this.setState({ chatInfos: chatInfos });
 
-      return learner;
+      return slot;
 
     } catch (error) {
       log.error(`assignLearnerToChat exception: ${error.message}`);
@@ -266,14 +266,15 @@ class OlabModeratorTag extends React.Component {
 
       // re-initialize property manager with array of Participant objects
       this.propManager = new SlotManager(this.MAX_TURKEES);
+
       for (const learner of learners) {
-        this.assignLearnerToChat(learner);       
+        // add learner to chat component
+        this.assignLearnerToChat(learner);
       }
 
-      learner = this.propManager.assignLearner(learner);
-      chatInfos = this.propManager.Slots();
+      var chatInfos = this.propManager.Slots();
 
-      this.setState({ chatInfos: chatInfos });   
+      this.setState({ chatInfos: chatInfos });
 
     } catch (error) {
       log.error(`onLearnerList exception: ${error.message}`);
@@ -371,8 +372,8 @@ class OlabModeratorTag extends React.Component {
 
     log.debug(`OlabTurkerTag render '${userName}'`);
 
-    const tableLayout = { border: '2px solid black', backgroundColor: '#3333' };
-    const emptyTableLayout = { border: '2px solid black' };
+    const tableLayout = { border: '2px solid black', backgroundColor: '#3333',  width: '100%' };
+    const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
     let { rows: chatRows, foundConnectedChat } = this.generateChatGrid();
 
     try {
@@ -388,11 +389,9 @@ class OlabModeratorTag extends React.Component {
           }
 
           {!foundConnectedChat &&
-            <Table style={emptyTableLayout} >
-              <TableBody>
-                <center><h3>Waiting for learners</h3></center>
-              </TableBody>
-            </Table>
+            <div style={emptyGridLayout} >
+              <h3>Waiting for learners</h3>
+            </div>
           }
 
           <TurkerChatStatusBar

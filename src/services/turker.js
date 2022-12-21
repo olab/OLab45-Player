@@ -67,6 +67,8 @@ class Turker extends TurkTalk {
       roomName = moderator.roomName
     }
 
+    log.debug(`registering turker for room name: ${roomName}`);
+
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKER,
       roomName,

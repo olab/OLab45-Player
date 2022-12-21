@@ -68,7 +68,7 @@ class TurkerChatCell extends React.Component {
         <TurkeeChatStatusBar
           onMessageReceived={this.onMessageReceived}
           connection={connection}
-          learnerInfo={learnerInfo} />
+          chatInfo={chatInfo} />
       </TableCell>
     );
   } catch(error) {

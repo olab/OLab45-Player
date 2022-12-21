@@ -283,7 +283,7 @@ class Chat extends React.Component {
             <Table stickyHeader size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell><center><b></b></center></TableCell>
+                  <TableCell><b></b></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
