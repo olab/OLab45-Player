@@ -10,9 +10,10 @@ import log from 'loglevel';
 import styles from '../styles.module.css';
 
 import SlotManager from './SlotManager'
+import TurkerChatCell from './TurkerChatCell'
 var constants = require('../../../services/constants');
 
-class ChatGrid extends React.Component {
+class TurkerChatGrid extends React.Component {
 
   constructor(props) {
     super(props);
@@ -51,7 +52,7 @@ class ChatGrid extends React.Component {
 
     else {
       log.debug(`onChatGridCommandCallback ignoring command: '${payload.command}'`);
-    }   
+    }
 
   }
 
@@ -59,19 +60,16 @@ class ChatGrid extends React.Component {
 
     try {
 
-      let moderator = new Participant(payload);
-      moderator.isModerator = true;
-
-      log.debug(`onCommandRoomAssigned: setting room: '${moderator.toString()}'`);
-
-      let connectionInfo = persistantStorage.get('connectionInfo');
-      if (connectionInfo == null) {
-        connectionInfo = moderator;
-        persistantStorage.save('connectionInfo', connectionInfo);
+      // ignore any messages to me directly
+      if (this.props.moderatorInfo.userId === payload.userId) {
+        return false;
       }
 
+      this.propManager.assignLearner(payload);
+      var slotInfos = this.propManager.Slots();
+
       this.setState({
-        localInfo: connectionInfo
+        slotInfos: slotInfos
       });
 
     } catch (error) {
@@ -155,7 +153,7 @@ class ChatGrid extends React.Component {
           connectedSlots.push(slotInfo);
           columns.push(
             <TurkerChatCell
-              connection={this.turker.connection}
+              connection={this.connection}
               moderatorInfo={localInfo}
               chatInfo={slotInfo}
               playerProps={this.props.props}
@@ -200,4 +198,4 @@ class ChatGrid extends React.Component {
   }
 }
 
-export default withStyles(styles)(ChatGrid);
+export default withStyles(styles)(TurkerChatGrid);

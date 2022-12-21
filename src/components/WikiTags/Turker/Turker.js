@@ -13,6 +13,7 @@ import styles from '../styles.module.css';
 import SlotManager from './SlotManager'
 import TurkerChatCell from './TurkerChatCell';
 import TurkerChatStatusBar from './TurkerChatStatusBar';
+import TurkerChatGrid from './TurkerChatGrid';
 import Participant from '../../../helpers/participant';
 var constants = require('../../../services/constants');
 const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
@@ -41,7 +42,8 @@ class OlabModeratorTag extends React.Component {
       userName: props.props.authActions.getUserName(),
       width: '100%',
       localInfo: { Name: null, ConnectionId: null, RoomName: null },
-      sessionId: ''
+      sessionId: '',
+      foundConnectedChat: false
     };
 
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
@@ -52,7 +54,7 @@ class OlabModeratorTag extends React.Component {
     this.onAssignClicked = this.onAssignClicked.bind(this);
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
     this.onAtriumLearnerSelected = this.onAtriumLearnerSelected.bind(this);
-    this.assignTurkeeToChat = this.assignLearnerToChat.bind(this);
+    // this.assignTurkeeToChat = this.assignLearnerToChat.bind(this);
 
     this.turker = new Turker(this);
     this.turker.connect(this.state.userName);
@@ -284,13 +286,16 @@ class OlabModeratorTag extends React.Component {
       }
 
       // add learner to chat component
-      const slotInfo = this.assignLearnerToChat(selectedLearner);
+      // const slotInfo = this.assignLearnerToChat(selectedLearner);
+
+      // turn on the chat grid so it cna recieve messages
+      this.setState({ foundConnectedChat: true });
 
       let {
         localInfo
       } = this.state;
 
-      // signal server with assignment of turkee to turker
+      // signal server with assignment of turkee to this room
       this.turker.onAssignLearner(selectedLearner, localInfo.roomName);
 
     } catch (error) {
@@ -299,25 +304,25 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  assignLearnerToChat(learner) {
+  // assignLearnerToChat(learner) {
 
-    try {
+  //   try {
 
-      let {
-        chatInfos,
-      } = this.state;
+  //     let {
+  //       chatInfos,
+  //     } = this.state;
 
-      var slot = this.propManager.assignLearner(learner);
-      chatInfos = this.propManager.Slots();
+  //     var slot = this.propManager.assignLearner(learner);
+  //     chatInfos = this.propManager.Slots();
 
-      this.setState({ chatInfos: chatInfos });
+  //     this.setState({ chatInfos: chatInfos });
 
-      return slot;
+  //     return slot;
 
-    } catch (error) {
-      log.error(`assignLearnerToChat exception: ${error.message}`);
-    }
-  }
+  //   } catch (error) {
+  //     log.error(`assignLearnerToChat exception: ${error.message}`);
+  //   }
+  // }
 
   // handle learner list (for rebuilding
   // chat cells after a disconnect)
@@ -363,45 +368,49 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  generateChatGrid() {
+  // generateChatGrid() {
 
-    const {
-      chatInfos,
-      localInfo
-    } = this.state;
+  //   const {
+  //     chatInfos,
+  //     localInfo
+  //   } = this.state;
 
-    const cellStyling = { padding: 7 }
-    let foundConnectedChat = false;
+  //   const cellStyling = { padding: 7 }
+  //   let foundConnectedChat = false;
 
-    let rows = [];
-    for (var rowIndex = 0; rowIndex < this.NUM_ROWS; rowIndex++) {
-      let columns = [];
-      for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {
+  //   let rows = [];
+  //   for (var rowIndex = 0; rowIndex < this.NUM_ROWS; rowIndex++) {
+  //     let columns = [];
+  //     for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {
 
-        const chatInfo = chatInfos[(rowIndex * this.numColumns) + columnIndex];
-        if (chatInfo.show) {
-          foundConnectedChat = true;
-          columns.push(
-            <TurkerChatCell
-              connection={this.turker.connection}
-              moderatorInfo={localInfo}
-              chatInfo={chatInfo}
-              playerProps={this.props.props}
-              learnerInfo={chatInfo} />
-          );
-        }
-      }
+  //       const chatInfo = chatInfos[(rowIndex * this.numColumns) + columnIndex];
+  //       if (chatInfo.show) {
+  //         foundConnectedChat = true;
+  //         columns.push(
+  //           <TurkerChatCell
+  //             connection={this.turker.connection}
+  //             moderatorInfo={localInfo}
+  //             chatInfo={chatInfo}
+  //             playerProps={this.props.props}
+  //             learnerInfo={chatInfo} />
+  //         );
+  //       }
+  //     }
 
-      rows.push(
-        <TableRow>
-          {columns}
-        </TableRow>
-      );
+  //     rows.push(
+  //       <TableRow>
+  //         {columns}
+  //       </TableRow>
+  //     );
 
-    }
+  //   }
 
-    return { rows, foundConnectedChat };
+  //   return { rows, foundConnectedChat };
 
+  // }
+
+  haveAssignedSlots(enable) {
+    this.setState({ foundConnectedChat: enable });
   }
 
   render() {
@@ -409,6 +418,7 @@ class OlabModeratorTag extends React.Component {
     const {
       atriumLearners,
       selectedLearnerUserId,
+      foundConnectedChat,
       userName,
       connectionStatus,
       localInfo,
@@ -419,19 +429,27 @@ class OlabModeratorTag extends React.Component {
 
     const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
     const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
-    let { rows: chatRows, foundConnectedChat } = this.generateChatGrid();
+    // let { rows: chatRows, foundConnectedChat } = this.generateChatGrid();
 
     try {
       return (
         <Grid container item xs={12}>
 
           {foundConnectedChat &&
+            <TurkerChatGrid
+              connection={this.connection}
+              roomName={localInfo.roomName}
+              moderatorInfo={localInfo}
+            />
+          }
+
+          {/* {foundConnectedChat &&
             <Table style={tableLayout}>
               <TableBody>
                 {chatRows}
               </TableBody>
             </Table>
-          }
+          } */}
 
           {!foundConnectedChat &&
             <div style={emptyGridLayout} >
