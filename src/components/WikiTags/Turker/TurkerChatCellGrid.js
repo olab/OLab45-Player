@@ -9,11 +9,11 @@ import { withStyles } from '@material-ui/core/styles';
 import log from 'loglevel';
 import styles from '../styles.module.css';
 
-import SlotManager from './SlotManager'
-import TurkerChatCell from './TurkerChatCell'
+import SlotManager from '../ChatCell/SlotManager';
+import ChatCell from '../ChatCell/ChatCell'
 var constants = require('../../../services/constants');
 
-class TurkerChatGrid extends React.Component {
+class TurkerChatCellGrid extends React.Component {
 
   constructor(props) {
     super(props);
@@ -23,6 +23,7 @@ class TurkerChatGrid extends React.Component {
     this.MAX_TURKEES = 8;
     this.NUM_ROWS = 2;
     this.numColumns = this.MAX_TURKEES / this.NUM_ROWS;
+
     // initialize property manager with array of Participant objects
     this.propManager = new SlotManager(this.MAX_TURKEES);
 
@@ -31,23 +32,28 @@ class TurkerChatGrid extends React.Component {
 
     this.state = {
       slotInfos: this.propManager.Slots(),
-      moderatorInfo: this.props.moderatorInfo
+      moderatorInfo: this.props.moderatorInfo,
+      hasAssignedLearner: false
     };
 
     this.onLearnerAssignmentChanged = this.onLearnerAssignmentChanged.bind(this);
 
     var self = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onChatGridCommandCallback(payload) });
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
 
   }
 
   // *****
-  onChatGridCommandCallback(payload) {
+  onCommandCallback(payload) {
 
     log.debug(`onChatGridCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}`);
 
     if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
       this.onCommandRoomAssigned(payload.data);
+    }
+
+    else if (payload.command === constants.SIGNALCMD_LEARNER_ASSIGNED) {
+      this.onCommandLearnerAssigned(payload.data);
     }
 
     else {
@@ -76,6 +82,26 @@ class TurkerChatGrid extends React.Component {
       log.error(`onCommandRoomAssigned exception: ${error.message}`);
     }
 
+  }
+
+  // learner has been assigned to the room
+  onCommandLearnerAssigned(payload) {
+
+    try {
+
+      var slot = this.propManager.assignLearner(payload);
+      slot.assigned = true;
+      slot.show = true;
+
+      var chatInfos = this.propManager.Slots();
+      this.setState({
+        hasAssignedLearner: true, 
+        chatInfos: chatInfos 
+      });
+
+    } catch (error) {
+      log.error(`onLearnerAssigned exception: ${error.message}`);
+    }
   }
 
   // signal up connected learner assignments
@@ -136,7 +162,8 @@ class TurkerChatGrid extends React.Component {
 
     const {
       slotInfos,
-      localInfo
+      localInfo,
+      moderatorInfo
     } = this.state;
 
     let foundConnectedChat = false;
@@ -152,12 +179,12 @@ class TurkerChatGrid extends React.Component {
           foundConnectedChat = true;
           connectedSlots.push(slotInfo);
           columns.push(
-            <TurkerChatCell
+            <ChatCell
+              isModerator={this.props.isModerator}
               connection={this.connection}
-              moderatorInfo={localInfo}
-              chatInfo={slotInfo}
-              playerProps={this.props.props}
-              learnerInfo={slotInfo} />
+              localInfo={moderatorInfo}
+              remoteInfo={slotInfo}
+              playerProps={this.props.props} />
           );
         }
       }
@@ -179,18 +206,31 @@ class TurkerChatGrid extends React.Component {
   render() {
 
     const {
+      hasAssignedLearner
     } = this.state;
 
     const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
+    const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
+
     let chatRows = this.generateChatGrid();
 
-    return (
-      <Table style={tableLayout}>
-        <TableBody>
-          {chatRows}
-        </TableBody>
-      </Table>
-    );
+    if (hasAssignedLearner) {
+      return (
+        <Table style={tableLayout}>
+          <TableBody>
+            {chatRows}
+          </TableBody>
+        </Table>
+      );
+    }
+    else {
+      return (
+        <div style={emptyGridLayout} >
+          <h3>Waiting for learners</h3>
+        </div>
+      );
+    }
+
   } catch(error) {
     return (
       <b>TurkerStatusBar: {error.message}</b>
@@ -198,4 +238,4 @@ class TurkerChatGrid extends React.Component {
   }
 }
 
-export default withStyles(styles)(TurkerChatGrid);
+export default withStyles(styles)(TurkerChatCellGrid);

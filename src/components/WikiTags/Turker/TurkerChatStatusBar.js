@@ -17,31 +17,22 @@ class TurkerChatStatusBar extends React.Component {
       width: '100%',
     };
 
+    this.isModerator = this.props.isModerator;
   }
 
   generateCenterStatusString() {
 
-    const {
-      ConnectionId,
-    } = this.props.localInfo;
-
-    let roomString = '';
+    const { localInfo } = this.props;
+    return localInfo?.roomName;
 
     // if (this.props.remoteInfo.RoomName) {
     //     roomString = `Room: ${this.props.remoteInfo.RoomName}`;
-    // }
-
-    // if ((ConnectionId) && (ConnectionId.length > 0)) {
-    //     return roomString;
     // }
   }
 
   generateLeftStatusString() {
 
-    const {
-      connection,
-    } = this.props;
-
+    const { connection } = this.props;
     if (connection.connectionId && (connection.connectionId.length > 0))
       return `${connection._connectionState} (Id: ${connection.connectionId.slice(-3)})`;
 
@@ -54,6 +45,7 @@ class TurkerChatStatusBar extends React.Component {
 
     let {
       width,
+      localInfo
     } = this.state;
 
     try {

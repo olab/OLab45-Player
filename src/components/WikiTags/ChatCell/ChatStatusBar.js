@@ -7,60 +7,59 @@ import { withStyles } from '@material-ui/core/styles';
 import log from 'loglevel';
 import styles from '../styles.module.css';
 
-class TurkeeChatStatusBar extends React.Component {
+class ChatStatusBar extends React.Component {
 
   constructor(props) {
 
     super(props);
 
     this.state = {
-      width: '100%',
+      lastUpdate: null,
+      localInfo: this.props.localInfo,
+      connection: this.props.connection
     };
 
   }
 
   generateLeftStatusString() {
 
-    const {
-      connection,
-    } = this.props;
-
-    if (this.props.chatInfo.nickName) {
-
-      if (this.props.chatInfo.assigned) {
-        return "Assigned";
-      }
-      else {
-        return "Disconnected";
-      }
-    }
-
-    return '';
-
+    let { connection } = this.state;
+    if (connection.connectionId && (connection.connectionId.length > 0))
+      return `${connection._connectionState} (Id: ${connection.connectionId.slice(-3)})`;
   }
 
   generateCenterStatusString() {
-    return this.props.chatInfo.lastMessageTime;
+
+    if (this.props.isModerated) {
+
+      let { lastUpdate } = this.state;
+      if (lastUpdate) {
+        const hours = `0${lastUpdate.getHours()}`;
+        const minutes = `0${lastUpdate.getMinutes()}`;
+        return `Last rec'd: ${hours.slice(hours.length - 2)}:${minutes.slice(minutes.length - 2, minutes.length)}`;
+      }
+    }   
+
   }
 
   generateRightStatusString() {
-    return this.props.chatInfo.nickName;
+
+    if (this.props.isModerated) {
+      let { localInfo } = this.state;
+      return localInfo?.nickName;
+    }
+
+    return null;
   }
 
   render() {
-
-    log.debug(`TurkeeChatStatusBar render. state = ${JSON.stringify(this.state)}`);
-
-    let {
-      width,
-    } = this.state;
 
     try {
 
       const statusLeftString = this.generateLeftStatusString();
       const statusCenterString = this.generateCenterStatusString();
       const statusRightString = this.generateRightStatusString();
-      const divLayout = { width: width, border: '2px solid black', backgroundColor: '#3333', borderTop: '0px solid black' };
+      const divLayout = { width: '100%', border: '2px solid black', backgroundColor: '#3333', borderTop: '0px solid black' };
 
       return (
         <div style={divLayout}>
@@ -80,11 +79,11 @@ class TurkeeChatStatusBar extends React.Component {
 
     } catch (error) {
       return (
-        <b>TurkeeStatusBar: {error.message}</b>
+        <b>ChatStatusBar: {error.message}</b>
       );
     }
   }
 
 }
 
-export default withStyles(styles)(TurkeeChatStatusBar);
+export default withStyles(styles)(ChatStatusBar);

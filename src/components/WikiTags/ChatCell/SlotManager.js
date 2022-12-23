@@ -111,8 +111,8 @@ class SlotManager {
     let slot = this.Slots()[index];
     let learner = new Participant(newLearner);
 
-    slot.assigned = true;
-    slot.show = true;
+    slot.assigned = false;
+    slot.show = false;
     slot.SetParticipant(learner);
 
     log.debug(`assignLearner: ${learner.toString()}`);

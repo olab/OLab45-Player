@@ -2,14 +2,19 @@
 import * as React from 'react';
 import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
+import {
+  Table,
+  TableBody,
+  TableRow
+} from '@material-ui/core';
 
-import Chat from '../../Chat/Chat'
 import Turkee from '../../../services/turkee';
 import styles from '../styles.module.css';
-import TurkeeChatStatusBar from './TurkeeChatStatusBar';
-const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
-// import Participant from '../../../helpers/participant';
+import ChatCell from '../ChatCell/ChatCell'
 import SlotInfo from '../../../helpers/SlotInfo';
+import SlotManager from '../ChatCell/SlotManager';
+var constants = require('../../../services/constants');
+const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabAttendeeTag extends React.Component {
 
@@ -17,11 +22,13 @@ class OlabAttendeeTag extends React.Component {
 
     super(props);
 
+    this.propManager = new SlotManager(1);
+
     this.state = {
       connectionStatus: '',
-      chatInfo: new SlotInfo(),
+      slotInfos: this.propManager.Slots(),
       maxHeight: 200,
-      remoteInfo: { Name: '', ConnectionId: '', RoomName: props.name },
+      remoteInfo: new SlotInfo(),
       userName: props.props.authActions.getUserName(),
       width: '100%',
       id: this.props.name,
@@ -30,12 +37,89 @@ class OlabAttendeeTag extends React.Component {
 
     this.turkee = new Turkee(this);
     this.turkee.connect(this.state.userName);
+    this.connection = this.turkee.connection;
 
     this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
 
+    var self = this;
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
+
   }
 
-  componentDidMount() { 
+  onCommandCallback(payload) {
+
+    try {
+
+      log.debug(`onTurkeeCommandCallback: ${payload.command}`);
+
+      if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+        this.onRoomAssigned(payload.data);
+      }
+
+      else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
+        this.onAtriumAssigned(payload.data);
+      }
+
+      else {
+        log.debug(`onTurkeeCommandCallback unknown command: '${payload.command}'`);
+      }
+
+    } catch (error) {
+      log.error(`onTurkeeCommandCallback exception: ${error.message}`);
+    }
+
+  }
+
+  // learner has been assigned to an atrium
+  onAtriumAssigned(learner) {
+
+    this.propManager.assignLearner(learner);
+    var slotInfo = this.propManager.Slots()[0];
+    slotInfo.show = true;
+
+    log.debug(`onAtriumAssigned localInfo = ${JSON.stringify(slotInfo, null, 2)}]`);
+    persistantStorage.save('connectionInfo', slotInfo);
+
+    this.setState({
+      localInfo: slotInfo
+    });
+
+
+  }
+
+  onRoomAssigned(payload) {
+
+    try {
+
+      let {
+        userName
+      } = this.state;
+
+      // ignore any messages not to me
+      if (userName !== payload.local.userId) {
+        return false;
+      }
+
+      var slotInfo = this.propManager.Slots()[0];
+      slotInfo.SetParticipant(payload.local);
+      slotInfo.assigned = true;
+      slotInfo.show = true;
+
+      this.setState({
+        localInfo: slotInfo
+      });
+
+      log.debug(`onRoomAssigned localInfo = ${JSON.stringify(slotInfo, null, 2)}]`);
+
+      persistantStorage.save('connectionInfo', slotInfo);
+
+    } catch (error) {
+      log.error(`onRoomAssigned exception: ${error.message}`);
+    }
+
+  }
+
+  componentDidMount() {
     this.componentMounted = true;
   }
 
@@ -45,7 +129,7 @@ class OlabAttendeeTag extends React.Component {
 
     this.componentMounted = false;
 
-    if ( this.turkee ) {
+    if (this.turkee) {
       await this.turkee.disconnect();
       this.turkee = null;
     }
@@ -77,48 +161,17 @@ class OlabAttendeeTag extends React.Component {
     });
   }
 
-  // applies changes to remote info for conversation
-  onRoomAssigned(payload) {
-
-    try {
-
-      log.debug(`onRoomAssigned: setting room: '${[payload]}'`);
-
-      let slot = new SlotInfo( { assigned: true, show: true });
-      slot.SetParticipant(payload);
-
-      // this.setState({
-      //   slotInfo: slot
-      // });
-
-      persistantStorage.save('connectionInfo', slot);
-
-    } catch (error) {
-      log.error(`onRoomAssigned exception: ${error.message}`);
-    }
-
-  }
-
-  // learner has been assigned to an atrium
-  onAtriumAssigned(learner) {
-
-    learner.assignedTo = "atrium";
-    persistantStorage.save('connectionInfo', learner);
-    this.setState({
-      learnerInfo: learner
-    });
-  }
-
   render() {
 
     const {
       id,
-      chatInfo,
+      slotInfos,
       remoteInfo,
-      connectionStatus,
-      userName,
-      sessionId
+      userName
     } = this.state;
+
+    const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
+    let slotInfo = slotInfos[0];
 
     log.debug(`OlabTurkeeTag render '${userName}'`);
 
@@ -133,18 +186,17 @@ class OlabAttendeeTag extends React.Component {
       }
 
       return (
-        <>
-          <Chat
-            connection={this.turkee.connection}
-            chatInfo={chatInfo}
-            playerProps={this.props.props} />
-          <TurkeeChatStatusBar
-            sessionId={sessionId}
-            connection={this.turkee.connection}
-            connectionStatus={connectionStatus}
-            localInfo={chatInfo}
-            remoteInfo={remoteInfo} />
-        </>
+        <Table style={tableLayout}>
+          <TableBody>
+            <ChatCell
+              isModerator={false}
+              style={{ width: '100%' }}
+              connection={this.connection}
+              localInfo={slotInfo}
+              remoteInfo={remoteInfo}
+              playerProps={this.props.props} />
+          </TableBody>
+        </Table>
       );
 
     } catch (error) {

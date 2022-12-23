@@ -6,15 +6,14 @@ import {
 } from '@material-ui/core';
 import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
-import { HubConnectionState } from '@microsoft/signalr';
 
 import Turker from '../../../services/turker';
 import styles from '../styles.module.css';
-import SlotManager from './SlotManager'
-import TurkerChatCell from './TurkerChatCell';
+import SlotManager from '../ChatCell/SlotManager';
 import TurkerChatStatusBar from './TurkerChatStatusBar';
-import TurkerChatGrid from './TurkerChatGrid';
+import TurkerChatCellGrid from './TurkerChatCellGrid';
 import Participant from '../../../helpers/participant';
+import SlotInfo from '../../../helpers/SlotInfo';
 var constants = require('../../../services/constants');
 const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
 
@@ -41,20 +40,17 @@ class OlabModeratorTag extends React.Component {
       atriumLearners: [],
       userName: props.props.authActions.getUserName(),
       width: '100%',
-      localInfo: { Name: null, ConnectionId: null, RoomName: null },
-      sessionId: '',
-      foundConnectedChat: false
+      localInfo: new SlotInfo(),
+      sessionId: ''
     };
 
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
     this.onRoomAssigned = this.onRoomAssigned.bind(this);
 
-
     this.onTurkeeSelected = this.onAtriumLearnerSelected.bind(this);
     this.onAssignClicked = this.onAssignClicked.bind(this);
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
     this.onAtriumLearnerSelected = this.onAtriumLearnerSelected.bind(this);
-    // this.assignTurkeeToChat = this.assignLearnerToChat.bind(this);
 
     this.turker = new Turker(this);
     this.turker.connect(this.state.userName);
@@ -68,10 +64,14 @@ class OlabModeratorTag extends React.Component {
 
     try {
 
-      log.debug(`onTurkerCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}]`);
+      log.debug(`onTurkerCommandCallback: ${payload.command}`);
 
       if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
         this.onRoomAssigned(payload.data);
+      }
+
+      else if (payload.command === constants.SIGNALCMD_LEARNER_ASSIGNED) {
+        this.onLearnerAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
@@ -97,28 +97,31 @@ class OlabModeratorTag extends React.Component {
     try {
 
       let {
-        userName
+        userName,
+        localInfo
       } = this.state;
 
       // ignore any messages not to me
-      if (userName !== payload.userId) {
+      if (userName !== payload.local.userId) {
         return false;
       }
 
-      let moderator = new Participant(payload);
+      let moderator = new Participant(payload.local);
       moderator.isModerator = true;
 
-      log.debug(`onRoomAssigned: setting room: '${moderator.toString()}'`);
+      localInfo = new SlotInfo();
+      localInfo.assigned = true;
+      localInfo.show = true;
 
-      let connectionInfo = persistantStorage.get('connectionInfo');
-      if (connectionInfo == null) {
-        connectionInfo = moderator;
-        persistantStorage.save('connectionInfo', connectionInfo);
-      }
+      localInfo.SetParticipant(moderator);
 
       this.setState({
-        localInfo: connectionInfo
+        localInfo: localInfo
       });
+
+      log.debug(`onRoomAssigned localInfo = ${JSON.stringify(localInfo, null, 2)}]`);
+
+      persistantStorage.save('connectionInfo', localInfo);
 
     } catch (error) {
       log.error(`onRoomAssigned exception: ${error.message}`);
@@ -162,6 +165,77 @@ class OlabModeratorTag extends React.Component {
       log.error(`onAtriumUpdate exception: ${error.message}`);
     }
 
+  }
+
+  onAtriumLearnerSelected(event) {
+
+    try {
+
+      let {
+        selectedLearnerUserId
+      } = this.state;
+
+      // test for valid turkee selected from available list
+      if (event.target.value !== '0') {
+
+        log.debug(`onAtriumLearnerSelected: ${event.target.value}`);
+
+        // find learner in atrium list
+        for (let item of this.state.atriumLearners) {
+          if (item.userId === event.target.value) {
+            selectedLearnerUserId = item.userId;
+          }
+        }
+
+        this.setState({ selectedLearnerUserId: selectedLearnerUserId });
+      }
+
+    } catch (error) {
+      log.error(`onAtriumLearnerSelected exception: ${error.message}`);
+    }
+
+  }
+
+  onAssignClicked(event) {
+
+    try {
+
+      const { selectedLearnerUserId } = this.state;
+      let selectedLearner = null;
+
+      // get unassigned atrium learner from list
+      for (let item of this.state.atriumLearners) {
+        if (item.userId === selectedLearnerUserId) {
+          selectedLearner = item;
+        }
+      }
+
+      if (!selectedLearner) {
+        throw new Error(`Unable to find unassigned learner ${selectedLearnerUserId}`);
+      }
+
+      let { localInfo } = this.state;
+
+      log.debug(`onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
+
+      // signal server with assignment of turkee to this room
+      this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, selectedLearner, localInfo.roomName);
+
+    } catch (error) {
+      log.error(`onAssignClicked exception: ${error.message}`);
+    }
+
+  }
+
+  // learner has been assigned to the room so 
+  // we can 'open up' the chat grid
+  onLearnerAssigned(payload) {
+
+    try {
+      this.setState({ foundConnectedChat: true });
+    } catch (error) {
+      log.error(`onLearnerAssigned exception: ${error.message}`);
+    }
   }
 
   // applies changes to connection status
@@ -238,91 +312,25 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  onAtriumLearnerSelected(event) {
+  assignLearnerToChat(learner) {
 
     try {
 
       let {
-        selectedLearnerUserId
+        chatInfos,
       } = this.state;
 
-      // test for valid turkee selected from available list
-      if (event.target.value !== '0') {
+      var slot = this.propManager.assignLearner(learner);
+      chatInfos = this.propManager.Slots();
 
-        log.debug(`onAtriumLearnerSelected: ${event.target.value}`);
+      this.setState({ chatInfos: chatInfos });
 
-        // find learner in atrium list
-        for (let item of this.state.atriumLearners) {
-          if (item.userId === event.target.value) {
-            selectedLearnerUserId = item.userId;
-          }
-        }
-
-        this.setState({ selectedLearnerUserId: selectedLearnerUserId });
-      }
+      return slot;
 
     } catch (error) {
-      log.error(`onAtriumLearnerSelected exception: ${error.message}`);
+      log.error(`assignLearnerToChat exception: ${error.message}`);
     }
-
   }
-
-  onAssignClicked(event) {
-
-    try {
-
-      const { selectedLearnerUserId } = this.state;
-      let selectedLearner = null;
-
-      // get unassigned atrium learner from list
-      for (let item of this.state.atriumLearners) {
-        if (item.userId === selectedLearnerUserId) {
-          selectedLearner = item;
-        }
-      }
-
-      if (!selectedLearner) {
-        throw new Error(`Unable to find unassigned learner ${selectedLearnerUserId}`);
-      }
-
-      // add learner to chat component
-      // const slotInfo = this.assignLearnerToChat(selectedLearner);
-
-      // turn on the chat grid so it cna recieve messages
-      this.setState({ foundConnectedChat: true });
-
-      let {
-        localInfo
-      } = this.state;
-
-      // signal server with assignment of turkee to this room
-      this.turker.onAssignLearner(selectedLearner, localInfo.roomName);
-
-    } catch (error) {
-      log.error(`onAssignClicked exception: ${error.message}`);
-    }
-
-  }
-
-  // assignLearnerToChat(learner) {
-
-  //   try {
-
-  //     let {
-  //       chatInfos,
-  //     } = this.state;
-
-  //     var slot = this.propManager.assignLearner(learner);
-  //     chatInfos = this.propManager.Slots();
-
-  //     this.setState({ chatInfos: chatInfos });
-
-  //     return slot;
-
-  //   } catch (error) {
-  //     log.error(`assignLearnerToChat exception: ${error.message}`);
-  //   }
-  // }
 
   // handle learner list (for rebuilding
   // chat cells after a disconnect)
@@ -368,57 +376,11 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  // generateChatGrid() {
-
-  //   const {
-  //     chatInfos,
-  //     localInfo
-  //   } = this.state;
-
-  //   const cellStyling = { padding: 7 }
-  //   let foundConnectedChat = false;
-
-  //   let rows = [];
-  //   for (var rowIndex = 0; rowIndex < this.NUM_ROWS; rowIndex++) {
-  //     let columns = [];
-  //     for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {
-
-  //       const chatInfo = chatInfos[(rowIndex * this.numColumns) + columnIndex];
-  //       if (chatInfo.show) {
-  //         foundConnectedChat = true;
-  //         columns.push(
-  //           <TurkerChatCell
-  //             connection={this.turker.connection}
-  //             moderatorInfo={localInfo}
-  //             chatInfo={chatInfo}
-  //             playerProps={this.props.props}
-  //             learnerInfo={chatInfo} />
-  //         );
-  //       }
-  //     }
-
-  //     rows.push(
-  //       <TableRow>
-  //         {columns}
-  //       </TableRow>
-  //     );
-
-  //   }
-
-  //   return { rows, foundConnectedChat };
-
-  // }
-
-  haveAssignedSlots(enable) {
-    this.setState({ foundConnectedChat: enable });
-  }
-
   render() {
 
     const {
       atriumLearners,
       selectedLearnerUserId,
-      foundConnectedChat,
       userName,
       connectionStatus,
       localInfo,
@@ -429,38 +391,21 @@ class OlabModeratorTag extends React.Component {
 
     const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
     const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
-    // let { rows: chatRows, foundConnectedChat } = this.generateChatGrid();
 
     try {
       return (
         <Grid container item xs={12}>
 
-          {foundConnectedChat &&
-            <TurkerChatGrid
-              connection={this.connection}
-              roomName={localInfo.roomName}
-              moderatorInfo={localInfo}
-            />
-          }
-
-          {/* {foundConnectedChat &&
-            <Table style={tableLayout}>
-              <TableBody>
-                {chatRows}
-              </TableBody>
-            </Table>
-          } */}
-
-          {!foundConnectedChat &&
-            <div style={emptyGridLayout} >
-              <h3>Waiting for learners</h3>
-            </div>
-          }
+          <TurkerChatCellGrid
+            connection={this.connection}
+            roomName={localInfo.roomName}
+            moderatorInfo={localInfo}
+          />
 
           <TurkerChatStatusBar
+            isModerator={true}
             sessionId={sessionId}
             connection={this.turker.connection}
-            connectionStatus={connectionStatus}
             localInfo={localInfo} />
 
           &nbsp;

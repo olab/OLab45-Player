@@ -18,7 +18,7 @@ class Turker extends TurkTalk {
     this.playerState = component.props.props;
     this.penName = `${component.props.props.map.name}|${component.props.name}`;
 
-    this.onAssignTurkee = this.onAssignLearner.bind(this);
+    // this.onAssignTurkee = this.onAssignLearner.bind(this);
     this.onCommandCallback = this.onCommandCallback.bind(this);
     this.onDisconnected = this.onDisconnected.bind(this);
 
@@ -75,6 +75,30 @@ class Turker extends TurkTalk {
       false);
   }
 
+  // *****
+  onDisconnected() {
+
+    try {
+      log.debug(`onDisconnected`);
+      if (this.component.onConnectionChanged) {
+
+        // clear out session id
+        persistantStorage.save('ttalk_sessionId');
+
+        if (this.component.onConnectionChanged) {
+          this.component.onConnectionChanged({
+            connection: this.connection.connection,
+            Name: this.username
+          });
+        }
+      }
+
+    } catch (error) {
+      log.error(`onDisconnected exception: ${error.message}`);
+    }
+
+  }
+
   onReconnecting(error) {
     try {
       log.debug(`onReconnecting: ${error}`);
@@ -106,88 +130,16 @@ class Turker extends TurkTalk {
   }
 
   // *****
-  onDisconnected() {
-
-    try {
-      log.debug(`onDisconnected`);
-      if (this.component.onConnectionChanged) {
-
-        // clear out session id
-        persistantStorage.save('ttalk_sessionId');
-
-        if (this.component.onConnectionChanged) {
-          this.component.onConnectionChanged({
-            connection: this.connection.connection,
-            Name: this.username
-          });
-        }
-      }
-
-    } catch (error) {
-      log.error(`onDisconnected exception: ${error.message}`);
-    }
-
-  }
-
-  // *****
   onCommandCallback(payload) {
 
     try {
 
-      log.debug(`onCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}]`);
+      log.debug(`onCommandCallback: ${payload.command}`);
 
       // test if command NOT handled in base class
       if (super.onCommandCallback(payload)) {
         return;
       }      
-
-      if (payload.command === constants.SIGNALCMD_LEARNER_LIST) {
-
-        if (this.component.onLearnerList) {
-          this.component.onLearnerList(payload.data);
-        }
-
-        return true;
-      }
-
-      if (payload.command === constants.SIGNALCMD_ROOMREJOINED) {
-
-        if (this.component.onRoomRejoined) {
-          this.component.onRoomRejoined(payload.data);
-        }
-
-        return true;
-      }
-
-      // else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-
-      //   if (this.component.onRoomAssigned) {
-      //     this.component.onRoomAssigned(payload.data);
-      //   }
-
-      //   return true;
-      // }
-
-      else if (payload.command === constants.SIGNALCMD_ROOMUNASSIGNED) {
-
-        if (this.component.onRoomUnassigned) {
-          this.component.onRoomUnassigned(payload.data);
-        }
-
-        return true;
-      }
-
-      else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
-
-        if (this.component.onAtriumUpdate) {
-          this.component.onAtriumUpdate(payload.data);
-        }
-
-      }
-
-      else if (payload.command === constants.SIGNALCMD_UNASSIGNED) {
-        // TODO: finish this
-      }
 
       else {
         log.debug(`onCommandCallback unknown command: '${payload.command}'`);
@@ -198,13 +150,6 @@ class Turker extends TurkTalk {
     }
 
   }
-
-  onAssignLearner(learner, roomName) {
-    log.debug(`onAssignLearner: learner = '${JSON.stringify(learner, null, 2)}' `);
-    this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, learner, roomName);
-  }
-
-  // }
 
 };
 

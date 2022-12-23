@@ -128,21 +128,21 @@ class Turkee extends TurkTalk {
 
     try {
 
-      log.debug(`onCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}`);
+      log.debug(`onCommandCallback: ${payload.command}`);
 
       // test if command NOT handled in base class
       if (super.onCommandCallback(payload)) {
         return;
       }
 
-      if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+      // if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
 
-        if (this.component.onRoomAssigned) {
-          this.component.onRoomAssigned(payload.data);
-        }
+      //   if (this.component.onRoomAssigned) {
+      //     this.component.onRoomAssigned(payload.data);
+      //   }
 
-        return true;
-      }
+      //   return true;
+      // }
 
       if (payload.command === constants.SIGNALCMD_MODERATOR_STATUS) {
 
@@ -153,14 +153,14 @@ class Turkee extends TurkTalk {
         return true;
       }
 
-      else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
+      // else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
 
-        if (this.component.onAtriumAssigned) {
-          this.component.onAtriumAssigned(payload.data);
-        }
+      //   if (this.component.onAtriumAssigned) {
+      //     this.component.onAtriumAssigned(payload.data);
+      //   }
 
-        return true;
-      }
+      //   return true;
+      // }
 
       else {
         log.debug(`onCommandCallback unknown command: '${payload.command}'`);
