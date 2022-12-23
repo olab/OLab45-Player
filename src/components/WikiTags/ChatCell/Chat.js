@@ -152,8 +152,8 @@ class Chat extends React.Component {
       // if not system message, determine locality
       // of message
       if (!payload.isSystemMessage) {
-        log.info(`moderator msg locality: ('${this.props.moderatorInfo.userId}' == '${payload.from}'?)`);
-        isLocal = this.props.localInfo.userId == payload.from;
+        log.info(`moderator msg locality: ('${localInfo.userId}' == '${payload.from}'?)`);
+        isLocal = localInfo.userId == payload.from;
       }
       else {
 
@@ -179,26 +179,14 @@ class Chat extends React.Component {
 
     try {
 
-      const { message, chatInfo } = this.state;
-      const { connectionId } = chatInfo;
+      const { message, localInfo } = this.state;
 
       if (message.length > 0) {
 
-        let from = {};
-
-        // if component has moderator, then reflect
-        // that in the message sender        
-        if (this.props.moderatorInfo) {
-          from = Object.assign({}, this.props.moderatorInfo);
-        }
-        else {
-          from = chatInfo;
-        }
-
         const messagePayload = {
           envelope: {
-            to: chatInfo.commandChannel,
-            from: from
+            to: localInfo.commandChannel,
+            from: localInfo
           },
           Data: message
         };
@@ -258,11 +246,12 @@ class Chat extends React.Component {
 
     const divLayout = { width: '100%', border: '2px solid black', backgroundColor: '#3333' };
     const tableContainerStyle = { height: '100%', maxHeight: '200' };
+    let disabled = true;
 
     // disable entry if:
     //  1) not assigned in room
     //  2) not connected to hub
-    const disabled = (
+    disabled = (
       !localInfo.assigned ||
       !this.props.connection.connectionId
     );

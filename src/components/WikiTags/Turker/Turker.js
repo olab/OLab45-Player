@@ -397,9 +397,10 @@ class OlabModeratorTag extends React.Component {
         <Grid container item xs={12}>
 
           <TurkerChatCellGrid
+            isModerator={true}
             connection={this.connection}
             roomName={localInfo.roomName}
-            moderatorInfo={localInfo}
+            localInfo={localInfo}
           />
 
           <TurkerChatStatusBar

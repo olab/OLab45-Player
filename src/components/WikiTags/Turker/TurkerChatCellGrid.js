@@ -32,7 +32,7 @@ class TurkerChatCellGrid extends React.Component {
 
     this.state = {
       slotInfos: this.propManager.Slots(),
-      moderatorInfo: this.props.moderatorInfo,
+      localInfo: this.props.localInfo,
       hasAssignedLearner: false
     };
 
@@ -46,40 +46,18 @@ class TurkerChatCellGrid extends React.Component {
   // *****
   onCommandCallback(payload) {
 
-    log.debug(`onChatGridCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}`);
+    log.debug(`onTurkerChatGridCommandCallback: ${payload.command}`);
 
-    if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-      this.onCommandRoomAssigned(payload.data);
-    }
+    // if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+    //   this.onCommandRoomAssigned(payload.data);
+    // }
 
-    else if (payload.command === constants.SIGNALCMD_LEARNER_ASSIGNED) {
+    if (payload.command === constants.SIGNALCMD_LEARNER_ASSIGNED) {
       this.onCommandLearnerAssigned(payload.data);
     }
 
     else {
-      log.debug(`onChatGridCommandCallback ignoring command: '${payload.command}'`);
-    }
-
-  }
-
-  onCommandRoomAssigned(payload) {
-
-    try {
-
-      // ignore any messages to me directly
-      if (this.props.moderatorInfo.userId === payload.userId) {
-        return false;
-      }
-
-      this.propManager.assignLearner(payload);
-      var slotInfos = this.propManager.Slots();
-
-      this.setState({
-        slotInfos: slotInfos
-      });
-
-    } catch (error) {
-      log.error(`onCommandRoomAssigned exception: ${error.message}`);
+      log.debug(`onTurkerChatGridCommandCallback ignoring command: '${payload.command}'`);
     }
 
   }
@@ -95,8 +73,8 @@ class TurkerChatCellGrid extends React.Component {
 
       var chatInfos = this.propManager.Slots();
       this.setState({
-        hasAssignedLearner: true, 
-        chatInfos: chatInfos 
+        hasAssignedLearner: true,
+        chatInfos: chatInfos
       });
 
     } catch (error) {
@@ -162,8 +140,7 @@ class TurkerChatCellGrid extends React.Component {
 
     const {
       slotInfos,
-      localInfo,
-      moderatorInfo
+      localInfo
     } = this.state;
 
     let foundConnectedChat = false;
@@ -174,15 +151,25 @@ class TurkerChatCellGrid extends React.Component {
       let columns = [];
       for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {
 
-        const slotInfo = slotInfos[(rowIndex * this.numColumns) + columnIndex];
-        if (slotInfo.show) {
+        const index = (rowIndex * this.numColumns) + columnIndex;
+
+        // make a copy of the current moderator so we can
+        // assigned learner-specific information (allowing 
+        // individual state for each chat grid item)
+        const slotInfo = slotInfos[index];
+        let newInfo = Object.assign({}, this.props.localInfo);
+        newInfo.assigned = slotInfo.assigned;
+        newInfo.show = slotInfo.show;
+        newInfo.commandChannel = slotInfo.commandChannel;
+
+        if (newInfo.show) {
           foundConnectedChat = true;
           connectedSlots.push(slotInfo);
           columns.push(
             <ChatCell
               isModerator={this.props.isModerator}
               connection={this.connection}
-              localInfo={moderatorInfo}
+              localInfo={newInfo}
               remoteInfo={slotInfo}
               playerProps={this.props.props} />
           );

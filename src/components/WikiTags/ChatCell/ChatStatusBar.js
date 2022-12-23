@@ -16,16 +16,21 @@ class ChatStatusBar extends React.Component {
     this.state = {
       lastUpdate: null,
       localInfo: this.props.localInfo,
-      connection: this.props.connection
+      connection: this.props.connection,
+      isModerator: this.props.isModerator
     };
 
   }
 
   generateLeftStatusString() {
 
-    let { connection } = this.state;
-    if (connection.connectionId && (connection.connectionId.length > 0))
-      return `${connection._connectionState} (Id: ${connection.connectionId.slice(-3)})`;
+    let { connection, isModerator } = this.state;
+    if (connection.connectionId && (connection.connectionId.length > 0)) {
+      if (!isModerator) {
+        return `${connection._connectionState} (Id: ${connection.connectionId.slice(-3)})`;
+      }
+    }
+    
   }
 
   generateCenterStatusString() {
@@ -38,7 +43,7 @@ class ChatStatusBar extends React.Component {
         const minutes = `0${lastUpdate.getMinutes()}`;
         return `Last rec'd: ${hours.slice(hours.length - 2)}:${minutes.slice(minutes.length - 2, minutes.length)}`;
       }
-    }   
+    }
 
   }
 
