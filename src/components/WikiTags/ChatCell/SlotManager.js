@@ -7,19 +7,21 @@ class SlotManager {
   // *****
   constructor(count) {
 
-    this.slots = [];
+    this.remoteSlots = [];
+    this.localSlots = [];
 
     for (let index = 0; index < count; index++) {
 
       var slot = new SlotInfo( { key: index });
-      this.slots.push(slot);
+      this.remoteSlots.push(slot);
+      this.localSlots.push(slot);
     }
 
   }
 
   // *****
-  Slots() {
-    return this.slots;
+  RemoteSlots() {
+    return this.remoteSlots;
   }
 
   // *****
@@ -27,7 +29,7 @@ class SlotManager {
 
     try {
 
-      for (let item of this.Slots()) {
+      for (let item of this.RemoteSlots()) {
         if (item.connectionId === connectionId)
           return item;
       }
@@ -46,7 +48,7 @@ class SlotManager {
 
     try {
 
-      for (let item of this.Slots()) {
+      for (let item of this.RemoteSlots()) {
         if (item.userId === userId)
           return item;
       }
@@ -65,7 +67,7 @@ class SlotManager {
 
     try {
 
-      for (let item of this.Slots()) {
+      for (let item of this.RemoteSlots()) {
         if (item.key === key)
           return item;
       }
@@ -85,7 +87,7 @@ class SlotManager {
 
     try {
 
-      for (let slot of this.Slots()) {
+      for (let slot of this.RemoteSlots()) {
         if (slot.isOpen()) {
           return slot.key;
         }
@@ -108,7 +110,7 @@ class SlotManager {
 
     log.debug(`assigning '${newLearner.userId}' to slot ${index}`);
 
-    let slot = this.Slots()[index];
+    let slot = this.RemoteSlots()[index];
     let learner = new Participant(newLearner);
 
     slot.assigned = false;
@@ -117,7 +119,7 @@ class SlotManager {
 
     log.debug(`assignLearner: ${learner.toString()}`);
 
-    return this.Slots()[index];
+    return this.RemoteSlots()[index];
   }
 
 };
