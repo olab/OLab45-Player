@@ -25,13 +25,13 @@ class TurkerChatCellGrid extends React.Component {
     this.numColumns = this.MAX_TURKEES / this.NUM_ROWS;
 
     // initialize property manager with array of Participant objects
-    this.propManager = new SlotManager(this.MAX_TURKEES);
+    this.slotManager = new SlotManager(this.MAX_TURKEES);
 
     this.connection = this.props.connection;
     this.roomName = this.props.roomName;
 
     this.state = {
-      slotInfos: this.propManager.Slots(),
+      remoteSlotInfos: this.slotManager.RemoteSlots(),
       localInfo: this.props.localInfo,
       hasAssignedLearner: false
     };
@@ -71,11 +71,11 @@ class TurkerChatCellGrid extends React.Component {
 
     try {
 
-      var slot = this.propManager.assignLearner(payload);
+      var slot = this.slotManager.assignLearner(payload);
       slot.assigned = true;
       slot.show = true;
 
-      var chatInfos = this.propManager.Slots();
+      var chatInfos = this.slotManager.RemoteSlots();
       this.setState({
         hasAssignedLearner: true,
         chatInfos: chatInfos
@@ -99,9 +99,9 @@ class TurkerChatCellGrid extends React.Component {
 
       // get chat for connection id.  when found, mark the chat
       // as disconnected.
-      let chatInfo = this.propManager.getSlotByConnectionId(payload);
+      let chatInfo = this.slotManager.getSlotByConnectionId(payload.connectionId);
       if (chatInfo) {
-        chatInfo.connected = false;
+        chatInfo.assigned = false;
         this.setState({ chatInfos: chatInfos });
       }
 
@@ -147,14 +147,14 @@ class TurkerChatCellGrid extends React.Component {
       log.debug(`onLearnerList: refreshing: '${JSON.stringify(learners)}'`);
 
       // re-initialize property manager with array of Participant objects
-      this.propManager = new SlotManager(this.MAX_TURKEES);
+      this.slotManager = new SlotManager(this.MAX_TURKEES);
 
       for (const learner of learners) {
         // add learner to chat component
         this.assignLearnerToChat(learner);
       }
 
-      var slotInfos = this.propManager.Slots();
+      var slotInfos = this.slotManager.RemoteSlots();
 
       this.setState({ slotInfos: slotInfos });
 
@@ -167,7 +167,7 @@ class TurkerChatCellGrid extends React.Component {
   generateChatGrid() {
 
     const {
-      slotInfos,
+      remoteSlotInfos,
       localInfo
     } = this.state;
 
@@ -184,7 +184,7 @@ class TurkerChatCellGrid extends React.Component {
         // make a copy of the current moderator so we can
         // assigned learner-specific information (allowing 
         // individual state for each chat grid item)
-        const slotInfo = slotInfos[index];
+        const slotInfo = remoteSlotInfos[index];
         let newInfo = Object.assign({}, this.props.localInfo);
         newInfo.assigned = slotInfo.assigned;
         newInfo.show = slotInfo.show;
@@ -206,7 +206,7 @@ class TurkerChatCellGrid extends React.Component {
       }
 
       rows.push(
-        <TableRow>
+        <TableRow key={rowIndex}>
           {columns}
         </TableRow>
       );
