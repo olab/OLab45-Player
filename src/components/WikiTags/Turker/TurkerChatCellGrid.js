@@ -56,6 +56,10 @@ class TurkerChatCellGrid extends React.Component {
       this.onCommandLearnerAssigned(payload.data);
     }
 
+    else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
+      this.onCommandLearnerUnassigned(payload.data);
+    }    
+
     else {
       log.debug(`onTurkerChatGridCommandCallback ignoring command: '${payload.command}'`);
     }
@@ -79,6 +83,30 @@ class TurkerChatCellGrid extends React.Component {
 
     } catch (error) {
       log.error(`onLearnerAssigned exception: ${error.message}`);
+    }
+  }
+
+  // learner has disconnected from the topic
+  onCommandLearnerUnassigned(payload) {
+
+    try {
+
+      log.debug(`onLearnerUnassigned: connectionId '${payload}'`);
+
+      let {
+        chatInfos
+      } = this.state;
+
+      // get chat for connection id.  when found, mark the chat
+      // as disconnected.
+      let chatInfo = this.propManager.getSlotByConnectionId(payload);
+      if (chatInfo) {
+        chatInfo.connected = false;
+        this.setState({ chatInfos: chatInfos });
+      }
+
+    } catch (error) {
+      log.error(`onLearnerUnassigned exception: ${error.message}`);
     }
   }
 
@@ -167,6 +195,7 @@ class TurkerChatCellGrid extends React.Component {
           connectedSlots.push(slotInfo);
           columns.push(
             <ChatCell
+              key={index}
               isModerator={this.props.isModerator}
               connection={this.connection}
               localInfo={newInfo}

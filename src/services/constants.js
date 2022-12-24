@@ -12,7 +12,7 @@ module.exports = Object.freeze({
     SIGNALMETHOD_MESSAGE:         'message',
     SIGNALCMD_ROOMASSIGNED:       'roomassignment',
     SIGNALCMD_ROOMREJOINED:       'roomrejoined',
-    SIGNALCMD_ROOMUNASSIGNED:     'roomunassignment',
+    SIGNALCMD_LEARNER_UNASSIGNED: 'learnerunassignment',
     SIGNALCMD_ATRIUMASSIGNED:     'atriumassignment',
     SIGNALMETHOD_SYSTEM_MESSAGE:  'systemmessage',
     SIGNALCMD_UNASSIGNED:         'UNASSIGNED',

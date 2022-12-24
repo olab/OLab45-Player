@@ -23,17 +23,7 @@ class OlabModeratorTag extends React.Component {
 
     super(props);
 
-    // this defines the max number of turkees
-    // for the turker
-    this.MAX_TURKEES = 8;
-    this.NUM_ROWS = 2;
-    this.numColumns = this.MAX_TURKEES / this.NUM_ROWS;
-
-    // initialize property manager with array of Participant objects
-    this.propManager = new SlotManager(this.MAX_TURKEES);
-
     this.state = {
-      chatInfos: this.propManager.Slots(),
       connectionStatus: '',
       maxHeight: 200,
       selectedLearnerUserId: '0',
@@ -263,118 +253,88 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  onRoomUnassigned(payload) {
+  // onRoomRejoined(payload) {
 
-    try {
+  //   try {
 
-      log.debug(`onRoomUnassigned: connectionId '${payload}'`);
+  //     let {
+  //       chatInfos,
+  //     } = this.state;
 
-      let {
-        chatInfos
-      } = this.state;
+  //     let learner = new Participant(payload);
+  //     log.debug(`onRoomRejoined: setting room: '${learner.toString()}'`);
 
-      // get chat for connection id.  when found, mark the chat
-      // as disconnected.
-      let chatInfo = this.propManager.getSlotByConnectionId(payload);
-      if (chatInfo) {
-        chatInfo.connected = false;
-        this.setState({ chatInfos: chatInfos });
-      }
+  //     // get chat for learner.  when found, mark the chat
+  //     // as (re)connected).
+  //     let chatInfo = this.propManager.getSlotByUserId(learner.userId);
+  //     if (chatInfo) {
+  //       chatInfo.connected = true;
+  //       chatInfos = this.propManager.Slots();
+  //       this.setState({ chatInfos: chatInfos });
+  //     }
 
-    } catch (error) {
-      log.error(`onRoomUnassigned exception: ${error.message}`);
-    }
-  }
+  //   } catch (error) {
+  //     log.error(`onRoomRejoined exception: ${error.message}`);
+  //   }
 
-  onRoomRejoined(payload) {
+  // }
 
-    try {
+  // assignLearnerToChat(learner) {
 
-      let {
-        chatInfos,
-      } = this.state;
+  //   try {
 
-      let learner = new Participant(payload);
-      log.debug(`onRoomRejoined: setting room: '${learner.toString()}'`);
+  //     let {
+  //       chatInfos,
+  //     } = this.state;
 
-      // get chat for learner.  when found, mark the chat
-      // as (re)connected).
-      let chatInfo = this.propManager.getSlotByUserId(learner.userId);
-      if (chatInfo) {
-        chatInfo.connected = true;
-        chatInfos = this.propManager.Slots();
-        this.setState({ chatInfos: chatInfos });
-      }
+  //     var slot = this.propManager.assignLearner(learner);
+  //     chatInfos = this.propManager.Slots();
 
-    } catch (error) {
-      log.error(`onRoomRejoined exception: ${error.message}`);
-    }
+  //     this.setState({ chatInfos: chatInfos });
 
-  }
+  //     return slot;
 
-  assignLearnerToChat(learner) {
-
-    try {
-
-      let {
-        chatInfos,
-      } = this.state;
-
-      var slot = this.propManager.assignLearner(learner);
-      chatInfos = this.propManager.Slots();
-
-      this.setState({ chatInfos: chatInfos });
-
-      return slot;
-
-    } catch (error) {
-      log.error(`assignLearnerToChat exception: ${error.message}`);
-    }
-  }
+  //   } catch (error) {
+  //     log.error(`assignLearnerToChat exception: ${error.message}`);
+  //   }
+  // }
 
   // handle learner list (for rebuilding
   // chat cells after a disconnect)
-  onLearnerList(payloadArray) {
+  // onLearnerList(payloadArray) {
 
-    try {
+  //   try {
 
-      let learners = [];
+  //     let learners = [];
 
-      // save atrium contents if array passed in
-      if (Array.isArray(payloadArray) && (payloadArray.length >= 0)) {
-        let key = 1;
-        for (const payloadItem of payloadArray) {
+  //     // save atrium contents if array passed in
+  //     if (Array.isArray(payloadArray) && (payloadArray.length >= 0)) {
+  //       let key = 1;
+  //       for (const payloadItem of payloadArray) {
 
-          // make a copy of the object so it can be modified  
-          var learner = Object.assign({}, payloadItem);
+  //         // make a copy of the object so it can be modified  
+  //         var learner = Object.assign({}, payloadItem);
 
-          // add a 'key/value' properties so atriumContents plays nicely with
-          // javascript .map()
-          learner.key = `${key++}`;
+  //         // add a 'key/value' properties so atriumContents plays nicely with
+  //         // javascript .map()
+  //         learner.key = `${key++}`;
 
-          learners.push(learner);
-        }
-      }
+  //         learners.push(learner);
+  //       }
+  //     }
 
-      log.debug(`onLearnerList: refreshing: '${JSON.stringify(learners)}'`);
+  //     log.debug(`onLearnerList: refreshing: '${JSON.stringify(learners)}'`);
 
-      // re-initialize property manager with array of Participant objects
-      this.propManager = new SlotManager(this.MAX_TURKEES);
+  //     for (const learner of learners) {
+  //       // add learner to chat component
+  //       this.assignLearnerToChat(learner);
+  //     }
 
-      for (const learner of learners) {
-        // add learner to chat component
-        this.assignLearnerToChat(learner);
-      }
+  //   } catch (error) {
+  //     log.error(`onLearnerList exception: ${error.message}`);
+  //   }
 
-      var chatInfos = this.propManager.Slots();
-
-      this.setState({ chatInfos: chatInfos });
-
-    } catch (error) {
-      log.error(`onLearnerList exception: ${error.message}`);
-    }
-
-  }
+  // }
 
   render() {
 
@@ -394,56 +354,59 @@ class OlabModeratorTag extends React.Component {
 
     try {
       return (
-        <Grid container item xs={12}>
+        <>
+          <Grid container item xs={12}>
 
-          <TurkerChatCellGrid
-            isModerator={true}
-            connection={this.connection}
-            roomName={localInfo.roomName}
-            localInfo={localInfo}
-          />
+            <TurkerChatCellGrid
+              isModerator={true}
+              connection={this.connection}
+              roomName={localInfo.roomName}
+              localInfo={localInfo}
+            />
 
-          <TurkerChatStatusBar
-            isModerator={true}
-            sessionId={sessionId}
-            connection={this.turker.connection}
-            localInfo={localInfo} />
+            <TurkerChatStatusBar
+              isModerator={true}
+              sessionId={sessionId}
+              connection={this.turker.connection}
+              localInfo={localInfo} />
 
-          &nbsp;
+            &nbsp;
 
-          <Grid container>
-            <Grid container item xs={3}>
-              <FormLabel>Unassigned Learners ({atriumLearners.length} waiting)</FormLabel>
-              <Select
-                value={selectedLearnerUserId}
-                onChange={this.onAtriumLearnerSelected}
-                style={{ width: '100%' }}
-              >
-                <MenuItem key="0" value="0">
-                  <em>--Select--</em>
-                </MenuItem>
-                {atriumLearners.map((item) => (
-                  <MenuItem
-                    key={item.userId}
-                    value={item.userId}>
-                    {item.nickName}
+            <Grid container>
+              <Grid container item xs={3}>
+                <FormLabel>Unassigned Learners ({atriumLearners.length} waiting)</FormLabel>
+                <Select
+                  value={selectedLearnerUserId}
+                  onChange={this.onAtriumLearnerSelected}
+                  style={{ width: '100%' }}
+                >
+                  <MenuItem key="0" value="0">
+                    <em>--Select--</em>
                   </MenuItem>
-                ))}
-              </Select>
-            </Grid>
-            <Grid container item xs={1}>
-              <Button
-                variant="outlined"
-                color="primary"
-                size="small"
-                style={{ verticalAlign: 'center', height: '30px' }}
-                onClick={this.onAssignClicked}
-              >
-                &nbsp;Assign&nbsp;
-              </Button>
+                  {atriumLearners.map((item) => (
+                    <MenuItem
+                      key={item.userId}
+                      value={item.userId}>
+                      {item.nickName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+              <Grid container item xs={1}>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  size="small"
+                  style={{ verticalAlign: 'center', height: '30px' }}
+                  onClick={this.onAssignClicked}
+                >
+                  &nbsp;Assign&nbsp;
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
+          <br />
+        </>
       );
 
     } catch (error) {
