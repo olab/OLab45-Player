@@ -56,11 +56,11 @@ class TurkerChatCellGrid extends React.Component {
     // }
 
     if (payload.command === constants.SIGNALCMD_LEARNER_ASSIGNED) {
-      this.onCommandLearnerAssigned(payload.data);
+      this.onLearnerAssigned(payload.data);
     }
 
     else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
-      this.onCommandLearnerUnassigned(payload.data);
+      this.onLearnerUnassigned(payload.data);
     }
 
     else {
@@ -70,7 +70,7 @@ class TurkerChatCellGrid extends React.Component {
   }
 
   // learner has been assigned to the room
-  onCommandLearnerAssigned(payload) {
+  onLearnerAssigned(payload) {
 
     try {
 
@@ -91,7 +91,7 @@ class TurkerChatCellGrid extends React.Component {
   }
 
   // learner has disconnected from the topic
-  onCommandLearnerUnassigned(payload) {
+  onLearnerUnassigned(payload) {
 
     try {
 

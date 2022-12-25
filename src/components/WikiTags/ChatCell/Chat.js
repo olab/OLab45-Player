@@ -62,6 +62,10 @@ class Chat extends React.Component {
       this.onRoomAssigned(payload.data);
     }
 
+    else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
+      this.onLearnerUnassigned(payload.data);
+    }
+
     // else if (payload.command === constants.SIGNALCMD_TURKER_DISCONNECTED) {
     //   this.onRemoteDisconnected(payload);
     // }
@@ -80,6 +84,8 @@ class Chat extends React.Component {
   // so paint a message to the chat window
   onAtriumAssigned(payload) {
 
+    log.info(`onAtriumAssigned (${JSON.stringify(payload, null, 1)})`);
+
     let { localInfo } = this.state;
 
     this.onSystemMessageCallback({
@@ -92,12 +98,28 @@ class Chat extends React.Component {
   // so paint a message to the chat window  
   onRoomAssigned(payload) {
 
-    let { localInfo } = this.state;
+    log.info(`onRoomAssigned (${JSON.stringify(payload, null, 1)})`);
+
+    let { isModerator } = this.state;
 
     this.onSystemMessageCallback({
-      recipientGroupName: localInfo.commandChannel,
-      data: `Connected to room ${localInfo.roomName}`
+      recipientGroupName: payload.local.commandChannel,
+      data: isModerator ? 
+        `'${payload.local.nickName}' connected to room` : 
+        `Connected to room. Moderator is ${payload.remote.nickName}`
     });    
+  }
+
+  onLearnerUnassigned(payload) {
+
+    log.info(`onLearnerUnassigned (${JSON.stringify(payload, null, 1)})`);
+
+    let { localInfo } = this.state;
+    
+    this.onSystemMessageCallback({
+      recipientGroupName: payload.local.commandChannel,
+      data: `'${payload.userId}' has left the room`
+    });
   }
 
   // onRemoteDisconnected(payload) {
@@ -119,6 +141,9 @@ class Chat extends React.Component {
   onSystemMessageCallback(payload) {
 
     try {
+
+      log.info(`onSystemMessageCallback (${JSON.stringify(payload, null, 1)})`);
+
       payload.isSystemMessage = true;
       this.onMessageCallback(payload);
     } catch (error) {
@@ -132,16 +157,17 @@ class Chat extends React.Component {
 
     try {
 
-      log.info(`onMessage (${JSON.stringify(payload, null, 1)})`);
-
       const {
         conversation,
         localInfo,
         senderInfo
       } = this.state;
 
+      log.info(`onMessage (${JSON.stringify(payload, null, 1)})`);
+
       // ensure the message was for this chat box
       if (payload.recipientGroupName !== localInfo.commandChannel) {
+        log.info(`onMessage: message not for '${localInfo.commandChannel}'`);
         return;
       }
 
@@ -280,7 +306,7 @@ class Chat extends React.Component {
                             backgroundColor: 'grey',
                             color: 'white',
                             borderRadius: '25px',
-                            fontSize: '16px',
+                            fontSize: '14px',
                             padding: '10px'
                           }}
                         >
