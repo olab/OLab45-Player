@@ -64,7 +64,6 @@ class ChatCell extends React.Component {
           onMessageReceived={this.onMessageReceived}
           connection={connection}
           localInfo={localInfo}
-          remoteInfo={remoteInfo}
           playerProps={playerProps} />
         <ChatStatusBar
           isModerator={this.props.isModerator}
