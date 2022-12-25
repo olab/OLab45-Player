@@ -21,7 +21,7 @@ class ChatCell extends React.Component {
     this.state = {
       connection: this.props.connection,
       localInfo: this.props.localInfo,
-      remoteInfo: this.props.remoteInfo,
+      senderInfo: this.props.senderInfo,
       playerProps: this.props.playerProps,
       lastMessageTime: null
     };
@@ -52,7 +52,7 @@ class ChatCell extends React.Component {
     const cellStyling = { padding: 7 }
     const {
       connection,
-      remoteInfo,
+      senderInfo,
       localInfo,
       playerProps,
     } = this.state;
@@ -64,12 +64,13 @@ class ChatCell extends React.Component {
           onMessageReceived={this.onMessageReceived}
           connection={connection}
           localInfo={localInfo}
+          senderInfo={senderInfo}
           playerProps={playerProps} />
         <ChatStatusBar
           isModerator={this.props.isModerator}
           onMessageReceived={this.onMessageReceived}
           connection={connection}
-          remoteInfo={remoteInfo} />
+          senderInfo={senderInfo} />
       </TableCell>
     );
   } catch(error) {

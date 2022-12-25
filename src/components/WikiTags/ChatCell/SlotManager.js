@@ -5,23 +5,31 @@ import SlotInfo from '../../../helpers/SlotInfo';
 class SlotManager {
 
   // *****
-  constructor(count) {
+  constructor(count, slotTemplate = null) {
 
-    this.remoteSlots = [];
-    this.localSlots = [];
+    this.slots = [];
 
+    // initialize slot (either use default or 
+    // use the template passed in)
     for (let index = 0; index < count; index++) {
 
-      var slot = new SlotInfo( { key: index });
-      this.remoteSlots.push(slot);
-      this.localSlots.push(slot);
+      var slot = new SlotInfo();
+
+      // overlay template on new object
+      if (slotTemplate) {
+        slot.SetParticipant(slotTemplate);
+      }
+
+      slot.key = index;
+
+      this.slots.push(slot);
     }
 
   }
 
   // *****
-  RemoteSlots() {
-    return this.remoteSlots;
+  Slots() {
+    return this.slots;
   }
 
   // *****
@@ -29,7 +37,7 @@ class SlotManager {
 
     try {
 
-      for (let item of this.RemoteSlots()) {
+      for (let item of this.Slots()) {
         if (item.connectionId === connectionId)
           return item;
       }
@@ -48,7 +56,7 @@ class SlotManager {
 
     try {
 
-      for (let item of this.RemoteSlots()) {
+      for (let item of this.Slots()) {
         if (item.userId === userId)
           return item;
       }
@@ -67,7 +75,7 @@ class SlotManager {
 
     try {
 
-      for (let item of this.RemoteSlots()) {
+      for (let item of this.Slots()) {
         if (item.key === key)
           return item;
       }
@@ -87,8 +95,8 @@ class SlotManager {
 
     try {
 
-      for (let slot of this.RemoteSlots()) {
-        if (slot.isOpen()) {
+      for (let slot of this.Slots()) {
+        if (!slot.assigned) {
           return slot.key;
         }
       }
@@ -110,16 +118,17 @@ class SlotManager {
 
     log.debug(`assigning '${newLearner.userId}' to slot ${index}`);
 
-    let slot = this.RemoteSlots()[index];
+    let slot = this.Slots()[index];
     let learner = new Participant(newLearner);
 
-    slot.assigned = false;
-    slot.show = false;
+    slot.assigned = true;
+    slot.show = true;
+
     slot.SetParticipant(learner);
 
     log.debug(`assignLearner: ${learner.toString()}`);
 
-    return this.RemoteSlots()[index];
+    return this.Slots()[index];
   }
 
 };

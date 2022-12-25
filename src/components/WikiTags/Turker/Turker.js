@@ -30,7 +30,7 @@ class OlabModeratorTag extends React.Component {
       atriumLearners: [],
       userName: props.props.authActions.getUserName(),
       width: '100%',
-      localInfo: new SlotInfo(),
+      localInfo: null,
       sessionId: ''
     };
 

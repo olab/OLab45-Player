@@ -19,6 +19,7 @@ class Chat extends React.Component {
 
     this.state = {
       localInfo: this.props.localInfo,
+      senderInfo: this.props.senderInfo,
       conversation: [],
       playerProps: this.props.playerProps,
       message: '',
@@ -135,7 +136,8 @@ class Chat extends React.Component {
 
       const {
         conversation,
-        localInfo
+        localInfo,
+        senderInfo
       } = this.state;
 
       // ensure the message was for this chat box
@@ -152,8 +154,8 @@ class Chat extends React.Component {
       // if not system message, determine locality
       // of message
       if (!payload.isSystemMessage) {
-        log.info(`moderator msg locality: ('${localInfo.userId}' == '${payload.from}'?)`);
-        isLocal = localInfo.userId == payload.from;
+        log.info(`moderator msg locality: ('${senderInfo.userId}' == '${payload.from}'?)`);
+        isLocal = senderInfo.userId == payload.from;
       }
       else {
 
@@ -179,14 +181,14 @@ class Chat extends React.Component {
 
     try {
 
-      const { message, localInfo } = this.state;
+      const { message, senderInfo, localInfo } = this.state;
 
       if (message.length > 0) {
 
         const messagePayload = {
           envelope: {
             to: localInfo.commandChannel,
-            from: localInfo
+            from: senderInfo
           },
           Data: message
         };

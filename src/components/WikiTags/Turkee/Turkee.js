@@ -167,6 +167,7 @@ class OlabAttendeeTag extends React.Component {
       id,
       slotInfos,
       remoteInfo,
+      localInfo,
       userName
     } = this.state;
 
@@ -193,7 +194,7 @@ class OlabAttendeeTag extends React.Component {
               style={{ width: '100%' }}
               connection={this.connection}
               localInfo={slotInfo}
-              remoteInfo={remoteInfo}
+              senderInfo={slotInfo}
               playerProps={this.props.props} />
           </TableBody>
         </Table>
