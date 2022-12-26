@@ -23,7 +23,8 @@ class Chat extends React.Component {
       conversation: [],
       playerProps: this.props.playerProps,
       message: '',
-      isModerator: this.props.isModerator
+      isModerator: this.props.isModerator,
+      inMacroMode: false
     };
 
     this.connection = this.props.connection;
@@ -244,6 +245,17 @@ class Chat extends React.Component {
       this.onSendClicked(null);
       event.preventDefault();
     }
+
+    else if (event.key === '#') {
+      this.setState( { inMacroMode: true });
+      log.debug(`entering macro mode`);
+    }
+
+    else if (event.key === " ") {
+      this.setState( { inMacroMode: false });
+      log.debug(`exitting macro mode`);
+    }
+
   }
 
   onMessageTextChanged = (event) => {
