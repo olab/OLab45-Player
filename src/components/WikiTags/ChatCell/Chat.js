@@ -105,10 +105,10 @@ class Chat extends React.Component {
 
     this.onSystemMessageCallback({
       recipientGroupName: payload.local.commandChannel,
-      data: isModerator ? 
-        `'${payload.local.nickName}' connected to room` : 
+      data: isModerator ?
+        `'${payload.local.nickName}' connected to room` :
         `Connected to room. Moderator is '${payload.remote.nickName}'`
-    });    
+    });
   }
 
   onLearnerUnassigned(payload) {
@@ -116,7 +116,7 @@ class Chat extends React.Component {
     log.info(`onLearnerUnassigned (${JSON.stringify(payload, null, 1)})`);
 
     let { localInfo } = this.state;
-    
+
     this.onSystemMessageCallback({
       recipientGroupName: payload.local.commandChannel,
       data: `'${payload.userId}' has left the room`
@@ -240,20 +240,65 @@ class Chat extends React.Component {
     return { key, message, isLocalMessage };
   }
 
+  evaluateMacro() {
+
+    try {
+      let { message, localInfo } = this.state;
+
+      // put space char back on end so regex can match it
+      message += ' ';
+
+      const macroRegEx = /\~.*\s/gm;
+      let replaceString = '';
+
+      // extract macro name
+      let macro = macroRegEx.exec(message)[0].replace('~', '');
+      macro = macro.replace(' ', '');
+
+      switch (macro) {
+        case 'm':
+          replaceString = localInfo.nickName;
+          break;
+        case 'u':
+          replaceString = localInfo.userId;
+          break;
+        case 'greet':
+          replaceString = 'Hello there, how are you?';
+          break;
+        default:
+          break;
+      }
+
+      // do the string replacement
+      let newMsg = message.replace(macroRegEx, replaceString);
+      newMsg += ' ';
+
+      this.setState({ message: newMsg });
+
+    } catch (error) {
+      log.error(`evaluateMacro exception: ${error.message}`);
+    }
+
+  }
+
   onMessageKeyDown = (event) => {
+
+    let { inMacroMode, message } = this.state;
+
     if (event.key === 'Enter') {
       this.onSendClicked(null);
       event.preventDefault();
     }
 
-    else if (event.key === '#') {
-      this.setState( { inMacroMode: true });
+    else if (event.key === '~') {
+      this.setState({ inMacroMode: true });
       log.debug(`entering macro mode`);
     }
 
-    else if (event.key === " ") {
-      this.setState( { inMacroMode: false });
-      log.debug(`exitting macro mode`);
+    else if ((event.key === " ") && inMacroMode) {
+      log.debug(`evaluating macro ${message}`);
+      this.setState({ inMacroMode: false });
+      this.evaluateMacro();
     }
 
   }
