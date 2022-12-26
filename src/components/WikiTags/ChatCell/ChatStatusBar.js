@@ -72,19 +72,19 @@ class ChatStatusBar extends React.Component {
       const statusRightString = this.generateRightStatusString();
 
       const divLayout = { width: '100%', border: '2px solid black', backgroundColor: '#3333', borderTop: '0px solid black' };
-      const gridLayout = {  marginLeft: '10px', fontWeight: 'bold', backgroundColor: '#grey' };
+      const gridLayout = { fontWeight: 'bold', backgroundColor: '#grey' };
 
       return (
         <div style={divLayout}>
-          <Grid container className={'TurkeeStatusBar'} style={gridLayout}>
-            <Grid container justifyContent="start" item xs={4}>
-              {statusLeftString}
+          <Grid container style={gridLayout}>
+            <Grid container justifyContent="flex-start" item xs={4}>
+              &nbsp;{statusLeftString}
             </Grid>
             <Grid container justifyContent="center" item xs={4}>
               {statusCenterString}
             </Grid>
             <Grid container justifyContent="flex-end" item xs={4}>
-              {statusRightString}
+              {statusRightString}&nbsp;
             </Grid>
           </Grid>
         </div>

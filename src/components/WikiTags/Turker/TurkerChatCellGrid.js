@@ -11,6 +11,8 @@ import styles from '../styles.module.css';
 
 import SlotManager from '../ChatCell/SlotManager';
 import ChatCell from '../ChatCell/ChatCell'
+const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
+
 var constants = require('../../../services/constants');
 
 class TurkerChatCellGrid extends React.Component {
@@ -24,11 +26,7 @@ class TurkerChatCellGrid extends React.Component {
     this.NUM_ROWS = 2;
     this.numColumns = this.MAX_TURKEES / this.NUM_ROWS;
 
-    this.buildSlotManager();
-    // initialize property manager with array of Participant objects
-    // this.slotManager = new SlotManager(
-    // this.MAX_TURKEES,
-    // this.props.localInfo);
+    this.slotManager = this.buildSlotManager();
 
     this.connection = this.props.connection;
     this.roomName = this.props.roomName;
@@ -36,7 +34,7 @@ class TurkerChatCellGrid extends React.Component {
     this.state = {
       slotInfos: this.slotManager.Slots(),
       localInfo: this.props.localInfo,
-      hasAssignedLearner: false
+      hasAssignedLearner: this.slotManager.haveAssigned
     };
 
     this.onLearnerAssignmentChanged = this.onLearnerAssignmentChanged.bind(this);
@@ -81,9 +79,11 @@ class TurkerChatCellGrid extends React.Component {
 
       var chatInfos = this.slotManager.Slots();
       this.setState({
-        hasAssignedLearner: true,
+        hasAssignedLearner: this.slotManager.haveAssigned,
         chatInfos: chatInfos
       });
+
+      persistantStorage.save('slotInfos', chatInfos);
 
     } catch (error) {
       log.error(`onLearnerAssigned exception: ${error.message}`);
@@ -108,6 +108,8 @@ class TurkerChatCellGrid extends React.Component {
         chatInfo.assigned = false;
         this.setState({ chatInfos: chatInfos });
       }
+
+      persistantStorage.save('slotInfos', chatInfos);
 
     } catch (error) {
       log.error(`onLearnerUnassigned exception: ${error.message}`);
@@ -224,7 +226,7 @@ class TurkerChatCellGrid extends React.Component {
     // test if already have one, if so
     // then do nothing
     if (this.slotManager) {
-      return;
+      return this.slotManager;
     }
 
     // test if moderator is connected
@@ -235,7 +237,7 @@ class TurkerChatCellGrid extends React.Component {
       tempInfo.assigned = false;
       tempInfo.show = false;
 
-      this.slotManager = new SlotManager(
+      return new SlotManager(
         this.MAX_TURKEES,
         tempInfo);
     }

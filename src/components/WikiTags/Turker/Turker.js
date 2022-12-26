@@ -23,15 +23,21 @@ class OlabModeratorTag extends React.Component {
 
     super(props);
 
+    var atrium = persistantStorage.get(
+      'atrium', { 
+        atriumLearners: [], selectedLearnerUserId: '0' 
+      });
+
     this.state = {
       connectionStatus: '',
       maxHeight: 200,
-      selectedLearnerUserId: '0',
-      atriumLearners: [],
+      // selectedLearnerUserId: '0',
+      // atriumLearners: [],
       userName: props.props.authActions.getUserName(),
       width: '100%',
       localInfo: null,
-      sessionId: ''
+      sessionId: '',
+      ...atrium
     };
 
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
@@ -60,16 +66,8 @@ class OlabModeratorTag extends React.Component {
         this.onRoomAssigned(payload.data);
       }
 
-      else if (payload.command === constants.SIGNALCMD_LEARNER_ASSIGNED) {
-        this.onLearnerAssigned(payload.data);
-      }
-
       else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
         this.onAtriumUpdate(payload.data);
-      }
-
-      else if (payload.command === constants.SIGNALCMD_LEARNER_LIST) {
-        this.onLearnerList(payload.data);
       }
 
       else {
@@ -125,6 +123,9 @@ class OlabModeratorTag extends React.Component {
     try {
 
       let atriumLearners = [];
+      let {
+        localInfo
+      } = this.state;
 
       // save atrium contents if array passed in
       if (Array.isArray(payloadArray) && (payloadArray.length >= 0)) {
@@ -149,6 +150,8 @@ class OlabModeratorTag extends React.Component {
           selectedLearnerUserId: '0'
         });
 
+        this.updateAtriumState();
+
       }
 
     } catch (error) {
@@ -162,7 +165,9 @@ class OlabModeratorTag extends React.Component {
     try {
 
       let {
-        selectedLearnerUserId
+        selectedLearnerUserId,
+        atriumLearners,
+        localInfo
       } = this.state;
 
       // test for valid turkee selected from available list
@@ -178,6 +183,8 @@ class OlabModeratorTag extends React.Component {
         }
 
         this.setState({ selectedLearnerUserId: selectedLearnerUserId });
+
+        this.updateAtriumState();
       }
 
     } catch (error) {
@@ -211,21 +218,35 @@ class OlabModeratorTag extends React.Component {
       // signal server with assignment of turkee to this room
       this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, selectedLearner, localInfo.roomName);
 
+      this.updateAtriumState();
+
     } catch (error) {
       log.error(`onAssignClicked exception: ${error.message}`);
     }
 
   }
 
-  // learner has been assigned to the room so 
-  // we can 'open up' the chat grid
-  onLearnerAssigned(payload) {
+  updateAtriumState() {
 
     try {
-      this.setState({ foundConnectedChat: true });
+      let {
+        selectedLearnerUserId,
+        atriumLearners,
+        localInfo
+      } = this.state;
+  
+      const state = {
+        roomName: localInfo.roomName,
+        selectedLearnerUserId,
+        atriumLearners
+      };
+  
+      persistantStorage.save('atrium', state);
+        
     } catch (error) {
-      log.error(`onLearnerAssigned exception: ${error.message}`);
+      log.error(`updateAtriumState exception: ${error.message}`);
     }
+
   }
 
   // applies changes to connection status
@@ -239,7 +260,7 @@ class OlabModeratorTag extends React.Component {
         localInfo
       } = this.state;
 
-      localInfo.ConnectionId = connectionData.connection.connectionId;
+      localInfo.connectionId = connectionData.connection.connectionId;
       localInfo.Name = connectionData.Name;
 
       this.setState({
@@ -357,20 +378,25 @@ class OlabModeratorTag extends React.Component {
         <>
           <Grid container item xs={12}>
 
-            <TurkerChatCellGrid
-              isModerator={true}
-              connection={this.connection}
-              roomName={localInfo.roomName}
-              localInfo={localInfo}
-            />
+            <Grid container>
+              <TurkerChatCellGrid
+                isModerator={true}
+                connection={this.connection}
+                roomName={localInfo.roomName}
+                localInfo={localInfo}
+              />
 
-            <TurkerChatStatusBar
-              isModerator={true}
-              sessionId={sessionId}
-              connection={this.turker.connection}
-              localInfo={localInfo} />
+              <TurkerChatStatusBar
+                isModerator={true}
+                sessionId={sessionId}
+                connection={this.turker.connection}
+                localInfo={localInfo} />
 
-            &nbsp;
+            </Grid>
+
+            <Grid container>
+              <br />
+            </Grid>
 
             <Grid container>
               <Grid container item xs={3}>

@@ -1,29 +1,63 @@
 import log from 'loglevel';
 import Participant from '../../../helpers/participant';
 import SlotInfo from '../../../helpers/SlotInfo';
+const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
 
 class SlotManager {
 
   // *****
   constructor(count, slotTemplate = null) {
 
+    var slotInfos = persistantStorage.get('slotInfos', []);
+
     this.slots = [];
+    this.haveAssigned = false;
 
-    // initialize slot (either use default or 
-    // use the template passed in)
-    for (let index = 0; index < count; index++) {
+    // if have no saved slots, initialize a 
+    // new list of slots
+    if (slotInfos.length == 0) {
 
-      var slot = new SlotInfo();
+      // initialize slot (either use default or 
+      // use the template passed in)
+      for (let index = 0; index < count; index++) {
 
-      // overlay template on new object
-      if (slotTemplate) {
-        slot.SetParticipant(slotTemplate);
+        var slot = new SlotInfo();
+
+        // overlay template on new object
+        if (slotTemplate) {
+          slot.SetParticipant(slotTemplate);
+        }
+
+        // set flag that there is at least
+        // one assigned slot
+        if ( slot.assigned ) {
+          this.haveAssigned = true;
+        }
+
+        slot.key = index;
+        this.slots.push(slot);
       }
 
-      slot.key = index;
-
-      this.slots.push(slot);
     }
+    else {
+
+      for (let index = 0; index < count; index++) {
+        var slot = new SlotInfo(slotInfos[index]);
+
+        // set flag that there is at least
+        // one assigned slot
+        if ( slot.assigned ) {
+          this.haveAssigned = true;
+        }
+
+        slot.key = index;
+        this.slots.push(slot);        
+      }
+    }
+    
+    persistantStorage.save(
+      'slotInfos',
+      this.slots );    
 
   }
 
@@ -123,6 +157,8 @@ class SlotManager {
 
     slot.assigned = true;
     slot.show = true;
+
+    this.haveAssigned = true;
 
     slot.SetParticipant(learner);
 

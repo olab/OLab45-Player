@@ -3,13 +3,18 @@ import * as React from 'react';
 import {
   Table, TableBody, Button,
   TableCell, Paper, TableContainer,
-  TableHead, TableRow, TextField
+  TableHead, TableRow, TextField, Tooltip
 } from '@material-ui/core';
 import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
 import styles from '../styles.module.css';
 import { HubConnectionState } from '@microsoft/signalr';
 var constants = require('../../../services/constants');
+
+import SendIcon from '@material-ui/icons/Send';
+import ClearIcon from '@material-ui/icons/Clear';
+import CancelPresentationIcon from '@material-ui/icons/CancelPresentation';
+import BlockIcon from '@material-ui/icons/Block';
 
 class Chat extends React.Component {
 
@@ -315,7 +320,7 @@ class Chat extends React.Component {
 
   scrollToBottom = () => {
     let t = this.messageRef;
-    this.messageRef.current.scrollTop = this.messageRef.current.scrollHeight;
+    this.messageRef.current.scrollTop = this.messageRef.current?.scrollHeight;
   }
 
   render() {
@@ -429,13 +434,38 @@ class Chat extends React.Component {
                     />
                   </TableCell>
                   <TableCell align="right">
-                    <Button
-                      variant="contained"
-                      disabled={disabled}
-                      onClick={this.onSendClicked}
-                      color="primary">
-                      Send
-                    </Button>
+                    {(isModerator) && (
+                      <>
+                        <Tooltip title="Disconnect" placement="top">
+                          <Button
+                            variant="contained"
+                            disabled={disabled}
+                            onClick={this.onSendClicked}
+                            color="secondary">
+                            <CancelPresentationIcon/>
+                          </Button>
+                        </Tooltip>
+                        <Tooltip title="Clear" placement="top">
+                          <Button
+                            variant="contained"
+                            disabled={disabled}
+                            onClick={this.onSendClicked}
+                            color="primary">
+                            <ClearIcon />
+                          </Button>
+                        </Tooltip>
+                      </>
+                    )}
+                    <Tooltip title="Send" placement="top">
+                      <Button
+                        variant="contained"
+                        disabled={disabled}
+                        onClick={this.onSendClicked}
+                        color="primary">
+                        <SendIcon />
+                      </Button>
+                    </Tooltip>
+
                   </TableCell>
                 </TableRow>
               </TableBody>

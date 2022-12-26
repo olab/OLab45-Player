@@ -9,12 +9,13 @@ class SlotInfo {
     this.assigned = false;
     this.lastMessageTime = '-';
 
+    var tmp = new Participant();
+    Object.assign(this, { ...this, ...tmp });   
+        
     if (source) {
       Object.assign(this, { ...this, ...source });
     }
-
-    var tmp = new Participant();
-    Object.assign(this, { ...this, ...tmp });    
+ 
   }
 
   isOpen() {
