@@ -70,6 +70,7 @@ class ChatCell extends React.Component {
           isModerator={this.props.isModerator}
           onMessageReceived={this.onMessageReceived}
           connection={connection}
+          localInfo={localInfo}
           senderInfo={senderInfo} />
       </TableCell>
     );

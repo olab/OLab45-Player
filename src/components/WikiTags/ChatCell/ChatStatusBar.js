@@ -30,7 +30,7 @@ class ChatStatusBar extends React.Component {
         return `${connection._connectionState} (Id: ${connection.connectionId.slice(-3)})`;
       }
       else {
-        return;
+        return '-';
       }
 
     }
@@ -49,11 +49,13 @@ class ChatStatusBar extends React.Component {
       }
     }
 
+    return '-';
+
   }
 
   generateRightStatusString() {
 
-    if (this.props.isModerated) {
+    if (this.props.isModerator) {
       let { localInfo } = this.state;
       return localInfo?.nickName;
     }
@@ -70,18 +72,18 @@ class ChatStatusBar extends React.Component {
       const statusRightString = this.generateRightStatusString();
 
       const divLayout = { width: '100%', border: '2px solid black', backgroundColor: '#3333', borderTop: '0px solid black' };
-      const gridLayout = { marginLeft: '10px', fontWeight: 'bold', backgroundColor: '#grey' };
+      const gridLayout = {  marginLeft: '10px', fontWeight: 'bold', backgroundColor: '#grey' };
 
       return (
         <div style={divLayout}>
           <Grid container className={'TurkeeStatusBar'} style={gridLayout}>
-            <Grid container justifyContent="flex-start" item xs={4}>
+            <Grid container justifyContent="start" item xs={4}>
               {statusLeftString}
             </Grid>
             <Grid container justifyContent="center" item xs={4}>
               {statusCenterString}
             </Grid>
-            <Grid container justifyContent="flex-start" item xs={4}>
+            <Grid container justifyContent="flex-end" item xs={4}>
               {statusRightString}
             </Grid>
           </Grid>

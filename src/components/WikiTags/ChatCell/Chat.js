@@ -106,7 +106,7 @@ class Chat extends React.Component {
       recipientGroupName: payload.local.commandChannel,
       data: isModerator ? 
         `'${payload.local.nickName}' connected to room` : 
-        `Connected to room. Moderator is ${payload.remote.nickName}`
+        `Connected to room. Moderator is '${payload.remote.nickName}'`
     });    
   }
 
@@ -273,7 +273,7 @@ class Chat extends React.Component {
     } = this.state;
 
     const divLayout = { width: '100%', border: '2px solid black', backgroundColor: '#3333' };
-    const tableContainerStyle = { height: '100%', maxHeight: '200' };
+    const tableContainerStyle = { maxHeight: 200 };
     let disabled = true;
 
     // disable entry if:
