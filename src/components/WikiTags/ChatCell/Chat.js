@@ -123,8 +123,8 @@ class Chat extends React.Component {
     let { localInfo } = this.state;
 
     this.onSystemMessageCallback({
-      recipientGroupName: payload.local.commandChannel,
-      data: `'${payload.userId}' has left the room`
+      recipientGroupName: payload.commandChannel,
+      data: `'${payload.nickName}' has left the room`
     });
   }
 
