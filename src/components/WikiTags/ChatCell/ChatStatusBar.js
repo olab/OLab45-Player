@@ -26,7 +26,8 @@ class ChatStatusBar extends React.Component {
     this.messageTimer = null;
     this.connection = this.props.connection;
 
-    this.updateMessageTimer = this.updateMessageTimer.bind(this);
+    this.onMessageTimer = this.onMessageTimer.bind(this);
+    this.onMessageCallback = this.onMessageCallback.bind(this);
 
     var self = this;
     this.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => { self.onMessageCallback(payload) });
@@ -37,7 +38,9 @@ class ChatStatusBar extends React.Component {
   onMessageCallback(payload) {
 
     let {
-      lastMessageTime
+      lastMessageTime,
+      messageTimer,
+      localInfo
     } = this.state;
 
     lastMessageTime = new Date();
@@ -47,17 +50,20 @@ class ChatStatusBar extends React.Component {
 
     // if no message timer and this is a moderator
     // then start the message timer
-    if (!this.messageTimer && this.props.isModerator) {
-      this.messageTimer = setInterval(this.updateMessageTimer, 5000);
+    if (!messageTimer && this.props.isModerator) {
+      messageTimer = setInterval(this.onMessageTimer, 5000);
+      log.debug(`setting timer ${messageTimer}. Room '${localInfo.commandChannel}'`);
+      this.setState({ messageTimer: messageTimer });
     }
 
   }
 
-  updateMessageTimer() {
+  onMessageTimer() {
 
     let { 
       elapsedTime, 
-      lastMessageTime 
+      lastMessageTime,
+      localInfo
     } = this.state;
 
     const epochLast = lastMessageTime.getTime();
@@ -69,6 +75,8 @@ class ChatStatusBar extends React.Component {
       let seconds = diffSeconds - minutes * 60;
       elapsedTime = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
     }
+
+    log.debug(`timer ${this.messageTimer} fired.  Room '${localInfo.commandChannel}'. time: ${elapsedTime}`);
 
     this.setState({ elapsedTime: elapsedTime });
 
