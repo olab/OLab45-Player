@@ -218,6 +218,7 @@ class OlabModeratorTag extends React.Component {
       // signal server with assignment of turkee to this room
       this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, selectedLearner, localInfo.roomName);
 
+      // save atrium state to local storage
       this.updateAtriumState();
 
     } catch (error) {
