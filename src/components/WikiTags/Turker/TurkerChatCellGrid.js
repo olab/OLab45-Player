@@ -37,8 +37,6 @@ class TurkerChatCellGrid extends React.Component {
       hasAssignedLearner: this.slotManager.haveAssigned
     };
 
-    this.onLearnerAssignmentChanged = this.onLearnerAssignmentChanged.bind(this);
-
     var self = this;
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
 
@@ -116,16 +114,6 @@ class TurkerChatCellGrid extends React.Component {
     }
   }
 
-  // signal up connected learner assignments
-  onLearnerAssignmentChanged(connectedSlots) {
-
-    log.debug(`onLearnerAssignmentChanged: number of connected slots '${connectedSlots.length}'`);
-
-    if (this.props.onLearnerAssignmentChanged) {
-      this.props.onLearnerAssignmentChanged(connectedSlots);
-    }
-  }
-
   // handle learner list (for rebuilding
   // chat cells after a disconnect)
   onLearnerList(payloadArray) {
@@ -180,8 +168,12 @@ class TurkerChatCellGrid extends React.Component {
     let foundConnectedChat = false;
     let connectedSlots = [];
 
-    let rows = [];
+    let chatRows = [];
+
+    log.debug(`generateChatGrid:`);
+
     for (var rowIndex = 0; rowIndex < this.NUM_ROWS; rowIndex++) {
+
       let columns = [];
       for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {
 
@@ -194,20 +186,24 @@ class TurkerChatCellGrid extends React.Component {
 
         if (slotInfo.show) {
           foundConnectedChat = true;
-          connectedSlots.push(slotInfo);
-          columns.push(
-            <ChatCell
-              key={index}
-              isModerator={this.props.isModerator}
-              connection={this.connection}
-              localInfo={slotInfo}
-              senderInfo={localInfo}
-              playerProps={this.props.props} />
-          );
         }
+
+        log.debug(`   ${rowIndex}:${columnIndex}: '${slotInfo.commandChannel}' show? '${slotInfo.show}'`);
+
+        connectedSlots.push(slotInfo);
+        columns.push(
+          <ChatCell
+            key={index}
+            isModerator={this.props.isModerator}
+            connection={this.connection}
+            localInfo={slotInfo}
+            senderInfo={localInfo}
+            playerProps={this.props.props} />
+        );
+
       }
 
-      rows.push(
+      chatRows.push(
         <TableRow key={rowIndex}>
           {columns}
         </TableRow>
@@ -215,9 +211,29 @@ class TurkerChatCellGrid extends React.Component {
 
     }
 
-    this.onLearnerAssignmentChanged(connectedSlots);
+    if (foundConnectedChat) {
 
-    return rows;
+      const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
+
+      return (
+        <Table style={tableLayout}>
+          <TableBody>
+            {chatRows}
+          </TableBody>
+        </Table>
+      );
+
+    }
+    else {
+
+      const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
+
+      return (
+        <div style={emptyGridLayout} >
+          <h3>Waiting for learners</h3>
+        </div>
+      );
+    }
 
   }
 
@@ -232,7 +248,7 @@ class TurkerChatCellGrid extends React.Component {
     // test if moderator is connected
     if (this.props.localInfo) {
 
-      var tempInfo = Object.assign({}, this.props.localInfo );
+      var tempInfo = Object.assign({}, this.props.localInfo);
       tempInfo.commandChannel = null;
       tempInfo.assigned = false;
       tempInfo.show = false;
@@ -245,31 +261,8 @@ class TurkerChatCellGrid extends React.Component {
 
   render() {
 
-    const {
-      hasAssignedLearner,
-    } = this.state;
-
-    const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
-    const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
-
     let chatRows = this.generateChatGrid();
-
-    if (hasAssignedLearner && chatRows) {
-      return (
-        <Table style={tableLayout}>
-          <TableBody>
-            {chatRows}
-          </TableBody>
-        </Table>
-      );
-    }
-    else {
-      return (
-        <div style={emptyGridLayout} >
-          <h3>Waiting for learners</h3>
-        </div>
-      );
-    }
+    return chatRows;
 
   } catch(error) {
     return (

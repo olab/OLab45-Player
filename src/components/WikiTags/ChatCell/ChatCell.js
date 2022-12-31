@@ -15,7 +15,7 @@ var constants = require('../../../services/constants');
 class ChatCell extends React.Component {
 
   constructor(props) {
-    
+
     super(props);
 
     this.state = {
@@ -31,7 +31,7 @@ class ChatCell extends React.Component {
     this.connection = this.props.connection;
 
     var self = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });    
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
 
   }
 
@@ -41,10 +41,10 @@ class ChatCell extends React.Component {
   }
 
   // a message was received in a child component
-  onMessageReceived(message) {    
+  onMessageReceived(message) {
     let { lastMessageTime } = this.state;
     lastMessageTime = new Date();
-    this.setState( { lastMessageTime: lastMessageTime });
+    this.setState({ lastMessageTime: lastMessageTime });
   }
 
   render() {
@@ -57,23 +57,29 @@ class ChatCell extends React.Component {
       playerProps,
     } = this.state;
 
-    return (
-      <TableCell style={cellStyling}>
-        <Chat
-          isModerator={this.props.isModerator}
-          onMessageReceived={this.onMessageReceived}
-          connection={connection}
-          localInfo={localInfo}
-          senderInfo={senderInfo}
-          playerProps={playerProps} />
-        <ChatStatusBar
-          isModerator={this.props.isModerator}
-          onMessageReceived={this.onMessageReceived}
-          connection={connection}
-          localInfo={localInfo}
-          senderInfo={senderInfo} />
-      </TableCell>
-    );
+    if (localInfo.show) {
+      return (
+        <TableCell style={cellStyling}>
+          <Chat
+            isModerator={this.props.isModerator}
+            onMessageReceived={this.onMessageReceived}
+            connection={connection}
+            localInfo={localInfo}
+            senderInfo={senderInfo}
+            playerProps={playerProps} />
+          <ChatStatusBar
+            isModerator={this.props.isModerator}
+            onMessageReceived={this.onMessageReceived}
+            connection={connection}
+            localInfo={localInfo}
+            senderInfo={senderInfo} />
+        </TableCell>
+      );
+    }
+    else {
+      return (<></>);
+    }
+    
   } catch(error) {
     return (
       <b>TurkerStatusBar: {error.message}</b>
