@@ -6,6 +6,7 @@ import {
 import { withStyles } from '@material-ui/core/styles';
 import log from 'loglevel';
 import styles from '../styles.module.css';
+var constants = require('../../../services/constants');
 
 class ChatStatusBar extends React.Component {
 
@@ -17,8 +18,59 @@ class ChatStatusBar extends React.Component {
       lastUpdate: null,
       localInfo: this.props.localInfo,
       connection: this.props.connection,
-      isModerator: this.props.isModerator
+      isModerator: this.props.isModerator,
+      lastMessageTime: null,
+      elapsedTime: null
     };
+
+    this.messageTimer = null;
+    this.connection = this.props.connection;
+
+    this.updateMessageTimer = this.updateMessageTimer.bind(this);
+
+    var self = this;
+    this.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => { self.onMessageCallback(payload) });
+
+  }
+
+  // chat message method listener
+  onMessageCallback(payload) {
+
+    let {
+      lastMessageTime
+    } = this.state;
+
+    lastMessageTime = new Date();
+    this.setState({ 
+      elapsedTime: "00:00", 
+      lastMessageTime: lastMessageTime });
+
+    // if no message timer and this is a moderator
+    // then start the message timer
+    if (!this.messageTimer && this.props.isModerator) {
+      this.messageTimer = setInterval(this.updateMessageTimer, 5000);
+    }
+
+  }
+
+  updateMessageTimer() {
+
+    let { 
+      elapsedTime, 
+      lastMessageTime 
+    } = this.state;
+
+    const epochLast = lastMessageTime.getTime();
+    const epochNow = new Date().getTime();
+
+    var diffSeconds = Math.floor((epochNow - epochLast) / 1000);
+    if ( diffSeconds !== 0 ) {
+      let minutes = Math.floor(diffSeconds/60);
+      let seconds = diffSeconds - minutes * 60;
+      elapsedTime = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+    }
+
+    this.setState({ elapsedTime: elapsedTime });
 
   }
 
@@ -39,14 +91,14 @@ class ChatStatusBar extends React.Component {
 
   generateCenterStatusString() {
 
-    if (this.props.isModerated) {
+    if (this.props.isModerator) {
 
-      let { lastUpdate } = this.state;
-      if (lastUpdate) {
-        const hours = `0${lastUpdate.getHours()}`;
-        const minutes = `0${lastUpdate.getMinutes()}`;
-        return `Last rec'd: ${hours.slice(hours.length - 2)}:${minutes.slice(minutes.length - 2, minutes.length)}`;
+      let { elapsedTime } = this.state;
+
+      if (elapsedTime) {
+        return `Elapsed time: ${elapsedTime} sec`;
       }
+
     }
 
     return '-';

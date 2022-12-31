@@ -27,7 +27,6 @@ class ChatCell extends React.Component {
     };
 
     this.onCommandCallback = this.onCommandCallback.bind(this);
-    this.onMessageReceived = this.onMessageReceived.bind(this);
     this.connection = this.props.connection;
 
     var self = this;
@@ -40,13 +39,6 @@ class ChatCell extends React.Component {
     log.debug(`onChatCellCommandCallback: ${payload.command}`);
   }
 
-  // a message was received in a child component
-  onMessageReceived(message) {
-    let { lastMessageTime } = this.state;
-    lastMessageTime = new Date();
-    this.setState({ lastMessageTime: lastMessageTime });
-  }
-
   render() {
 
     const cellStyling = { padding: 7 }
@@ -55,6 +47,7 @@ class ChatCell extends React.Component {
       senderInfo,
       localInfo,
       playerProps,
+      lastMessageTime
     } = this.state;
 
     if (localInfo.show) {
@@ -62,16 +55,15 @@ class ChatCell extends React.Component {
         <TableCell style={cellStyling}>
           <Chat
             isModerator={this.props.isModerator}
-            onMessageReceived={this.onMessageReceived}
             connection={connection}
             localInfo={localInfo}
             senderInfo={senderInfo}
             playerProps={playerProps} />
           <ChatStatusBar
             isModerator={this.props.isModerator}
-            onMessageReceived={this.onMessageReceived}
             connection={connection}
             localInfo={localInfo}
+            lastMessageTime={lastMessageTime}
             senderInfo={senderInfo} />
         </TableCell>
       );
