@@ -40,7 +40,7 @@ class Chat extends React.Component {
     this.onCommandCallback = this.onCommandCallback.bind(this);
     this.onMessageCallback = this.onMessageCallback.bind(this);
     this.onSystemMessageCallback = this.onSystemMessageCallback.bind(this);
-    this.onRoomAssigned = this.onRoomAssigned.bind(this);
+    this.onLearnerAssigned = this.onParticipantAssigned.bind(this);
     this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
     // this.onRemoteDisconnected = this.onRemoteDisconnected.bind(this);
     this.scrollToBottom = this.scrollToBottom.bind(this);
@@ -65,23 +65,15 @@ class Chat extends React.Component {
     }
 
     else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-      this.onRoomAssigned(payload.data);
+      this.onParticipantAssigned(payload.data);
     }
 
     else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
       this.onLearnerUnassigned(payload.data);
     }
 
-    // else if (payload.command === constants.SIGNALCMD_TURKER_DISCONNECTED) {
-    //   this.onRemoteDisconnected(payload);
-    // }
-
-    // else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-    //   this.onRoomAssigned(payload.data);
-    // }
-
     else {
-      log.debug(`onChatCommandCallback unknown command: '${payload.command}'`);
+      log.debug(`onChatCommandCallback ignoring command: '${payload.command}'`);
     }
 
   }
@@ -100,11 +92,11 @@ class Chat extends React.Component {
     });
   }
 
-  // chat participant has been assigned to a room,
+  // participant has been assigned to a room,
   // so paint a message to the chat window  
-  onRoomAssigned(payload) {
+  onParticipantAssigned(payload) {
 
-    log.info(`onRoomAssigned (${JSON.stringify(payload, null, 1)})`);
+    log.info(`onParticipantAssigned (${JSON.stringify(payload, null, 1)})`);
 
     let { isModerator } = this.state;
 
@@ -177,6 +169,8 @@ class Chat extends React.Component {
         return;
       }
 
+      log.info(`onMessage: message for '${localInfo.commandChannel}'`);
+
       // tri-ary flag: 
       //  true = locally initiated message (echo), 
       //  false = remotely initiated message
@@ -186,12 +180,13 @@ class Chat extends React.Component {
       // if not system message, determine locality
       // of message
       if (!payload.isSystemMessage) {
-        log.info(`moderator msg locality: ('${senderInfo.userId}' == '${payload.from}'?)`);
+        log.info(`system message.  testing message direction: ('${senderInfo.userId}' == '${payload.from}'?)`);
         isLocal = senderInfo.userId == payload.from;
       }
       else {
 
-        // signal parent component of new message
+        // 'normal' message, so we can signal 
+        // parent component of new message
         if (this.props.onMessageReceived) {
           this.props.onMessageReceived(payload);
         }
