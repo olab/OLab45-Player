@@ -43,10 +43,17 @@ class ChatStatusBar extends React.Component {
       localInfo
     } = this.state;
 
+    // ensure the message was for this chat box
+    if (payload.recipientGroupName !== localInfo.commandChannel) {
+      log.info(`onMessage: message not for '${localInfo.commandChannel}'`);
+      return;
+    }
+
     lastMessageTime = new Date();
-    this.setState({ 
-      elapsedTime: "00:00", 
-      lastMessageTime: lastMessageTime });
+    this.setState({
+      elapsedTime: "00:00",
+      lastMessageTime: lastMessageTime
+    });
 
     // if no message timer and this is a moderator
     // then start the message timer
@@ -60,23 +67,24 @@ class ChatStatusBar extends React.Component {
 
   onMessageTimer() {
 
-    let { 
-      elapsedTime, 
+    let {
+      elapsedTime,
       lastMessageTime,
-      localInfo
+      localInfo,
+      messageTimer
     } = this.state;
 
     const epochLast = lastMessageTime.getTime();
     const epochNow = new Date().getTime();
 
     var diffSeconds = Math.floor((epochNow - epochLast) / 1000);
-    if ( diffSeconds !== 0 ) {
-      let minutes = Math.floor(diffSeconds/60);
+    if (diffSeconds !== 0) {
+      let minutes = Math.floor(diffSeconds / 60);
       let seconds = diffSeconds - minutes * 60;
-      elapsedTime = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+      elapsedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
-    log.debug(`timer ${this.messageTimer} fired.  Room '${localInfo.commandChannel}'. time: ${elapsedTime}`);
+    log.debug(`timer ${messageTimer} fired.  Room '${localInfo.commandChannel}'. time: ${elapsedTime}`);
 
     this.setState({ elapsedTime: elapsedTime });
 
