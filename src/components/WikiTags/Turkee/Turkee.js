@@ -38,6 +38,7 @@ class OlabAttendeeTag extends React.Component {
     this.turkee = new Turkee(this);
     this.turkee.connect(this.state.userName);
     this.connection = this.turkee.connection;
+    this.connectionId = '';
 
     this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
 
@@ -50,7 +51,7 @@ class OlabAttendeeTag extends React.Component {
 
     try {
 
-      log.debug(`onTurkeeCommandCallback: ${payload.command}`);
+      log.debug(`'${this.connectionId}' onTurkeeCommandCallback: ${payload.command}`);
 
       if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
         this.onRoomAssigned(payload.data);
@@ -61,11 +62,11 @@ class OlabAttendeeTag extends React.Component {
       }
 
       else {
-        log.debug(`onTurkeeCommandCallback unknown command: '${payload.command}'`);
+        log.debug(`'${this.connectionId}' onTurkeeCommandCallback unknown command: '${payload.command}'`);
       }
 
     } catch (error) {
-      log.error(`onTurkeeCommandCallback exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onTurkeeCommandCallback exception: ${error.message}`);
     }
 
   }
@@ -77,7 +78,7 @@ class OlabAttendeeTag extends React.Component {
     var slotInfo = this.propManager.Slots()[0];
     slotInfo.show = true;
 
-    log.debug(`onAtriumAssigned localInfo = ${JSON.stringify(slotInfo, null, 2)}]`);
+    log.debug(`'${this.connectionId}' onAtriumAssigned localInfo = ${JSON.stringify(slotInfo, null, 2)}]`);
     persistantStorage.save('connectionInfo', slotInfo);
 
     this.setState({
@@ -109,12 +110,12 @@ class OlabAttendeeTag extends React.Component {
         localInfo: slotInfo
       });
 
-      log.debug(`onRoomAssigned localInfo = ${JSON.stringify(slotInfo, null, 2)}]`);
+      log.debug(`'${this.connectionId}' onRoomAssigned localInfo = ${JSON.stringify(slotInfo, null, 2)}]`);
 
       persistantStorage.save('connectionInfo', slotInfo);
 
     } catch (error) {
-      log.error(`onRoomAssigned exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onRoomAssigned exception: ${error.message}`);
     }
 
   }
@@ -125,7 +126,7 @@ class OlabAttendeeTag extends React.Component {
 
   async componentWillUnmount() {
 
-    log.debug(`OlabAttendeeTag unmounting`);
+    log.debug(`'${this.connectionId}' OlabAttendeeTag unmounting`);
 
     this.componentMounted = false;
 
@@ -159,6 +160,9 @@ class OlabAttendeeTag extends React.Component {
       localInfo: connectionInfo,
       remoteInfo: remoteInfo
     });
+
+    this.connectionId = connectionInfo.connectionId;
+
   }
 
   render() {
@@ -174,7 +178,7 @@ class OlabAttendeeTag extends React.Component {
     const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
     let slotInfo = slotInfos[0];
 
-    log.debug(`OlabTurkeeTag render '${userName}'`);
+    log.debug(`'${this.connectionId}' OlabTurkeeTag render '${userName}'`);
 
     try {
 

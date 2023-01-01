@@ -6,6 +6,7 @@ import {
 import { withStyles } from '@material-ui/core/styles';
 import log from 'loglevel';
 import styles from '../styles.module.css';
+import { connect } from 'formik';
 var constants = require('../../../services/constants');
 
 class ChatStatusBar extends React.Component {
@@ -20,17 +21,63 @@ class ChatStatusBar extends React.Component {
       connection: this.props.connection,
       isModerator: this.props.isModerator,
       lastMessageTime: null,
-      elapsedTime: null
+      centerStatusString: null
     };
 
     this.messageTimer = null;
-    this.connection = this.props.connection;
+    this.connectionId = this.props.connection.connectionId?.slice(-3);
 
     this.onMessageTimer = this.onMessageTimer.bind(this);
     this.onMessageCallback = this.onMessageCallback.bind(this);
 
     var self = this;
-    this.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => { self.onMessageCallback(payload) });
+
+    this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
+      if (payload.commandChannel === this.state.localInfo.commandChannel) {
+        self.onCommandCallback(payload);
+      }
+    });
+
+    this.state.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => {
+      if (payload.commandChannel === this.state.localInfo.commandChannel) {
+        self.onMessageCallback(payload);
+      }
+    });
+
+  }
+
+  // command method listener
+  onCommandCallback(payload) {
+
+    log.debug(`'${this.connectionId}' onChatStatusBarCommandCallback: ${payload.command}`);
+
+    if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
+      this.onLearnerUnassigned(payload.data);
+    }
+
+    else {
+      log.debug(`'${this.connectionId}' onChatStatusBarCommandCallback: ignoring command: '${payload.command}'`);
+    }
+
+  }
+
+  onLearnerUnassigned(payload) {
+
+    let {
+      isModerator,
+      messageTimer,
+      centerStatusString
+    } = this.state;
+
+    if (isModerator) {
+      clearInterval(messageTimer);
+      messageTimer = null;
+      centerStatusString = '-';
+
+      this.setState({
+        messageTimer: messageTimer, centerStatusString: centerStatusString
+      });
+    }
 
   }
 
@@ -43,15 +90,9 @@ class ChatStatusBar extends React.Component {
       localInfo
     } = this.state;
 
-    // ensure the message was for this chat box
-    if (payload.recipientGroupName !== localInfo.commandChannel) {
-      log.info(`onMessage: message not for '${localInfo.commandChannel}'`);
-      return;
-    }
-
     lastMessageTime = new Date();
     this.setState({
-      elapsedTime: "00:00",
+      centerStatusString: "00:00",
       lastMessageTime: lastMessageTime
     });
 
@@ -59,7 +100,7 @@ class ChatStatusBar extends React.Component {
     // then start the message timer
     if (!messageTimer && this.props.isModerator) {
       messageTimer = setInterval(this.onMessageTimer, 5000);
-      log.debug(`setting timer ${messageTimer}. Room '${localInfo.commandChannel}'`);
+      log.debug(`'${this.connectionId}' setting timer ${messageTimer}. Room '${localInfo.commandChannel}'`);
       this.setState({ messageTimer: messageTimer });
     }
 
@@ -68,7 +109,7 @@ class ChatStatusBar extends React.Component {
   onMessageTimer() {
 
     let {
-      elapsedTime,
+      centerStatusString,
       lastMessageTime,
       localInfo,
       messageTimer
@@ -81,12 +122,12 @@ class ChatStatusBar extends React.Component {
     if (diffSeconds !== 0) {
       let minutes = Math.floor(diffSeconds / 60);
       let seconds = diffSeconds - minutes * 60;
-      elapsedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      centerStatusString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
-    log.debug(`timer ${messageTimer} fired.  Room '${localInfo.commandChannel}'. time: ${elapsedTime}`);
+    log.debug(`'${this.connectionId}'  timer ${messageTimer} fired.  Room '${localInfo.commandChannel}'. seconds: ${diffSeconds}`);
 
-    this.setState({ elapsedTime: elapsedTime });
+    this.setState({ centerStatusString: centerStatusString });
 
   }
 
@@ -102,6 +143,9 @@ class ChatStatusBar extends React.Component {
       }
 
     }
+    else {
+      return connection._connectionState;
+    }
 
   }
 
@@ -109,10 +153,10 @@ class ChatStatusBar extends React.Component {
 
     if (this.props.isModerator) {
 
-      let { elapsedTime } = this.state;
+      let { centerStatusString } = this.state;
 
-      if (elapsedTime) {
-        return `Elapsed time: ${elapsedTime} sec`;
+      if (centerStatusString) {
+        return centerStatusString;
       }
 
     }

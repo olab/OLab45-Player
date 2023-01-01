@@ -33,9 +33,9 @@ class Turkee extends TurkTalk {
   // *****
   onConnected(clientObject) {
 
-    log.info(`onConnected: connection succeeded.  Id = '${this.connection.connectionId}'`);
+    log.info(`'${this.connection.connectionId}' onConnected: connection succeeded`);
 
-    this.connectionId = this.connection.connectionId;
+    this.connectionId = this.connection.connectionId.slice(-3);
 
     this.connection.onclose(clientObject.onDisconnected);
     this.connection.onreconnecting(clientObject.onReconnecting);
@@ -44,7 +44,7 @@ class Turkee extends TurkTalk {
     if (this.component.onConnectionChanged) {
       this.component.onConnectionChanged({
         connectionStatus: this.connection._connectionState,
-        ConnectionId: this.connectionId,
+        connectionId: this.connectionId,
         Name: this.username
       });
     }
@@ -57,7 +57,7 @@ class Turkee extends TurkTalk {
       roomName = connectionInfo.roomName;
     }
 
-    log.debug(`registering learner for room name: ${roomName}`);
+    log.debug(`'${this.connectionId}' registering learner for room name: ${roomName}`);
 
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKEE,
@@ -66,7 +66,7 @@ class Turkee extends TurkTalk {
 
   onReconnecting(error) {
     try {
-      log.debug(`onReconnecting: ${error}`);
+      log.debug(`'${this.connectionId}' onReconnecting: ${error}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -75,13 +75,13 @@ class Turkee extends TurkTalk {
         });
       }
     } catch (error) {
-      log.error(`onReconnecting exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onReconnecting exception: ${error.message}`);
     }
   }
 
   onReconnected(connectionId) {
     try {
-      log.debug(`onReconnected: ${connectionId}`);
+      log.debug(`'${connectionId}' onReconnected`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -90,7 +90,7 @@ class Turkee extends TurkTalk {
         });
       }
     } catch (error) {
-      log.error(`onReconnected exception: ${error.message}`);
+      log.error(`'${connectionId}' onReconnected exception: ${error.message}`);
     }
   }
 
@@ -103,7 +103,7 @@ class Turkee extends TurkTalk {
         return;
       }
 
-      log.debug(`onDisconnected`);
+      log.debug(`'${this.connectionId}' onDisconnected`);
 
       if (this?.component?.onConnectionChanged) {
 
@@ -112,13 +112,13 @@ class Turkee extends TurkTalk {
 
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
-          ConnectionId: '',
+          connectionId: '',
           Name: this.username
         });
       }
 
     } catch (error) {
-      log.error(`onDisconnected exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onDisconnected exception: ${error.message}`);
     }
 
   }
@@ -128,7 +128,7 @@ class Turkee extends TurkTalk {
 
     try {
 
-      log.debug(`onCommandCallback: ${payload.command}`);
+      log.debug(`'${this.connectionId}' onCommandCallback: ${payload.command}`);
 
       // test if command NOT handled in base class
       if (super.onCommandCallback(payload)) {
@@ -163,11 +163,11 @@ class Turkee extends TurkTalk {
       // }
 
       else {
-        log.debug(`onCommandCallback unknown command: '${payload.command}'`);
+        log.debug(`'${this.connectionId}' onCommandCallback unknown command: '${payload.command}'`);
       }
 
     } catch (error) {
-      log.error(`onCommandCallback exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onCommandCallback exception: ${error.message}`);
     }
 
   }

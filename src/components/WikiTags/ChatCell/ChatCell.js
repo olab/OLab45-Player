@@ -27,16 +27,16 @@ class ChatCell extends React.Component {
     };
 
     this.onCommandCallback = this.onCommandCallback.bind(this);
-    this.connection = this.props.connection;
+    this.connectionId = this.state.connection.connectionId?.slice(-3);
 
     var self = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
+    this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
 
   }
 
   // command method listener
   onCommandCallback(payload) {
-    log.debug(`onChatCellCommandCallback: ${payload.command}`);
+    // log.debug(`'${this.state.connection.connectionId?.slice(-3)}' onChatCellCommandCallback: ${payload.command}`);
   }
 
   render() {

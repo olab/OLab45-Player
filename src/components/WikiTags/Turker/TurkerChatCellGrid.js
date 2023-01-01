@@ -28,7 +28,6 @@ class TurkerChatCellGrid extends React.Component {
 
     this.slotManager = this.buildSlotManager();
 
-    this.connection = this.props.connection;
     this.roomName = this.props.roomName;
 
     this.state = {
@@ -37,19 +36,24 @@ class TurkerChatCellGrid extends React.Component {
       hasAssignedLearner: this.slotManager.haveAssigned
     };
 
+    this.connection = this.props.connection;
+    this.connectionId = this.props.connection.connectionId?.slice(-3);
+
     var self = this;
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
 
   }
 
+  componentDidUpdate(prevProps) {
+    if(prevProps.localInfo !== this.props.localInfo) {
+      this.setState({localInfo: this.props.localInfo});
+    }
+  }
+
   // *****
   onCommandCallback(payload) {
 
-    log.debug(`onTurkerChatGridCommandCallback: ${payload.command}`);
-
-    // if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-    //   this.onCommandRoomAssigned(payload.data);
-    // }
+    log.debug(`'${this.connectionId}' onTurkerChatGridCommandCallback: ${payload.command}`);
 
     if (payload.command === constants.SIGNALCMD_LEARNER_ASSIGNED) {
       this.onLearnerAssigned(payload.data);
@@ -60,7 +64,7 @@ class TurkerChatCellGrid extends React.Component {
     }
 
     else {
-      log.debug(`onTurkerChatGridCommandCallback ignoring command: '${payload.command}'`);
+      log.debug(`'${this.connectionId}' onTurkerChatGridCommandCallback ignoring command: '${payload.command}'`);
     }
 
   }
@@ -84,7 +88,7 @@ class TurkerChatCellGrid extends React.Component {
       persistantStorage.save('slotInfos', chatInfos);
 
     } catch (error) {
-      log.error(`onLearnerAssigned exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onLearnerAssigned exception: ${error.message}`);
     }
   }
 
@@ -93,7 +97,7 @@ class TurkerChatCellGrid extends React.Component {
 
     try {
 
-      log.debug(`onLearnerUnassigned: connectionId '${payload}'`);
+      log.debug(`'${this.connectionId}' onLearnerUnassigned: connectionId '${payload}'`);
 
       let {
         chatInfos
@@ -110,7 +114,7 @@ class TurkerChatCellGrid extends React.Component {
       persistantStorage.save('slotInfos', chatInfos);
 
     } catch (error) {
-      log.error(`onLearnerUnassigned exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onLearnerUnassigned exception: ${error.message}`);
     }
   }
 
@@ -138,7 +142,7 @@ class TurkerChatCellGrid extends React.Component {
         }
       }
 
-      log.debug(`onLearnerList: refreshing: '${JSON.stringify(learners)}'`);
+      log.debug(`'${this.connectionId}' onLearnerList: refreshing: '${JSON.stringify(learners)}'`);
 
       // re-initialize property manager with array of Participant objects
       this.slotManager = new SlotManager(this.MAX_TURKEES);
@@ -153,7 +157,7 @@ class TurkerChatCellGrid extends React.Component {
       this.setState({ slotInfos: slotInfos });
 
     } catch (error) {
-      log.error(`onLearnerList exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onLearnerList exception: ${error.message}`);
     }
 
   }
@@ -170,7 +174,7 @@ class TurkerChatCellGrid extends React.Component {
 
     let chatRows = [];
 
-    log.debug(`generateChatGrid:`);
+    log.debug(`'${this.connectionId}' generateChatGrid:`);
 
     for (var rowIndex = 0; rowIndex < this.NUM_ROWS; rowIndex++) {
 

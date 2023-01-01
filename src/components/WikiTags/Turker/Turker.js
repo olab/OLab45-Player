@@ -24,9 +24,9 @@ class OlabModeratorTag extends React.Component {
     super(props);
 
     var atrium = persistantStorage.get(
-      'atrium', { 
-        atriumLearners: [], selectedLearnerUserId: '0' 
-      });
+      'atrium', {
+      atriumLearners: [], selectedLearnerUserId: '0'
+    });
 
     this.state = {
       connectionStatus: '',
@@ -35,7 +35,7 @@ class OlabModeratorTag extends React.Component {
       // atriumLearners: [],
       userName: props.props.authActions.getUserName(),
       width: '100%',
-      localInfo: null,
+      localInfo: {},
       sessionId: '',
       ...atrium
     };
@@ -51,6 +51,7 @@ class OlabModeratorTag extends React.Component {
     this.turker = new Turker(this);
     this.turker.connect(this.state.userName);
     this.connection = this.turker.connection;
+    this.connectionId = '';
 
     var self = this;
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
@@ -60,7 +61,7 @@ class OlabModeratorTag extends React.Component {
 
     try {
 
-      log.debug(`onTurkerCommandCallback: ${payload.command}`);
+      log.debug(`'${this.connectionId}' onTurkerCommandCallback: ${payload.command}`);
 
       if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
         this.onRoomAssigned(payload.data);
@@ -71,11 +72,11 @@ class OlabModeratorTag extends React.Component {
       }
 
       else {
-        log.debug(`onTurkerCommandCallback unknown command: '${payload.command}'`);
+        log.debug(`'${this.connectionId}' onTurkerCommandCallback unknown command: '${payload.command}'`);
       }
 
     } catch (error) {
-      log.error(`onTurkerCommandCallback exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onTurkerCommandCallback exception: ${error.message}`);
     }
 
   }
@@ -107,12 +108,12 @@ class OlabModeratorTag extends React.Component {
         localInfo: localInfo
       });
 
-      log.debug(`onRoomAssigned localInfo = ${JSON.stringify(localInfo, null, 2)}]`);
+      log.debug(`'${this.connectionId}' onRoomAssigned localInfo = ${JSON.stringify(localInfo, null, 2)}]`);
 
       persistantStorage.save('connectionInfo', localInfo);
 
     } catch (error) {
-      log.error(`onRoomAssigned exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onRoomAssigned exception: ${error.message}`);
     }
 
   }
@@ -143,7 +144,7 @@ class OlabModeratorTag extends React.Component {
           atriumLearners.push(learner);
         }
 
-        log.debug(`onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
+        log.debug(`'${this.connectionId}' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
 
         this.setState({
           atriumLearners: atriumLearners,
@@ -155,7 +156,7 @@ class OlabModeratorTag extends React.Component {
       }
 
     } catch (error) {
-      log.error(`onAtriumUpdate exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onAtriumUpdate exception: ${error.message}`);
     }
 
   }
@@ -173,7 +174,7 @@ class OlabModeratorTag extends React.Component {
       // test for valid turkee selected from available list
       if (event.target.value !== '0') {
 
-        log.debug(`onAtriumLearnerSelected: ${event.target.value}`);
+        log.debug(`'${this.connectionId}' onAtriumLearnerSelected: ${event.target.value}`);
 
         // find learner in atrium list
         for (let item of this.state.atriumLearners) {
@@ -188,7 +189,7 @@ class OlabModeratorTag extends React.Component {
       }
 
     } catch (error) {
-      log.error(`onAtriumLearnerSelected exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onAtriumLearnerSelected exception: ${error.message}`);
     }
 
   }
@@ -213,7 +214,7 @@ class OlabModeratorTag extends React.Component {
 
       let { localInfo } = this.state;
 
-      log.debug(`onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
+      log.debug(`'${this.connectionId}' onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
 
       // signal server with assignment of turkee to this room
       this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, selectedLearner, localInfo.roomName);
@@ -222,7 +223,7 @@ class OlabModeratorTag extends React.Component {
       this.updateAtriumState();
 
     } catch (error) {
-      log.error(`onAssignClicked exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onAssignClicked exception: ${error.message}`);
     }
 
   }
@@ -235,17 +236,17 @@ class OlabModeratorTag extends React.Component {
         atriumLearners,
         localInfo
       } = this.state;
-  
+
       const state = {
         roomName: localInfo.roomName,
         selectedLearnerUserId,
         atriumLearners
       };
-  
+
       persistantStorage.save('atrium', state);
-        
+
     } catch (error) {
-      log.error(`updateAtriumState exception: ${error.message}`);
+      log.error(`'${this.connectionId}' updateAtriumState exception: ${error.message}`);
     }
 
   }
@@ -253,7 +254,7 @@ class OlabModeratorTag extends React.Component {
   // applies changes to connection status
   onConnectionChanged(connectionData) {
 
-    log.debug(`onConnectionChanged: ${connectionData.connection._connectionState}, id: ${connectionData.connection.connectionId}`);
+    log.debug(`'${this.connectionId}' onConnectionChanged: ${connectionData.connection._connectionState}, id: ${connectionData.connection.connectionId}`);
 
     try {
 
@@ -269,94 +270,13 @@ class OlabModeratorTag extends React.Component {
         connectionStatus: connectionData.connection._connectionState
       });
 
+      this.connectionId = connectionData.connection.connectionId?.slice(-3);
+
     } catch (error) {
-      log.error(`onConnectionChanged exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onConnectionChanged exception: ${error.message}`);
     }
 
   }
-
-  // onRoomRejoined(payload) {
-
-  //   try {
-
-  //     let {
-  //       chatInfos,
-  //     } = this.state;
-
-  //     let learner = new Participant(payload);
-  //     log.debug(`onRoomRejoined: setting room: '${learner.toString()}'`);
-
-  //     // get chat for learner.  when found, mark the chat
-  //     // as (re)connected).
-  //     let chatInfo = this.propManager.getSlotByUserId(learner.userId);
-  //     if (chatInfo) {
-  //       chatInfo.connected = true;
-  //       chatInfos = this.propManager.Slots();
-  //       this.setState({ chatInfos: chatInfos });
-  //     }
-
-  //   } catch (error) {
-  //     log.error(`onRoomRejoined exception: ${error.message}`);
-  //   }
-
-  // }
-
-  // assignLearnerToChat(learner) {
-
-  //   try {
-
-  //     let {
-  //       chatInfos,
-  //     } = this.state;
-
-  //     var slot = this.propManager.assignLearner(learner);
-  //     chatInfos = this.propManager.Slots();
-
-  //     this.setState({ chatInfos: chatInfos });
-
-  //     return slot;
-
-  //   } catch (error) {
-  //     log.error(`assignLearnerToChat exception: ${error.message}`);
-  //   }
-  // }
-
-  // handle learner list (for rebuilding
-  // chat cells after a disconnect)
-  // onLearnerList(payloadArray) {
-
-  //   try {
-
-  //     let learners = [];
-
-  //     // save atrium contents if array passed in
-  //     if (Array.isArray(payloadArray) && (payloadArray.length >= 0)) {
-  //       let key = 1;
-  //       for (const payloadItem of payloadArray) {
-
-  //         // make a copy of the object so it can be modified  
-  //         var learner = Object.assign({}, payloadItem);
-
-  //         // add a 'key/value' properties so atriumContents plays nicely with
-  //         // javascript .map()
-  //         learner.key = `${key++}`;
-
-  //         learners.push(learner);
-  //       }
-  //     }
-
-  //     log.debug(`onLearnerList: refreshing: '${JSON.stringify(learners)}'`);
-
-  //     for (const learner of learners) {
-  //       // add learner to chat component
-  //       this.assignLearnerToChat(learner);
-  //     }
-
-  //   } catch (error) {
-  //     log.error(`onLearnerList exception: ${error.message}`);
-  //   }
-
-  // }
 
   render() {
 
@@ -369,7 +289,7 @@ class OlabModeratorTag extends React.Component {
       sessionId,
     } = this.state;
 
-    log.debug(`OlabTurkerTag render '${userName}'`);
+    log.debug(`'${this.connectionId}' OlabTurkerTag render '${userName}'`);
 
     const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
     const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
