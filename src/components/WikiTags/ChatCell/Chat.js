@@ -144,7 +144,7 @@ class Chat extends React.Component {
     localInfo.assigned = false;
 
     this.setState({ localInfo: localInfo });
-    
+
     this.onSystemMessageCallback({
       commandChannel: payload.commandChannel,
       data: `'${payload.nickName}' has left the room`
@@ -289,7 +289,7 @@ class Chat extends React.Component {
   evaluateMacro() {
 
     try {
-      let { message, localInfo } = this.state;
+      let { message, localInfo, senderInfo } = this.state;
 
       // put space char back on end so regex can match it
       message += ' ';
@@ -303,10 +303,10 @@ class Chat extends React.Component {
 
       switch (macro) {
         case 'n':
-          replaceString = localInfo.nickName;
+          replaceString = senderInfo.nickName;
           break;
         case 'u':
-          replaceString = localInfo.userId;
+          replaceString = senderInfo.userId;
           break;
         case 'greet':
           replaceString = 'Hello there, how are you?';
