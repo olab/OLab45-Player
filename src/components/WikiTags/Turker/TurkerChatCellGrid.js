@@ -112,7 +112,14 @@ class TurkerChatCellGrid extends React.Component {
         localSlots: localSlots
       });
 
-      persistantStorage.save('slotInfos', chatInfos);
+      // update the slot state in storage
+      persistantStorage.save(
+        'slotState',
+        {
+          remoteSlots: remoteSlots,
+          localSlots: localSlots
+        }
+      );
 
     } catch (error) {
       log.error(`'${this.connectionId}' onLearnerAssigned exception: ${error.message}`);
@@ -127,7 +134,8 @@ class TurkerChatCellGrid extends React.Component {
       log.debug(`'${this.connectionId}' onLearnerUnassigned: connectionId '${payload}'`);
 
       let {
-        chatInfos
+        localSlots,
+        remoteSlots
       } = this.state;
 
       // get chat for connection id.  when found, mark the chat
@@ -138,7 +146,14 @@ class TurkerChatCellGrid extends React.Component {
         this.setState({ chatInfos: chatInfos });
       }
 
-      persistantStorage.save('slotInfos', chatInfos);
+      // update the slot state in storage
+      persistantStorage.save(
+        'slotState',
+        {
+          remoteSlots: remoteSlots,
+          localSlots: localSlots
+        }
+      );
 
     } catch (error) {
       log.error(`'${this.connectionId}' onLearnerUnassigned exception: ${error.message}`);

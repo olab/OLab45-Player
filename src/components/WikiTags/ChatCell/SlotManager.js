@@ -15,23 +15,21 @@ class SlotManager {
         localSlots: []
       });
 
-    // var slotInfos = persistantStorage.get('slotInfos', []);
-
     this.haveAssigned = false;
     this.haveLocalAssigned = false;
+    this.remoteSlots = [];
+    this.localSlots = [];
 
     // if have no saved slots, initialize a 
     // new list of slots
-    if (localSlots.length == 0) {
-      
-      this.remoteSlots = [];
-      this.localSlots = [];
+    if (localSlots.length == 0) {      
 
       // initialize slot (either use default or 
       // use the template passed in)
       for (let index = 0; index < count; index++) {
 
         var slot = new SlotInfo();
+        slot.key = index;
 
         this.localSlots.push(Object.assign({}, slot));
 
@@ -46,7 +44,6 @@ class SlotManager {
           this.haveAssigned = true;
         }
 
-        slot.key = index;
         this.remoteSlots.push(slot);
 
       }
@@ -63,10 +60,12 @@ class SlotManager {
     }
     else {
 
-      this.remoteSlots = remoteSlots;
-      this.localSlots = localSlots;
-
+      // make objects read from storage full
+      // SlotInfo objects again
       for (let index = 0; index < count; index++) {
+
+        this.remoteSlots.push(new SlotInfo(remoteSlots[index]));
+        this.localSlots.push(new SlotInfo(localSlots[index]));
 
         // set flag that there is at least
         // one assigned slot
@@ -151,7 +150,7 @@ class SlotManager {
 
     try {
 
-      for (let slot of this.Slots()) {
+      for (let slot of this.LocalSlots()) {
         if (!slot.assigned) {
           return slot.key;
         }
@@ -186,7 +185,7 @@ class SlotManager {
 
     let index = this.getOpenSlotIndex();
     if (index == null) {
-      throw new Error(`No available slots to assign learner ${learner.userId} `);
+      throw new Error(`No available slots to assign learner ${newLearner.userId} `);
     }
 
     log.debug(`assigning '${newLearner.userId}' to slot ${index}`);

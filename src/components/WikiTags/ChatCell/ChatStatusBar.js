@@ -19,6 +19,7 @@ class ChatStatusBar extends React.Component {
       show: this.props.show,
       lastUpdate: null,
       localInfo: this.props.localInfo,
+      senderInfo: this.props.senderInfo,
       connection: this.props.connection,
       isModerator: this.props.isModerator,
       lastMessageTime: null,
@@ -34,13 +35,13 @@ class ChatStatusBar extends React.Component {
     var chatStatusBarSelf = this;
 
     this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
-      if (payload.commandChannel === this.state.localInfo.commandChannel) {
+      if (payload.commandChannel === this.state.senderInfo.commandChannel) {
         chatStatusBarSelf.onCommandCallback(payload);
       }
     });
 
     this.state.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => {
-      if (payload.commandChannel === this.state.localInfo.commandChannel) {
+      if (payload.commandChannel === this.state.senderInfo.commandChannel) {
         chatStatusBarSelf.onMessageCallback(payload);
       }
     });
@@ -51,6 +52,12 @@ class ChatStatusBar extends React.Component {
     if (prevProps.show !== this.props.show) {
       this.setState({ show: this.props.show });
     }
+    if (prevProps.senderInfo !== this.props.senderInfo) {
+      this.setState({ senderInfo: this.props.senderInfo });
+    }
+    if (prevProps.localInfo !== this.props.localInfo) {
+      this.setState({ localInfo: this.props.localInfo });
+    }        
   }
 
   // command method listener
@@ -103,9 +110,9 @@ class ChatStatusBar extends React.Component {
       senderInfo
     } = this.state;
 
-    // test if incoming message, meaning we set
-    // the last incoming message time
-    if (payload.from === localInfo.userId) {
+    // test if incoming message from remote side, meaning we set
+    // the last incoming message time and start the timer
+    if (payload.from !== localInfo.userId) {
 
       lastMessageTime = new Date();
       this.setState({
@@ -123,7 +130,7 @@ class ChatStatusBar extends React.Component {
       }
     }
 
-    // message is from sender, so remove the timer
+    // message is from myself, so remove the timer
     else {
 
       clearInterval(messageTimer);
