@@ -8,18 +8,24 @@ class SlotManager {
   // *****
   constructor(count, slotTemplate = null) {
 
-    var slotInfos = []; // persistantStorage.get('slotInfos', []);
-    // var slotInfos = persistantStorage.get('slotInfos', []);
+    var { remoteSlots, localSlots } = persistantStorage.get(
+      'slotState',
+      {
+        remoteSlots: [],
+        localSlots: []
+      });
 
-    this.remoteSlots = [];
-    this.localSlots = [];
+    // var slotInfos = persistantStorage.get('slotInfos', []);
 
     this.haveAssigned = false;
     this.haveLocalAssigned = false;
 
     // if have no saved slots, initialize a 
     // new list of slots
-    if (slotInfos.length == 0) {
+    if (localSlots.length == 0) {
+      
+      this.remoteSlots = [];
+      this.localSlots = [];
 
       // initialize slot (either use default or 
       // use the template passed in)
@@ -27,7 +33,7 @@ class SlotManager {
 
         var slot = new SlotInfo();
 
-        this.localSlots.push( Object.assign( {}, slot ) );
+        this.localSlots.push(Object.assign({}, slot));
 
         // overlay template on new object
         if (slotTemplate) {
@@ -45,26 +51,30 @@ class SlotManager {
 
       }
 
+      // update the slot state in storage
+      persistantStorage.save(
+        'slotState',
+        {
+          remoteSlots: this.remoteSlots,
+          localSlots: this.localSlots
+        }
+      );
+
     }
     else {
 
+      this.remoteSlots = remoteSlots;
+      this.localSlots = localSlots;
+
       for (let index = 0; index < count; index++) {
-        var slot = new SlotInfo(slotInfos[index]);
 
         // set flag that there is at least
         // one assigned slot
-        if (slot.assigned) {
+        if (localSlots[index].assigned) {
           this.haveAssigned = true;
         }
-
-        slot.key = index;
-        this.remoteSlots.push(slot);
       }
     }
-
-    persistantStorage.save(
-      'slotInfos',
-      this.remoteSlots);
 
   }
 
@@ -161,7 +171,7 @@ class SlotManager {
     for (let index = 0; index < this.LocalSlots().length; index++) {
 
       // overwrite the local info array
-      let slotLocalInfo = new SlotInfo(localInfo);      
+      let slotLocalInfo = new SlotInfo(localInfo);
       slotLocalInfo.key = index;
 
       this.LocalSlots()[index] = slotLocalInfo;
@@ -189,7 +199,7 @@ class SlotManager {
 
     // clone the localInfo so we can set it's properties
     // per slot
-    let newLocalInfo = Object.assign( {}, localInfo );
+    let newLocalInfo = Object.assign({}, localInfo);
     newLocalInfo.show = true;
     newLocalInfo.assigned = true;
     newLocalInfo.commandChannel = newLearner.commandChannel;
@@ -197,8 +207,8 @@ class SlotManager {
 
     log.debug(`assignLearner: ${learner.toString()}`);
 
-    return { 
-      remoteSlot: this.Slots()[index], 
+    return {
+      remoteSlot: this.Slots()[index],
       localSlot: this.LocalSlots()[index]
     }
   }
