@@ -35,7 +35,7 @@ class OlabModeratorTag extends React.Component {
       // atriumLearners: [],
       userName: props.props.authActions.getUserName(),
       width: '100%',
-      localInfo: {},
+      localInfo: new SlotInfo(),
       sessionId: '',
       ...atrium
     };
@@ -46,7 +46,7 @@ class OlabModeratorTag extends React.Component {
     this.onTurkeeSelected = this.onAtriumLearnerSelected.bind(this);
     this.onAssignClicked = this.onAssignClicked.bind(this);
     this.onCloseClicked = this.onCloseClicked.bind(this);
-    
+
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
     this.onAtriumLearnerSelected = this.onAtriumLearnerSelected.bind(this);
 
@@ -102,7 +102,6 @@ class OlabModeratorTag extends React.Component {
 
       localInfo = new SlotInfo();
       localInfo.assigned = true;
-      localInfo.show = true;
 
       localInfo.SetParticipant(moderator);
 
@@ -203,7 +202,7 @@ class OlabModeratorTag extends React.Component {
     log.debug(`'${this.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`);
 
     // signal server to close out this room
-    this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);    
+    this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
   }
 
   onAssignClicked(event) {
@@ -264,25 +263,15 @@ class OlabModeratorTag extends React.Component {
   }
 
   // applies changes to connection status
-  onConnectionChanged(connectionData) {
-
-    log.debug(`'${this.connectionId}' onConnectionChanged: ${connectionData.connection._connectionState}, id: ${connectionData.connection.connectionId}`);
+  onConnectionChanged(connectionInfo) {
 
     try {
 
-      let {
-        localInfo
-      } = this.state;
-
-      localInfo.connectionId = connectionData.connection.connectionId;
-      localInfo.Name = connectionData.Name;
-
       this.setState({
-        localInfo: localInfo,
-        connectionStatus: connectionData.connection._connectionState
+        connectionStatus: connectionInfo.connectionStatus,
       });
 
-      this.connectionId = connectionData.connection.connectionId?.slice(-3);
+      this.connectionId = connectionInfo.connectionId;
 
     } catch (error) {
       log.error(`'${this.connectionId}' onConnectionChanged exception: ${error.message}`);
@@ -302,9 +291,6 @@ class OlabModeratorTag extends React.Component {
     } = this.state;
 
     log.debug(`'${this.connectionId}' OlabTurkerTag render '${userName}'`);
-
-    const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
-    const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
 
     try {
       return (
@@ -365,7 +351,7 @@ class OlabModeratorTag extends React.Component {
               <Grid container item xs={4}>
                 &nbsp;
               </Grid>
-              <Grid container  justifyContent="flex-end" item xs={4}>
+              <Grid container justifyContent="flex-end" item xs={4}>
                 <Button
                   variant="contained"
                   color="primary"

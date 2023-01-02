@@ -54,7 +54,8 @@ class Turker extends TurkTalk {
 
     if (this.component.onConnectionChanged) {
       this.component.onConnectionChanged({
-        connection: this.connection.connection,
+        connectionStatus: this.connection._connectionState,
+        connectionId: this.connectionId,
         Name: this.username
       });
     }

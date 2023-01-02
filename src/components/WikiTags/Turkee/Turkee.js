@@ -32,6 +32,7 @@ class OlabAttendeeTag extends React.Component {
       slotInfos: this.propManager.Slots(),
       maxHeight: 200,
       remoteInfo: new SlotInfo(),
+      localInfo: new SlotInfo(),
       userName: props.props.authActions.getUserName(),
       width: '100%',
       id: this.props.name,
@@ -77,14 +78,19 @@ class OlabAttendeeTag extends React.Component {
   // learner has been assigned to an atrium
   onAtriumAssigned(learner) {
 
-    this.propManager.assignLearner(learner);
-    var slotInfo = this.propManager.Slots()[0];
+    learner.isModerator = false;
+    learner.show = true;
 
-    log.debug(`'${this.connectionId}' onAtriumAssigned localInfo = ${JSON.stringify(slotInfo, null, 2)}]`);
-    persistantStorage.save('connectionInfo', slotInfo);
+    this.propManager.assignLocalInfo(learner);
+    // this.propManager.assignLearner(learner);
+    var localInfo = this.propManager.LocalSlots()[0];
+    localInfo.connectionId = localInfo.connectionId.slice(-3);
+
+    log.debug(`'${this.connectionId}' onAtriumAssigned localInfo = ${JSON.stringify(localInfo, null, 2)}]`);
+    persistantStorage.save('connectionInfo', localInfo);
 
     this.setState({
-      localInfo: slotInfo
+      localInfo: localInfo
     });
 
 
@@ -155,11 +161,8 @@ class OlabAttendeeTag extends React.Component {
       remoteInfo
     } = this.state;
 
-    remoteInfo.RoomName = connectionInfo.RoomName;
-
     this.setState({
       connectionStatus: connectionInfo.connectionStatus,
-      localInfo: connectionInfo,
       remoteInfo: remoteInfo
     });
 
@@ -196,11 +199,11 @@ class OlabAttendeeTag extends React.Component {
         <Table style={tableLayout}>
           <TableBody>
             <ChatCell
-              isModerator={false}
+              isModerator={localInfo.isModerator}
               style={{ width: '100%' }}
               connection={this.connection}
-              localInfo={slotInfo}
-              senderInfo={slotInfo}
+              localInfo={localInfo}
+              senderInfo={remoteInfo}
               playerProps={this.props.props} />
           </TableBody>
         </Table>

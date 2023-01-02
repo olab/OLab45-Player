@@ -8,7 +8,8 @@ class SlotManager {
   // *****
   constructor(count, slotTemplate = null) {
 
-    var slotInfos = persistantStorage.get('slotInfos', []);
+    var slotInfos = []; // persistantStorage.get('slotInfos', []);
+    // var slotInfos = persistantStorage.get('slotInfos', []);
 
     this.remoteSlots = [];
     this.localSlots = [];
@@ -25,6 +26,8 @@ class SlotManager {
       for (let index = 0; index < count; index++) {
 
         var slot = new SlotInfo();
+
+        this.localSlots.push( Object.assign( {}, slot ) );
 
         // overlay template on new object
         if (slotTemplate) {
@@ -155,16 +158,13 @@ class SlotManager {
 
     // make copy of localInfo so it can be modified per slot
 
-    for (let index = 0; index < this.Slots().length; index++) {
+    for (let index = 0; index < this.LocalSlots().length; index++) {
 
-      // create editable copy of localInfo
+      // overwrite the local info array
       let slotLocalInfo = new SlotInfo(localInfo);      
-
-      slotLocalInfo.show = false;
-      slotLocalInfo.assigned = false;      
       slotLocalInfo.key = index;
 
-      this.localSlots.push(slotLocalInfo);
+      this.LocalSlots()[index] = slotLocalInfo;
     }
 
     this.haveLocalAssigned = true;
@@ -172,7 +172,7 @@ class SlotManager {
   }
 
   // *****
-  assignLearner(newLearner) {
+  assignLearner(localInfo, newLearner) {
 
     let index = this.getOpenSlotIndex();
     if (index == null) {
@@ -187,14 +187,20 @@ class SlotManager {
     this.haveAssigned = true;
     slot.SetParticipant(learner);
 
-    let localInfo = this.LocalSlots()[index];
-    localInfo.show = true;
-    localInfo.assigned = true;
-    localInfo.commandChannel = newLearner.commandChannel;
+    // clone the localInfo so we can set it's properties
+    // per slot
+    let newLocalInfo = Object.assign( {}, localInfo );
+    newLocalInfo.show = true;
+    newLocalInfo.assigned = true;
+    newLocalInfo.commandChannel = newLearner.commandChannel;
+    this.LocalSlots()[index] = newLocalInfo;
 
     log.debug(`assignLearner: ${learner.toString()}`);
 
-    return this.Slots()[index];
+    return { 
+      remoteSlot: this.Slots()[index], 
+      localSlot: this.LocalSlots()[index]
+    }
   }
 
 };

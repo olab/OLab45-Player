@@ -31,7 +31,8 @@ class TurkerChatCellGrid extends React.Component {
     this.roomName = this.props.roomName;
 
     this.state = {
-      slotInfos: this.slotManager.Slots(),
+      localSlots: this.slotManager.Slots(),
+      remoteSlots: this.slotManager.LocalSlots(),
       localInfo: this.props.localInfo,
       hasAssignedLearner: this.slotManager.haveAssigned
     };
@@ -45,8 +46,30 @@ class TurkerChatCellGrid extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(prevProps.localInfo !== this.props.localInfo) {
-      this.setState({localInfo: this.props.localInfo});
+    if (prevProps.localInfo !== this.props.localInfo) {
+      this.setState({ localInfo: this.props.localInfo });
+    }
+  }
+
+  buildSlotManager() {
+
+    // test if already have one, if so
+    // then do nothing
+    if (this.slotManager) {
+      return this.slotManager;
+    }
+
+    // test if moderator is connected
+    if (this.props.localInfo) {
+
+      var tempInfo = Object.assign({}, this.props.localInfo);
+      tempInfo.commandChannel = null;
+      tempInfo.assigned = false;
+      tempInfo.show = false;
+
+      return new SlotManager(
+        this.MAX_TURKEES,
+        tempInfo);
     }
   }
 
@@ -74,15 +97,19 @@ class TurkerChatCellGrid extends React.Component {
 
     try {
 
-      var slot = this.slotManager.assignLearner(payload);
+      const { localInfo } = this.state;
+      let { localSlot, remoteSlot } = this.slotManager.assignLearner(localInfo, payload);
 
-      slot.assigned = true;
-      slot.show = true;
+      localSlot.assigned = true;
+      localSlot.show = true;
 
-      var chatInfos = this.slotManager.Slots();
+      var remoteSlots = this.slotManager.Slots();
+      var localSlots = this.slotManager.LocalSlots();
+
       this.setState({
         hasAssignedLearner: this.slotManager.haveAssigned,
-        chatInfos: chatInfos
+        remoteSlots: remoteSlots,
+        localSlots: localSlots
       });
 
       persistantStorage.save('slotInfos', chatInfos);
@@ -165,56 +192,60 @@ class TurkerChatCellGrid extends React.Component {
   generateChatGrid() {
 
     const {
-      slotInfos,
+      remoteSlots,
+      localSlots,
       localInfo
     } = this.state;
 
     let foundConnectedChat = false;
-    let connectedSlots = [];
 
     let chatRows = [];
 
     log.debug(`'${this.connectionId}' generateChatGrid:`);
 
-    for (var rowIndex = 0; rowIndex < this.NUM_ROWS; rowIndex++) {
+    // only do grid work if localInfo is not empty
+    if (!localInfo.isEmpty()) {
 
-      let columns = [];
-      for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {
+      for (var rowIndex = 0; rowIndex < this.NUM_ROWS; rowIndex++) {
 
-        const index = (rowIndex * this.numColumns) + columnIndex;
+        let columns = [];
+        for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {
 
-        // make a copy of the current moderator so we can
-        // assigned learner-specific information (allowing 
-        // individual state for each chat grid item)
-        const slotInfo = slotInfos[index];
+          const index = (rowIndex * this.numColumns) + columnIndex;
 
-        if (slotInfo.show) {
-          foundConnectedChat = true;
+          // make a copy of the current moderator so we can
+          // assigned learner-specific information (allowing 
+          // individual state for each chat grid item)
+          const remoteSlot = remoteSlots[index];
+          const localSlot = localSlots[index];
+
+          if (localSlot.show) {
+            foundConnectedChat = true;
+          }
+
+          log.debug(`   ${rowIndex}:${columnIndex}: '${remoteSlot.commandChannel}' show? '${localSlot.show}'`);
+
+          columns.push(
+            <ChatCell
+              key={index}
+              isModerator={this.props.isModerator}
+              connection={this.connection}
+              localInfo={localSlot}
+              senderInfo={remoteSlot}
+              playerProps={this.props.props} />
+          );
+
         }
 
-        log.debug(`   ${rowIndex}:${columnIndex}: '${slotInfo.commandChannel}' show? '${slotInfo.show}'`);
-
-        connectedSlots.push(slotInfo);
-        columns.push(
-          <ChatCell
-            key={index}
-            isModerator={this.props.isModerator}
-            connection={this.connection}
-            localInfo={slotInfo}
-            senderInfo={localInfo}
-            playerProps={this.props.props} />
+        chatRows.push(
+          <TableRow key={rowIndex}>
+            {columns}
+          </TableRow>
         );
 
       }
-
-      chatRows.push(
-        <TableRow key={rowIndex}>
-          {columns}
-        </TableRow>
-      );
-
     }
-
+    
     if (foundConnectedChat) {
 
       const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
@@ -239,28 +270,6 @@ class TurkerChatCellGrid extends React.Component {
       );
     }
 
-  }
-
-  buildSlotManager() {
-
-    // test if already have one, if so
-    // then do nothing
-    if (this.slotManager) {
-      return this.slotManager;
-    }
-
-    // test if moderator is connected
-    if (this.props.localInfo) {
-
-      var tempInfo = Object.assign({}, this.props.localInfo);
-      tempInfo.commandChannel = null;
-      tempInfo.assigned = false;
-      tempInfo.show = false;
-
-      return new SlotManager(
-        this.MAX_TURKEES,
-        tempInfo);
-    }
   }
 
   render() {

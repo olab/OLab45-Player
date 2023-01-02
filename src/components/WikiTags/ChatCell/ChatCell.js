@@ -34,6 +34,12 @@ class ChatCell extends React.Component {
 
   }
 
+  componentDidUpdate(prevProps) {
+    if(prevProps.localInfo !== this.props.localInfo) {
+      this.setState({localInfo: this.props.localInfo});
+    }
+  }
+
   // command method listener
   onCommandCallback(payload) {
     // log.debug(`'${this.state.connection.connectionId?.slice(-3)}' onChatCellCommandCallback: ${payload.command}`);
