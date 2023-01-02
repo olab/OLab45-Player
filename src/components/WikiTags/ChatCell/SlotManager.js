@@ -10,8 +10,11 @@ class SlotManager {
 
     var slotInfos = persistantStorage.get('slotInfos', []);
 
-    this.slots = [];
+    this.remoteSlots = [];
+    this.localSlots = [];
+
     this.haveAssigned = false;
+    this.haveLocalAssigned = false;
 
     // if have no saved slots, initialize a 
     // new list of slots
@@ -30,12 +33,13 @@ class SlotManager {
 
         // set flag that there is at least
         // one assigned slot
-        if ( slot.assigned ) {
+        if (slot.assigned) {
           this.haveAssigned = true;
         }
 
         slot.key = index;
-        this.slots.push(slot);
+        this.remoteSlots.push(slot);
+
       }
 
     }
@@ -46,24 +50,29 @@ class SlotManager {
 
         // set flag that there is at least
         // one assigned slot
-        if ( slot.assigned ) {
+        if (slot.assigned) {
           this.haveAssigned = true;
         }
 
         slot.key = index;
-        this.slots.push(slot);        
+        this.remoteSlots.push(slot);
       }
     }
-    
+
     persistantStorage.save(
       'slotInfos',
-      this.slots );    
+      this.remoteSlots);
 
   }
 
   // *****
   Slots() {
-    return this.slots;
+    return this.remoteSlots;
+  }
+
+  // *****
+  LocalSlots() {
+    return this.localSlots;
   }
 
   // *****
@@ -142,6 +151,26 @@ class SlotManager {
     return null;
   }
 
+  assignLocalInfo(localInfo) {
+
+    // make copy of localInfo so it can be modified per slot
+
+    for (let index = 0; index < this.Slots().length; index++) {
+
+      // create editable copy of localInfo
+      let slotLocalInfo = new SlotInfo(localInfo);      
+
+      slotLocalInfo.show = false;
+      slotLocalInfo.assigned = false;      
+      slotLocalInfo.key = index;
+
+      this.localSlots.push(slotLocalInfo);
+    }
+
+    this.haveLocalAssigned = true;
+
+  }
+
   // *****
   assignLearner(newLearner) {
 
@@ -156,8 +185,12 @@ class SlotManager {
     let learner = new Participant(newLearner);
 
     this.haveAssigned = true;
-
     slot.SetParticipant(learner);
+
+    let localInfo = this.LocalSlots()[index];
+    localInfo.show = true;
+    localInfo.assigned = true;
+    localInfo.commandChannel = newLearner.commandChannel;
 
     log.debug(`assignLearner: ${learner.toString()}`);
 

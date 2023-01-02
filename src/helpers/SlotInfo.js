@@ -29,6 +29,10 @@ class SlotInfo {
     Object.assign(this, { ...this, ...learner });        
     this.key = slotKey;
   }
+
+  isEmpty() {
+    return !this.userId;
+  }
 }
 
 export default SlotInfo;
