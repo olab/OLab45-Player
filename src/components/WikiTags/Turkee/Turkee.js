@@ -23,6 +23,9 @@ class OlabAttendeeTag extends React.Component {
     super(props);
 
     this.propManager = new SlotManager(1);
+    // this makes the chat and status bar
+    // components visible
+    this.propManager.Slots()[0].show = true;
 
     this.state = {
       connectionStatus: '',
@@ -76,7 +79,6 @@ class OlabAttendeeTag extends React.Component {
 
     this.propManager.assignLearner(learner);
     var slotInfo = this.propManager.Slots()[0];
-    slotInfo.show = true;
 
     log.debug(`'${this.connectionId}' onAtriumAssigned localInfo = ${JSON.stringify(slotInfo, null, 2)}]`);
     persistantStorage.save('connectionInfo', slotInfo);

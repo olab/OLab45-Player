@@ -11,6 +11,7 @@ module.exports = Object.freeze({
     SIGNALCMD_ASSIGNTURKEE:       'assignAttendee',
     SIGNALMETHOD_MESSAGE:         'message',
     SIGNALCMD_ROOMASSIGNED:       'roomassignment',
+    SIGNALCMD_ROOMCLOSE:          'roomclose',
     SIGNALCMD_ROOMREJOINED:       'roomrejoined',
     SIGNALCMD_LEARNER_UNASSIGNED: 'learnerunassignment',
     SIGNALCMD_ATRIUMASSIGNED:     'atriumassignment',

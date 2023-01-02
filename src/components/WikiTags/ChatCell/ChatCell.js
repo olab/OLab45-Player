@@ -50,28 +50,26 @@ class ChatCell extends React.Component {
       lastMessageTime
     } = this.state;
 
-    if (localInfo.show) {
-      return (
-        <TableCell style={cellStyling}>
-          <Chat
-            isModerator={this.props.isModerator}
-            connection={connection}
-            localInfo={localInfo}
-            senderInfo={senderInfo}
-            playerProps={playerProps} />
-          <ChatStatusBar
-            isModerator={this.props.isModerator}
-            connection={connection}
-            localInfo={localInfo}
-            lastMessageTime={lastMessageTime}
-            senderInfo={senderInfo} />
-        </TableCell>
-      );
-    }
-    else {
-      return (<></>);
-    }
-    
+    return (
+      <TableCell style={cellStyling}>
+        <Chat
+          show={localInfo.show}
+          isModerator={this.props.isModerator}
+          connection={connection}
+          localInfo={localInfo}
+          senderInfo={senderInfo}
+          playerProps={playerProps} />
+        <ChatStatusBar
+          show={localInfo.show}
+          isModerator={this.props.isModerator}
+          connection={connection}
+          localInfo={localInfo}
+          lastMessageTime={lastMessageTime}
+          senderInfo={senderInfo} />
+      </TableCell>
+    );
+
+
   } catch(error) {
     return (
       <b>TurkerStatusBar: {error.message}</b>

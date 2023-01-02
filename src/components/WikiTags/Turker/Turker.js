@@ -45,6 +45,8 @@ class OlabModeratorTag extends React.Component {
 
     this.onTurkeeSelected = this.onAtriumLearnerSelected.bind(this);
     this.onAssignClicked = this.onAssignClicked.bind(this);
+    this.onCloseClicked = this.onCloseClicked.bind(this);
+    
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
     this.onAtriumLearnerSelected = this.onAtriumLearnerSelected.bind(this);
 
@@ -192,6 +194,16 @@ class OlabModeratorTag extends React.Component {
       log.error(`'${this.connectionId}' onAtriumLearnerSelected exception: ${error.message}`);
     }
 
+  }
+
+  onCloseClicked(event) {
+
+    const { localInfo } = this.state;
+
+    log.debug(`'${this.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`);
+
+    // signal server to close out this room
+    this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);    
   }
 
   onAssignClicked(event) {
@@ -348,6 +360,20 @@ class OlabModeratorTag extends React.Component {
                   onClick={this.onAssignClicked}
                 >
                   &nbsp;Assign&nbsp;
+                </Button>
+              </Grid>
+              <Grid container item xs={4}>
+                &nbsp;
+              </Grid>
+              <Grid container  justifyContent="flex-end" item xs={4}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  style={{ verticalAlign: 'center', height: '30px' }}
+                  onClick={this.onCloseClicked}
+                >
+                  &nbsp;Close Room&nbsp;
                 </Button>
               </Grid>
             </Grid>

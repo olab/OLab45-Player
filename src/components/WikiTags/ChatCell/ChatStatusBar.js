@@ -16,6 +16,7 @@ class ChatStatusBar extends React.Component {
     super(props);
 
     this.state = {
+      show: this.props.show,
       lastUpdate: null,
       localInfo: this.props.localInfo,
       connection: this.props.connection,
@@ -30,20 +31,26 @@ class ChatStatusBar extends React.Component {
     this.onMessageTimer = this.onMessageTimer.bind(this);
     this.onMessageCallback = this.onMessageCallback.bind(this);
 
-    var self = this;
+    var chatStatusBarSelf = this;
 
     this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
       if (payload.commandChannel === this.state.localInfo.commandChannel) {
-        self.onCommandCallback(payload);
+        chatStatusBarSelf.onCommandCallback(payload);
       }
     });
 
     this.state.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => {
       if (payload.commandChannel === this.state.localInfo.commandChannel) {
-        self.onMessageCallback(payload);
+        chatStatusBarSelf.onMessageCallback(payload);
       }
     });
 
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.show !== this.props.show) {
+      this.setState({ show: this.props.show });
+    }
   }
 
   // command method listener
@@ -84,24 +91,52 @@ class ChatStatusBar extends React.Component {
   // chat message method listener
   onMessageCallback(payload) {
 
+    // if not moderator, we are done here
+    if (!this.props.isModerator) {
+      return;
+    }
+
     let {
       lastMessageTime,
       messageTimer,
-      localInfo
+      localInfo,
+      senderInfo
     } = this.state;
 
-    lastMessageTime = new Date();
-    this.setState({
-      centerStatusString: "00:00",
-      lastMessageTime: lastMessageTime
-    });
+    // test if incoming message, meaning we set
+    // the last incoming message time
+    if (payload.from === localInfo.userId) {
 
-    // if no message timer and this is a moderator
-    // then start the message timer
-    if (!messageTimer && this.props.isModerator) {
-      messageTimer = setInterval(this.onMessageTimer, 5000);
-      log.debug(`'${this.connectionId}' setting timer ${messageTimer}. Room '${localInfo.commandChannel}'`);
-      this.setState({ messageTimer: messageTimer });
+      lastMessageTime = new Date();
+      this.setState({
+        centerStatusString: "00:00",
+        lastMessageTime: lastMessageTime
+      });
+
+      // if no message timer start one
+      if (!messageTimer) {
+
+        messageTimer = setInterval(this.onMessageTimer, 5000);
+        log.debug(`'${this.connectionId}' setting timer ${messageTimer}. Room '${localInfo.commandChannel}'`);
+        this.setState({ messageTimer: messageTimer });
+
+      }
+    }
+
+    // message is from sender, so remove the timer
+    else {
+
+      clearInterval(messageTimer);
+
+      lastMessageTime = null;
+      this.setState({
+        centerStatusString: "-",
+        lastMessageTime: lastMessageTime,
+        messageTimer: null
+      });
+
+      log.debug(`'${this.connectionId}' clearing timer. Room '${localInfo.commandChannel}'`);
+
     }
 
   }
@@ -178,6 +213,12 @@ class ChatStatusBar extends React.Component {
   render() {
 
     try {
+
+      let { show } = this.state;
+
+      if (!show) {
+        return null;
+      }
 
       const statusLeftString = this.generateLeftStatusString();
       const statusCenterString = this.generateCenterStatusString();

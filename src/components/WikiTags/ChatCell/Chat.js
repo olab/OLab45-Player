@@ -23,6 +23,7 @@ class Chat extends React.Component {
     super(props);
 
     this.state = {
+      show: this.props.show,
       localInfo: this.props.localInfo,
       senderInfo: this.props.senderInfo,
       conversation: [],
@@ -46,14 +47,20 @@ class Chat extends React.Component {
     // this.onRemoteDisconnected = this.onRemoteDisconnected.bind(this);
     this.scrollToBottom = this.scrollToBottom.bind(this);
 
-    var self = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
-    this.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => { self.onMessageCallback(payload) });
-    this.connection.on(constants.SIGNALMETHOD_SYSTEM_MESSAGE, (payload) => { self.onSystemMessageCallback(payload) });
+    var chatSelf = this;
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { chatSelf.onCommandCallback(payload) });
+    this.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => { chatSelf.onMessageCallback(payload) });
+    this.connection.on(constants.SIGNALMETHOD_SYSTEM_MESSAGE, (payload) => { chatSelf.onSystemMessageCallback(payload) });
 
     this.messageRef = React.createRef();
 
     log.debug(`'${this.connectionId}' Chat component initialized.  group = '${this.props.localInfo?.roomName}'`);
+  }
+
+  componentDidUpdate(prevProps) {
+    if(prevProps.show !== this.props.show) {
+      this.setState({show: this.props.show});
+    }
   }
 
   // command method listener
@@ -153,6 +160,7 @@ class Chat extends React.Component {
 
       payload.isSystemMessage = true;
       this.onMessageCallback(payload);
+
     } catch (error) {
       log.error(`'${this.connectionId}' onSystemMessage exception: ${error.message}`);
     }
@@ -211,6 +219,18 @@ class Chat extends React.Component {
       log.error(`'${this.connectionId}' onChatMessage exception: ${error.message}`);
     }
 
+  }
+
+  onClearClicked = (event) => {
+
+    let { localInfo } = this.state;
+
+    this.setState( { conversation: [] } );     
+
+    this.onSystemMessageCallback({
+      commandChannel: localInfo.commandChannel,
+      data: `'Conversation cleared`
+    });      
   }
 
   onSendClicked = (event) => {
@@ -335,8 +355,13 @@ class Chat extends React.Component {
       message,
       width,
       isModerator,
-      localInfo
+      localInfo,
+      show
     } = this.state;
+
+    if ( !show ) {
+      return null;
+    }
 
     const divLayout = { width: '100%', border: '2px solid black', backgroundColor: '#3333' };
     const tableContainerStyle = { maxHeight: 200 };
@@ -382,7 +407,7 @@ class Chat extends React.Component {
                     )}
                     {(conversationItem.isLocalMessage === true) && (
                       <TableCell style={{ borderBottom: "none" }} align="left">
-                        <b>You::&nbsp;</b>
+                        <b>You:&nbsp;</b>
                         <span
                           style={{
                             border: 'none',
@@ -399,7 +424,7 @@ class Chat extends React.Component {
                     )}
                     {(conversationItem.isLocalMessage === false) && (
                       <TableCell style={{ borderBottom: "none" }} align="right">
-                        <b>Moderator:&nbsp;</b>
+                        <b>{!isModerator ? "Moderator" : localInfo.userId}:&nbsp;</b>
                         <span
                           style={{
                             border: 'none',
@@ -443,21 +468,21 @@ class Chat extends React.Component {
                         <Tooltip title="Disconnect" placement="top">
                           <Button
                             variant="contained"
-                            disabled={disabled}
+                            disabled={true}
                             onClick={this.onSendClicked}
                             color="secondary">
                             <CancelPresentationIcon/>
                           </Button>
                         </Tooltip>
-                        <Tooltip title="Clear" placement="top">
+                        {/* <Tooltip title="Clear" placement="top">
                           <Button
                             variant="contained"
                             disabled={disabled}
-                            onClick={this.onSendClicked}
+                            onClick={this.onClearClicked}
                             color="primary">
                             <ClearIcon />
                           </Button>
-                        </Tooltip>
+                        </Tooltip> */}
                       </>
                     )}
                     <Tooltip title="Send" placement="top">
