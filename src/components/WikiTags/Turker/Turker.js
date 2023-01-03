@@ -314,7 +314,7 @@ class OlabModeratorTag extends React.Component {
             </Grid>
 
             <Grid container>
-              <br />
+              <div><br /></div>
             </Grid>
 
             <Grid container>
