@@ -62,6 +62,7 @@ function App() {
   }, [token, authActions]);
 
   const isExpired = authActions.isExpiredSession();
+  const reactVersion = process.env.REACT_APP_VERSION;
 
   log.debug(`render: token: ${token}`);
 
@@ -71,11 +72,11 @@ function App() {
 
   return (
     <div className="wrapper">
-      <Header authActions={authActions} />
+      <Header version={reactVersion} authActions={authActions} />
       <Routes>
-        <Route path={`/`} element={<Home authActions={authActions} />} />
-        <Route path={`/home`} element={<Home authActions={authActions} />} />
-        <Route path={`/player/:mapId/:nodeId`} element={<Player authActions={authActions} />} />
+        <Route path={`/player`} element={<Home authActions={authActions} />} />
+        <Route path={`/player/home`} element={<Home authActions={authActions} />} />
+        <Route path={`/player/player/:mapId/:nodeId`} element={<Player authActions={authActions} />} />
         <Route path="*" element={<NoMatch />} />
       </Routes>
     </div>

@@ -33,9 +33,9 @@ class Turkee extends TurkTalk {
   // *****
   onConnected(clientObject) {
 
-    log.info(`onConnected: connection succeeded.  Id = '${this.connection.connectionId}'`);
+    log.info(`'${this.connection.connectionId}' onConnected: connection succeeded`);
 
-    this.connectionId = this.connection.connectionId;
+    this.connectionId = this.connection.connectionId.slice(-3);
 
     this.connection.onclose(clientObject.onDisconnected);
     this.connection.onreconnecting(clientObject.onReconnecting);
@@ -44,7 +44,7 @@ class Turkee extends TurkTalk {
     if (this.component.onConnectionChanged) {
       this.component.onConnectionChanged({
         connectionStatus: this.connection._connectionState,
-        ConnectionId: this.connectionId,
+        connectionId: this.connectionId,
         Name: this.username
       });
     }
@@ -54,8 +54,10 @@ class Turkee extends TurkTalk {
     let roomName = this.penName;
     const connectionInfo = persistantStorage.get('connectionInfo');
     if ( connectionInfo != null ) {
-      roomName = connectionInfo.RoomName;
+      roomName = connectionInfo.roomName;
     }
+
+    log.debug(`'${this.connectionId}' registering learner for room name: ${roomName}`);
 
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKEE,
@@ -64,7 +66,7 @@ class Turkee extends TurkTalk {
 
   onReconnecting(error) {
     try {
-      log.debug(`onReconnecting: ${error}`);
+      log.debug(`'${this.connectionId}' onReconnecting: ${error}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -73,13 +75,13 @@ class Turkee extends TurkTalk {
         });
       }
     } catch (error) {
-      log.error(`onReconnecting exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onReconnecting exception: ${error.message}`);
     }
   }
 
   onReconnected(connectionId) {
     try {
-      log.debug(`onReconnected: ${connectionId}`);
+      log.debug(`'${connectionId}' onReconnected`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -88,7 +90,7 @@ class Turkee extends TurkTalk {
         });
       }
     } catch (error) {
-      log.error(`onReconnected exception: ${error.message}`);
+      log.error(`'${connectionId}' onReconnected exception: ${error.message}`);
     }
   }
 
@@ -96,21 +98,27 @@ class Turkee extends TurkTalk {
   onDisconnected() {
 
     try {
-      log.debug(`onDisconnected`);
-      if (this.component.onConnectionChanged) {
+
+      if ( !this?.component?.componentMounted ) {
+        return;
+      }
+
+      log.debug(`'${this.connectionId}' onDisconnected`);
+
+      if (this?.component?.onConnectionChanged) {
 
         // clear out session id
         persistantStorage.save('ttalk_sessionId');
 
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
-          ConnectionId: '',
+          connectionId: '',
           Name: this.username
         });
       }
 
     } catch (error) {
-      log.error(`onDisconnected exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onDisconnected exception: ${error.message}`);
     }
 
   }
@@ -120,37 +128,46 @@ class Turkee extends TurkTalk {
 
     try {
 
-      log.debug(`onCommandCallback: ${payload.command}, ${JSON.stringify(payload.data, null, 2)}]`);
+      log.debug(`'${this.connectionId}' onCommandCallback: ${payload.command}`);
 
       // test if command NOT handled in base class
       if (super.onCommandCallback(payload)) {
         return;
       }
 
-      if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+      // if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
 
-        if (this.component.onRoomAssigned) {
-          this.component.onRoomAssigned(payload.data);
+      //   if (this.component.onRoomAssigned) {
+      //     this.component.onRoomAssigned(payload.data);
+      //   }
+
+      //   return true;
+      // }
+
+      if (payload.command === constants.SIGNALCMD_MODERATOR_STATUS) {
+
+        if (this.component.onModeratorStatus) {
+          this.component.onModeratorStatus(payload.data);
         }
 
         return true;
       }
 
-      else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
+      // else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
 
-        if (this.component.onAtriumAssigned) {
-          this.component.onAtriumAssigned(payload.data);
-        }
+      //   if (this.component.onAtriumAssigned) {
+      //     this.component.onAtriumAssigned(payload.data);
+      //   }
 
-        return true;
-      }
+      //   return true;
+      // }
 
       else {
-        log.error(`onCommandCallback unknown command: '${payload.command}'`);
+        log.debug(`'${this.connectionId}' onCommandCallback unknown command: '${payload.command}'`);
       }
 
     } catch (error) {
-      log.error(`onCommandCallback exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onCommandCallback exception: ${error.message}`);
     }
 
   }

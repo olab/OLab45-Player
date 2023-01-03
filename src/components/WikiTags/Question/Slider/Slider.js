@@ -10,6 +10,7 @@ import log from 'loglevel';
 
 import styles from '../../styles.module.css';
 import siteStyles from '../../site.module.css';
+const persistantStorage = require('../../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabSliderQuestion extends React.Component {
 
@@ -62,12 +63,14 @@ class OlabSliderQuestion extends React.Component {
   transmitResponse() {
 
     const { onSubmitResponse, authActions, map, node } = this.props.props;
+    let sessionId = persistantStorage.get('sessionId');
 
     let responseState = {
       ...this.state,
       authActions,
       map,
       node,
+      sessionId,
       setInProgress: this.setInProgress,
       setIsDisabled: this.setIsDisabled
     };

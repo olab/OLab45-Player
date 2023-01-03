@@ -28,7 +28,7 @@ export const VersionWrapper = styled.div`
     font-size: 16px;
     color: #0089EC;
     align-items: right;
-    min-width: 100px;
+    min-width: 120px;
 `;
 
 export const Logo = styled.div`

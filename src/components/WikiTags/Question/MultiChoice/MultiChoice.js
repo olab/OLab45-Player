@@ -107,12 +107,14 @@ class OlabMultiPickQuestion extends React.Component {
   transmitResponse() {
 
     const { onSubmitResponse, authActions, map, node } = this.props.props;
+    let sessionId = persistantStorage.get('sessionId');
 
     let responseState = {
       ...this.state,
       authActions,
       map,
       node,
+      sessionId,
       setInProgress: this.setInProgress,
       setIsDisabled: this.setIsDisabled
     };

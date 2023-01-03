@@ -10,6 +10,7 @@ class Participant {
     this.connectionId = null;
     this.roomName = null;
     this.commandChannel = null;
+    this.isModerator = null;
 
     if (source) {
       Object.assign(this, { ...this, ...source });
@@ -17,7 +18,7 @@ class Participant {
   }
 
   toString() {
-    return `${this.userId} ${this.connectionId?.split(-3)}`;
+    return `${this.userId} ${this.connectionId?.slice(-3)} moderator? ${this.isModerator}`;
   }
 }
 

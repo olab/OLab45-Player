@@ -12,6 +12,7 @@ import log from 'loglevel';
 
 import styles from '../../styles.module.css';
 import siteStyles from '../../site.module.css';
+const persistantStorage = require('../../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabDropDownQuestion extends React.Component {
 
@@ -39,6 +40,7 @@ class OlabDropDownQuestion extends React.Component {
 
     const value = Number(event.target.value);
     const question = this.state.question;
+    let sessionId = persistantStorage.get('sessionId');
 
     // test if only one respond allowed.  Disable control
     // if this is the case
@@ -71,6 +73,7 @@ class OlabDropDownQuestion extends React.Component {
         ...this.state,
         response,
         value,
+        sessionId,
         setInProgress,
         setIsDisabled
       };

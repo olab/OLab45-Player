@@ -1,21 +1,20 @@
 // @flow
 import * as React from 'react';
 import {
-  Button, Grid, FormLabel, Table, TableBody, MenuItem,
-  TableCell, Select,
-  TableRow
+  Button, Grid, FormLabel, Table,
+  TableBody, MenuItem, Select, TableRow
 } from '@material-ui/core';
 import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
-import { HubConnectionState } from '@microsoft/signalr';
 
-import Chat from '../../Chat/Chat'
 import Turker from '../../../services/turker';
 import styles from '../styles.module.css';
-import PropManager from './PropManager'
+import SlotManager from '../ChatCell/SlotManager';
 import TurkerChatStatusBar from './TurkerChatStatusBar';
-import TurkeeChatStatusBar from './TurkeeChatStatusBar';
+import TurkerChatCellGrid from './TurkerChatCellGrid';
 import Participant from '../../../helpers/participant';
+import SlotInfo from '../../../helpers/SlotInfo';
+var constants = require('../../../services/constants');
 const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabModeratorTag extends React.Component {
@@ -24,61 +23,62 @@ class OlabModeratorTag extends React.Component {
 
     super(props);
 
-    // this defines the max number of turkees
-    // for the turker
-    this.MAX_TURKEES = 8;
-    this.NUM_ROWS = 2;
-    this.numColumns = this.MAX_TURKEES / this.NUM_ROWS;
-
-    // initialize property manager with array of Participant objects
-    this.propManager = new PropManager(this.MAX_TURKEES);
+    var atrium = persistantStorage.get(
+      'atrium', {
+      atriumLearners: [], selectedLearnerUserId: '0'
+    });
 
     this.state = {
-      connectionInfos: this.propManager.Slots(),
       connectionStatus: '',
       maxHeight: 200,
-      selectedLearnerUserId: '0',
-      atriumLearners: [],
+      // selectedLearnerUserId: '0',
+      // atriumLearners: [],
       userName: props.props.authActions.getUserName(),
       width: '100%',
-      localInfo: { Name: null, ConnectionId: null, RoomName: null },
+      localInfo: new SlotInfo(),
       sessionId: '',
+      ...atrium
     };
 
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
+    this.onRoomAssigned = this.onRoomAssigned.bind(this);
+
     this.onTurkeeSelected = this.onAtriumLearnerSelected.bind(this);
     this.onAssignClicked = this.onAssignClicked.bind(this);
-    this.onRoomAssigned = this.onRoomAssigned.bind(this);
+    this.onCloseClicked = this.onCloseClicked.bind(this);
+
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
     this.onAtriumLearnerSelected = this.onAtriumLearnerSelected.bind(this);
-    this.assignTurkeeToChat = this.assignLearnerToChat.bind(this);
 
     this.turker = new Turker(this);
     this.turker.connect(this.state.userName);
+    this.connection = this.turker.connection;
+    this.connectionId = '';
 
+    var self = this;
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
   }
 
-  // applies changes to connection status
-  onConnectionChanged(connectionData) {
-
-    log.debug(`onConnectionChanged: ${connectionData.connection._connectionState}, id: ${connectionData.connection.connectionId}`);
+  onCommandCallback(payload) {
 
     try {
 
-      let {
-        localInfo
-      } = this.state;
+      log.debug(`'${this.connectionId}' onTurkerCommandCallback: ${payload.command}`);
 
-      localInfo.ConnectionId = connectionData.connection.connectionId;
-      localInfo.Name = connectionData.Name;
+      if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+        this.onRoomAssigned(payload.data);
+      }
 
-      this.setState({
-        localInfo: localInfo,
-        connectionStatus: connectionData.connection._connectionState
-      });
+      else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
+        this.onAtriumUpdate(payload.data);
+      }
+
+      else {
+        log.debug(`'${this.connectionId}' onTurkerCommandCallback unknown command: '${payload.command}'`);
+      }
 
     } catch (error) {
-      log.error(`onConnectionChanged exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onTurkerCommandCallback exception: ${error.message}`);
     }
 
   }
@@ -87,21 +87,77 @@ class OlabModeratorTag extends React.Component {
 
     try {
 
-      let moderator = new Participant(payload);
-      log.debug(`onRoomAssigned: setting room: '${moderator.toString()}'`);
+      let {
+        userName,
+        localInfo
+      } = this.state;
 
-      let connectionInfo = persistantStorage.get('connectionInfo');
-      if (connectionInfo == null) {
-        connectionInfo = moderator;
-        persistantStorage.save('connectionInfo', connectionInfo);
+      // ignore any messages not to me
+      if (userName !== payload.local.userId) {
+        return false;
       }
 
+      let moderator = new Participant(payload.local);
+      moderator.isModerator = true;
+
+      localInfo = new SlotInfo();
+      localInfo.assigned = true;
+
+      localInfo.SetParticipant(moderator);
+
       this.setState({
-        localInfo: connectionInfo
+        localInfo: localInfo
       });
 
+      log.debug(`'${this.connectionId}' onRoomAssigned localInfo = ${JSON.stringify(localInfo, null, 2)}]`);
+
+      persistantStorage.save('connectionInfo', localInfo);
+
     } catch (error) {
-      log.error(`onRoomAssigned exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onRoomAssigned exception: ${error.message}`);
+    }
+
+  }
+
+  // handle atrium contents updated
+  onAtriumUpdate(payloadArray) {
+
+    try {
+
+      let atriumLearners = [];
+      let {
+        localInfo
+      } = this.state;
+
+      // save atrium contents if array passed in
+      if (Array.isArray(payloadArray) && (payloadArray.length >= 0)) {
+
+        let key = 1;
+        for (const payloadItem of payloadArray) {
+
+          // make a copy of the object so it can be modified  
+          var learner = Object.assign({}, payloadItem);
+
+          // add a 'key/value' properties so atriumContents plays nicely with
+          // javascript .map()
+          learner.key = `${key++}`;
+
+          atriumLearners.push(learner);
+        }
+
+        log.debug(`'${this.connectionId}' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
+
+        this.setState({
+          atriumLearners: atriumLearners,
+          selectedLearnerUserId: '0'
+        });
+
+        this.updateAtriumState();
+
+      }
+
+    } catch (error) {
+      log.error(`'${this.connectionId}' onAtriumUpdate exception: ${error.message}`);
     }
 
   }
@@ -111,13 +167,15 @@ class OlabModeratorTag extends React.Component {
     try {
 
       let {
-        selectedLearnerUserId
+        selectedLearnerUserId,
+        atriumLearners,
+        localInfo
       } = this.state;
 
       // test for valid turkee selected from available list
       if (event.target.value !== '0') {
 
-        log.debug(`onAtriumLearnerSelected: ${event.target.value}`);
+        log.debug(`'${this.connectionId}' onAtriumLearnerSelected: ${event.target.value}`);
 
         // find learner in atrium list
         for (let item of this.state.atriumLearners) {
@@ -127,12 +185,24 @@ class OlabModeratorTag extends React.Component {
         }
 
         this.setState({ selectedLearnerUserId: selectedLearnerUserId });
+
+        this.updateAtriumState();
       }
 
     } catch (error) {
-      log.error(`onAtriumLearnerSelected exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onAtriumLearnerSelected exception: ${error.message}`);
     }
 
+  }
+
+  onCloseClicked(event) {
+
+    const { localInfo } = this.state;
+
+    log.debug(`'${this.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`);
+
+    // signal server to close out this room
+    this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
   }
 
   onAssignClicked(event) {
@@ -153,112 +223,59 @@ class OlabModeratorTag extends React.Component {
         throw new Error(`Unable to find unassigned learner ${selectedLearnerUserId}`);
       }
 
-      // add turkee to chat component
-      const slotInfo = this.assignLearnerToChat(selectedLearner);
+      let { localInfo } = this.state;
 
-      // signal server with assignment of turkee to turker
-      this.turker.onAssignLearner(selectedLearner);
+      log.debug(`'${this.connectionId}' onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
+
+      // signal server with assignment of turkee to this room
+      this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, selectedLearner, localInfo.roomName);
+
+      // save atrium state to local storage
+      this.updateAtriumState();
 
     } catch (error) {
-      log.error(`onAssignClicked exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onAssignClicked exception: ${error.message}`);
     }
 
   }
 
-  assignLearnerToChat(learner) {
+  updateAtriumState() {
 
     try {
-
       let {
-        connectionInfos,
+        selectedLearnerUserId,
+        atriumLearners,
         localInfo
       } = this.state;
 
-      learner = this.propManager.assignLearner(learner);
-      connectionInfos = this.propManager.Slots();
+      const state = {
+        roomName: localInfo.roomName,
+        selectedLearnerUserId,
+        atriumLearners
+      };
 
-      this.setState({ connectionInfos: connectionInfos });
-
-      return learner;
+      persistantStorage.save('atrium', state);
 
     } catch (error) {
-      log.error(`assignLearnerToChat exception: ${error.message}`);
+      log.error(`'${this.connectionId}' updateAtriumState exception: ${error.message}`);
     }
+
   }
 
-  // handle atrium contents updated
-  onAtriumUpdate(payloadArray) {
+  // applies changes to connection status
+  onConnectionChanged(connectionInfo) {
 
     try {
 
-      let atriumLearners = [];
-
-      // save atrium contents if array passed in
-      if (Array.isArray(payloadArray) && (payloadArray.length >= 0)) {
-        let key = 1;
-        for (const payloadItem of payloadArray) {
-
-          // make a copy of the object so it can be modified  
-          var learner = Object.assign({}, payloadItem);
-
-          // add a 'key/value' properties so atriumContents plays nicely with
-          // javascript .map()
-          learner.key = `${key++}`;
-
-          atriumLearners.push(learner);
-        }
-      }
-
-      log.debug(`onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
-
       this.setState({
-        atriumLearners: atriumLearners,
-        selectedLearnerUserId: '0'
+        connectionStatus: connectionInfo.connectionStatus,
       });
 
+      this.connectionId = connectionInfo.connectionId;
+
     } catch (error) {
-      log.error(`onAtriumUpdate exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onConnectionChanged exception: ${error.message}`);
     }
-
-  }
-
-  generateChatGrid() {
-
-    const {
-      connectionInfos,
-      localInfo
-    } = this.state;
-
-    const cellStyling = { padding: 7 }
-
-    let rows = [];
-    for (var rowIndex = 0; rowIndex < this.NUM_ROWS; rowIndex++) {
-      let columns = [];
-      for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {
-        const connectionInfo = connectionInfos[(rowIndex * this.numColumns) + columnIndex];
-
-        columns.push(
-          <TableCell style={cellStyling}>
-            <Chat
-              connection={this.turker.connection}
-              moderatorInfo={localInfo}
-              learnerInfo={connectionInfo}
-              playerProps={this.props.props} />
-            <TurkeeChatStatusBar
-              connection={this.turker.connection}
-              learnerInfo={connectionInfo} />
-          </TableCell>
-        );
-      }
-
-      rows.push(
-        <TableRow>
-          {columns}
-        </TableRow>
-      );
-    }
-
-    return rows;
 
   }
 
@@ -273,62 +290,82 @@ class OlabModeratorTag extends React.Component {
       sessionId,
     } = this.state;
 
-    log.debug(`OlabTurkerTag render '${userName}'`);
-
-    const tableLayout = { border: '2px solid black', backgroundColor: '#3333' };
-    let chatRows = this.generateChatGrid();
+    log.debug(`'${this.connectionId}' OlabTurkerTag render '${userName}'`);
 
     try {
       return (
-        <Grid container item xs={12}>
+        <>
+          <Grid container item xs={12}>
 
-          <Table style={tableLayout}>
-            <TableBody>
-              {chatRows}
-            </TableBody>
-          </Table>
+            <Grid container>
+              <TurkerChatCellGrid
+                isModerator={true}
+                connection={this.connection}
+                roomName={localInfo.roomName}
+                localInfo={localInfo}
+              />
 
-          <TurkerChatStatusBar
-            sessionId={sessionId}
-            connection={this.turker.connection}
-            connectionStatus={connectionStatus}
-            localInfo={localInfo} />
+              <TurkerChatStatusBar
+                isModerator={true}
+                sessionId={sessionId}
+                connection={this.turker.connection}
+                localInfo={localInfo} />
 
-          &nbsp;
-
-          <Grid container>
-            <Grid container item xs={3}>
-              <FormLabel>Unassigned Learners ({atriumLearners.length} waiting)</FormLabel>
-              <Select
-                value={selectedLearnerUserId}
-                onChange={this.onAtriumLearnerSelected}
-                style={{ width: '100%' }}
-              >
-                <MenuItem key="0" value="0">
-                  <em>--Select--</em>
-                </MenuItem>
-                {atriumLearners.map((item) => (
-                  <MenuItem
-                    key={item.userId}
-                    value={item.userId}>
-                    {item.nickName}
-                  </MenuItem>
-                ))}
-              </Select>
             </Grid>
-            <Grid container item xs={1}>
-              <Button
-                variant="outlined"
-                color="primary"
-                size="small"
-                style={{ verticalAlign: 'center', height: '30px' }}
-                onClick={this.onAssignClicked}
-              >
-                &nbsp;Assign&nbsp;
-              </Button>
+
+            <Grid container>
+              <br />
+            </Grid>
+
+            <Grid container>
+              <Grid container item xs={3}>
+                <FormLabel>Unassigned Learners ({atriumLearners.length} waiting)</FormLabel>
+                <Select
+                  value={selectedLearnerUserId}
+                  onChange={this.onAtriumLearnerSelected}
+                  style={{ width: '100%' }}
+                >
+                  <MenuItem key="0" value="0">
+                    <em>--Select--</em>
+                  </MenuItem>
+                  {atriumLearners.map((item) => (
+                    <MenuItem
+                      key={item.userId}
+                      value={item.userId}>
+                      {item.nickName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+              <Grid container item xs={1}>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  size="small"
+                  style={{ verticalAlign: 'center', height: '30px' }}
+                  onClick={this.onAssignClicked}
+                >
+                  &nbsp;Assign&nbsp;
+                </Button>
+              </Grid>
+              <Grid container item xs={4}>
+                &nbsp;
+              </Grid>
+              <Grid container justifyContent="flex-end" item xs={4}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  style={{ verticalAlign: 'center', height: '30px' }}
+                  onClick={this.onCloseClicked}
+                >
+                  &nbsp;Close Room&nbsp;
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
+          <br />
+        </>
       );
 
     } catch (error) {

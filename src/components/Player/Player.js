@@ -70,6 +70,7 @@ class Player extends PureComponent {
       this.state.scopedObjects.map = persistantStorage.get('map-so');
       this.state.scopedObjects.node = persistantStorage.get('node-so');
       this.state.nodesVisited = persistantStorage.get('visit-once-nodes');
+      this.state.sessionId = persistantStorage.get('sessionId');
     }
     else {
       log.info(`disabled cache`);
@@ -249,7 +250,6 @@ class Player extends PureComponent {
       this.setState({
         isNodeFetched: true,
         node: objData,
-        sessionId: objData.sessionId,
         scopedObjects: {
           map: scopedObjects.map,
           node: scopedObjectsData,
@@ -262,8 +262,12 @@ class Player extends PureComponent {
         persistantStorage.save('node-so', this.state.scopedObjects.node);
       }
 
-      if ( nodeId === 0 ) {
+      // test if root node
+      if ( objData.typeId === 1 ) {
         persistantStorage.save('sessionId', objData.sessionId);
+        this.setState({
+          sessionId: objData.sessionId,
+        });
       }
 
       log.debug('read node data');

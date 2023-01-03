@@ -153,6 +153,7 @@ async function getMapNode(props, mapId, nodeId) {
       if (data.status === 402) {
         props.authActions.logout();
       }
+
       return data.json();
     });
 }
@@ -222,11 +223,10 @@ async function getServerScopedObjects(props, serverId) {
 
 async function submitQuestionValue(state) {
 
-  const { map, node, authActions, dynamicObjects, question, responseId, value, setInProgress } = state;
+  const { map, node, authActions, dynamicObjects, question, responseId, value, setInProgress, sessionId } = state;
 
   let token = authActions.getToken();
   let url = `${config.API_URL}/response/${question.id}`;
-  let sessionId = persistantStorage.get('sessionId');
 
   log.debug(`submitQuestionValue(${question.id}, ${responseId}, ${value}, [func]) url: ${url})`);
 
