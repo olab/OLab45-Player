@@ -483,13 +483,15 @@ class Chat extends React.Component {
                     {(isModerator) && (
                       <>
                         <Tooltip title="Disconnect" placement="top">
-                          <Button
-                            variant="contained"
-                            disabled={true}
-                            onClick={this.onSendClicked}
-                            color="secondary">
-                            <CancelPresentationIcon />
-                          </Button>
+                          <span>
+                            <Button
+                              variant="contained"
+                              disabled={true}
+                              onClick={this.onSendClicked}
+                              color="secondary">
+                              <CancelPresentationIcon />
+                            </Button>
+                          </span>
                         </Tooltip>
                         {/* <Tooltip title="Clear" placement="top">
                           <Button
@@ -503,13 +505,15 @@ class Chat extends React.Component {
                       </>
                     )}
                     <Tooltip title="Send" placement="top">
-                      <Button
-                        variant="contained"
-                        disabled={disabled}
-                        onClick={this.onSendClicked}
-                        color="primary">
-                        <SendIcon />
-                      </Button>
+                      <span>
+                        <Button
+                          variant="contained"
+                          disabled={disabled}
+                          onClick={this.onSendClicked}
+                          color="primary">
+                          <SendIcon />
+                        </Button>
+                      </span>
                     </Tooltip>
 
                   </TableCell>

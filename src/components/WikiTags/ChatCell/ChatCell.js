@@ -35,8 +35,8 @@ class ChatCell extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(prevProps.localInfo !== this.props.localInfo) {
-      this.setState({localInfo: this.props.localInfo});
+    if (prevProps.localInfo !== this.props.localInfo) {
+      this.setState({ localInfo: this.props.localInfo });
     }
   }
 
@@ -47,7 +47,6 @@ class ChatCell extends React.Component {
 
   render() {
 
-    const cellStyling = { padding: 7 }
     const {
       connection,
       senderInfo,
@@ -55,6 +54,11 @@ class ChatCell extends React.Component {
       playerProps,
       lastMessageTime
     } = this.state;
+
+    let cellStyling = { padding: 7 };
+    if (!localInfo.show) {
+      cellStyling = { display: 'none', padding: 7 };
+    }
 
     return (
       <TableCell style={cellStyling}>

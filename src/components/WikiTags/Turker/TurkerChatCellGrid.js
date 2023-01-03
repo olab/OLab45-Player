@@ -212,6 +212,8 @@ class TurkerChatCellGrid extends React.Component {
       localInfo
     } = this.state;
 
+    const displayNone = { display: 'none' };
+
     let foundConnectedChat = false;
 
     let chatRows = [];
