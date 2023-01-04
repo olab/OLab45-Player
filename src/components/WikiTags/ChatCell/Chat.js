@@ -31,7 +31,8 @@ class Chat extends React.Component {
       playerProps: this.props.playerProps,
       message: '',
       isModerator: this.props.isModerator,
-      inMacroMode: false
+      inMacroMode: false,
+      key: this.props.key
     };
 
     this.connection = this.props.connection;
@@ -147,7 +148,7 @@ class Chat extends React.Component {
 
     this.onSystemMessageCallback({
       commandChannel: payload.commandChannel,
-      data: `'${payload.nickName}' has left the room`
+      data: `'${payload.nickName}' has been disconnected from room`
     });
   }
 
@@ -272,9 +273,7 @@ class Chat extends React.Component {
       }
 
       // clear out sent messages
-      this.setState({
-        message: ''
-      });
+      this.setState({ message: '' });
 
     } catch (error) {
       log.error(`'${localInfo.connectionId}' onSendClicked exception: ${error.message}`);

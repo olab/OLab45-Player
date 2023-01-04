@@ -23,7 +23,8 @@ class ChatCell extends React.Component {
       localInfo: this.props.localInfo,
       senderInfo: this.props.senderInfo,
       playerProps: this.props.playerProps,
-      lastMessageTime: null
+      lastMessageTime: null,
+      key: this.props.key
     };
 
     this.onCommandCallback = this.onCommandCallback.bind(this);
@@ -63,6 +64,7 @@ class ChatCell extends React.Component {
     return (
       <TableCell style={cellStyling}>
         <Chat
+          key={this.props.key}
           show={localInfo.show}
           isModerator={this.props.isModerator}
           connection={connection}
@@ -70,6 +72,7 @@ class ChatCell extends React.Component {
           senderInfo={senderInfo}
           playerProps={playerProps} />
         <ChatStatusBar
+          key={this.props.key}
           show={localInfo.show}
           isModerator={this.props.isModerator}
           connection={connection}

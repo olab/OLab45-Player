@@ -29,7 +29,7 @@ class OlabModeratorTag extends React.Component {
     });
 
     this.state = {
-      connectionStatus: '',
+      connectionStatus: null,
       maxHeight: 200,
       // selectedLearnerUserId: '0',
       // atriumLearners: [],
@@ -61,9 +61,11 @@ class OlabModeratorTag extends React.Component {
 
   onCommandCallback(payload) {
 
+    let { localInfo } = this.state;
+
     try {
 
-      log.debug(`'${this.connectionId}' onTurkerCommandCallback: ${payload.command}`);
+      log.debug(`'${localInfo.connectionId}' onTurkerCommandCallback: ${payload.command}`);
 
       if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
         this.onRoomAssigned(payload.data);
@@ -74,23 +76,23 @@ class OlabModeratorTag extends React.Component {
       }
 
       else {
-        log.debug(`'${this.connectionId}' onTurkerCommandCallback unknown command: '${payload.command}'`);
+        log.debug(`'${localInfo.connectionId}' onTurkerCommandCallback unknown command: '${payload.command}'`);
       }
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onTurkerCommandCallback exception: ${error.message}`);
+      log.error(`'${localInfo.connectionId}' onTurkerCommandCallback exception: ${error.message}`);
     }
 
   }
 
   onRoomAssigned(payload) {
 
-    try {
+    let {
+      userName,
+      localInfo
+    } = this.state;
 
-      let {
-        userName,
-        localInfo
-      } = this.state;
+    try {
 
       // ignore any messages not to me
       if (userName !== payload.local.userId) {
@@ -104,23 +106,26 @@ class OlabModeratorTag extends React.Component {
       localInfo.assigned = true;
 
       localInfo.SetParticipant(moderator);
+      localInfo.connectionId = localInfo.connectionId.slice(-3);
 
       this.setState({
         localInfo: localInfo
       });
 
-      log.debug(`'${this.connectionId}' onRoomAssigned localInfo = ${JSON.stringify(localInfo, null, 2)}]`);
+      log.debug(`'${localInfo.connectionId}' onRoomAssigned localInfo = ${JSON.stringify(localInfo, null, 2)}]`);
 
       persistantStorage.save('connectionInfo', localInfo);
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onRoomAssigned exception: ${error.message}`);
+      log.error(`'${localInfo.connectionId}' onRoomAssigned exception: ${error.message}`);
     }
 
   }
 
   // handle atrium contents updated
   onAtriumUpdate(payloadArray) {
+
+    let { localInfo } = this.state;
 
     try {
 
@@ -145,7 +150,7 @@ class OlabModeratorTag extends React.Component {
           atriumLearners.push(learner);
         }
 
-        log.debug(`'${this.connectionId}' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
+        log.debug(`'${localInfo.connectionId}' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
 
         this.setState({
           atriumLearners: atriumLearners,
@@ -157,12 +162,14 @@ class OlabModeratorTag extends React.Component {
       }
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onAtriumUpdate exception: ${error.message}`);
+      log.error(`'${localInfo.connectionId}' onAtriumUpdate exception: ${error.message}`);
     }
 
   }
 
   onAtriumLearnerSelected(event) {
+
+    let { localInfo } = this.state;
 
     try {
 
@@ -175,7 +182,7 @@ class OlabModeratorTag extends React.Component {
       // test for valid turkee selected from available list
       if (event.target.value !== '0') {
 
-        log.debug(`'${this.connectionId}' onAtriumLearnerSelected: ${event.target.value}`);
+        log.debug(`'${localInfo.connectionId}' onAtriumLearnerSelected: ${event.target.value}`);
 
         // find learner in atrium list
         for (let item of this.state.atriumLearners) {
@@ -190,7 +197,7 @@ class OlabModeratorTag extends React.Component {
       }
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onAtriumLearnerSelected exception: ${error.message}`);
+      log.error(`'${localInfo.connectionId}' onAtriumLearnerSelected exception: ${error.message}`);
     }
 
   }
@@ -199,13 +206,15 @@ class OlabModeratorTag extends React.Component {
 
     const { localInfo } = this.state;
 
-    log.debug(`'${this.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`);
+    log.debug(`'${localInfo.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`);
 
     // signal server to close out this room
     this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
   }
 
   onAssignClicked(event) {
+
+    let { localInfo } = this.state;
 
     try {
 
@@ -225,7 +234,7 @@ class OlabModeratorTag extends React.Component {
 
       let { localInfo } = this.state;
 
-      log.debug(`'${this.connectionId}' onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
+      log.debug(`'${localInfo.connectionId}' onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
 
       // signal server with assignment of turkee to this room
       this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, selectedLearner, localInfo.roomName);
@@ -234,19 +243,20 @@ class OlabModeratorTag extends React.Component {
       this.updateAtriumState();
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onAssignClicked exception: ${error.message}`);
+      log.error(`'${localInfo.connectionId}' onAssignClicked exception: ${error.message}`);
     }
 
   }
 
   updateAtriumState() {
 
+    let {
+      selectedLearnerUserId,
+      atriumLearners,
+      localInfo
+    } = this.state;
+
     try {
-      let {
-        selectedLearnerUserId,
-        atriumLearners,
-        localInfo
-      } = this.state;
 
       const state = {
         roomName: localInfo.roomName,
@@ -257,7 +267,7 @@ class OlabModeratorTag extends React.Component {
       persistantStorage.save('atrium', state);
 
     } catch (error) {
-      log.error(`'${this.connectionId}' updateAtriumState exception: ${error.message}`);
+      log.error(`'${localInfo.connectionId}' updateAtriumState exception: ${error.message}`);
     }
 
   }
@@ -267,14 +277,16 @@ class OlabModeratorTag extends React.Component {
 
     try {
 
+      const { localInfo } = this.state;
+      localInfo.connectionId = connectionInfo.connectionId;
+
       this.setState({
-        connectionStatus: connectionInfo.connectionStatus,
+        connectionStatus: connectionInfo,
+        localInfo: localInfo
       });
 
-      this.connectionId = connectionInfo.connectionId;
-
     } catch (error) {
-      log.error(`'${this.connectionId}' onConnectionChanged exception: ${error.message}`);
+      log.error(`'${connectionInfo.connectionId}' onConnectionChanged exception: ${error.message}`);
     }
 
   }
@@ -290,9 +302,16 @@ class OlabModeratorTag extends React.Component {
       sessionId,
     } = this.state;
 
-    log.debug(`'${this.connectionId}' OlabTurkerTag render '${userName}'`);
+    log.debug(`'${localInfo.connectionId}' OlabTurkerTag render '${userName}'`);
 
     try {
+
+      // prevent anything interesting happening
+      // until we are connected
+      if (!connectionStatus || !localInfo?.assigned) {
+        return (<></>);
+      }
+
       return (
         <>
           <Grid container item xs={12}>

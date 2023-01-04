@@ -8,12 +8,15 @@ class SlotManager {
   // *****
   constructor(count, slotTemplate = null) {
 
-    var { remoteSlots, localSlots } = persistantStorage.get(
-      'slotState',
-      {
-        remoteSlots: [],
-        localSlots: []
-      });
+    // TODO: add this for connection recovery later
+    // var { remoteSlots, localSlots } = persistantStorage.get(
+    //   'slotState',
+    //   {
+    //     remoteSlots: [],
+    //     localSlots: []
+    //   });
+    let remoteSlots = [];
+    let localSlots = [];
 
     this.haveAssigned = false;
     this.haveLocalAssigned = false;
@@ -22,7 +25,7 @@ class SlotManager {
 
     // if have no saved slots, initialize a 
     // new list of slots
-    if (localSlots.length == 0) {      
+    if (localSlots.length == 0) {
 
       // initialize slot (either use default or 
       // use the template passed in)
@@ -48,14 +51,15 @@ class SlotManager {
 
       }
 
+      // TODO: add this for connection recovery later
       // update the slot state in storage
-      persistantStorage.save(
-        'slotState',
-        {
-          remoteSlots: this.remoteSlots,
-          localSlots: this.localSlots
-        }
-      );
+      // persistantStorage.save(
+      //   'slotState',
+      //   {
+      //     remoteSlots: this.remoteSlots,
+      //     localSlots: this.localSlots
+      //   }
+      // );
 
     }
     else {

@@ -28,11 +28,11 @@ class OlabAttendeeTag extends React.Component {
     this.propManager.Slots()[0].show = true;
 
     this.state = {
-      connectionStatus: '',
+      connectionStatus: null,
       slotInfos: this.propManager.Slots(),
       maxHeight: 200,
       remoteInfo: new SlotInfo(),
-      localInfo: new SlotInfo(),
+      localInfo: new SlotInfo({ connectionId: '???' }),
       userName: props.props.authActions.getUserName(),
       width: '100%',
       id: this.props.name,
@@ -82,7 +82,6 @@ class OlabAttendeeTag extends React.Component {
     learner.show = true;
 
     this.propManager.assignLocalInfo(learner);
-    // this.propManager.assignLearner(learner);
     var localInfo = this.propManager.LocalSlots()[0];
     localInfo.connectionId = localInfo.connectionId.slice(-3);
 
@@ -157,12 +156,11 @@ class OlabAttendeeTag extends React.Component {
   // applies changes to connection status
   onConnectionChanged(connectionInfo) {
 
-    let {
-      remoteInfo
-    } = this.state;
+    let { remoteInfo, localInfo } = this.state;
+    localInfo.connectionId = connectionInfo.connectionId;
 
     this.setState({
-      connectionStatus: connectionInfo.connectionStatus,
+      connectionStatus: connectionInfo,
       remoteInfo: remoteInfo
     });
 
@@ -174,16 +172,15 @@ class OlabAttendeeTag extends React.Component {
 
     const {
       id,
-      slotInfos,
+      connectionStatus,
       remoteInfo,
       localInfo,
       userName
     } = this.state;
 
     const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
-    let slotInfo = slotInfos[0];
 
-    log.debug(`'${this.connectionId}' OlabTurkeeTag render '${userName}'`);
+    log.debug(`'${localInfo.connectionId}' OlabTurkeeTag render '${userName}'`);
 
     try {
 
@@ -195,18 +192,28 @@ class OlabAttendeeTag extends React.Component {
         );
       }
 
+      // prevent anything interesting happening
+      // until we are connected
+      if (!connectionStatus) {
+        return (<></>);
+      }
+
       return (
-        <Table style={tableLayout}>
-          <TableBody>
-            <ChatCell
-              isModerator={localInfo.isModerator}
-              style={{ width: '100%' }}
-              connection={this.connection}
-              localInfo={localInfo}
-              senderInfo={remoteInfo}
-              playerProps={this.props.props} />
-          </TableBody>
-        </Table>
+        <>
+          <Table style={tableLayout}>
+            <TableBody>
+              <ChatCell
+                key={0}
+                isModerator={localInfo.isModerator}
+                style={{ width: '100%' }}
+                connection={this.connection}
+                localInfo={localInfo}
+                senderInfo={remoteInfo}
+                playerProps={this.props.props} />
+            </TableBody>
+          </Table>
+          <br />
+        </>
       );
 
     } catch (error) {
