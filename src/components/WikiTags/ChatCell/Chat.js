@@ -397,14 +397,9 @@ class Chat extends React.Component {
         <div name="chat" style={divLayout}>
           <TableContainer ref={this.messageRef} name="conversation" component={Paper} style={tableContainerStyle}>
             <Table stickyHeader size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell><b></b></TableCell>
-                </TableRow>
-              </TableHead>
               <TableBody>
                 {conversation.map((conversationItem) => (
-                  <TableRow style={{ bottomBorder: '0px' }} key={conversationItem.key}>
+                  <TableRow name="convrow" style={{ bottomBorder: '0px' }} key={conversationItem.key}>
                     {(conversationItem.isLocalMessage == null) && (
                       <TableCell style={{ borderBottom: "none" }} align="center">
                         <span
@@ -431,7 +426,8 @@ class Chat extends React.Component {
                             color: 'white',
                             borderRadius: '25px',
                             fontSize: '16px',
-                            padding: '10px'
+                            padding: '10px',
+                            lineHeight: '1.8'
                           }}
                         >
                           {conversationItem.message}
@@ -439,7 +435,7 @@ class Chat extends React.Component {
                       </TableCell>
                     )}
                     {(conversationItem.isLocalMessage === false) && (
-                      <TableCell style={{ borderBottom: "none" }} align="right">
+                      <TableCell style={{ borderBottom: "none" }} align="left">
                         <b>{!isModerator ? "Moderator" : localInfo.userId}:&nbsp;</b>
                         <span
                           style={{
@@ -448,7 +444,8 @@ class Chat extends React.Component {
                             color: 'white',
                             borderRadius: '25px',
                             fontSize: '16px',
-                            padding: '10px'
+                            padding: '10px',
+                            lineHeight: '1.8'
                           }}
                         >
                           {conversationItem.message}
@@ -465,7 +462,7 @@ class Chat extends React.Component {
             <Table size="small" aria-label="a dense table">
               <TableBody>
                 <TableRow sx={{ background: 'grey' }}>
-                  <TableCell>
+                  <TableCell style={{ width: '80%'}} >
                     <TextField
                       id="message"
                       label="Message"

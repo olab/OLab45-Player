@@ -56,7 +56,7 @@ class ChatCell extends React.Component {
       lastMessageTime
     } = this.state;
 
-    let cellStyling = { padding: 7 };
+    let cellStyling = Object.assign({ padding: 7 }, this.props.style);
     if (!localInfo.show) {
       cellStyling = { display: 'none', padding: 7 };
     }
