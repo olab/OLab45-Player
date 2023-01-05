@@ -380,7 +380,7 @@ class Chat extends React.Component {
     }
 
     const divLayout = { width: '100%', border: '2px solid black', backgroundColor: '#3333' };
-    const tableContainerStyle = { maxHeight: 200 };
+    const tableContainerStyle = { maxHeight: 300 };
     let disabled = true;
 
     // disable entry if:
@@ -418,38 +418,53 @@ class Chat extends React.Component {
                     )}
                     {(conversationItem.isLocalMessage === true) && (
                       <TableCell style={{ borderBottom: "none" }} align="left">
-                        <b>You:&nbsp;</b>
-                        <span
-                          style={{
-                            border: 'none',
-                            backgroundColor: 'blue',
-                            color: 'white',
-                            borderRadius: '25px',
-                            fontSize: '16px',
-                            padding: '10px',
-                            lineHeight: '1.8'
-                          }}
-                        >
-                          {conversationItem.message}
-                        </span>
+
+                        <Table stickyHeader size="small">
+                          <TableRow>
+                            <TableCell>
+                              <b>You:</b>
+                            </TableCell>
+                            <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'blue', }}>
+                              <span
+                                style={{
+                                  border: 'none',
+                                  color: 'white',
+                                  fontSize: '16px',
+                                  padding: '10px',
+                                  lineHeight: '1.8'
+                                }}
+                              >
+                                {conversationItem.message}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        </Table>
                       </TableCell>
                     )}
                     {(conversationItem.isLocalMessage === false) && (
-                      <TableCell style={{ borderBottom: "none" }} align="left">
-                        <b>{!isModerator ? "Moderator" : localInfo.userId}:&nbsp;</b>
-                        <span
-                          style={{
-                            border: 'none',
-                            backgroundColor: 'green',
-                            color: 'white',
-                            borderRadius: '25px',
-                            fontSize: '16px',
-                            padding: '10px',
-                            lineHeight: '1.8'
-                          }}
-                        >
-                          {conversationItem.message}
-                        </span>
+                      <TableCell style={{ borderBottom: "none" }}>
+
+                        <Table stickyHeader size="small">
+                          <TableRow>
+                            <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'green', }}>
+                              <span
+                                style={{
+                                  border: 'none',
+                                  backgroundColor: 'green',
+                                  color: 'white',                                  
+                                  fontSize: '16px',
+                                  padding: '10px',
+                                  lineHeight: '1.8'
+                                }}
+                              >
+                                {conversationItem.message}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <b>{!isModerator ? "Moderator" : localInfo.userId}:&nbsp;</b>
+                            </TableCell>
+                          </TableRow>
+                        </Table>
                       </TableCell>
                     )}
                   </TableRow>
@@ -462,7 +477,7 @@ class Chat extends React.Component {
             <Table size="small" aria-label="a dense table">
               <TableBody>
                 <TableRow sx={{ background: 'grey' }}>
-                  <TableCell style={{ width: '80%'}} >
+                  <TableCell style={{ width: '80%' }} >
                     <TextField
                       id="message"
                       label="Message"
