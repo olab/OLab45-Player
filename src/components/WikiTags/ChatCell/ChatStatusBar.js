@@ -235,7 +235,7 @@ class ChatStatusBar extends React.Component {
       const gridLayout = { fontWeight: 'bold', backgroundColor: '#grey' };
 
       return (
-        <div style={divLayout}>
+        <div name="chatStatusBar" style={divLayout}>
           <Grid container style={gridLayout}>
             <Grid container justifyContent="flex-start" item xs={4}>
               &nbsp;{statusLeftString}
