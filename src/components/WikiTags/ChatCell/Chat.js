@@ -68,6 +68,10 @@ class Chat extends React.Component {
       this.setState({ localInfo: this.props.localInfo });
     }
 
+    if (prevProps.senderInfo !== this.props.senderInfo) {
+      this.setState({ senderInfo: this.props.senderInfo });
+    }
+
   }
 
   // command method listener
@@ -121,8 +125,14 @@ class Chat extends React.Component {
 
     log.info(`'${localInfo.connectionId}' onParticipantAssigned (${JSON.stringify(payload, null, 1)})`);
 
-    var remoteInfo = new SlotInfo(payload.remote);
-    this.setState({ senderInfo: remoteInfo });
+    if (isModerator) {
+      var remoteInfo = new SlotInfo(payload.local);
+      this.setState({ senderInfo: remoteInfo });
+    }
+    else {
+      var remoteInfo = new SlotInfo(payload.remote);
+      this.setState({ senderInfo: remoteInfo });
+    }
 
     this.onSystemMessageCallback({
       commandChannel: payload.local.commandChannel,
@@ -410,7 +420,7 @@ class Chat extends React.Component {
                             <TableCell style={{ width: '10%' }}>
                               <b>You:</b>
                             </TableCell>
-                            <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'blue', }}>
+                            <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'blue' }}>
                               <span
                                 style={{
                                   border: 'none',
@@ -432,7 +442,7 @@ class Chat extends React.Component {
 
                         <Table stickyHeader size="small">
                           <TableRow>
-                            <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'green', }}>
+                            <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'green' }}>
                               <span
                                 style={{
                                   border: 'none',

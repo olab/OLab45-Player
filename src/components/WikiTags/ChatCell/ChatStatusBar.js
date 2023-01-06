@@ -7,6 +7,7 @@ import { withStyles } from '@material-ui/core/styles';
 import log from 'loglevel';
 import styles from '../styles.module.css';
 import { connect } from 'formik';
+import { LastPageOutlined } from '@material-ui/icons';
 var constants = require('../../../services/constants');
 
 class ChatStatusBar extends React.Component {
@@ -157,6 +158,10 @@ class ChatStatusBar extends React.Component {
       messageTimer
     } = this.state;
 
+    if ( !lastMessageTime ) {
+      return;
+    }
+    
     const epochLast = lastMessageTime.getTime();
     const epochNow = new Date().getTime();
 
