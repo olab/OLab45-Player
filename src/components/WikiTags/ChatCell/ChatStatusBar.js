@@ -210,8 +210,8 @@ class ChatStatusBar extends React.Component {
   generateRightStatusString() {
 
     if (this.props.isModerator) {
-      let { localInfo } = this.state;
-      return localInfo?.nickName;
+      let { senderInfo } = this.state;
+      return senderInfo?.nickName;
     }
 
     return null;

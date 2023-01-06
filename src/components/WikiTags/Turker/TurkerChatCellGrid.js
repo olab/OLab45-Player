@@ -306,7 +306,7 @@ class TurkerChatCellGrid extends React.Component {
 
   return (
     <div style={emptyGridLayout} >
-      <h3>Waiting for learners</h3>
+      <h3>Waiting for Participant</h3>
     </div>
   );
 }

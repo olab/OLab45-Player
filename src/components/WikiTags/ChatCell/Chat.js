@@ -109,7 +109,7 @@ class Chat extends React.Component {
 
     this.onSystemMessageCallback({
       commandChannel: localInfo.commandChannel,
-      data: "Waiting for Room"
+      data: "Waiting to be admitted"
     });
   }
 
@@ -151,21 +151,6 @@ class Chat extends React.Component {
       data: `'${payload.nickName}' has been disconnected from room`
     });
   }
-
-  // onRemoteDisconnected(payload) {
-
-  //   log.info(`onRemoteDisconnected (${JSON.stringify(payload, null, 1)})`);
-
-  //   let { localInfo } = this.state;
-  //   localInfo.isAssigned = false;
-  //   this.setState( { localInfo: localInfo });
-
-  //   this.onSystemMessageCallback({
-  //     commandChannel: chatInfo.commandChannel,
-  //     data: "Disconnected"
-  //   });
-
-  // }
 
   // system message method listener
   onSystemMessageCallback(payload) {
@@ -372,6 +357,7 @@ class Chat extends React.Component {
       width,
       isModerator,
       localInfo,
+      senderInfo,
       show
     } = this.state;
 
@@ -421,7 +407,7 @@ class Chat extends React.Component {
 
                         <Table stickyHeader size="small">
                           <TableRow>
-                            <TableCell>
+                            <TableCell style={{ width: '10%' }}>
                               <b>You:</b>
                             </TableCell>
                             <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'blue', }}>
@@ -451,7 +437,7 @@ class Chat extends React.Component {
                                 style={{
                                   border: 'none',
                                   backgroundColor: 'green',
-                                  color: 'white',                                  
+                                  color: 'white',
                                   fontSize: '16px',
                                   padding: '10px',
                                   lineHeight: '1.8'
@@ -460,8 +446,8 @@ class Chat extends React.Component {
                                 {conversationItem.message}
                               </span>
                             </TableCell>
-                            <TableCell>
-                              <b>{!isModerator ? "Moderator" : localInfo.userId}:&nbsp;</b>
+                            <TableCell style={{ width: '10%' }}>
+                              <b>{!isModerator ? "Moderator" : senderInfo.nickName}:&nbsp;</b>
                             </TableCell>
                           </TableRow>
                         </Table>
