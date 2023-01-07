@@ -1,7 +1,7 @@
 import log from 'loglevel';
-import Participant from '../../../helpers/participant';
-import SlotInfo from '../../../helpers/SlotInfo';
-const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
+import Participant from '../../../../helpers/participant';
+import SlotInfo from '../../../../helpers/SlotInfo';
+const persistantStorage = require('../../../../utils/StateStorage').PersistantStateStorage;
 
 class SlotManager {
 

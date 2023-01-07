@@ -10,8 +10,8 @@ import OlabCounterTag from '../WikiTags/Counter/Counter';
 import OlabLinksTag from '../WikiTags/Links';
 import OlabMediaResourceTag from '../WikiTags/MediaResource/MediaResource';
 import OlabQuestionTag from '../WikiTags/Question/Question';
-import OlabAttendeeTag from '../WikiTags/Turkee/Turkee';
-import OlabModeratorTag from '../WikiTags/Turker/Turker';
+import OlabAttendeeTag from '../WikiTags/Question/TurkTalk/Turkee/Turkee';
+import OlabModeratorTag from '../WikiTags/Question/TurkTalk/Turker/Turker';
 import { withParams } from "../ComponentWrapper";
 
 import styles from './styles';

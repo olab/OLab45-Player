@@ -7,15 +7,14 @@ import {
 import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
 
-import Turker from '../../../services/turker';
-import styles from '../styles.module.css';
-import SlotManager from '../ChatCell/SlotManager';
+import Turker from '../../../../../services/turker';
+import styles from '../../../styles.module.css';
 import TurkerChatStatusBar from './TurkerChatStatusBar';
 import TurkerChatCellGrid from './TurkerChatCellGrid';
-import Participant from '../../../helpers/participant';
-import SlotInfo from '../../../helpers/SlotInfo';
-var constants = require('../../../services/constants');
-const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
+import Participant from '../../../../../helpers/participant';
+import SlotInfo from '../../../../../helpers/SlotInfo';
+var constants = require('../../../../../services/constants');
+const persistantStorage = require('../../../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabModeratorTag extends React.Component {
 

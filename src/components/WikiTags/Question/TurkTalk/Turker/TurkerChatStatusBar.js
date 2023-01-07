@@ -5,7 +5,7 @@ import {
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import log from 'loglevel';
-import styles from '../styles.module.css';
+import styles from '../../../styles.module.css';
 
 class TurkerChatStatusBar extends React.Component {
 

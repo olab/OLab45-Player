@@ -7,13 +7,13 @@ import {
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import log from 'loglevel';
-import styles from '../styles.module.css';
+import styles from '../../../styles.module.css';
 
-import SlotManager from '../ChatCell/SlotManager';
-import ChatCell from '../ChatCell/ChatCell'
-const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
+import SlotManager from '../SlotManager';
+import ChatCell from '../../../../ChatCell/ChatCell'
+const persistantStorage = require('../../../../../utils/StateStorage').PersistantStateStorage;
 
-var constants = require('../../../services/constants');
+var constants = require('../../../../../services/constants');
 
 class TurkerChatCellGrid extends React.Component {
 

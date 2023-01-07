@@ -8,13 +8,13 @@ import {
   TableRow
 } from '@material-ui/core';
 
-import Turkee from '../../../services/turkee';
+import Turkee from '../../../../../services/turkee';
 import styles from '../styles.module.css';
-import ChatCell from '../ChatCell/ChatCell'
-import SlotInfo from '../../../helpers/SlotInfo';
-import SlotManager from '../ChatCell/SlotManager';
-var constants = require('../../../services/constants');
-const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
+import ChatCell from '../../../ChatCell/ChatCell'
+import SlotInfo from '../../../../../helpers/SlotInfo';
+import SlotManager from '../TurkTalk/SlotManager';
+var constants = require('../../../../../services/constants');
+const persistantStorage = require('../../../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabAttendeeTag extends React.Component {
 

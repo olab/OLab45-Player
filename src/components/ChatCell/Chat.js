@@ -7,15 +7,15 @@ import {
 } from '@material-ui/core';
 import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
-import styles from '../styles.module.css';
+import styles from '../WikiTags/styles.module.css';
 import { HubConnectionState } from '@microsoft/signalr';
-var constants = require('../../../services/constants');
+var constants = require('../../services/constants');
 
 import SendIcon from '@material-ui/icons/Send';
 import ClearIcon from '@material-ui/icons/Clear';
 import CancelPresentationIcon from '@material-ui/icons/CancelPresentation';
 import BlockIcon from '@material-ui/icons/Block';
-import SlotInfo from '../../../helpers/SlotInfo';
+import SlotInfo from '../../helpers/SlotInfo';
 
 class Chat extends React.Component {
 

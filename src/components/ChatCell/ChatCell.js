@@ -6,11 +6,11 @@ import {
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import log from 'loglevel';
-import styles from '../styles.module.css';
+import styles from '../WikiTags/styles.module.css';
 
 import Chat from './Chat'
 import ChatStatusBar from './ChatStatusBar';
-var constants = require('../../../services/constants');
+var constants = require('../../services/constants');
 
 class ChatCell extends React.Component {
 
