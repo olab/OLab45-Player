@@ -36,7 +36,7 @@ class OlabAttendeeTag extends React.Component {
       userName: props.props.authActions.getUserName(),
       width: '100%',
       id: this.props.name,
-      sessionId: ''
+      contextId: props.props.contextId
     };
 
     this.turkee = new Turkee(this);
@@ -143,8 +143,8 @@ class OlabAttendeeTag extends React.Component {
     }
   }
 
-  // the sessionId has changed
-  onSessionIdChanged(Id) {
+  // the contextId has changed
+  oncontextIdChanged(Id) {
 
     let { chatInfo } = this.state;
 

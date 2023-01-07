@@ -11,6 +11,8 @@ class TurkTalk {
   constructor(component) {
 
     this.component = component;
+    this.contextId = component.props.props.contextId;
+
     this.type = this.constructor.name;
     const url = config.TTALK_HUB_URL;
 
@@ -18,9 +20,10 @@ class TurkTalk {
 
     const sessionInfo = persistantStorage.get('sessionInfo');
     const token = `${sessionInfo?.authInfo.token}`;
-
+    const hubUrl = `${url}?access_token=${token}&contextId=${this.contextId}`;
+    
     this.connection = new HubConnectionBuilder()
-      .withUrl(`${url}?access_token=${token}`)
+      .withUrl(hubUrl)
       // .withUrl(url, { accessTokenFactory: () => this.token })
       // .withAutomaticReconnect()
       .configureLogging(LogLevel.Error)

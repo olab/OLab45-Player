@@ -54,7 +54,7 @@ class Player extends PureComponent {
       nodesVisited: [],
       nodeId: Number(nodeId),
       // urlParam: param,
-      sessionId: null,
+      contextId: null,
       signalRConnection: null
     };
 
@@ -70,7 +70,7 @@ class Player extends PureComponent {
       this.state.scopedObjects.map = persistantStorage.get('map-so');
       this.state.scopedObjects.node = persistantStorage.get('node-so');
       this.state.nodesVisited = persistantStorage.get('visit-once-nodes');
-      this.state.sessionId = persistantStorage.get('sessionId');
+      this.state.contextId = persistantStorage.get('contextId');
     }
     else {
       log.info(`disabled cache`);
@@ -87,8 +87,8 @@ class Player extends PureComponent {
 
   async componentDidMount() {
 
-    this.setState({ mapId: this.props.params.mapId });    
-    this.setState({ nodeId: this.props.params.nodeId });    
+    this.setState({ mapId: this.props.params.mapId });
+    this.setState({ nodeId: this.props.params.nodeId });
 
     await this.getServer(this.props, 1);
     await this.getMap(this.props, this.state.mapId);
@@ -247,7 +247,16 @@ class Player extends PureComponent {
       const { data: scopedObjectsData } = await getNodeScopedObjects(props, objData.id);
       const { scopedObjects } = this.state;
 
+      // test if root node
+      if (objData.typeId === 1) {
+        persistantStorage.save('contextId', objData.contextId);
+      }
+      else {
+        objData.contextId = persistantStorage.get('contextId');
+      }
+
       this.setState({
+        contextId: objData.contextId,
         isNodeFetched: true,
         node: objData,
         scopedObjects: {
@@ -262,14 +271,6 @@ class Player extends PureComponent {
         persistantStorage.save('node-so', this.state.scopedObjects.node);
       }
 
-      // test if root node
-      if ( objData.typeId === 1 ) {
-        persistantStorage.save('sessionId', objData.sessionId);
-        this.setState({
-          sessionId: objData.sessionId,
-        });
-      }
-
       log.debug('read node data');
 
     } catch (error) {
@@ -278,8 +279,8 @@ class Player extends PureComponent {
 
   }
 
-  setCounterChange = ( state ) => {
-    alert( state );
+  setCounterChange = (state) => {
+    alert(state);
   }
 
   getDynamic = async (props, state) => {
@@ -343,7 +344,7 @@ class Player extends PureComponent {
       scopedObjects,
       dynamicObjects,
       urlParam,
-      sessionId
+      contextId
     } = this.state;
 
     const {
@@ -376,10 +377,19 @@ class Player extends PureComponent {
                   scopedObjects,
                   urlParam,
                   nodesVisited,
-                  sessionId
+                  contextId
                 },
               }}
-              components={{ OlabConstantTag, OlabQuestionTag, OlabLinksTag, OlabCountersTag, OlabCounterTag, OlabMediaResourceTag, OlabAttendeeTag, OlabModeratorTag }}
+              components={{
+                OlabConstantTag,
+                OlabQuestionTag,
+                OlabLinksTag,
+                OlabCountersTag,
+                OlabCounterTag,
+                OlabMediaResourceTag,
+                OlabAttendeeTag,
+                OlabModeratorTag
+              }}
               jsx={theme?.header}
               onError={(arg) => this.onJsxParseError(arg)}
             />
@@ -403,10 +413,19 @@ class Player extends PureComponent {
                   dynamicObjects,
                   urlParam,
                   nodesVisited,
-                  sessionId
+                  contextId
                 },
               }}
-              components={{ OlabConstantTag, OlabQuestionTag, OlabLinksTag, OlabCountersTag, OlabCounterTag, OlabMediaResourceTag, OlabAttendeeTag, OlabModeratorTag }}
+              components={{
+                OlabConstantTag,
+                OlabQuestionTag,
+                OlabLinksTag,
+                OlabCountersTag,
+                OlabCounterTag,
+                OlabMediaResourceTag,
+                OlabAttendeeTag,
+                OlabModeratorTag
+              }}
               jsx={theme?.footer}
               onError={(arg) => this.onJsxParseError(arg)}
             />
@@ -431,10 +450,19 @@ class Player extends PureComponent {
                 dynamicObjects,
                 urlParam,
                 nodesVisited,
-                sessionId
+                contextId
               },
             }}
-            components={{ OlabConstantTag, OlabQuestionTag, OlabLinksTag, OlabCountersTag, OlabCounterTag, OlabMediaResourceTag, OlabAttendeeTag, OlabModeratorTag }}
+            components={{
+              OlabConstantTag,
+              OlabQuestionTag,
+              OlabLinksTag,
+              OlabCountersTag,
+              OlabCounterTag,
+              OlabMediaResourceTag,
+              OlabAttendeeTag,
+              OlabModeratorTag
+            }}
             jsx={node.text}
             onError={(arg) => this.onJsxParseError(arg)}
           />
@@ -446,9 +474,9 @@ class Player extends PureComponent {
         nodesVisited.push(this.state.node.id);
 
         // remove any duplicates.
-        var newNodesVisited = [ ...new Set(nodesVisited) ];        
+        var newNodesVisited = [...new Set(nodesVisited)];
         this.setState({ nodesVisited: newNodesVisited });
-        
+
         log.debug(`saving visited node id: ${this.state.node.id}`);
         persistantStorage.save('visit-once-nodes', newNodesVisited);
 

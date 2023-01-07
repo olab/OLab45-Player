@@ -2,6 +2,10 @@ import log from 'loglevel';
 import { config } from '../config';
 const persistantStorage = require('../utils/StateStorage').PersistantStateStorage;
 
+async function activityReport(props, contextId) {
+
+}
+
 async function importer(props, fileName) {
 
   let token = props.authActions.getToken();
@@ -282,5 +286,6 @@ export {
   getServerScopedObjects,
   getDynamicScopedObjects,
   importer,
-  submitQuestionValue
+  submitQuestionValue,
+  activityReport
 };
