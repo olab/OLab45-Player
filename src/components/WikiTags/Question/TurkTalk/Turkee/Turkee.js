@@ -36,7 +36,12 @@ class OlabAttendeeTag extends React.Component {
       userName: props.props.authActions.getUserName(),
       width: '100%',
       id: this.props.name,
-      contextId: props.props.contextId
+      session: { 
+        contextId: props.props.contextId,
+        mapId: props.props.map.id,
+        nodeId: props.props.node.id,
+        questionId: props.props.question.id,
+      }
     };
 
     this.turkee = new Turkee(this);
@@ -175,7 +180,8 @@ class OlabAttendeeTag extends React.Component {
       connectionStatus,
       remoteInfo,
       localInfo,
-      userName
+      userName,
+      session
     } = this.state;
 
     const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
@@ -200,6 +206,7 @@ class OlabAttendeeTag extends React.Component {
 
       return (
         <>
+          {this.props.props.question.stem}
           <Table style={tableLayout}>
             <TableBody>
               <ChatCell
@@ -209,6 +216,7 @@ class OlabAttendeeTag extends React.Component {
                 connection={this.connection}
                 localInfo={localInfo}
                 senderInfo={remoteInfo}
+                session={session}
                 playerProps={this.props.props} />
             </TableBody>
           </Table>

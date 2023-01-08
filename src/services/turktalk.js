@@ -18,9 +18,12 @@ class TurkTalk {
 
     log.debug(`turk talk url: ${url}`);
 
+    this.questionSettings = JSON.parse( this.component.props.props.question.settings );
+    this.penName = `${component.props.props.map.name}|${this.questionSettings.roomName}`;
+
     const sessionInfo = persistantStorage.get('sessionInfo');
     const token = `${sessionInfo?.authInfo.token}`;
-    const hubUrl = `${url}?access_token=${token}&contextId=${this.contextId}`;
+    const hubUrl = `${url}?access_token=${token}&contextId=${this.contextId}&questionId=${this.component.props.props.question.id}`;
     
     this.connection = new HubConnectionBuilder()
       .withUrl(hubUrl)

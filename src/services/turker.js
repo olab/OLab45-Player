@@ -16,7 +16,6 @@ class Turker extends TurkTalk {
     this.onAddTurkee = onAddTurkee;
     this.onRemoveTurkey = onRemoveTurkey;
     this.playerState = component.props.props;
-    this.penName = `${component.props.props.map.name}|${component.props.name}`;
 
     // this.onAssignTurkee = this.onAssignLearner.bind(this);
     this.onCommandCallback = this.onCommandCallback.bind(this);

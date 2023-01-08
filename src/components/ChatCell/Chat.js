@@ -24,15 +24,10 @@ class Chat extends React.Component {
     super(props);
 
     this.state = {
-      show: this.props.show,
-      localInfo: this.props.localInfo,
-      senderInfo: this.props.senderInfo,
       conversation: [],
-      playerProps: this.props.playerProps,
       message: '',
-      isModerator: this.props.isModerator,
       inMacroMode: false,
-      key: this.props.key
+      ...this.props
     };
 
     this.connection = this.props.connection;
@@ -137,8 +132,8 @@ class Chat extends React.Component {
     this.onSystemMessageCallback({
       commandChannel: payload.local.commandChannel,
       data: isModerator ?
-        `'${payload.local.nickName}' connected to room` :
-        `Connected to room. Moderator is '${payload.remote.nickName}'`
+        `'${payload.local.nickName}' connected` :
+        `Connected. You are talking to '${payload.remote.nickName}'`
     });
   }
 
@@ -158,7 +153,7 @@ class Chat extends React.Component {
 
     this.onSystemMessageCallback({
       commandChannel: payload.commandChannel,
-      data: `'${payload.nickName}' has been disconnected from room`
+      data: `'${payload.nickName}' has been disconnected`
     });
   }
 
@@ -250,7 +245,7 @@ class Chat extends React.Component {
 
     try {
 
-      const { message, senderInfo, localInfo } = this.state;
+      const { message, senderInfo, localInfo, session } = this.state;
 
       if (message.length > 0) {
 
@@ -259,6 +254,7 @@ class Chat extends React.Component {
             to: localInfo.commandChannel,
             from: localInfo
           },
+          session: session,
           Data: message
         };
 

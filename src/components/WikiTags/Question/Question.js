@@ -14,7 +14,8 @@ import OlabMultiPickQuestion from './MultiChoice/MultiChoice';
 import OlabSliderQuestion from './Slider/Slider';
 import OlabDropDownQuestion from './DropDown/DropDown';
 import OlabDragAndDropQuestion from './DragAndDrop/DragAndDrop';
-
+import OlabAttendeeTag from './TurkTalk/Turkee/Turkee';
+import OlabModeratorTag from './TurkTalk/Turker/Turker';
 
 const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
 
@@ -100,7 +101,8 @@ class OlabQuestionTag extends React.Component {
         question: this.state.question,
         map: this.state.map,
         node: this.state.node,
-        dynamicObjects: this.state.dynamicObjects
+        dynamicObjects: this.state.dynamicObjects,
+        contextId: this.props.props.contextId
       };
 
       let questionType = props.question.questionType;
@@ -130,9 +132,17 @@ class OlabQuestionTag extends React.Component {
           return (
             <OlabDragAndDropQuestion props={props} />
           );
+        case 15:
+          return (
+            <OlabModeratorTag props={props} />
+          );
         case 12:
           return (
             <OlabDropDownQuestion props={props} />
+          );
+        case 11:
+          return (
+            <OlabAttendeeTag props={props} />
           );
         default:
           return (

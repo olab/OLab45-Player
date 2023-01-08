@@ -13,7 +13,6 @@ class Turkee extends TurkTalk {
     this.bindConnectionMessage(this.connection);
     this.onDisconnected = this.onDisconnected.bind(this);
     this.playerState = component.props.props;
-    this.penName = `${component.props.props.map.name}|${component.props.name}`;
   }
 
   // *****
