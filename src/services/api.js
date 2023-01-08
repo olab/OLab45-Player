@@ -143,14 +143,14 @@ async function getMapNode(props, mapId, nodeId) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/node/${nodeId}`;
   log.debug(`getMapNode(${mapId}, ${nodeId}) url: ${url})`);
-  let sessionId = persistantStorage.get('sessionId');
+  let contextId = persistantStorage.get('contextId');
 
   return fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
-      'OLabSessionId': sessionId
+      'OLabSessionId': contextId
     }
   })
     .then((data) => {
