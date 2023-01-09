@@ -117,17 +117,26 @@ class Chat extends React.Component {
   onParticipantAssigned(payload) {
 
     let { isModerator, localInfo } = this.state;
+    let remoteInfo = {};
+    let session = {};
 
     log.info(`'${localInfo.connectionId}' onParticipantAssigned (${JSON.stringify(payload, null, 1)})`);
 
     if (isModerator) {
-      var remoteInfo = new SlotInfo(payload.local);
-      this.setState({ senderInfo: remoteInfo });
+      remoteInfo = new SlotInfo(payload.local);
+      // get the (learner) session info from the payload
+      session = payload.local.session;
     }
     else {
-      var remoteInfo = new SlotInfo(payload.remote);
-      this.setState({ senderInfo: remoteInfo });
+      remoteInfo = new SlotInfo(payload.remote);
+      // there should already be session info in the state
+      session = localInfo.session;
     }
+
+    this.setState({
+      senderInfo: remoteInfo,
+      session: session
+    });
 
     this.onSystemMessageCallback({
       commandChannel: payload.local.commandChannel,
@@ -414,7 +423,7 @@ class Chat extends React.Component {
                         <Table stickyHeader size="small">
                           <TableRow>
                             <TableCell style={{ width: '10%' }}>
-                              <b>You:</b>
+                              <b>You</b>
                             </TableCell>
                             <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'blue' }}>
                               <span
@@ -429,6 +438,9 @@ class Chat extends React.Component {
                                 {conversationItem.message}
                               </span>
                             </TableCell>
+                            <TableCell style={{ width: '15%' }}>
+                              <b>&nbsp;</b>
+                            </TableCell>
                           </TableRow>
                         </Table>
                       </TableCell>
@@ -438,6 +450,9 @@ class Chat extends React.Component {
 
                         <Table stickyHeader size="small">
                           <TableRow>
+                            <TableCell style={{ width: '15%' }}>
+                              <b>&nbsp;</b>
+                            </TableCell>
                             <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'green' }}>
                               <span
                                 style={{
@@ -453,7 +468,7 @@ class Chat extends React.Component {
                               </span>
                             </TableCell>
                             <TableCell style={{ width: '10%' }}>
-                              <b>{!isModerator ? "Moderator" : senderInfo.nickName}:&nbsp;</b>
+                              <b>{!isModerator ? "Moderator" : senderInfo.nickName}&nbsp;</b>
                             </TableCell>
                           </TableRow>
                         </Table>

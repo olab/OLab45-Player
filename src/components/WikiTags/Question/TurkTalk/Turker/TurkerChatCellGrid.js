@@ -143,7 +143,6 @@ class TurkerChatCellGrid extends React.Component {
       let chatInfo = this.slotManager.getSlotByConnectionId(payload.connectionId);
       if (chatInfo) {
         chatInfo.assigned = false;
-        this.setState({ chatInfos: chatInfos });
       }
 
       // update the slot state in storage
@@ -214,14 +213,14 @@ class TurkerChatCellGrid extends React.Component {
     }
 
     if (!totalToShow) {
-      return  { width: '100%' };
+      return { width: '100%' };
     }
 
     if (totalToShow < this.numColumns) {
       return { width: `${Math.floor(100 / totalToShow)}%` };
     }
 
-    return  { width: '25%' };
+    return { width: '25%' };
 
   }
 
@@ -264,65 +263,70 @@ class TurkerChatCellGrid extends React.Component {
 
           log.debug(`   ${rowIndex}:${columnIndex}: '${remoteSlot.commandChannel}' show? '${localSlot.show}'`);
 
+          var session = {
+            contextId: null
+          };
+
           columns.push(
             <ChatCell
               name="chatcell"
+              session={session}
               key={index}
               style={chatCellWidthStyle}
-              isModerator = { this.props.isModerator }
-              connection = { this.connection }
-              localInfo = { localSlot }
-              senderInfo = { remoteSlot }
-              playerProps = { this.props.props } />
+              isModerator={this.props.isModerator}
+              connection={this.connection}
+              localInfo={localSlot}
+              senderInfo={remoteSlot}
+              playerProps={this.props.props} />
           );
 
-      }
+        }
 
-      chatRows.push(
-        <TableRow key={rowIndex}>
-          {columns}
-        </TableRow>
+        chatRows.push(
+          <TableRow key={rowIndex}>
+            {columns}
+          </TableRow>
+        );
+
+      }
+    }
+
+    if (foundConnectedChat) {
+
+      const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
+
+      return (
+        <Table style={tableLayout}>
+          <TableBody>
+            {chatRows}
+          </TableBody>
+        </Table>
       );
 
     }
-  }
-
-  if(foundConnectedChat) {
-
-    const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
-
-    return (
-      <Table style={tableLayout}>
-        <TableBody>
-          {chatRows}
-        </TableBody>
-      </Table>
-    );
-
-  }
     else {
 
-  const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
+      const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
 
-  return (
-    <div style={emptyGridLayout} >
-      <h3>Waiting for Participant</h3>
-    </div>
-  );
-}
+      return (
+        <div style={emptyGridLayout} >
+          <h3>Waiting for Participant</h3>
+        </div>
+      );
+    }
 
   }
 
-render() {
+  render() {
 
-  let chatRows = this.generateChatGrid();
-  return chatRows;
+    let chatRows = this.generateChatGrid();
+    return chatRows;
 
-} catch (error) {
-  return (
-    <b>TurkerStatusBar: {error.message}</b>
-  );
-}
+  } catch(error) {
+    return (
+      <b>TurkerStatusBar: {error.message}</b>
+    );
+  }
 }
 
 export default withStyles(styles)(TurkerChatCellGrid);

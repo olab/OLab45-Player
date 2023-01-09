@@ -1,6 +1,7 @@
 import TurkTalk from './turktalk';
 import log from 'loglevel';
 var constants = require('./constants');
+
 const persistantStorage = require('../utils/StateStorage').PersistantStateStorage;
 
 class Turkee extends TurkTalk {
@@ -10,6 +11,7 @@ class Turkee extends TurkTalk {
 
     super(component);
 
+    this.session = component.state.session;
     this.bindConnectionMessage(this.connection);
     this.onDisconnected = this.onDisconnected.bind(this);
     this.playerState = component.props.props;
@@ -51,17 +53,18 @@ class Turkee extends TurkTalk {
 
     // save room name to persistant storage in case 
     // user refreshes the window    
-    let roomName = this.penName;
+    this.session.roomName = this.penName;
+
     const connectionInfo = persistantStorage.get('connectionInfo');
     if ( connectionInfo != null ) {
-      roomName = connectionInfo.roomName;
+      this.session.roomName = connectionInfo.roomName;
     }
 
-    log.debug(`'${this.connectionId}' registering learner for room name: ${roomName}`);
+    log.debug(`'${this.connectionId}' registering learner for room name: ${this.session.roomName}`);
 
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKEE,
-      roomName);
+      this.session);
   }
 
   onReconnecting(error) {

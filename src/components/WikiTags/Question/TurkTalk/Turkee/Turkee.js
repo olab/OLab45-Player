@@ -13,6 +13,8 @@ import styles from '../../../styles.module.css';
 import ChatCell from '../../../../ChatCell/ChatCell'
 import SlotInfo from '../../../../../helpers/SlotInfo';
 import SlotManager from '../SlotManager';
+import Session from '../../../../../services/session';
+
 var constants = require('../../../../../services/constants');
 const persistantStorage = require('../../../../../utils/StateStorage').PersistantStateStorage;
 
@@ -27,6 +29,8 @@ class OlabAttendeeTag extends React.Component {
     // components visible
     this.propManager.Slots()[0].show = true;
 
+    let session = new Session( props.props );
+
     this.state = {
       connectionStatus: null,
       slotInfos: this.propManager.Slots(),
@@ -36,12 +40,7 @@ class OlabAttendeeTag extends React.Component {
       userName: props.props.authActions.getUserName(),
       width: '100%',
       id: this.props.name,
-      session: { 
-        contextId: props.props.contextId,
-        mapId: props.props.map.id,
-        nodeId: props.props.node.id,
-        questionId: props.props.question.id,
-      }
+      session: session
     };
 
     this.turkee = new Turkee(this);

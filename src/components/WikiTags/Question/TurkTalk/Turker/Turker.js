@@ -35,7 +35,6 @@ class OlabModeratorTag extends React.Component {
       userName: props.props.authActions.getUserName(),
       width: '100%',
       localInfo: new SlotInfo(),
-      sessionId: '',
       ...atrium
     };
 
@@ -94,11 +93,11 @@ class OlabModeratorTag extends React.Component {
     try {
 
       // ignore any messages not to me
-      if (userName !== payload.local.userId) {
+      if (userName !== payload.remote.userId) {
         return false;
       }
 
-      let moderator = new Participant(payload.local);
+      let moderator = new Participant(payload.remote);
       moderator.isModerator = true;
 
       localInfo = new SlotInfo();
