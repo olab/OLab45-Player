@@ -368,7 +368,7 @@ class OlabModeratorTag extends React.Component {
 
             <Grid container>
               <Grid container item xs={3}>
-                <FormLabel>Unassigned Learners ({atriumLearners.length} waiting)</FormLabel>
+                <FormLabel>Atrium ({atriumLearners.length} waiting)</FormLabel>
                 <Select
                   value={selectedLearnerUserId}
                   onChange={this.onAtriumLearnerSelected}

@@ -24,16 +24,16 @@ class OlabAttendeeTag extends React.Component {
 
     super(props);
 
-    this.propManager = new SlotManager(1);
+    this.slotManager = new SlotManager(1);
     // this makes the chat and status bar
     // components visible
-    this.propManager.Slots()[0].show = true;
+    this.slotManager.RemoteSlots()[0].show = true;
 
     let session = new Session(props.props);
 
     this.state = {
       connectionStatus: null,
-      slotInfos: this.propManager.Slots(),
+      slotInfos: this.slotManager.RemoteSlots(),
       maxHeight: 200,
       remoteInfo: new SlotInfo(),
       localInfo: new SlotInfo({ connectionId: '???' }),
@@ -53,6 +53,12 @@ class OlabAttendeeTag extends React.Component {
     var self = this;
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
 
+  }
+
+  dumpConnectionState() {
+    var infoState = { localInfo: this.state.localInfo, remoteInfo: null };
+    log.debug(`'${this.connectionId}' onAtriumAssigned localInfo = ${JSON.stringify(infoState, null, 2)}]`);
+    persistantStorage.save('infoState', infoState);
   }
 
   onCommandCallback(payload) {
@@ -80,22 +86,34 @@ class OlabAttendeeTag extends React.Component {
   }
 
   // learner has been assigned to an atrium
-  onAtriumAssigned(learner) {
+  onAtriumAssigned(payload) {
 
-    learner.isModerator = false;
-    learner.show = true;
+    try {
 
-    this.propManager.assignLocalInfo(learner);
-    var localInfo = this.propManager.LocalSlots()[0];
-    localInfo.connectionId = localInfo.connectionId.slice(-3);
+      let { userName } = this.state;
 
-    log.debug(`'${this.connectionId}' onAtriumAssigned localInfo = ${JSON.stringify(localInfo, null, 2)}]`);
-    persistantStorage.save('connectionInfo', localInfo);
+      // ignore any messages not to me
+      if (userName !== payload.userId) {
+        return false;
+      }
 
-    this.setState({
-      localInfo: localInfo
-    });
+      payload.isModerator = false;
+      payload.show = true;
+      payload.connectionId = payload.connectionId.slice(-3);
 
+      this.slotManager.assignLocalInfo(payload);
+      var localInfo = this.slotManager.LocalSlots()[0];
+
+      this.setState({
+        localInfo: localInfo,
+        remoteInfo: null
+      });
+
+      this.dumpConnectionState();
+
+    } catch (error) {
+      log.error(`'${this.connectionId}' onAtriumAssigned exception: ${error.message}`);
+    }
 
   }
 
@@ -103,27 +121,23 @@ class OlabAttendeeTag extends React.Component {
 
     try {
 
-      let {
-        userName
-      } = this.state;
+      let { userName } = this.state;
 
       // ignore any messages not to me
       if (userName !== payload.local.userId) {
         return false;
       }
 
-      var slotInfo = this.propManager.Slots()[0];
-      slotInfo.SetParticipant(payload.local);
-      slotInfo.assigned = true;
-      slotInfo.show = true;
+      const { localInfo } = this.state;
+      let { remoteSlots, localSlots } = this.slotManager.assignLearner(localInfo, payload.remote);
 
       this.setState({
-        localInfo: slotInfo
+        showChatGrid: true,
+        localInfo: localSlots[0],
+        remoteInfo: remoteSlots[0]
       });
 
-      log.debug(`'${this.connectionId}' onRoomAssigned localInfo = ${JSON.stringify(slotInfo, null, 2)}]`);
-
-      persistantStorage.save('connectionInfo', slotInfo);
+      this.dumpConnectionState();
 
     } catch (error) {
       log.error(`'${this.connectionId}' onRoomAssigned exception: ${error.message}`);

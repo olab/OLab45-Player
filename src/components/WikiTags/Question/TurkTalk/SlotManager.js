@@ -34,11 +34,12 @@ class SlotManager {
         var slot = new SlotInfo();
         slot.key = index;
 
-        this.localSlots.push(Object.assign({}, slot));
+        this.localSlots.push(slot);
 
         // clone the slot so we can apply the slot template
         // to a separate object
         slot = new SlotInfo();
+        slot.key = index;
 
         // overlay template on new object
         if (slotTemplate) {
@@ -80,7 +81,7 @@ class SlotManager {
   }
 
   // *****
-  Slots() {
+  RemoteSlots() {
     return this.remoteSlots;
   }
 
@@ -89,12 +90,27 @@ class SlotManager {
     return this.localSlots;
   }
 
+  assignLocalInfo(localInfo) {
+
+    // make copy of localInfo so it can be modified per slot
+
+    for (let index = 0; index < this.LocalSlots().length; index++) {
+
+      // overwrite the local info array
+      let slotLocalInfo = new SlotInfo(localInfo);
+      slotLocalInfo.key = index;
+
+      this.LocalSlots()[index] = slotLocalInfo;
+    }
+
+  }
+
   // *****
   getSlotByConnectionId(connectionId) {
 
     try {
 
-      for (let item of this.Slots()) {
+      for (let item of this.RemoteSlots()) {
         if (item.connectionId === connectionId)
           return item;
       }
@@ -113,7 +129,7 @@ class SlotManager {
 
     try {
 
-      for (let item of this.Slots()) {
+      for (let item of this.RemoteSlots()) {
         if (item.userId === userId)
           return item;
       }
@@ -132,7 +148,7 @@ class SlotManager {
 
     try {
 
-      for (let item of this.Slots()) {
+      for (let item of this.RemoteSlots()) {
         if (item.key === key)
           return item;
       }
@@ -152,7 +168,7 @@ class SlotManager {
 
     try {
 
-      for (let slot of this.LocalSlots()) {
+      for (let slot of this.RemoteSlots()) {
         if (!slot.assigned) {
           return slot.key;
         }
@@ -165,51 +181,53 @@ class SlotManager {
     return null;
   }
 
-  assignLocalInfo(localInfo) {
+  // unassign a (remote) conversation
+  unassignLearner(payload) {
 
-    // make copy of localInfo so it can be modified per slot
-
-    for (let index = 0; index < this.LocalSlots().length; index++) {
-
-      // overwrite the local info array
-      let slotLocalInfo = new SlotInfo(localInfo);
-      slotLocalInfo.key = index;
-
-      this.LocalSlots()[index] = slotLocalInfo;
+    // get chat for connection id.  when found, mark the chat
+    // as disconnected.
+    let slotInfo = this.getSlotByConnectionId(payload.connectionId);
+    if (slotInfo) {
+      // blank out slot
+      slotInfo = new SlotInfo({ key: slotInfo.key });
+      this.RemoteSlots()[ slotInfo.key ] = slotInfo;
     }
 
-    this.haveLocalAssigned = true;
+    return {
+      remoteSlots: this.RemoteSlots(),
+      localSlots: this.LocalSlots()
+    }
 
   }
 
   // *****
-  assignLearner(localInfo, newLearner) {
+  assignLearner(localInfo, remoteInfo) {
 
     let index = this.getOpenSlotIndex();
     if (index == null) {
-      throw new Error(`No available slots to assign learner ${newLearner.userId} `);
+      throw new Error(`No available slots to assign learner ${remoteInfo.userId} `);
     }
 
-    log.debug(`assigning '${newLearner.userId}' to slot ${index}`);
+    log.debug(`assigning '${remoteInfo.userId}' to slot ${index}`);
 
-    let slot = this.Slots()[index];
-    let learner = new Participant(newLearner);
+    let remoteSlot = this.RemoteSlots()[index];
+    let participant = new SlotInfo(remoteInfo);
+    remoteSlot.SetParticipant(participant);
 
     this.haveAssigned = true;
-    slot.SetParticipant(learner);
 
     // clone the localInfo so we can set it's properties
     // per slot
-    let newLocalInfo = Object.assign({}, localInfo);
-    newLocalInfo.show = true;
-    newLocalInfo.assigned = true;
-    newLocalInfo.commandChannel = newLearner.commandChannel;
-    this.LocalSlots()[index] = newLocalInfo;
+    participant = new SlotInfo(localInfo);
+    participant.show = true;
+    participant.assigned = true;
 
-    log.debug(`assignLearner: ${learner.toString()}`);
+    this.LocalSlots()[index] = participant;
+
+    log.debug(`assignLearner: ${participant.toString()}`);
 
     return {
-      remoteSlots: this.Slots(),
+      remoteSlots: this.RemoteSlots(),
       localSlots: this.LocalSlots()
     }
   }

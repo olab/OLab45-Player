@@ -171,7 +171,12 @@ class Chat extends React.Component {
 
     try {
 
-      let { localInfo, senderInfo } = this.state;
+      let { isModerator, localInfo, senderInfo } = this.state;
+
+      // gatekeep if this chat instance has a learner assigned
+      if (isModerator && !senderInfo?.userId) {
+        return;
+      }
 
       this.onSystemMessageCallback({
         commandChannel: localInfo?.commandChannel,

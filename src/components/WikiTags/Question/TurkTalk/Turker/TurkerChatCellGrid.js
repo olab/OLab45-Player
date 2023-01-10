@@ -31,10 +31,10 @@ class TurkerChatCellGrid extends React.Component {
     this.roomName = this.props.roomName;
 
     this.state = {
-      localSlots: this.slotManager.Slots(),
+      localSlots: this.slotManager.RemoteSlots(),
       remoteSlots: this.slotManager.LocalSlots(),
       localInfo: this.props.localInfo,
-      showChatGrid: this.slotManager.haveAssigned
+      showChatGrid: false
     };
 
     this.connection = this.props.connection;
@@ -98,10 +98,15 @@ class TurkerChatCellGrid extends React.Component {
     try {
 
       const { localInfo } = this.state;
+
+      // the connected learner's command channel becomes
+      // our own locla channel
+      localInfo.commandChannel = payload.commandChannel;
+
       let { remoteSlots, localSlots } = this.slotManager.assignLearner(localInfo, payload);
 
       this.setState({
-        hasAssignedLearner: this.slotManager.haveAssigned,
+        showChatGrid: true,
         remoteSlots: remoteSlots,
         localSlots: localSlots
       });
@@ -127,20 +132,7 @@ class TurkerChatCellGrid extends React.Component {
 
       log.debug(`'${this.connectionId}' onLearnerUnassigned: connectionId '${payload}'`);
 
-      let {
-        localSlots,
-        remoteSlots
-      } = this.state;
-
-      // get chat for connection id.  when found, mark the chat
-      // as disconnected.
-      let chatInfo = this.slotManager.getSlotByConnectionId(payload.connectionId);
-      if (chatInfo) {
-        chatInfo.assigned = false;
-      }
-
-      remoteSlots = this.slotManager.Slots();
-      localSlots = this.slotManager.LocalSlots();
+      let { remoteSlots, localSlots } = this.slotManager.unassignLearner(payload);
 
       this.setState({
         remoteSlots: remoteSlots,
@@ -195,7 +187,7 @@ class TurkerChatCellGrid extends React.Component {
         this.assignLearnerToChat(learner);
       }
 
-      var slotInfos = this.slotManager.Slots();
+      var slotInfos = this.slotManager.RemoteSlots();
 
       this.setState({ slotInfos: slotInfos });
 
@@ -231,7 +223,8 @@ class TurkerChatCellGrid extends React.Component {
     const {
       remoteSlots,
       localSlots,
-      localInfo
+      localInfo,
+      showChatGrid
     } = this.state;
 
     let foundConnectedChat = false;
@@ -306,8 +299,14 @@ class TurkerChatCellGrid extends React.Component {
       );
 
     }
-    else {
 
+  }
+
+  render() {
+
+    const { showChatGrid } = this.state;
+
+    if ( !showChatGrid ) {
       const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
 
       return (
@@ -316,10 +315,6 @@ class TurkerChatCellGrid extends React.Component {
         </div>
       );
     }
-
-  }
-
-  render() {
 
     let chatRows = this.generateChatGrid();
     return chatRows;
