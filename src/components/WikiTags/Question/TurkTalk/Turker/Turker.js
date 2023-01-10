@@ -46,7 +46,7 @@ class OlabModeratorTag extends React.Component {
 
     this.handleInfoClose = this.handleInfoClose.bind(this);
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
-    this.onRoomAssigned = this.onRoomAssigned.bind(this);
+    this.onModeratorAssigned = this.onModeratorAssigned.bind(this);
 
     this.onTurkeeSelected = this.onAtriumLearnerSelected.bind(this);
     this.onAssignClicked = this.onAssignClicked.bind(this);
@@ -72,8 +72,8 @@ class OlabModeratorTag extends React.Component {
 
       log.debug(`'${localInfo.connectionId}' onTurkerCommandCallback: ${payload.command}`);
 
-      if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-        this.onRoomAssigned(payload.data);
+      if (payload.command === constants.SIGNALCMD_TURKER_ASSIGNED) {
+        this.onModeratorAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
@@ -90,7 +90,7 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  onRoomAssigned(payload) {
+  onModeratorAssigned(payload) {
 
     let {
       userName,
@@ -114,15 +114,16 @@ class OlabModeratorTag extends React.Component {
       localInfo.connectionId = localInfo.connectionId.slice(-3);
 
       this.setState({
-        localInfo: localInfo
+        localInfo: localInfo,
+        mapNodes: payload.mapNodes
       });
 
-      log.debug(`'${localInfo.connectionId}' onRoomAssigned localInfo = ${JSON.stringify(localInfo, null, 2)}]`);
+      log.debug(`'${localInfo.connectionId}' onModeratorAssigned localInfo = ${JSON.stringify(localInfo, null, 2)}]`);
 
       persistantStorage.save('connectionInfo', localInfo);
 
     } catch (error) {
-      log.error(`'${localInfo.connectionId}' onRoomAssigned exception: ${error.message}`);
+      log.error(`'${localInfo.connectionId}' onModeratorAssigned exception: ${error.message}`);
     }
 
   }

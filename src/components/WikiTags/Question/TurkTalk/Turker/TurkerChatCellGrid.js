@@ -82,6 +82,10 @@ class TurkerChatCellGrid extends React.Component {
       this.onLearnerAssigned(payload.data);
     }
 
+    if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+      this.onRoomAssigned(payload.data);
+    }
+
     else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
       this.onLearnerUnassigned(payload.data);
     }
@@ -92,6 +96,14 @@ class TurkerChatCellGrid extends React.Component {
 
   }
 
+  onRoomAssigned(payload) {
+    try {
+      
+    } catch (error) {
+      log.error(`'${this.connectionId}' onRoomAssigned exception: ${error.message}`);
+    }
+  }
+  
   // learner has been assigned to the room
   onLearnerAssigned(payload) {
 

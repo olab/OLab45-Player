@@ -71,6 +71,7 @@ class Turker extends TurkTalk {
 
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKER,
+      this.component.props.props.map.id,
       roomName,
       false);
   }

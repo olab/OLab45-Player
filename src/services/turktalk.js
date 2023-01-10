@@ -23,7 +23,7 @@ class TurkTalk {
 
     const sessionInfo = persistantStorage.get('sessionInfo');
     const token = `${sessionInfo?.authInfo.token}`;
-    const hubUrl = `${url}?access_token=${token}&contextId=${this.contextId}&questionId=${this.component.props.props.question.id}`;
+    const hubUrl = `${url}?access_token=${token}&contextId=${this.contextId}&mapId=${this.component.props.props.map.id}`;
     
     this.connection = new HubConnectionBuilder()
       .withUrl(hubUrl)
