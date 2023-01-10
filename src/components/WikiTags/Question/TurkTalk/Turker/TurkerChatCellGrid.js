@@ -34,7 +34,7 @@ class TurkerChatCellGrid extends React.Component {
       localSlots: this.slotManager.Slots(),
       remoteSlots: this.slotManager.LocalSlots(),
       localInfo: this.props.localInfo,
-      showChatGrid: false
+      showChatGrid: this.slotManager.haveAssigned
     };
 
     this.connection = this.props.connection;
