@@ -2,10 +2,11 @@
 import * as React from 'react';
 import {
   Button, Grid, FormLabel, Table,
-  TableBody, MenuItem, Select, TableRow
+  TableBody, MenuItem, Select, TableRow, Snackbar
 } from '@material-ui/core';
 import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
+import MuiAlert from '@material-ui/lab/Alert';
 
 import Turker from '../../../../../services/turker';
 import styles from '../../../styles.module.css';
@@ -15,6 +16,10 @@ import Participant from '../../../../../helpers/participant';
 import SlotInfo from '../../../../../helpers/SlotInfo';
 var constants = require('../../../../../services/constants');
 const persistantStorage = require('../../../../../utils/StateStorage').PersistantStateStorage;
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 class OlabModeratorTag extends React.Component {
 
@@ -35,9 +40,11 @@ class OlabModeratorTag extends React.Component {
       userName: props.props.authActions.getUserName(),
       width: '100%',
       localInfo: new SlotInfo(),
-      ...atrium
+      ...atrium,
+      infoOpen: null
     };
 
+    this.handleInfoClose = this.handleInfoClose.bind(this);
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
     this.onRoomAssigned = this.onRoomAssigned.bind(this);
 
@@ -123,14 +130,13 @@ class OlabModeratorTag extends React.Component {
   // handle atrium contents updated
   onAtriumUpdate(payloadArray) {
 
-    let { localInfo } = this.state;
+    let { localInfo, atriumLearners } = this.state;
 
     try {
 
-      let atriumLearners = [];
-      let {
-        localInfo
-      } = this.state;
+      const previousAtriumCount = atriumLearners.length;
+
+      atriumLearners = [];
 
       // save atrium contents if array passed in
       if (Array.isArray(payloadArray) && (payloadArray.length >= 0)) {
@@ -150,12 +156,23 @@ class OlabModeratorTag extends React.Component {
 
         log.debug(`'${localInfo.connectionId}' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
 
-        this.setState({
-          atriumLearners: atriumLearners,
-          selectedLearnerUserId: '0'
-        });
+        if (previousAtriumCount != atriumLearners.length) {
+          this.setState({
+            atriumLearners: atriumLearners,
+            selectedLearnerUserId: '0',
+            infoOpen: true,
+            infoMessage: 'Atrium Updated'
+          });
+        }
+        else {
+          this.setState({
+            atriumLearners: atriumLearners,
+            selectedLearnerUserId: '0'
+          });
+        }
 
         this.updateAtriumState();
+
 
       }
 
@@ -218,6 +235,10 @@ class OlabModeratorTag extends React.Component {
 
       const { selectedLearnerUserId } = this.state;
       let selectedLearner = null;
+
+      if ((selectedLearnerUserId == undefined) || (selectedLearnerUserId == '0') ) {
+        return;
+      }
 
       // get unassigned atrium learner from list
       for (let item of this.state.atriumLearners) {
@@ -289,6 +310,15 @@ class OlabModeratorTag extends React.Component {
 
   }
 
+  handleInfoClose(event, reason) {
+
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ infoOpen: false });
+
+  };
+
   render() {
 
     const {
@@ -298,6 +328,8 @@ class OlabModeratorTag extends React.Component {
       connectionStatus,
       localInfo,
       sessionId,
+      infoOpen,
+      infoMessage,
     } = this.state;
 
     log.debug(`'${localInfo.connectionId}' OlabTurkerTag render '${userName}'`);
@@ -382,6 +414,13 @@ class OlabModeratorTag extends React.Component {
             </Grid>
           </Grid>
           <br />
+          {(infoOpen === true) && (
+            <Snackbar open={infoOpen} autoHideDuration={3000} onClose={this.handleInfoClose}>
+              <Alert onClose={this.handleInfoClose} severity="info">
+                {infoMessage}
+              </Alert>
+            </Snackbar>
+          )}
         </>
       );
 

@@ -29,7 +29,7 @@ class OlabAttendeeTag extends React.Component {
     // components visible
     this.propManager.Slots()[0].show = true;
 
-    let session = new Session( props.props );
+    let session = new Session(props.props);
 
     this.state = {
       connectionStatus: null,
@@ -208,15 +208,17 @@ class OlabAttendeeTag extends React.Component {
           {this.props.props.question.stem}
           <Table style={tableLayout}>
             <TableBody>
-              <ChatCell
-                key={0}
-                isModerator={localInfo.isModerator}
-                style={{ width: '100%' }}
-                connection={this.connection}
-                localInfo={localInfo}
-                senderInfo={remoteInfo}
-                session={session}
-                playerProps={this.props.props} />
+              <TableRow>
+                <ChatCell
+                  key={0}
+                  isModerator={localInfo.isModerator}
+                  style={{ width: '100%' }}
+                  connection={this.connection}
+                  localInfo={localInfo}
+                  senderInfo={remoteInfo}
+                  session={session}
+                  playerProps={this.props.props} />
+              </TableRow>
             </TableBody>
           </Table>
           <br />

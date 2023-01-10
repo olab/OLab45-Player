@@ -41,7 +41,6 @@ class Chat extends React.Component {
     this.onSystemMessageCallback = this.onSystemMessageCallback.bind(this);
     this.onLearnerAssigned = this.onParticipantAssigned.bind(this);
     this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
-    // this.onRemoteDisconnected = this.onRemoteDisconnected.bind(this);
     this.scrollToBottom = this.scrollToBottom.bind(this);
 
     var chatSelf = this;
@@ -152,18 +151,23 @@ class Chat extends React.Component {
 
   onLearnerUnassigned(payload) {
 
-    let { localInfo } = this.state;
+    try {
+      let { localInfo } = this.state;
 
-    log.info(`'${localInfo.connectionId}' onLearnerUnassigned (${JSON.stringify(payload, null, 1)})`);
+      log.info(`'${localInfo?.connectionId}' onLearnerUnassigned (${JSON.stringify(payload, null, 1)})`);
 
-    localInfo.assigned = false;
+      localInfo.assigned = false;
 
-    this.setState({ localInfo: localInfo });
+      this.setState({ localInfo: localInfo });
 
-    this.onSystemMessageCallback({
-      commandChannel: payload.commandChannel,
-      data: `'${payload.nickName}' has been disconnected`
-    });
+      this.onSystemMessageCallback({
+        commandChannel: localInfo.commandChannel,
+        data: `'${payload.nickName}' has been disconnected`
+      });
+
+    } catch (error) {
+      log.error(`onLearnerUnassigned exception: ${error.message}`);
+    }
   }
 
   // system message method listener
@@ -421,27 +425,29 @@ class Chat extends React.Component {
                       <TableCell style={{ borderBottom: "none" }} align="left">
 
                         <Table stickyHeader size="small">
-                          <TableRow>
-                            <TableCell style={{ width: '10%' }}>
-                              <b>You</b>
-                            </TableCell>
-                            <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'blue' }}>
-                              <span
-                                style={{
-                                  border: 'none',
-                                  color: 'white',
-                                  fontSize: '16px',
-                                  padding: '10px',
-                                  lineHeight: '1.8'
-                                }}
-                              >
-                                {conversationItem.message}
-                              </span>
-                            </TableCell>
-                            <TableCell style={{ width: '15%' }}>
-                              <b>&nbsp;</b>
-                            </TableCell>
-                          </TableRow>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell style={{ width: '10%' }}>
+                                <b>You</b>
+                              </TableCell>
+                              <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'blue' }}>
+                                <span
+                                  style={{
+                                    border: 'none',
+                                    color: 'white',
+                                    fontSize: '16px',
+                                    padding: '10px',
+                                    lineHeight: '1.8'
+                                  }}
+                                >
+                                  {conversationItem.message}
+                                </span>
+                              </TableCell>
+                              <TableCell style={{ width: '15%' }}>
+                                <b>&nbsp;</b>
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
                         </Table>
                       </TableCell>
                     )}
@@ -449,28 +455,30 @@ class Chat extends React.Component {
                       <TableCell style={{ borderBottom: "none" }}>
 
                         <Table stickyHeader size="small">
-                          <TableRow>
-                            <TableCell style={{ width: '15%' }}>
-                              <b>&nbsp;</b>
-                            </TableCell>
-                            <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'green' }}>
-                              <span
-                                style={{
-                                  border: 'none',
-                                  backgroundColor: 'green',
-                                  color: 'white',
-                                  fontSize: '16px',
-                                  padding: '10px',
-                                  lineHeight: '1.8'
-                                }}
-                              >
-                                {conversationItem.message}
-                              </span>
-                            </TableCell>
-                            <TableCell style={{ width: '10%' }}>
-                              <b>{!isModerator ? "Moderator" : senderInfo.nickName}&nbsp;</b>
-                            </TableCell>
-                          </TableRow>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell style={{ width: '15%' }}>
+                                <b>&nbsp;</b>
+                              </TableCell>
+                              <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'green' }}>
+                                <span
+                                  style={{
+                                    border: 'none',
+                                    backgroundColor: 'green',
+                                    color: 'white',
+                                    fontSize: '16px',
+                                    padding: '10px',
+                                    lineHeight: '1.8'
+                                  }}
+                                >
+                                  {conversationItem.message}
+                                </span>
+                              </TableCell>
+                              <TableCell style={{ width: '10%' }}>
+                                <b>{!isModerator ? "Moderator" : senderInfo.nickName}&nbsp;</b>
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
                         </Table>
                       </TableCell>
                     )}

@@ -4,14 +4,14 @@
       "name": "Moderator",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:3000/player/player/1649/32062",
+      "url": "http://localhost:3000/player/player/1649/0",
       "webRoot": "${workspaceFolder}"
     },
     {
       "name": "Learner",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:3000/player/player/1649/32069",
+      "url": "http://localhost:3000/player/player/1649/0",
       "webRoot": "${workspaceFolder}"
     }    
   ]
