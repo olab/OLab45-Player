@@ -106,7 +106,7 @@ class SlotManager {
   }
 
   // *****
-  getSlotByConnectionId(connectionId) {
+  getRemoteSlotByConnectionId(connectionId) {
 
     try {
 
@@ -125,7 +125,7 @@ class SlotManager {
   }
 
   // *****
-  getSlotByUserId(userId) {
+  getRemoteSlotByUserId(userId) {
 
     try {
 
@@ -144,7 +144,7 @@ class SlotManager {
   }
 
   // *****
-  getSlotByKey(key) {
+  getRemoteSlotByKey(key) {
 
     try {
 
@@ -156,7 +156,7 @@ class SlotManager {
       log.error(`could not find chat info for key ${key}`);
 
     } catch (error) {
-      log.error(`getPropByKey exception: ${error.message}`);
+      log.error(`getSlotByKey exception: ${error.message}`);
     }
 
     return null;
@@ -164,7 +164,7 @@ class SlotManager {
 
   // Get index of next open chat control or
   // find one user was already in
-  getOpenSlotIndex() {
+  getOpenRemoteSlotIndex() {
 
     try {
 
@@ -186,11 +186,11 @@ class SlotManager {
 
     // get chat for connection id.  when found, mark the chat
     // as disconnected.
-    let slotInfo = this.getSlotByConnectionId(payload.connectionId);
+    let slotInfo = this.getRemoteSlotByConnectionId(payload.connectionId);
     if (slotInfo) {
       // blank out slot
       slotInfo = new SlotInfo({ key: slotInfo.key });
-      this.RemoteSlots()[ slotInfo.key ] = slotInfo;
+      this.RemoteSlots()[slotInfo.key] = slotInfo;
     }
 
     return {
@@ -203,7 +203,7 @@ class SlotManager {
   // *****
   assignLearner(localInfo, remoteInfo) {
 
-    let index = this.getOpenSlotIndex();
+    let index = this.getOpenRemoteSlotIndex();
     if (index == null) {
       throw new Error(`No available slots to assign learner ${remoteInfo.userId} `);
     }
@@ -212,6 +212,8 @@ class SlotManager {
 
     let remoteSlot = this.RemoteSlots()[index];
     let participant = new SlotInfo(remoteInfo);
+    participant.show = true;
+    participant.assigned = true;
     remoteSlot.SetParticipant(participant);
 
     this.haveAssigned = true;
@@ -219,7 +221,8 @@ class SlotManager {
     // clone the localInfo so we can set it's properties
     // per slot
     participant = new SlotInfo(localInfo);
-    participant.show = true;
+    participant.key = index;
+    participant.show = true;    
     participant.assigned = true;
 
     this.LocalSlots()[index] = participant;
