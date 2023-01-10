@@ -27,6 +27,7 @@ class Chat extends React.Component {
       conversation: [],
       message: '',
       inMacroMode: false,
+      mapNodes: [],
       ...this.props
     };
 
@@ -40,6 +41,7 @@ class Chat extends React.Component {
     this.onMessageCallback = this.onMessageCallback.bind(this);
     this.onSystemMessageCallback = this.onSystemMessageCallback.bind(this);
     this.onLearnerAssigned = this.onParticipantAssigned.bind(this);
+    this.onModeratorAssigned = this.onModeratorAssigned.bind(this);
     this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
     this.scrollToBottom = this.scrollToBottom.bind(this);
 
@@ -81,6 +83,10 @@ class Chat extends React.Component {
         this.onAtriumAssigned(payload);
       }
 
+      if (payload.command === constants.SIGNALCMD_TURKER_ASSIGNED) {
+        this.onModeratorAssigned(payload.data);
+      }    
+  
       else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
         this.onParticipantAssigned(payload.data);
       }
@@ -101,8 +107,21 @@ class Chat extends React.Component {
       log.error(`onCommandCallback exception: ${error.message}`);
     }
 
-
   }
+
+  onModeratorAssigned(payload) {
+
+    try {
+
+      this.setState({
+        mapNodes: payload.mapNodes
+      });
+
+    } catch (error) {
+      log.error(`'${localInfo.connectionId}' onModeratorAssigned exception: ${error.message}`);
+    }
+
+  }  
 
   // chat participant has been assigned to a room atrium,
   // so paint a message to the chat window

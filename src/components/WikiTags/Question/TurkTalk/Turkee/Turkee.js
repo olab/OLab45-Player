@@ -50,8 +50,8 @@ class OlabAttendeeTag extends React.Component {
 
     this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
 
-    var self = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
+    var turkeeSelf = this;
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkeeSelf.onCommandCallback(payload) });
 
   }
 

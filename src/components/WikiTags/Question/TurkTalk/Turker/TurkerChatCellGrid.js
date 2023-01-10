@@ -277,6 +277,7 @@ class TurkerChatCellGrid extends React.Component {
           columns.push(
             <ChatCell
               name="chatcell"
+              mapNodes={this.props.mapNodes}
               session={session}
               key={index}
               style={chatCellWidthStyle}

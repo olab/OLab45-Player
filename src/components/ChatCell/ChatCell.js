@@ -62,6 +62,7 @@ class ChatCell extends React.Component {
       <TableCell style={cellStyling}>
         <Chat
           key={this.props.key}
+          mapNodes={this.props.mapNodes}
           session={session}
           show={localInfo.show}
           isModerator={this.props.isModerator}

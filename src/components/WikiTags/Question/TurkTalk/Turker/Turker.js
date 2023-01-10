@@ -118,7 +118,7 @@ class OlabModeratorTag extends React.Component {
         mapNodes: payload.mapNodes
       });
 
-      log.debug(`'${localInfo.connectionId}' onModeratorAssigned localInfo = ${JSON.stringify(localInfo, null, 2)}]`);
+      log.debug(`'${localInfo.connectionId}' onModeratorAssigned localInfo = ${JSON.stringify(payload, null, 2)}]`);
 
       persistantStorage.save('connectionInfo', localInfo);
 
@@ -331,6 +331,7 @@ class OlabModeratorTag extends React.Component {
       sessionId,
       infoOpen,
       infoMessage,
+      mapNodes
     } = this.state;
 
     log.debug(`'${localInfo.connectionId}' OlabTurkerTag render '${userName}'`);
@@ -353,6 +354,7 @@ class OlabModeratorTag extends React.Component {
                 connection={this.connection}
                 roomName={localInfo.roomName}
                 localInfo={localInfo}
+                mapNodes={mapNodes}
               />
 
               <TurkerChatStatusBar

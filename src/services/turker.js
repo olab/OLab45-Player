@@ -29,9 +29,9 @@ class Turker extends TurkTalk {
   bindConnectionMessage() {
 
     super.bindConnectionMessage()
-    var self = this;
+    var turkerSelf = this;
 
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkerSelf.onCommandCallback(payload) });
   }
 
   // *****
