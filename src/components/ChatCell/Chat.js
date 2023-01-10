@@ -54,6 +54,7 @@ class Chat extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
+
     if (prevProps.show !== this.props.show) {
       this.setState({ show: this.props.show });
     }
@@ -71,29 +72,35 @@ class Chat extends React.Component {
   // command method listener
   onCommandCallback(payload) {
 
-    let { localInfo } = this.state;
+    try {
+      let { localInfo } = this.state;
 
-    log.debug(`'${localInfo.connectionId}' onChatCommandCallback ${payload.command}`);
+      log.debug(`'${localInfo?.connectionId}' onChatCommandCallback ${payload.command}`);
 
-    if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
-      this.onAtriumAssigned(payload);
+      if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
+        this.onAtriumAssigned(payload);
+      }
+
+      else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+        this.onParticipantAssigned(payload.data);
+      }
+
+      else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
+        this.onLearnerUnassigned(payload.data);
+      }
+
+      else if (payload.command === constants.SIGNALCMD_TURKER_DISCONNECTED) {
+        this.onModeratorUnassigned(payload.data);
+      }
+
+      else {
+        log.debug(`'${localInfo?.connectionId}' onChatCommandCallback ignoring command: '${payload.command}'`);
+      }
+
+    } catch (error) {
+      log.error(`onCommandCallback exception: ${error.message}`);
     }
 
-    else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-      this.onParticipantAssigned(payload.data);
-    }
-
-    else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
-      this.onLearnerUnassigned(payload.data);
-    }
-
-    else if (payload.command === constants.SIGNALCMD_TURKER_DISCONNECTED) {
-      this.onModeratorUnassigned(payload.data);
-    }
-
-    else {
-      log.debug(`'${localInfo.connectionId}' onChatCommandCallback ignoring command: '${payload.command}'`);
-    }
 
   }
 
@@ -101,48 +108,59 @@ class Chat extends React.Component {
   // so paint a message to the chat window
   onAtriumAssigned(payload) {
 
-    let { localInfo } = this.state;
+    try {
 
-    log.info(`'${localInfo.connectionId}' onAtriumAssigned (${JSON.stringify(payload, null, 1)})`);
+      let { localInfo } = this.state;
 
-    this.onSystemMessageCallback({
-      commandChannel: localInfo.commandChannel,
-      data: "Waiting to be admitted"
-    });
+      log.info(`'${localInfo.connectionId}' onAtriumAssigned (${JSON.stringify(payload, null, 1)})`);
+
+      this.onSystemMessageCallback({
+        commandChannel: localInfo.commandChannel,
+        data: "Waiting to be admitted"
+      });
+
+    } catch (error) {
+      log.error(`onAtriumAssigned exception: ${error.message}`);
+    }
   }
 
   // participant has been assigned to a room,
   // so paint a message to the chat window  
   onParticipantAssigned(payload) {
 
-    let { isModerator, localInfo } = this.state;
-    let remoteInfo = {};
-    let session = {};
+    try {
+      let { isModerator, localInfo } = this.state;
+      let remoteInfo = {};
+      let session = {};
 
-    log.info(`'${localInfo.connectionId}' onParticipantAssigned (${JSON.stringify(payload, null, 1)})`);
+      log.info(`'${localInfo.connectionId}' onParticipantAssigned (${JSON.stringify(payload, null, 1)})`);
 
-    if (isModerator) {
-      remoteInfo = new SlotInfo(payload.local);
-      // get the (learner) session info from the payload
-      session = payload.local.session;
+      if (isModerator) {
+        remoteInfo = new SlotInfo(payload.local);
+        // get the (learner) session info from the payload
+        session = payload.local.session;
+      }
+      else {
+        remoteInfo = new SlotInfo(payload.remote);
+        // there should already be session info in the state
+        session = localInfo.session;
+      }
+
+      this.setState({
+        senderInfo: remoteInfo,
+        session: session
+      });
+
+      this.onSystemMessageCallback({
+        commandChannel: payload.local.commandChannel,
+        data: isModerator ?
+          `'${payload.local.nickName}' connected` :
+          `Connected. You are talking to '${payload.remote.nickName}'`
+      });
+
+    } catch (error) {
+      log.error(`onParticipantAssigned exception: ${error.message}`);
     }
-    else {
-      remoteInfo = new SlotInfo(payload.remote);
-      // there should already be session info in the state
-      session = localInfo.session;
-    }
-
-    this.setState({
-      senderInfo: remoteInfo,
-      session: session
-    });
-
-    this.onSystemMessageCallback({
-      commandChannel: payload.local.commandChannel,
-      data: isModerator ?
-        `'${payload.local.nickName}' connected` :
-        `Connected. You are talking to '${payload.remote.nickName}'`
-    });
   }
 
   onModeratorUnassigned(payload) {
@@ -152,16 +170,11 @@ class Chat extends React.Component {
   onLearnerUnassigned(payload) {
 
     try {
-      let { localInfo } = this.state;
 
-      log.info(`'${localInfo?.connectionId}' onLearnerUnassigned (${JSON.stringify(payload, null, 1)})`);
-
-      localInfo.assigned = false;
-
-      this.setState({ localInfo: localInfo });
+      let { localInfo, senderInfo } = this.state;
 
       this.onSystemMessageCallback({
-        commandChannel: localInfo.commandChannel,
+        commandChannel: localInfo?.commandChannel,
         data: `'${payload.nickName}' has been disconnected`
       });
 

@@ -34,7 +34,7 @@ class TurkerChatCellGrid extends React.Component {
       localSlots: this.slotManager.Slots(),
       remoteSlots: this.slotManager.LocalSlots(),
       localInfo: this.props.localInfo,
-      hasAssignedLearner: this.slotManager.haveAssigned
+      showChatGrid: false
     };
 
     this.connection = this.props.connection;
@@ -98,13 +98,7 @@ class TurkerChatCellGrid extends React.Component {
     try {
 
       const { localInfo } = this.state;
-      let { localSlot, remoteSlot } = this.slotManager.assignLearner(localInfo, payload);
-
-      localSlot.assigned = true;
-      localSlot.show = true;
-
-      var remoteSlots = this.slotManager.Slots();
-      var localSlots = this.slotManager.LocalSlots();
+      let { remoteSlots, localSlots } = this.slotManager.assignLearner(localInfo, payload);
 
       this.setState({
         hasAssignedLearner: this.slotManager.haveAssigned,
@@ -144,6 +138,14 @@ class TurkerChatCellGrid extends React.Component {
       if (chatInfo) {
         chatInfo.assigned = false;
       }
+
+      remoteSlots = this.slotManager.Slots();
+      localSlots = this.slotManager.LocalSlots();
+
+      this.setState({
+        remoteSlots: remoteSlots,
+        localSlots: localSlots
+      });
 
       // update the slot state in storage
       persistantStorage.save(

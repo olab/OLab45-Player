@@ -36,15 +36,13 @@ class SlotManager {
 
         this.localSlots.push(Object.assign({}, slot));
 
+        // clone the slot so we can apply the slot template
+        // to a separate object
+        slot = new SlotInfo();
+
         // overlay template on new object
         if (slotTemplate) {
           slot.SetParticipant(slotTemplate);
-        }
-
-        // set flag that there is at least
-        // one assigned slot
-        if (slot.assigned) {
-          this.haveAssigned = true;
         }
 
         this.remoteSlots.push(slot);
@@ -211,8 +209,8 @@ class SlotManager {
     log.debug(`assignLearner: ${learner.toString()}`);
 
     return {
-      remoteSlot: this.Slots()[index],
-      localSlot: this.LocalSlots()[index]
+      remoteSlots: this.Slots(),
+      localSlots: this.LocalSlots()
     }
   }
 
