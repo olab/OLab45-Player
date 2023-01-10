@@ -381,8 +381,12 @@ class Chat extends React.Component {
   }
 
   scrollToBottom = () => {
-    let t = this.messageRef;
-    this.messageRef.current.scrollTop = this.messageRef.current?.scrollHeight;
+    try {
+      let t = this.messageRef;
+      this.messageRef.current.scrollTop = this.messageRef.current?.scrollHeight;        
+    } catch (error) {
+      
+    }
   }
 
   render() {
@@ -493,7 +497,7 @@ class Chat extends React.Component {
                                 </span>
                               </TableCell>
                               <TableCell style={{ width: '10%' }}>
-                                <b>{!isModerator ? "Moderator" : senderInfo.nickName}&nbsp;</b>
+                                <b>{!isModerator ? "Moderator" : "Them"}&nbsp;</b>
                               </TableCell>
                             </TableRow>
                           </TableBody>

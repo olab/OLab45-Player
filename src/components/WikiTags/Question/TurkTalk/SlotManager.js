@@ -6,7 +6,7 @@ const persistantStorage = require('../../../../utils/StateStorage').PersistantSt
 class SlotManager {
 
   // *****
-  constructor(count, slotTemplate = null) {
+  constructor(count, localTemplate = null) {
 
     // TODO: add this for connection recovery later
     // var { remoteSlots, localSlots } = persistantStorage.get(
@@ -34,7 +34,7 @@ class SlotManager {
         var slot = new SlotInfo();
         slot.key = index;
 
-        this.localSlots.push(slot);
+        this.remoteSlots.push(slot);
 
         // clone the slot so we can apply the slot template
         // to a separate object
@@ -42,11 +42,11 @@ class SlotManager {
         slot.key = index;
 
         // overlay template on new object
-        if (slotTemplate) {
-          slot.SetParticipant(slotTemplate);
+        if (localTemplate) {
+          slot.SetParticipant(localTemplate);
         }
 
-        this.remoteSlots.push(slot);
+        this.localSlots.push(slot);
 
       }
 
