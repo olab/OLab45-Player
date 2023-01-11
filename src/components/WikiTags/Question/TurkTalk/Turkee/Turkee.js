@@ -49,7 +49,8 @@ class OlabAttendeeTag extends React.Component {
     this.connectionId = '';
 
     this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
-
+    this.onJumpNode = this.onJumpNode.bind(this);
+    
     var turkeeSelf = this;
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkeeSelf.onCommandCallback(payload) });
 
@@ -75,6 +76,10 @@ class OlabAttendeeTag extends React.Component {
         this.onAtriumAssigned(payload.data);
       }
 
+      else if (payload.command === constants.SIGNALCMD_JUMP_NODE) {
+        this.onJumpNode(payload);
+      }
+
       else {
         log.debug(`'${this.connectionId}' onTurkeeCommandCallback unknown command: '${payload.command}'`);
       }
@@ -83,6 +88,31 @@ class OlabAttendeeTag extends React.Component {
       log.error(`'${this.connectionId}' onTurkeeCommandCallback exception: ${error.message}`);
     }
 
+  }
+
+  onNavigateToNode = (mapId, nodeId, urlParam = null) => {
+
+    let url = `/player/player/${mapId}/${nodeId}`;
+    if (urlParam) {
+      url += `/${urlParam}`;
+    }
+
+    log.debug(`navigating to ${url}`)
+
+    window.location.href = url;
+  }
+
+  // moderator is sending the learner to a new node
+  onJumpNode(payload) {
+
+    try {
+
+      let { mapId, nodeId } = payload.data;
+      this.onNavigateToNode( mapId, nodeId );
+
+    } catch (error) {
+      log.error(`'${this.connectionId}' onJumpNode exception: ${error.message}`);
+    }
   }
 
   // learner has been assigned to an atrium

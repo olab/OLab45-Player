@@ -44,12 +44,12 @@ class Chat extends React.Component {
 
     // Binding this keyword  
     this.onMessageTextChanged = this.onMessageTextChanged.bind(this);
-    this.onSendClicked = this.onSendClicked.bind(this);
+    this.onClickSendMessage = this.onClickSendMessage.bind(this);
     this.onCommandCallback = this.onCommandCallback.bind(this);
     this.onMessageCallback = this.onMessageCallback.bind(this);
     this.onSystemMessageCallback = this.onSystemMessageCallback.bind(this);
-    this.onEnableSendToNodeModeClicked = this.onEnableSendToNodeModeClicked.bind(this);
-    this.onNodeSelected = this.onNodeSelected.bind(this);
+    this.onClickEnableSendToNodeMode = this.onClickEnableSendToNodeMode.bind(this);
+    this.onSelectNode = this.onSelectNode.bind(this);   
 
     this.onLearnerAssigned = this.onParticipantAssigned.bind(this);
     this.onModeratorAssigned = this.onModeratorAssigned.bind(this);
@@ -159,6 +159,7 @@ class Chat extends React.Component {
   onParticipantAssigned(payload) {
 
     try {
+
       let { isModerator, localInfo } = this.state;
       let remoteInfo = {};
       let session = {};
@@ -247,15 +248,15 @@ class Chat extends React.Component {
         senderInfo
       } = this.state;
 
-      log.info(`'${localInfo.connectionId}' onChatMessage (${JSON.stringify(payload, null, 1)})`);
+      log.info(`'${localInfo.connectionId}' onMessageCallback (${JSON.stringify(payload, null, 1)})`);
 
       // ensure the message was for this chat box
       if (payload.commandChannel !== localInfo.commandChannel) {
-        log.info(`'${localInfo.connectionId}' onChatMessage message not for '${localInfo.commandChannel}'`);
+        log.info(`'${localInfo.connectionId}' onMessageCallback message not for '${localInfo.commandChannel}'`);
         return;
       }
 
-      log.info(`'${localInfo.connectionId}' onChatMessage message for '${localInfo.commandChannel}'`);
+      log.info(`'${localInfo.connectionId}' onMessageCallback message for '${localInfo.commandChannel}'`);
 
       // tri-ary flag: 
       //  true = locally initiated message (echo), 
@@ -285,20 +286,43 @@ class Chat extends React.Component {
       this.scrollToBottom();
 
     } catch (error) {
-      log.error(`'${localInfo.connectionId}' onChatMessage exception: ${error.message}`);
+      log.error(`'${localInfo.connectionId}' onMessageCallback exception: ${error.message}`);
     }
 
   }
 
-  onEnableSendToNodeModeClicked = (event) => {
+  onClickJumpNode = (event) => {
+
+    try {
+      let { senderInfo, session, selectedNodeId } = this.state;
+  
+      const payload = {
+        envelope: {
+          to: senderInfo.commandChannel,
+          from: senderInfo
+        },
+        session: session,
+        data: { mapId: session.mapId, nodeId: selectedNodeId }
+      };
+
+      log.debug(`'onClickJumpNode ${JSON.stringify(payload, null, 2)}]`);
+
+      this.connection.send(constants.SIGNALCMD_JUMP_NODE, payload);
+      
+    } catch (error) {
+      log.error(`'${localInfo.connectionId}' onClickJumpNode exception: ${error.message}`);      
+    }
+  }
+
+  onClickEnableSendToNodeMode = (event) => {
     this.setState({ inJumpNodeMode: true });
   }
 
-  onCancelSendToNodeModeClicked = (event) => {
+  onClickCancelSendToNodeMode = (event) => {
     this.setState({ inJumpNodeMode: false });
   }
 
-  onNodeSelected(event) {
+  onSelectNode(event) {
 
     try {
 
@@ -326,7 +350,7 @@ class Chat extends React.Component {
 
   }
 
-  onClearClicked = (event) => {
+  onClickClear = (event) => {
 
     let { localInfo } = this.state;
 
@@ -338,7 +362,7 @@ class Chat extends React.Component {
     });
   }
 
-  onSendClicked = (event) => {
+  onClickSendMessage = (event) => {
 
     try {
 
@@ -419,7 +443,7 @@ class Chat extends React.Component {
     let { inMacroMode, message, localInfo } = this.state;
 
     if (event.key === 'Enter') {
-      this.onSendClicked(null);
+      this.onClickSendMessage(null);
       event.preventDefault();
     }
 
@@ -599,10 +623,10 @@ class Chat extends React.Component {
                     )}
                     {(inJumpNodeMode && (
                       <>
-                        <FormLabel>Select participant to:</FormLabel>
+                        <FormLabel>Send participant to:</FormLabel>
                         <Select
                           value={selectedNodeId}
-                          onChange={this.onNodeSelected}
+                          onChange={this.onSelectNode}
                           style={{ width: '100%' }}
                         >
                           <MenuItem key="0" value="0">
@@ -629,7 +653,7 @@ class Chat extends React.Component {
                               <Button
                                 variant="contained"
                                 disabled={disabled}
-                                onClick={this.onCancelSendToNodeModeClicked}
+                                onClick={this.onClickCancelSendToNodeMode}
                                 color="secondary">
                                 <CancelIcon />
                               </Button>
@@ -640,7 +664,7 @@ class Chat extends React.Component {
                               <Button
                                 variant="contained"
                                 disabled={disabled}
-                                onClick={this.onSendToNodeClicked}
+                                onClick={this.onClickJumpNode}
                                 color="primary">
                                 <ExitToAppIcon />
                               </Button>
@@ -651,12 +675,12 @@ class Chat extends React.Component {
                       )}
                     {!inJumpNodeMode && isModerator && (
                       <>
-                        <Tooltip title="Send Learner to Node" placement="top">
+                        <Tooltip title="Enter Node Selection Mode" placement="top">
                           <span>
                             <Button
                               variant="contained"
                               disabled={disabled}
-                              onClick={this.onEnableSendToNodeModeClicked}
+                              onClick={this.onClickEnableSendToNodeMode}
                               color="primary">
                               <ExitToAppIcon />
                             </Button>
@@ -670,7 +694,7 @@ class Chat extends React.Component {
                           <Button
                             variant="contained"
                             disabled={disabled}
-                            onClick={this.onSendClicked}
+                            onClick={this.onClickSendMessage}
                             color="primary">
                             <SendIcon />
                           </Button>

@@ -23,6 +23,7 @@ module.exports = Object.freeze({
     SIGNALCMD_LEARNER_LIST:       'learnerlist',
     SIGNALCMD_LEARNER_ASSIGNED:   'learnerassignment',
     SIGNALCMD_TURKER_ASSIGNED:    'moderatorassignment',
+    SIGNALCMD_JUMP_NODE:          'jumpnode',
     
     SIGNALCMD_TURKERCONNECT: 'TURKERCONNECT',
     SIGNALCMD_TURKEECONNECT: 'TURKEECONNECT',

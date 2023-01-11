@@ -38,7 +38,6 @@ class OlabLinksTag extends React.Component {
       className,
       props: {
         urlParam,
-        // linkHandler,
         map: {
           id: mapId,
         },
