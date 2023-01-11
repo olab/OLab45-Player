@@ -3,19 +3,25 @@ import * as React from 'react';
 import {
   Table, TableBody, Button,
   TableCell, Paper, TableContainer,
-  TableHead, TableRow, TextField, Tooltip
+  TableHead, TableRow, TextField, Tooltip,
+  Select, Menu, MenuItem, FormLabel
 } from '@material-ui/core';
 import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
 import styles from '../WikiTags/styles.module.css';
 import { HubConnectionState } from '@microsoft/signalr';
-var constants = require('../../services/constants');
 
 import SendIcon from '@material-ui/icons/Send';
 import ClearIcon from '@material-ui/icons/Clear';
+import CheckIcon from '@material-ui/icons/Check';
+import CancelIcon from '@material-ui/icons/Cancel';
 import CancelPresentationIcon from '@material-ui/icons/CancelPresentation';
 import BlockIcon from '@material-ui/icons/Block';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+
 import SlotInfo from '../../helpers/SlotInfo';
+
+var constants = require('../../services/constants');
 
 class Chat extends React.Component {
 
@@ -28,6 +34,8 @@ class Chat extends React.Component {
       message: '',
       inMacroMode: false,
       mapNodes: [],
+      inJumpNodeMode: false,
+      selectedNodeId: '0',
       ...this.props
     };
 
@@ -40,6 +48,9 @@ class Chat extends React.Component {
     this.onCommandCallback = this.onCommandCallback.bind(this);
     this.onMessageCallback = this.onMessageCallback.bind(this);
     this.onSystemMessageCallback = this.onSystemMessageCallback.bind(this);
+    this.onEnableSendToNodeModeClicked = this.onEnableSendToNodeModeClicked.bind(this);
+    this.onNodeSelected = this.onNodeSelected.bind(this);
+
     this.onLearnerAssigned = this.onParticipantAssigned.bind(this);
     this.onModeratorAssigned = this.onModeratorAssigned.bind(this);
     this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
@@ -85,8 +96,8 @@ class Chat extends React.Component {
 
       if (payload.command === constants.SIGNALCMD_TURKER_ASSIGNED) {
         this.onModeratorAssigned(payload.data);
-      }    
-  
+      }
+
       else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
         this.onParticipantAssigned(payload.data);
       }
@@ -121,7 +132,7 @@ class Chat extends React.Component {
       log.error(`'${localInfo.connectionId}' onModeratorAssigned exception: ${error.message}`);
     }
 
-  }  
+  }
 
   // chat participant has been assigned to a room atrium,
   // so paint a message to the chat window
@@ -279,6 +290,42 @@ class Chat extends React.Component {
 
   }
 
+  onEnableSendToNodeModeClicked = (event) => {
+    this.setState({ inJumpNodeMode: true });
+  }
+
+  onCancelSendToNodeModeClicked = (event) => {
+    this.setState({ inJumpNodeMode: false });
+  }
+
+  onNodeSelected(event) {
+
+    try {
+
+      let { selectedNodeId, mapNodes } = this.state;
+
+      // test for valid turkee selected from available list
+      if (event.target.value !== '0') {
+
+        log.debug(`onNodeSelected: ${event.target.value}`);
+
+        // find learner in atrium list
+        for (let item of mapNodes) {
+          if (item.id === event.target.value) {
+            selectedNodeId = item.id;
+            break;
+          }
+        }
+
+        this.setState({ selectedNodeId: selectedNodeId });
+      }
+
+    } catch (error) {
+      log.error(`'onNodeSelected exception: ${error.message}`);
+    }
+
+  }
+
   onClearClicked = (event) => {
 
     let { localInfo } = this.state;
@@ -402,9 +449,9 @@ class Chat extends React.Component {
   scrollToBottom = () => {
     try {
       let t = this.messageRef;
-      this.messageRef.current.scrollTop = this.messageRef.current?.scrollHeight;        
+      this.messageRef.current.scrollTop = this.messageRef.current?.scrollHeight;
     } catch (error) {
-      
+
     }
   }
 
@@ -418,7 +465,10 @@ class Chat extends React.Component {
       isModerator,
       localInfo,
       senderInfo,
-      show
+      show,
+      mapNodes,
+      inJumpNodeMode,
+      selectedNodeId
     } = this.state;
 
     if (!show) {
@@ -534,62 +584,106 @@ class Chat extends React.Component {
               <TableBody>
                 <TableRow sx={{ background: 'grey' }}>
                   <TableCell style={{ width: '80%' }} >
-                    <TextField
-                      id="message"
-                      label="Message"
-                      multiline
-                      maxRows={4}
-                      value={message}
-                      fullWidth
-                      disabled={disabled}
-                      onChange={this.onMessageTextChanged}
-                      onKeyDown={this.onMessageKeyDown}
-                    />
+                    {(!inJumpNodeMode && (
+                      <TextField
+                        id="message"
+                        label="Message"
+                        multiline
+                        maxRows={4}
+                        value={message}
+                        fullWidth
+                        disabled={disabled}
+                        onChange={this.onMessageTextChanged}
+                        onKeyDown={this.onMessageKeyDown}
+                      />)
+                    )}
+                    {(inJumpNodeMode && (
+                      <>
+                        <FormLabel>Select participant to:</FormLabel>
+                        <Select
+                          value={selectedNodeId}
+                          onChange={this.onNodeSelected}
+                          style={{ width: '100%' }}
+                        >
+                          <MenuItem key="0" value="0">
+                            <em>--Select--</em>
+                          </MenuItem>
+                          {mapNodes.map((item) => (
+                            <MenuItem
+                              key={item.id}
+                              value={item.id}>
+                              {item.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </>)
+                    )}
+
                   </TableCell>
                   <TableCell align="right">
-                    {(isModerator) && (
+                    {
+                      inJumpNodeMode && (
+                        <>
+                          <Tooltip title="Cancel" placement="top">
+                            <span>
+                              <Button
+                                variant="contained"
+                                disabled={disabled}
+                                onClick={this.onCancelSendToNodeModeClicked}
+                                color="secondary">
+                                <CancelIcon />
+                              </Button>
+                            </span>
+                          </Tooltip>
+                          <Tooltip title="Send To Node" placement="top">
+                            <span>
+                              <Button
+                                variant="contained"
+                                disabled={disabled}
+                                onClick={this.onSendToNodeClicked}
+                                color="primary">
+                                <ExitToAppIcon />
+                              </Button>
+                            </span>
+                          </Tooltip>
+
+                        </>
+                      )}
+                    {!inJumpNodeMode && isModerator && (
                       <>
-                        <Tooltip title="Disconnect" placement="top">
+                        <Tooltip title="Send Learner to Node" placement="top">
                           <span>
                             <Button
                               variant="contained"
-                              disabled={true}
-                              onClick={this.onSendClicked}
-                              color="secondary">
-                              <CancelPresentationIcon />
+                              disabled={disabled}
+                              onClick={this.onEnableSendToNodeModeClicked}
+                              color="primary">
+                              <ExitToAppIcon />
                             </Button>
                           </span>
                         </Tooltip>
-                        {/* <Tooltip title="Clear" placement="top">
+                      </>
+                    )}
+                    {!inJumpNodeMode && (
+                      <Tooltip title="Send" placement="top">
+                        <span>
                           <Button
                             variant="contained"
                             disabled={disabled}
-                            onClick={this.onClearClicked}
+                            onClick={this.onSendClicked}
                             color="primary">
-                            <ClearIcon />
+                            <SendIcon />
                           </Button>
-                        </Tooltip> */}
-                      </>
+                        </span>
+                      </Tooltip>
                     )}
-                    <Tooltip title="Send" placement="top">
-                      <span>
-                        <Button
-                          variant="contained"
-                          disabled={disabled}
-                          onClick={this.onSendClicked}
-                          color="primary">
-                          <SendIcon />
-                        </Button>
-                      </span>
-                    </Tooltip>
-
                   </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
           </TableContainer>
 
-        </div>
+        </div >
       );
 
     } catch (error) {
