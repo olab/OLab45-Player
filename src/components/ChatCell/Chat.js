@@ -35,7 +35,7 @@ class Chat extends React.Component {
       inMacroMode: false,
       mapNodes: [],
       inJumpNodeMode: false,
-      selectedNodeId: '0',
+      selectedNode: '0',
       ...this.props
     };
 
@@ -49,7 +49,7 @@ class Chat extends React.Component {
     this.onMessageCallback = this.onMessageCallback.bind(this);
     this.onSystemMessageCallback = this.onSystemMessageCallback.bind(this);
     this.onClickEnableSendToNodeMode = this.onClickEnableSendToNodeMode.bind(this);
-    this.onSelectNode = this.onSelectNode.bind(this);   
+    this.onSelectNode = this.onSelectNode.bind(this);
 
     this.onLearnerAssigned = this.onParticipantAssigned.bind(this);
     this.onModeratorAssigned = this.onModeratorAssigned.bind(this);
@@ -294,23 +294,30 @@ class Chat extends React.Component {
   onClickJumpNode = (event) => {
 
     try {
-      let { senderInfo, session, selectedNodeId } = this.state;
-  
+      
+      let { senderInfo, session, selectedNode } = this.state;
+
       const payload = {
         envelope: {
           to: senderInfo.commandChannel,
           from: senderInfo
         },
         session: session,
-        data: { mapId: session.mapId, nodeId: selectedNodeId }
+        data: { 
+          mapId: session.mapId, 
+          nodeId: selectedNode.nodeId, 
+          nodeName: selectedNode.name 
+        }
       };
 
       log.debug(`'onClickJumpNode ${JSON.stringify(payload, null, 2)}]`);
 
       this.connection.send(constants.SIGNALCMD_JUMP_NODE, payload);
-      
+
+      this.setState({ inJumpNodeMode: false });
+
     } catch (error) {
-      log.error(`'${localInfo.connectionId}' onClickJumpNode exception: ${error.message}`);      
+      log.error(`'${localInfo.connectionId}' onClickJumpNode exception: ${error.message}`);
     }
   }
 
@@ -326,7 +333,7 @@ class Chat extends React.Component {
 
     try {
 
-      let { selectedNodeId, mapNodes } = this.state;
+      let { selectedNode, mapNodes } = this.state;
 
       // test for valid turkee selected from available list
       if (event.target.value !== '0') {
@@ -336,12 +343,12 @@ class Chat extends React.Component {
         // find learner in atrium list
         for (let item of mapNodes) {
           if (item.id === event.target.value) {
-            selectedNodeId = item.id;
+            selectedNode = item;
             break;
           }
         }
 
-        this.setState({ selectedNodeId: selectedNodeId });
+        this.setState({ selectedNode: selectedNode });
       }
 
     } catch (error) {
@@ -492,7 +499,7 @@ class Chat extends React.Component {
       show,
       mapNodes,
       inJumpNodeMode,
-      selectedNodeId
+      selectedNode
     } = this.state;
 
     if (!show) {
@@ -625,7 +632,7 @@ class Chat extends React.Component {
                       <>
                         <FormLabel>Send participant to:</FormLabel>
                         <Select
-                          value={selectedNodeId}
+                          value={selectedNode}
                           onChange={this.onSelectNode}
                           style={{ width: '100%' }}
                         >

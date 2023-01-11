@@ -3,10 +3,10 @@ import * as React from 'react';
 import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
 import {
-  Table,
-  TableBody,
-  TableRow
+  Table, TableBody, TableRow,
+  Snackbar
 } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 
 import Turkee from '../../../../../services/turkee';
 import styles from '../../../styles.module.css';
@@ -17,6 +17,10 @@ import Session from '../../../../../services/session';
 
 var constants = require('../../../../../services/constants');
 const persistantStorage = require('../../../../../utils/StateStorage').PersistantStateStorage;
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 class OlabAttendeeTag extends React.Component {
 
@@ -40,7 +44,8 @@ class OlabAttendeeTag extends React.Component {
       userName: props.props.authActions.getUserName(),
       width: '100%',
       id: this.props.name,
-      session: session
+      session: session,
+      infoOpen: null
     };
 
     this.turkee = new Turkee(this);
@@ -48,6 +53,7 @@ class OlabAttendeeTag extends React.Component {
     this.connection = this.turkee.connection;
     this.connectionId = '';
 
+    this.handleInfoClose = this.handleInfoClose.bind(this);
     this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
     this.onJumpNode = this.onJumpNode.bind(this);
     
@@ -61,6 +67,15 @@ class OlabAttendeeTag extends React.Component {
     log.debug(`'${this.connectionId}' onAtriumAssigned localInfo = ${JSON.stringify(infoState, null, 2)}]`);
     persistantStorage.save('infoState', infoState);
   }
+
+  handleInfoClose(event, reason) {
+
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ infoOpen: false });
+
+  };
 
   onCommandCallback(payload) {
 
@@ -103,12 +118,22 @@ class OlabAttendeeTag extends React.Component {
   }
 
   // moderator is sending the learner to a new node
-  onJumpNode(payload) {
+  async onJumpNode(payload) {
 
     try {
 
-      let { mapId, nodeId } = payload.data;
+      let { mapId, nodeId, nodeName } = payload.data;
+
+      this.setState({
+        infoOpen: true,
+        infoMessage: `Moderator is sending you to '${nodeName}'` 
+      });
+
+      // pause for 5 seconds
+      await new Promise(r => setTimeout(r, 4000));
+
       this.onNavigateToNode( mapId, nodeId );
+
 
     } catch (error) {
       log.error(`'${this.connectionId}' onJumpNode exception: ${error.message}`);
@@ -224,7 +249,9 @@ class OlabAttendeeTag extends React.Component {
       remoteInfo,
       localInfo,
       userName,
-      session
+      session,
+      infoOpen,
+      infoMessage   
     } = this.state;
 
     const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
@@ -266,6 +293,13 @@ class OlabAttendeeTag extends React.Component {
             </TableBody>
           </Table>
           <br />
+          {(infoOpen === true) && (
+            <Snackbar open={infoOpen} autoHideDuration={3000} onClose={this.handleInfoClose}>
+              <Alert onClose={this.handleInfoClose} severity="info">
+                {infoMessage}
+              </Alert>
+            </Snackbar>
+          )}
         </>
       );
 
