@@ -16,16 +16,17 @@ class OlabDragAndDropQuestion extends React.Component {
 
     super(props);
     this.state = {
-      id: props.props.id,
-      name: props.props.name,
-      authActions: props.props.authActions,
-      question: props.props.question,
-      dynamicObjects: props.props.dynamicObjects,
-      onSubmitResponse: props.props.onSubmitResponse,
+      // id: props.props.id,
+      // name: props.props.name,
+      // authActions: props.props.authActions,
+      // question: props.props.question,
+      // dynamicObjects: props.props.dynamicObjects,
+      // onSubmitResponse: props.props.onSubmitResponse,
+      // map: props.props.map,
+      // node: props.props.node,
       showProgressSpinner: false,
       disabled: false,
-      map: props.props.map,
-      node: props.props.node
+      ...props.props
     };
 
     // Binding this keyword  
@@ -61,7 +62,7 @@ class OlabDragAndDropQuestion extends React.Component {
     log.debug(`OlabDragAndDropQuestion render '${name}'`);
 
     try {
-      
+
       let width = 300;
       if (question.width) {
         width = question.width;

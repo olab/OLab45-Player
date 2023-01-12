@@ -19,12 +19,13 @@ class OlabSliderQuestion extends React.Component {
     super(props);
 
     this.state = {
-      id: props.props.id,
-      name: props.props.name,
-      question: props.props.question,
-      dynamicObjects: props.props.dynamicObjects,
+      // id: props.props.id,
+      // name: props.props.name,
+      // question: props.props.question,
+      // dynamicObjects: props.props.dynamicObjects,
       showProgressSpinner: false,
-      disabled: false
+      disabled: false,
+      ...props.props
     };
 
     // post initial value to server if initializine
@@ -62,15 +63,19 @@ class OlabSliderQuestion extends React.Component {
 
   transmitResponse() {
 
-    const { onSubmitResponse, authActions, map, node } = this.props.props;
-    let sessionId = persistantStorage.get('sessionId');
-
+    const {
+      onSubmitResponse,
+      authActions,
+      map,
+      node,
+      contextId } = this.props.props;
+      
     let responseState = {
       ...this.state,
       authActions,
       map,
       node,
-      sessionId,
+      contextId,
       setInProgress: this.setInProgress,
       setIsDisabled: this.setIsDisabled
     };

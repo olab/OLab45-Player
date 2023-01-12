@@ -35,7 +35,8 @@ class Chat extends React.Component {
       inMacroMode: false,
       mapNodes: [],
       inJumpNodeMode: false,
-      selectedNode: '0',
+      selectedNode: {},
+      selectedNodeId: '0',
       ...this.props
     };
 
@@ -305,7 +306,7 @@ class Chat extends React.Component {
         session: session,
         data: { 
           mapId: session.mapId, 
-          nodeId: selectedNode.nodeId, 
+          nodeId: selectedNode.id, 
           nodeName: selectedNode.name 
         }
       };
@@ -333,26 +334,27 @@ class Chat extends React.Component {
 
     try {
 
-      let { selectedNode, mapNodes } = this.state;
+      let { selectedNodeId, selectedNode, mapNodes } = this.state;
 
       // test for valid turkee selected from available list
       if (event.target.value !== '0') {
 
-        log.debug(`onNodeSelected: ${event.target.value}`);
+        log.debug(`onSelectNode: ${event.target.value}`);
 
         // find learner in atrium list
         for (let item of mapNodes) {
           if (item.id === event.target.value) {
             selectedNode = item;
+            selectedNodeId = `${item.id}`;
             break;
           }
         }
 
-        this.setState({ selectedNode: selectedNode });
+        this.setState({ selectedNode, selectedNodeId });
       }
 
     } catch (error) {
-      log.error(`'onNodeSelected exception: ${error.message}`);
+      log.error(`'onSelectNode exception: ${error.message}`);
     }
 
   }
@@ -499,7 +501,7 @@ class Chat extends React.Component {
       show,
       mapNodes,
       inJumpNodeMode,
-      selectedNode
+      selectedNodeId
     } = this.state;
 
     if (!show) {
@@ -632,7 +634,7 @@ class Chat extends React.Component {
                       <>
                         <FormLabel>Send participant to:</FormLabel>
                         <Select
-                          value={selectedNode}
+                          value={selectedNodeId}
                           onChange={this.onSelectNode}
                           style={{ width: '100%' }}
                         >

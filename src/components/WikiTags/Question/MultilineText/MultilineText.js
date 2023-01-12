@@ -14,20 +14,23 @@ class OlabMultilineTextQuestion extends React.Component {
 
     super(props);
     this.state = {
-      id: props.props.id,
-      name: props.props.name,
-      question: props.props.question,
-      authActions: props.props.authActions,
-      dynamicObjects: props.props.dynamicObjects,
+      // id: props.props.id,
+      // name: props.props.name,
+      // question: props.props.question,
+      // authActions: props.props.authActions,
+      // dynamicObjects: props.props.dynamicObjects,
       onSubmitResponse: props.props.onSubmitResponse,
       showProgressSpinner: false,
       disabled: false,
-      map: props.props.map,
-      node: props.props.node
+      // map: props.props.map,
+      // node: props.props.node,
+      ...props.props
+
     };
 
     // Binding this keyword  
-    this.setInProgress = this.setInProgress.bind(this)
+    this.setInProgress = this.setInProgress.bind(this);
+    this.setValue = this.setValue.bind(this);
   }
 
   setInProgress(inProgress) {
@@ -45,11 +48,8 @@ class OlabMultilineTextQuestion extends React.Component {
     // test if only one respond allowed.  Disable control
     // if this is the case
     if ((question.numTries === -1) || (question.numTries === 1)) {
-      this.setState(state => {
-        disabled = true;
-        log.debug(`OlabMultilineTextQuestion disabled question '${question.id}' value = '${value}'.`);
-        return ({ disabled });
-      });
+      this.setState({ disabled: true });
+      log.debug(`OlabMultilineTextQuestion disabled question '${question.id}' value = '${value}'.`);
     }
 
     this.transmitResponse();
@@ -57,15 +57,19 @@ class OlabMultilineTextQuestion extends React.Component {
 
   transmitResponse() {
 
-    const { onSubmitResponse, authActions, map, node } = this.props.props;
-    let sessionId = persistantStorage.get('sessionId');
+    const {
+      onSubmitResponse,
+      authActions,
+      map,
+      node,
+      contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
       authActions,
       map,
       node,
-      sessionId,
+      contextId,
       setInProgress: this.setInProgress,
       setIsDisabled: this.setIsDisabled
     };
@@ -123,7 +127,7 @@ class OlabMultilineTextQuestion extends React.Component {
               id={`${id}-value`}
               value={question.value}
               disabled={disabled}
-              onChange={this.handleChange}>                
+              onChange={this.handleChange}>
             </textarea>
           </div>
           <div>

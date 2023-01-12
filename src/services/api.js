@@ -227,7 +227,16 @@ async function getServerScopedObjects(props, serverId) {
 
 async function submitQuestionValue(state) {
 
-  const { map, node, authActions, dynamicObjects, question, responseId, value, setInProgress, sessionId } = state;
+  const { 
+    map, 
+    node, 
+    authActions, 
+    dynamicObjects, 
+    question, 
+    responseId, 
+    value, 
+    setInProgress, 
+    contextId } = state;
 
   let token = authActions.getToken();
   let url = `${config.API_URL}/response/${question.id}`;
@@ -246,7 +255,7 @@ async function submitQuestionValue(state) {
     previousResponseId: question.previousResponseId,
     value: question.value,
     previousValue: question.previousValue,
-    dynamicObjects: dynamicObjects,
+    dynamicObjects: dynamicObjects
   };
 
   return fetch(url, {
@@ -254,7 +263,7 @@ async function submitQuestionValue(state) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
-      'OLabSessionId': sessionId
+      'OLabSessionId': contextId
     },
     body: JSON.stringify(body)
   })

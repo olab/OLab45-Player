@@ -20,16 +20,17 @@ class OlabDropDownQuestion extends React.Component {
 
     super(props);
     this.state = {
-      id: props.props.id,
-      name: props.props.name,
-      authActions: props.props.authActions,
-      question: props.props.question,
-      onSubmitResponse: props.props.onSubmitResponse,
-      dynamicObjects: props.props.dynamicObjects,
+      // id: props.props.id,
+      // name: props.props.name,
+      // authActions: props.props.authActions,
+      // question: props.props.question,
+      // onSubmitResponse: props.props.onSubmitResponse,
+      // dynamicObjects: props.props.dynamicObjects,
+      // map: props.props.map,
+      // node: props.props.node ,
       showProgressSpinner: false,
       disabled: false,
-      map: props.props.map,
-      node: props.props.node 
+      ...props.props
     };
 
     // Binding this keyword  
@@ -67,20 +68,32 @@ class OlabDropDownQuestion extends React.Component {
       }
     }
 
-    if (typeof this.state.onSubmitResponse !== 'undefined') {
-
-      let state = {
-        ...this.state,
-        response,
-        value,
-        sessionId,
-        setInProgress,
-        setIsDisabled
-      };
-
-      this.state.onSubmitResponse(state);
-    }
+    this.transmitResponse();
     
+  }
+
+  transmitResponse() {
+
+    const {
+      onSubmitResponse,
+      authActions,
+      map,
+      node,
+      contextId } = this.props.props;
+      
+    let responseState = {
+      ...this.state,
+      authActions,
+      map,
+      node,
+      contextId,
+      setInProgress: this.setInProgress,
+      setIsDisabled: this.setIsDisabled
+    };
+
+    if (typeof onSubmitResponse !== 'undefined') {
+      onSubmitResponse(responseState);
+    }
   }
 
   setInProgress(inProgress) {

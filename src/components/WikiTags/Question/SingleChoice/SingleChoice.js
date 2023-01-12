@@ -7,6 +7,10 @@ import {
   RadioGroup,
   FormControl,
 } from '@material-ui/core';
+
+import CloseIcon from '@material-ui/icons/Close';
+import CheckIcon from '@material-ui/icons/Check';
+
 import { withStyles } from '@material-ui/core/styles';
 import log from 'loglevel';
 
@@ -22,12 +26,13 @@ class OlabSinglePickQuestion extends React.Component {
     super(props);
 
     this.state = {
-      id: props.props.id,
-      name: props.props.name,
-      question: props.props.question,
-      dynamicObjects: props.props.dynamicObjects,
+      // id: props.props.id,
+      // name: props.props.name,
+      // question: props.props.question,
+      // dynamicObjects: props.props.dynamicObjects,
       showProgressSpinner: false,
-      disabled: false
+      disabled: false,
+      ...props.props
     };
 
     // Binding this keyword  
@@ -59,11 +64,12 @@ class OlabSinglePickQuestion extends React.Component {
         question.previousResponseId = null;
       else
         question.previousResponseId = question.responseId;
-        
-      question.responseId = response.id;      
+
+      question.responseId = response.id;
       question.value = question.responseId;
 
       return ({ question });
+
     },
       () => this.transmitResponse()
     );
@@ -76,15 +82,19 @@ class OlabSinglePickQuestion extends React.Component {
 
   transmitResponse() {
 
-    const { onSubmitResponse, authActions, map, node } = this.props.props;
-    let sessionId = persistantStorage.get('sessionId');
+    const {
+      onSubmitResponse,
+      authActions,
+      map,
+      node,
+      contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
       authActions,
       map,
       node,
-      sessionId,
+      contextId,
       setInProgress: this.setInProgress,
       setIsDisabled: this.setIsDisabled
     };
@@ -104,6 +114,41 @@ class OlabSinglePickQuestion extends React.Component {
 
     this.setState({ disabled: disabled });
     log.debug(`set disabled: ${disabled}`);
+  }
+
+  buildQuestionResponse(question, response) {
+
+    const { showAnswer } = this.state;
+
+    let radioChoice = (
+      <FormControlLabel
+        id={`qr-${response.id}`}
+        value={response.id}
+        control={<Radio />}
+        label={response.response}
+        disabled={disabled}
+      />
+    );
+
+    let correctnessIndicator = (<></>);
+
+    // test for 'correct' answer
+    if (question.showAnswer && (question.isCorrect > 0) && showAnswer) {
+      correctnessIndicator = (<CheckIcon style={{ color: green }} />);
+    }
+
+    // test for 'incorrect' answer
+    if (question.showAnswer && (question.isCorrect == 0) && showAnswer) {
+      correctnessIndicator = (<CloseIcon style={{ color: red }} />);
+    }
+
+    return (
+      <>
+        {radioChoice}
+        {correctnessIndicator}
+      </>
+    );
+
   }
 
   render() {

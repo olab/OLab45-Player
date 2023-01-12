@@ -255,6 +255,8 @@ class Player extends PureComponent {
         objData.contextId = persistantStorage.get('contextId');
       }
 
+      log.info(`contextId: ${objData.contextId}`);
+      
       this.setState({
         contextId: objData.contextId,
         isNodeFetched: true,
