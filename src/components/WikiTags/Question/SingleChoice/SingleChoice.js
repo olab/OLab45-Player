@@ -24,20 +24,7 @@ class OlabSinglePickQuestion extends React.Component {
 
     super(props);
 
-    // let questionState = props.props.dynamicObjects.question?.[`props.props.question.id`];
-    // if (!questionState) {
-    //   questionState = { 
-    //     showAnswerIndicators: false,
-    //     disabled: false
-    //   };
-    // }
-
     this.state = {
-      // id: props.props.id,
-      // name: props.props.name,
-      // question: props.props.question,
-      // dynamicObjects: props.props.dynamicObjects,
-      // ...questionState,
       ...props.props
     };
 
@@ -72,13 +59,15 @@ class OlabSinglePickQuestion extends React.Component {
     question.responseId = response.id;
     question.value = question.responseId;
 
+    log.debug(`OlabSinglePickQuestion set question '${question.id}' value = '${value}'`);
+
     // if single try question, disabled it
     if ( question.numTries > 0 ) {
       question.disabled = true;
     }
-
+    
     // first attempt to answer, so show answer
-    // indicators
+    // indicators, if called on
     question.showAnswerIndicators = true;
 
     this.setState({ question });
@@ -124,9 +113,14 @@ class OlabSinglePickQuestion extends React.Component {
   buildQuestionResponses(question) {
 
     let responses = [];
-
+    let key = 0;
     for (const response of question.responses) {
-      responses.push(this.buildQuestionResponse(question, response));
+      var item = (
+        <div key={key++}>
+          {this.buildQuestionResponse(question, response)}
+        </div>
+      );
+      responses.push(item);
     }
 
     return responses;
@@ -134,15 +128,12 @@ class OlabSinglePickQuestion extends React.Component {
 
   buildQuestionResponse(question, response) {
 
-    const { showAnswerIndicators, disabled } = this.state;
-
-    let radioChoice = (
+    let choice = (
       <FormControlLabel
         id={`qr-${response.id}`}
         value={response.id}
         control={<Radio />}
         label={response.response}
-        disabled={disabled}
       />
     );
 
@@ -163,7 +154,7 @@ class OlabSinglePickQuestion extends React.Component {
 
     return (
       <>
-        {radioChoice}
+        {choice}
         {correctnessIndicator}
       </>
     );
@@ -176,7 +167,6 @@ class OlabSinglePickQuestion extends React.Component {
       id,
       name,
       question,
-      disabled
     } = this.state;
 
     log.debug(`OlabSinglePickQuestion render '${name}'`);
@@ -191,10 +181,11 @@ class OlabSinglePickQuestion extends React.Component {
       }
 
       var responses = this.buildQuestionResponses(question);
+      var disabled = question.disabled == 0 ? false : true;
 
       return (
         <div className={`${styles['qusinglechoice']} ${siteStyles[id]}`} id={`${id}`}>
-          <FormControl component="fieldset" disabled={question.disabled}>
+          <FormControl component="fieldset" disabled={disabled}>
             <FormLabel component="legend">{question.stem}</FormLabel>
             <RadioGroup
               style={{ float: 'left' }}

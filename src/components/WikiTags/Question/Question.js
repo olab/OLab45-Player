@@ -65,9 +65,9 @@ class OlabQuestionTag extends React.Component {
   onSubmitResponse = async (newState) => {
 
     var { data } = await postQuestionValue(newState);
-    
+
     // bubble up the dynamic object to player since the
-    // objects may be shared to other components
+    // dynamic objects may be shared to other components
     if ((data != null) && (this.props.props.onUpdateDynamicObjects)) {
       this.props.props.onUpdateDynamicObjects(data);
     }
