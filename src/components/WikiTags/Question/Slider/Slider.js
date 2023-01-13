@@ -19,12 +19,6 @@ class OlabSliderQuestion extends React.Component {
     super(props);
 
     this.state = {
-      // id: props.props.id,
-      // name: props.props.name,
-      // question: props.props.question,
-      // dynamicObjects: props.props.dynamicObjects,
-      showProgressSpinner: false,
-      disabled: false,
       ...props.props
     };
 
@@ -95,11 +89,12 @@ class OlabSliderQuestion extends React.Component {
 
     const {
       id,
+      name,
       question,
       // disabled
     } = this.state;
 
-    log.debug(`OlabSliderQuestion render '${this.props.name}'`);
+    log.debug(`OlabSliderQuestion render '${name}'`);
 
     try {
 
@@ -112,7 +107,11 @@ class OlabSliderQuestion extends React.Component {
             <Typography id={`${id}-stem`} component="div" gutterBottom>
               {question.stem}
             </Typography>
-            <input readOnly className={`${styles['quslider-value']}`} id={`${id}-value`} value={question.value}></input>
+            <input 
+              readOnly 
+              className={`${styles['quslider-value']}`} 
+              id={`${id}-value`} 
+              value={question.value}></input>
             <Slider
               defaultValue={question.value}
               onChangeCommitted={(event, value) => this.setValue(event, value)}
@@ -121,7 +120,7 @@ class OlabSliderQuestion extends React.Component {
               name={`${id}-slider`}
               min={Number(settings.minValue)}
               max={Number(settings.maxValue)}
-              track={true}
+              track={false}
               valueLabelDisplay="auto"
             />
           </Box>

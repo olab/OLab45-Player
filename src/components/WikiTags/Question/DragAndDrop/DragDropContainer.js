@@ -26,10 +26,21 @@ class DragDropContainer extends React.Component {
 
       return { responses };
     })
+
+    // bubble the response order to the parent component
+    if ( this.props.onChange ) {
+      this.props.onChange(this.state.responses);
+    }    
   };
 
   renderCard = (response, index) => {
-    return (<Card key={response.id} index={index} id={response.id} text={response.response} moveCard={this.moveCard} />);
+    return (
+    <Card 
+      key={response.id} 
+      index={index} 
+      id={response.id} 
+      text={response.response} 
+      moveCard={this.moveCard} />);
   };
 
   render() {

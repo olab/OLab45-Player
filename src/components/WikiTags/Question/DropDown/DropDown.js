@@ -120,7 +120,7 @@ class OlabDropDownQuestion extends React.Component {
     let key = 0;
     for (const response of question.responses) {
       var item = (
-        <MenuItem value={Number(response.id)}>{response.response}</MenuItem>
+        <MenuItem key={key++} value={Number(response.id)}>{response.response}</MenuItem>
       );
       responses.push(item);
     }
