@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import { getQuestion } from '../WikiTags';
 import {
-  submitQuestionValue
+  postQuestionValue
 } from '../../../services/api'
 import styles from '../styles.module.css';
 import OlabMultilineTextQuestion from './MultilineText/MultilineText';
@@ -25,15 +25,7 @@ class OlabQuestionTag extends React.Component {
 
     super(props);
 
-    const {
-      name,
-      props: {
-        map,
-        node
-      }
-    } = this.props;
-
-    let question = getQuestion(name, this.props);
+    let question = getQuestion(this.props.name, this.props);
 
     if ((question.questionType !== 3) && (question.questionType !== 2)) {
       if (question.value === null) {
@@ -51,10 +43,8 @@ class OlabQuestionTag extends React.Component {
     }
 
     this.state = {
-      question: question,
-      map,
-      node,
-      dynamicObjects: this.props.props.dynamicObjects
+      question,
+      ...props.props
     };
 
     // Binding this keyword  
@@ -73,8 +63,12 @@ class OlabQuestionTag extends React.Component {
   }
 
   onSubmitResponse = async (newState) => {
-    var { data } = await submitQuestionValue(newState);
-    if (data != null) {
+
+    var { data } = await postQuestionValue(newState);
+    
+    // bubble up the dynamic object to player since the
+    // objects may be shared to other components
+    if ((data != null) && (this.props.props.onUpdateDynamicObjects)) {
       this.props.props.onUpdateDynamicObjects(data);
     }
   }

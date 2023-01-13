@@ -225,7 +225,7 @@ async function getServerScopedObjects(props, serverId) {
     });
 }
 
-async function submitQuestionValue(state) {
+async function postQuestionValue(state) {
 
   const { 
     map, 
@@ -241,7 +241,7 @@ async function submitQuestionValue(state) {
   let token = authActions.getToken();
   let url = `${config.API_URL}/response/${question.id}`;
 
-  log.debug(`submitQuestionValue(${question.id}, ${responseId}, ${value}, [func]) url: ${url})`);
+  log.debug(`postQuestionValue(${question.id}, ${responseId}, ${value}, [func]) url: ${url})`);
 
   if (typeof setInProgress !== 'undefined') {
     setInProgress(true);
@@ -295,6 +295,6 @@ export {
   getServerScopedObjects,
   getDynamicScopedObjects,
   importer,
-  submitQuestionValue,
+  postQuestionValue,
   activityReport
 };
