@@ -10,6 +10,17 @@ const persistantStorage = require('../../utils/StateStorage').PersistantStateSto
 
 class OlabLinksTag extends React.Component {
 
+  constructor(props) {
+
+    super(props);
+
+    const debug = persistantStorage.get('debug');
+    this.state = {
+      ...debug
+    };
+
+  }
+
   onNavigateToNode = (mapId, nodeId, urlParam) => {
 
     let url = `/player/player/${mapId}/${nodeId}`;
@@ -56,7 +67,7 @@ class OlabLinksTag extends React.Component {
 
     }
 
-    if (!persistantStorage.get('dbg-disableWikiRendering')) {
+    if (this.state.enableWikiRendering) {
 
       return (
         <div className={className}>

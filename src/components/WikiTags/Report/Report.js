@@ -7,13 +7,22 @@ const persistantStorage = require('../../../utils/StateStorage').PersistantState
 
 class OlabReportTag extends React.Component {
 
+  constructor(props) {
+
+    const debug = persistantStorage.get('debug');
+    this.state = {
+      ...debug
+    };
+
+  }
+
   render() {
 
     log.debug(`OlabReportTag render`);
 
     try {
 
-        if (persistantStorage.get('dbg-disableWikiRendering')) {
+        if (!this.state.enableWikiRendering) {
           return (
             <>
               <b>[[REPORT]]</b>

@@ -10,6 +10,15 @@ const persistantStorage = require('../../../utils/StateStorage').PersistantState
 
 class OlabMediaResourceTag extends React.Component {
 
+  constructor(props) {
+
+    const debug = persistantStorage.get('debug');
+    this.state = {
+      ...debug
+    };
+
+  }
+
   downloadFile(item) {
     try {
       getDownload(this.props.props, item);      
@@ -58,7 +67,7 @@ class OlabMediaResourceTag extends React.Component {
           sizeProps.width = item.width;
         }
         
-        if (persistantStorage.get('dbg-disableWikiRendering')) {
+        if (!this.state.enableWikiRendering) {
           return (
             <>
               <b>[[MR:{name}]] "{item.scopeLevel}/{item.parentId}/{item.path}"</b>

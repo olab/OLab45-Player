@@ -7,6 +7,17 @@ const persistantStorage = require('../../../utils/StateStorage').PersistantState
 
 class OlabCounterTag extends React.Component {
 
+  constructor(props) {
+
+    super(props);
+
+    const debug = persistantStorage.get('debug');
+    this.state = {
+      ...debug
+    };
+
+  }
+
   render() {
 
     const {
@@ -20,7 +31,7 @@ class OlabCounterTag extends React.Component {
 
       if (item != null) {
 
-        if (persistantStorage.get('dbg-disableWikiRendering')) {
+        if (!this.state.enableWikiRendering) {
           return (
             <>
               <b>[[CR:{name}]] "{item.value}"</b>

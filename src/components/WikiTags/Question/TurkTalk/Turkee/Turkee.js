@@ -34,6 +34,7 @@ class OlabAttendeeTag extends React.Component {
     this.slotManager.RemoteSlots()[0].show = true;
 
     let session = new Session(props.props);
+    const debug = persistantStorage.get('debug');
 
     this.state = {
       connectionStatus: null,
@@ -45,7 +46,8 @@ class OlabAttendeeTag extends React.Component {
       width: '100%',
       id: this.props.name,
       session: session,
-      infoOpen: null
+      infoOpen: null,
+      ...debug
     };
 
     this.turkee = new Turkee(this);
@@ -260,7 +262,7 @@ class OlabAttendeeTag extends React.Component {
 
     try {
 
-      if (persistantStorage.get('dbg-disableWikiRendering')) {
+      if (!this.state.enableWikiRendering) {
         return (
           <>
             [[ATTENDEE:{remoteInfo.RoomName}]]

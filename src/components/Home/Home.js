@@ -44,6 +44,9 @@ class Home extends PureComponent {
   constructor(props) {
 
     super(props);
+
+    const debug = persistantStorage.get('debug');
+
     this.state = {
       error: null,
       mapId: null,
@@ -54,14 +57,12 @@ class Home extends PureComponent {
       isButtonsDisabled: false,
       isMapsFetching: true,
       isMapInfoFetched: false,
-      sessionId: null
+      sessionId: null,
+      ...debug
     };
 
     this.listWithSearchRef = React.createRef();
     this.setPageTitle();
-
-    this.state.enableWikiTranslation = !persistantStorage.get('dbg-disableWikiRendering');
-    this.state.disableCache = persistantStorage.get('dbg-disableDataCaching');
 
     if (!this.state.disableCache) {
       this.state.maps = persistantStorage.get('maps', []);

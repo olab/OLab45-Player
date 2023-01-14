@@ -26,6 +26,7 @@ class OlabQuestionTag extends React.Component {
     super(props);
 
     let question = getQuestion(this.props.name, this.props);
+    const debug = persistantStorage.get('debug');
 
     if ((question.questionType !== 3) && (question.questionType !== 2)) {
       if (question.value === null) {
@@ -44,7 +45,8 @@ class OlabQuestionTag extends React.Component {
 
     this.state = {
       question,
-      ...props.props
+      ...props.props,
+      ...debug
     };
 
     // Binding this keyword  
@@ -77,7 +79,7 @@ class OlabQuestionTag extends React.Component {
 
     if (this.state.question != null) {
 
-      if (persistantStorage.get('dbg-disableWikiRendering')) {
+      if (!this.state.enableWikiRendering) {
         return (
           <>
             <b>{this.state.question.wiki} type {this.state.question.questionType} "{this.state.question.stem}"</b>

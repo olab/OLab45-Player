@@ -138,7 +138,7 @@ async function getMapScopedObjects(props, mapId) {
     });
 }
 
-async function getMapNode(props, mapId, nodeId) {
+async function getMapNode(props, mapId, nodeId, dynamicObjects) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/node/${nodeId}`;
@@ -146,12 +146,13 @@ async function getMapNode(props, mapId, nodeId) {
   let contextId = persistantStorage.get('contextId');
 
   return fetch(url, {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
       'OLabSessionId': contextId
-    }
+    },
+    body: JSON.stringify( dynamicObjects )
   })
     .then((data) => {
       if (data.status === 402) {

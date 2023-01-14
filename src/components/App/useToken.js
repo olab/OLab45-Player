@@ -30,7 +30,7 @@ export default function useToken() {
     return sessionInfo?.authInfo.token
   };
 
-  const saveToken = ( loginInfo, isExternalToken ) => {
+  const saveToken = (loginInfo, isExternalToken) => {
 
     let authInfo = loginInfo.authInfo;
 
@@ -70,12 +70,11 @@ export default function useToken() {
     }
 
     // initialize debug/diagnostic flags
-    if (!persistantStorage.get('dbg-disableWikiRendering')) {
-      persistantStorage.save('dbg-disableWikiRendering', false);
-    }
-
-    if (!persistantStorage.get('dbg-disableDataCaching')) {
-      persistantStorage.save('dbg-disableDataCaching', false);
+    if (!persistantStorage.get('debug')) {
+      persistantStorage.save('debug', {
+        enableWikiRendering: true,
+        disableDataCaching: false
+      });
     }
 
     if (!persistantStorage.get('visit-once-nodes')) {
@@ -95,7 +94,7 @@ export default function useToken() {
     return expiryDate < now;
   };
 
-  initializeState( false );
+  initializeState(false);
 
   const [sessionInfo] = useState(session());
   const [token, setToken] = useState(getToken());
