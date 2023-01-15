@@ -12,6 +12,8 @@ class OlabMediaResourceTag extends React.Component {
 
   constructor(props) {
 
+    super(props);
+
     const debug = persistantStorage.get('debug');
     this.state = {
       ...debug

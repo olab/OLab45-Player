@@ -59,6 +59,7 @@ class Player extends PureComponent {
     this.getServer = this.getServer.bind(this);
     this.getMap = this.getMap.bind(this);
     this.getNode = this.getNode.bind(this);
+    this.onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
 
     if (!this.state.disableCache) {
 
@@ -87,7 +88,7 @@ class Player extends PureComponent {
     window.addEventListener('popstate', function (event) {
       // eslint-disable-next-line
       history.pushState(null, document.title, location.href);
-      alert('Back button disabled during map play.');
+      alert('Back button disabled during case play.');
     });
 
   }
@@ -332,7 +333,7 @@ class Player extends PureComponent {
 
   onUpdateDynamicObjects = (dynamicObjects) => {
     this.setState({ dynamicObjects: dynamicObjects });
-    persistantStorage.save('dynamic-so', this.state.dynamicObjects);
+    persistantStorage.save('dynamicObjects', this.state.dynamicObjects);
   }
 
   onJsxParseError(arg) {
@@ -362,9 +363,9 @@ class Player extends PureComponent {
     if (isMounted) {
 
       const linkHandler = this.onNavigateToNode;
+      const onUpdateDynamicObjects = this.onUpdateDynamicObjects;
       const theme = this.lookupTheme();
       const haveTheme = (theme != null);
-      const onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
 
       document.title = node.title;
       this.setPageTitle(map.name, node.title);

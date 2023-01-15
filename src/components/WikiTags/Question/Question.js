@@ -64,8 +64,11 @@ class OlabQuestionTag extends React.Component {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+
   onSubmitResponse = async (newState) => {
 
+    // send question response to server and get the
+    // new dynamic objects state
     var { data } = await postQuestionValue(newState);
 
     // bubble up the dynamic object to player since the

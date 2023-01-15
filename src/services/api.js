@@ -244,9 +244,8 @@ async function postQuestionValue(state) {
 
   log.debug(`postQuestionValue(${question.id}, ${responseId}, ${value}, [func]) url: ${url})`);
 
-  if (typeof setInProgress !== 'undefined') {
-    setInProgress(true);
-  }
+  // signal to caller that we are starting the work
+  if (setInProgress) { setInProgress(true); }
 
   let body = {
     mapId: map.id,
@@ -270,9 +269,8 @@ async function postQuestionValue(state) {
   })
     .then((data) => {
 
-      if (typeof setInProgress !== 'undefined') {
-        setInProgress(false);
-      }
+      // signal to caller that we are done the work
+      if (!setInProgress) { setInProgress(false); }
 
       if (data.status === 402) {
         authActions.logout();
