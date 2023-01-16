@@ -60,7 +60,7 @@ class OlabAttendeeTag extends React.Component {
     this.onJumpNode = this.onJumpNode.bind(this);
     
     var turkeeSelf = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkeeSelf.onCommandCallback(payload) });
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkeeSelf.onCommand(payload) });
 
   }
 
@@ -79,27 +79,28 @@ class OlabAttendeeTag extends React.Component {
 
   };
 
-  onCommandCallback(payload) {
+  onCommand(payload) {
 
     try {
 
-      log.debug(`'${this.connectionId}' onTurkeeCommandCallback: ${payload.command}`);
-
       if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onRoomAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
+        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onAtriumAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_JUMP_NODE) {
+        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onJumpNode(payload);
       }
 
-      else {
-        log.debug(`'${this.connectionId}' onTurkeeCommandCallback unknown command: '${payload.command}'`);
-      }
+      // else {
+      //   log.debug(`'${this.connectionId}' onTurkeeCommandCallback unknown command: '${payload.command}'`);
+      // }
 
     } catch (error) {
       log.error(`'${this.connectionId}' onTurkeeCommandCallback exception: ${error.message}`);

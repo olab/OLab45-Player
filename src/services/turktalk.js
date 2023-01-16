@@ -66,7 +66,7 @@ class TurkTalk {
       });
   }
 
-  onCommandCallback(payload) {
+  onCommand(payload) {
 
     if (payload.Command === constants.SIGNALCMD_CONNECTIONSTATUS) {
       const { Id } = payload.Data;

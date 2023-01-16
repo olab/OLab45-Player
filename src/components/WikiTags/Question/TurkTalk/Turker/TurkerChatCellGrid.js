@@ -41,7 +41,7 @@ class TurkerChatCellGrid extends React.Component {
     this.connectionId = this.props.connection.connectionId?.slice(-3);
 
     var self = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
 
   }
 
@@ -74,19 +74,20 @@ class TurkerChatCellGrid extends React.Component {
   }
 
   // *****
-  onCommandCallback(payload) {
-
-    log.debug(`'${this.connectionId}' onTurkerChatGridCommandCallback: ${payload.command}`);
+  onCommand(payload) {
 
     if (payload.command === constants.SIGNALCMD_LEARNER_ASSIGNED) {
+      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
       this.onLearnerAssigned(payload.data);
     }
 
     if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
       this.onRoomAssigned(payload.data);
     }
 
     else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
+      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
       this.onLearnerUnassigned(payload.data);
     }
 

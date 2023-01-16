@@ -31,19 +31,19 @@ class ChatStatusBar extends React.Component {
     this.connectionId = this.props.connection.connectionId?.slice(-3);
 
     this.onMessageTimer = this.onMessageTimer.bind(this);
-    this.onMessageCallback = this.onMessageCallback.bind(this);
+    this.onMessage = this.onMessage.bind(this);
 
     var chatStatusBarSelf = this;
 
     this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
       if (payload.commandChannel === this.state.senderInfo.commandChannel) {
-        chatStatusBarSelf.onCommandCallback(payload);
+        chatStatusBarSelf.onCommand(payload);
       }
     });
 
     this.state.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => {
       if (payload.commandChannel === this.state.senderInfo.commandChannel) {
-        chatStatusBarSelf.onMessageCallback(payload);
+        chatStatusBarSelf.onMessage(payload);
       }
     });
 
@@ -62,7 +62,7 @@ class ChatStatusBar extends React.Component {
   }
 
   // command method listener
-  onCommandCallback(payload) {
+  onCommand(payload) {
 
     log.debug(`'${this.connectionId}' onChatStatusBarCommandCallback: ${payload.command}`);
 
@@ -97,7 +97,7 @@ class ChatStatusBar extends React.Component {
   }
 
   // chat message method listener
-  onMessageCallback(payload) {
+  onMessage(payload) {
 
     // if not moderator, we are done here
     if (!this.props.isModerator) {

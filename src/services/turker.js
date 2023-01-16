@@ -18,7 +18,7 @@ class Turker extends TurkTalk {
     this.playerState = component.props.props;
 
     // this.onAssignTurkee = this.onAssignLearner.bind(this);
-    this.onCommandCallback = this.onCommandCallback.bind(this);
+    this.onCommand = this.onCommand.bind(this);
     this.onDisconnected = this.onDisconnected.bind(this);
 
     this.bindConnectionMessage();
@@ -31,7 +31,7 @@ class Turker extends TurkTalk {
     super.bindConnectionMessage()
     var turkerSelf = this;
 
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkerSelf.onCommandCallback(payload) });
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkerSelf.onCommand(payload) });
   }
 
   // *****
@@ -132,23 +132,23 @@ class Turker extends TurkTalk {
   }
 
   // *****
-  onCommandCallback(payload) {
+  onCommand(payload) {
 
     try {
 
-      log.debug(`'${this.connectionId}' onCommandCallback: ${payload.command}`);
+      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
 
       // test if command NOT handled in base class
-      if (super.onCommandCallback(payload)) {
+      if (super.onCommand(payload)) {
         return;
       }      
 
       else {
-        log.debug(`'${this.connectionId}' onCommandCallback unknown command: '${payload.command}'`);
+        log.debug(`'${this.connectionId}' onCommand unknown command: '${payload.command}'`);
       }
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onCommandCallback exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onCommand exception: ${error.message}`);
     }
 
   }

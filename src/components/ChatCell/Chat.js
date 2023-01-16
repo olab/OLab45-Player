@@ -46,9 +46,9 @@ class Chat extends React.Component {
     // Binding this keyword  
     this.onMessageTextChanged = this.onMessageTextChanged.bind(this);
     this.onClickSendMessage = this.onClickSendMessage.bind(this);
-    this.onCommandCallback = this.onCommandCallback.bind(this);
-    this.onMessageCallback = this.onMessageCallback.bind(this);
-    this.onSystemMessageCallback = this.onSystemMessageCallback.bind(this);
+    this.onCommand = this.onCommand.bind(this);
+    this.onMessage = this.onMessage.bind(this);
+    this.onSystemMessage = this.onSystemMessage.bind(this);
     this.onClickEnableSendToNodeMode = this.onClickEnableSendToNodeMode.bind(this);
     this.onSelectNode = this.onSelectNode.bind(this);
 
@@ -58,9 +58,9 @@ class Chat extends React.Component {
     this.scrollToBottom = this.scrollToBottom.bind(this);
 
     var chatSelf = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { chatSelf.onCommandCallback(payload) });
-    this.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => { chatSelf.onMessageCallback(payload) });
-    this.connection.on(constants.SIGNALMETHOD_SYSTEM_MESSAGE, (payload) => { chatSelf.onSystemMessageCallback(payload) });
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { chatSelf.onCommand(payload) });
+    this.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => { chatSelf.onMessage(payload) });
+    this.connection.on(constants.SIGNALMETHOD_SYSTEM_MESSAGE, (payload) => { chatSelf.onSystemMessage(payload) });
 
     this.messageRef = React.createRef();
 
@@ -84,39 +84,42 @@ class Chat extends React.Component {
   }
 
   // command method listener
-  onCommandCallback(payload) {
+  onCommand(payload) {
 
     try {
-      let { localInfo } = this.state;
-
-      log.debug(`'${localInfo?.connectionId}' onChatCommandCallback ${payload.command}`);
+      let { isModerator, localInfo, senderInfo } = this.state;
 
       if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
+        log.debug(`'onCommand CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
         this.onAtriumAssigned(payload);
       }
 
       if (payload.command === constants.SIGNALCMD_TURKER_ASSIGNED) {
+        log.debug(`'onCommand CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
         this.onModeratorAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-        this.onParticipantAssigned(payload.data);
+        log.debug(`'onCommand CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
+        this.onParticipantAssigned(payload);
       }
 
       else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
-        this.onLearnerUnassigned(payload.data);
+        log.debug(`'onCommand CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
+        this.onLearnerUnassigned(payload);
       }
 
       else if (payload.command === constants.SIGNALCMD_TURKER_DISCONNECTED) {
+        log.debug(`'onCommand CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
         this.onModeratorUnassigned(payload.data);
       }
 
-      else {
-        log.debug(`'${localInfo?.connectionId}' onChatCommandCallback ignoring command: '${payload.command}'`);
-      }
+      // else {
+      //   log.debug(`'${localInfo?.connectionId}' onCommand ignoring command: '${payload.command}'`);
+      // }
 
     } catch (error) {
-      log.error(`onCommandCallback exception: ${error.message}`);
+      log.error(`onCommand exception: ${error.message}`);
     }
 
   }
@@ -141,14 +144,17 @@ class Chat extends React.Component {
 
     try {
 
-      let { localInfo } = this.state;
+      let { localInfo, isModerator } = this.state;
 
       log.info(`'${localInfo.connectionId}' onAtriumAssigned (${JSON.stringify(payload, null, 1)})`);
 
-      this.onSystemMessageCallback({
-        commandChannel: localInfo.commandChannel,
-        data: "Waiting to be admitted"
-      });
+      // only learners (non-moderators) get this waiting message
+      if (!isModerator) {
+        this.onSystemMessage({
+          commandChannel: localInfo.commandChannel,
+          data: "Waiting to be admitted"
+        });
+      }
 
     } catch (error) {
       log.error(`onAtriumAssigned exception: ${error.message}`);
@@ -168,12 +174,12 @@ class Chat extends React.Component {
       log.info(`'${localInfo.connectionId}' onParticipantAssigned (${JSON.stringify(payload, null, 1)})`);
 
       if (isModerator) {
-        remoteInfo = new SlotInfo(payload.local);
+        remoteInfo = new SlotInfo(payload.data.local);
         // get the (learner) session info from the payload
-        session = payload.local.session;
+        session = payload.data.local.session;
       }
       else {
-        remoteInfo = new SlotInfo(payload.remote);
+        remoteInfo = new SlotInfo(payload.data.remote);
         // there should already be session info in the state
         session = localInfo.session;
       }
@@ -183,11 +189,11 @@ class Chat extends React.Component {
         session: session
       });
 
-      this.onSystemMessageCallback({
-        commandChannel: payload.local.commandChannel,
+      this.onSystemMessage({
+        commandChannel: payload.data.local.commandChannel,
         data: isModerator ?
-          `'${payload.local.nickName}' connected` :
-          `Connected. You are talking to '${payload.remote.nickName}'`
+          `'${payload.data.local.nickName}' connected` :
+          `Connected. You are talking to '${payload.data.remote.nickName}'`
       });
 
     } catch (error) {
@@ -205,14 +211,24 @@ class Chat extends React.Component {
 
       let { isModerator, localInfo, senderInfo } = this.state;
 
-      // gatekeep if this chat instance has a learner assigned
+      // gatekeep if this chat instance has no learner assigned
       if (isModerator && !senderInfo?.userId) {
         return;
       }
 
-      this.onSystemMessageCallback({
+      // ensure the message was for this chat box
+      if (payload.commandChannel !== localInfo.commandChannel) {
+        log.info(`'${localInfo.connectionId}' onLearnerUnassigned message not for '${localInfo.commandChannel}'`);
+        return;
+      }
+
+      localInfo.assigned = false;
+
+      this.setState({ localInfo: localInfo });
+
+      this.onSystemMessage({
         commandChannel: localInfo?.commandChannel,
-        data: `'${payload.nickName}' has disconnected`
+        data: `'${payload.data.nickName}' has disconnected`
       });
 
     } catch (error) {
@@ -221,16 +237,16 @@ class Chat extends React.Component {
   }
 
   // system message method listener
-  onSystemMessageCallback(payload) {
+  onSystemMessage(payload) {
 
     try {
 
       let { localInfo } = this.state;
 
-      log.info(`'${localInfo.connectionId}' onSystemMessageCallback (${JSON.stringify(payload, null, 1)})`);
+      log.info(`'${localInfo.connectionId}' onSystemMessage (${JSON.stringify(payload, null, 1)})`);
 
       payload.isSystemMessage = true;
-      this.onMessageCallback(payload);
+      this.onMessage(payload);
 
     } catch (error) {
       log.error(`'${localInfo.connectionId}' onSystemMessage exception: ${error.message}`);
@@ -239,7 +255,7 @@ class Chat extends React.Component {
   }
 
   // chat message method listener
-  onMessageCallback(payload) {
+  onMessage(payload) {
 
     try {
 
@@ -249,15 +265,15 @@ class Chat extends React.Component {
         senderInfo
       } = this.state;
 
-      log.info(`'${localInfo.connectionId}' onMessageCallback (${JSON.stringify(payload, null, 1)})`);
+      log.info(`'${localInfo.connectionId}' onMessage (${JSON.stringify(payload, null, 1)})`);
 
       // ensure the message was for this chat box
       if (payload.commandChannel !== localInfo.commandChannel) {
-        log.info(`'${localInfo.connectionId}' onMessageCallback message not for '${localInfo.commandChannel}'`);
+        log.info(`'${localInfo.connectionId}' onMessage message not for '${localInfo.commandChannel}'`);
         return;
       }
 
-      log.info(`'${localInfo.connectionId}' onMessageCallback message for '${localInfo.commandChannel}'`);
+      log.info(`'${localInfo.connectionId}' onMessage message for '${localInfo.commandChannel}'`);
 
       // tri-ary flag: 
       //  true = locally initiated message (echo), 
@@ -287,7 +303,7 @@ class Chat extends React.Component {
       this.scrollToBottom();
 
     } catch (error) {
-      log.error(`'${localInfo.connectionId}' onMessageCallback exception: ${error.message}`);
+      log.error(`'${localInfo.connectionId}' onMessage exception: ${error.message}`);
     }
 
   }
@@ -295,7 +311,7 @@ class Chat extends React.Component {
   onClickJumpNode = (event) => {
 
     try {
-      
+
       let { senderInfo, session, selectedNode } = this.state;
 
       const payload = {
@@ -304,10 +320,10 @@ class Chat extends React.Component {
           from: senderInfo
         },
         session: session,
-        data: { 
-          mapId: session.mapId, 
-          nodeId: selectedNode.id, 
-          nodeName: selectedNode.name 
+        data: {
+          mapId: session.mapId,
+          nodeId: selectedNode.id,
+          nodeName: selectedNode.name
         }
       };
 
@@ -365,7 +381,7 @@ class Chat extends React.Component {
 
     this.setState({ conversation: [] });
 
-    this.onSystemMessageCallback({
+    this.onSystemMessage({
       commandChannel: localInfo.commandChannel,
       data: `'Conversation cleared`
     });

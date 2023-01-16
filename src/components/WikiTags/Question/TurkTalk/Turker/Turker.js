@@ -61,28 +61,28 @@ class OlabModeratorTag extends React.Component {
     this.connectionId = '';
 
     var self = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
   }
 
-  onCommandCallback(payload) {
+  onCommand(payload) {
 
     let { localInfo } = this.state;
 
     try {
 
-      log.debug(`'${localInfo.connectionId}' onTurkerCommandCallback: ${payload.command}`);
-
       if (payload.command === constants.SIGNALCMD_TURKER_ASSIGNED) {
+        log.debug(`'${localInfo.connectionId}' onCommand: ${payload.command}`);
         this.onModeratorAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
+        log.debug(`'${localInfo.connectionId}' onCommand: ${payload.command}`);
         this.onAtriumUpdate(payload.data);
       }
 
-      else {
-        log.debug(`'${localInfo.connectionId}' onTurkerCommandCallback unknown command: '${payload.command}'`);
-      }
+      // else {
+      //   log.debug(`'${localInfo.connectionId}' onTurkerCommandCallback unknown command: '${payload.command}'`);
+      // }
 
     } catch (error) {
       log.error(`'${localInfo.connectionId}' onTurkerCommandCallback exception: ${error.message}`);

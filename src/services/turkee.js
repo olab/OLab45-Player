@@ -23,7 +23,7 @@ class Turkee extends TurkTalk {
     super.bindConnectionMessage();
     var self = this;
 
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
   }
 
   // *****
@@ -127,14 +127,14 @@ class Turkee extends TurkTalk {
   }
 
   // *****
-  onCommandCallback(payload) {
+  onCommand(payload) {
 
     try {
 
-      log.debug(`'${this.connectionId}' onCommandCallback: ${payload.command}`);
+      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
 
       // test if command NOT handled in base class
-      if (super.onCommandCallback(payload)) {
+      if (super.onCommand(payload)) {
         return;
       }
 
@@ -166,11 +166,11 @@ class Turkee extends TurkTalk {
       // }
 
       else {
-        log.debug(`'${this.connectionId}' onCommandCallback unknown command: '${payload.command}'`);
+        log.debug(`'${this.connectionId}' onCommand unknown command: '${payload.command}'`);
       }
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onCommandCallback exception: ${error.message}`);
+      log.error(`'${this.connectionId}' onCommand exception: ${error.message}`);
     }
 
   }
