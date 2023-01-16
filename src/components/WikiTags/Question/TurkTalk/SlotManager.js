@@ -164,9 +164,17 @@ class SlotManager {
 
   // Get index of next open chat control or
   // find one user was already in
-  getOpenRemoteSlotIndex() {
+  getSlotIndex(remoteInfo) {
 
     try {
+
+      // first check to see if we are re-using a slot
+      // the learner was already in 
+      for (let slot of this.RemoteSlots()) {
+        if ( (!slot.assigned) && (remoteInfo.userId == slot.userId) ) {
+          return slot.key;
+        }
+      }
 
       for (let slot of this.RemoteSlots()) {
         if (!slot.assigned) {
@@ -189,7 +197,8 @@ class SlotManager {
     let slotInfo = this.getRemoteSlotByConnectionId(payload.connectionId);
     if (slotInfo) {
       // blank out slot
-      slotInfo = new SlotInfo({ key: slotInfo.key });
+      slotInfo.assigned = false;
+      // slotInfo = new SlotInfo({ key: slotInfo.key });
       this.RemoteSlots()[slotInfo.key] = slotInfo;
     }
 
@@ -203,7 +212,7 @@ class SlotManager {
   // *****
   assignLearner(localInfo, remoteInfo) {
 
-    let index = this.getOpenRemoteSlotIndex();
+    let index = this.getSlotIndex(remoteInfo);
     if (index == null) {
       throw new Error(`No available slots to assign learner ${remoteInfo.userId} `);
     }
