@@ -23,14 +23,14 @@ class ChatCell extends React.Component {
       lastMessageTime: null,
     };
 
-    this.index = this.props.localInfo.key;
+    this.index = this.props.localInfo.slotIndex;
     this.onCommand = this.onCommand.bind(this);
     this.connectionId = this.state.connection.connectionId?.slice(-3);
 
     var self = this;
     this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
 
-    log.debug(`ChatCell[${this.props.localInfo.key}] ctor`);
+    log.debug(`ChatCell[${this.index}] ctor`);
   }
 
   componentDidUpdate(prevProps) {
