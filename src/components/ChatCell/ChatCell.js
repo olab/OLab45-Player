@@ -23,12 +23,14 @@ class ChatCell extends React.Component {
       lastMessageTime: null,
     };
 
+    this.index = this.props.localInfo.key;
     this.onCommand = this.onCommand.bind(this);
     this.connectionId = this.state.connection.connectionId?.slice(-3);
 
     var self = this;
     this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
 
+    log.debug(`ChatCell[${this.props.localInfo.key}] ctor`);
   }
 
   componentDidUpdate(prevProps) {
@@ -61,7 +63,7 @@ class ChatCell extends React.Component {
     return (
       <TableCell style={cellStyling}>
         <Chat
-          key={this.props.key}
+          key={localInfo.key}
           mapNodes={this.props.mapNodes}
           session={session}
           show={localInfo.show}

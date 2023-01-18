@@ -257,7 +257,7 @@ class TurkerChatCellGrid extends React.Component {
         let columns = [];
         for (let columnIndex = 0; columnIndex < this.numColumns; columnIndex++) {
 
-          const index = (rowIndex * this.numColumns) + columnIndex;
+          let index = (rowIndex * this.numColumns) + columnIndex;
 
           // make a copy of the current moderator so we can
           // assigned learner-specific information (allowing 

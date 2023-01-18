@@ -257,7 +257,10 @@ class OlabModeratorTag extends React.Component {
       log.debug(`'${localInfo.connectionId}' onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
 
       // signal server with assignment of turkee to this room
-      this.connection.send(constants.SIGNALCMD_ASSIGNTURKEE, selectedLearner, localInfo.roomName);
+      this.connection.send(
+        constants.SIGNALCMD_ASSIGNTURKEE, 
+        selectedLearner, 
+        localInfo.roomName);
 
       // save atrium state to local storage
       this.updateAtriumState();
