@@ -9,7 +9,7 @@ class SlotManager {
   constructor(count, localTemplate = null) {
 
     // TODO: add this for connection recovery later
-    // var { remoteSlots, localSlots } = persistantStorage.get(null, 
+    // var { remoteSlots, localSlots } = persistantStorage.get(
     //   'slotState',
     //   {
     //     remoteSlots: [],
@@ -54,7 +54,7 @@ class SlotManager {
 
       // TODO: add this for connection recovery later
       // update the slot state in storage
-      // persistantStorage.save(null, 
+      // persistantStorage.save(
       //   'slotState',
       //   {
       //     remoteSlots: this.remoteSlots,

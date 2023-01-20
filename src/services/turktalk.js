@@ -21,7 +21,7 @@ class TurkTalk {
     this.questionSettings = JSON.parse( this.component.props.props.question.settings );
     this.penName = `${component.props.props.map.name}|${this.questionSettings.roomName}`;
 
-    const sessionInfo = persistantStorage.get(null, 'sessionInfo');
+    const sessionInfo = persistantStorage.get('sessionInfo');
     const token = `${sessionInfo?.authInfo.token}`;
     const hubUrl = `${url}?access_token=${token}&contextId=${this.contextId}&mapId=${this.component.props.props.map.id}`;
     
@@ -76,7 +76,7 @@ class TurkTalk {
         this.component.onSessionIdChanged(Id);
       }
 
-      persistantStorage.save(null, 'ttalk_sessionId', Id);
+      persistantStorage.save('ttalk_sessionId', Id);
     }
 
     return false;

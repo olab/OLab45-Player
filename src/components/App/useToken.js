@@ -5,28 +5,28 @@ const persistantStorage = require('../../utils/StateStorage').PersistantStateSto
 export default function useToken() {
 
   const getRole = () => {
-    const sessionInfo = persistantStorage.get(null, 'sessionInfo');
+    const sessionInfo = persistantStorage.get('sessionInfo');
     return sessionInfo?.role
   };
 
   const setUserName = (userName) => {
-    const sessionInfo = persistantStorage.get(null, 'sessionInfo');
+    const sessionInfo = persistantStorage.get('sessionInfo');
     sessionInfo.userName = userName;
-    persistantStorage.save(null, 'sessionInfo', sessionInfo);
+    persistantStorage.save('sessionInfo', sessionInfo);
   }
 
   const getUserName = () => {
-    const sessionInfo = persistantStorage.get(null, 'sessionInfo');
+    const sessionInfo = persistantStorage.get('sessionInfo');
     return sessionInfo?.userName
   }
 
   const isExternalToken = () => {
-    const sessionInfo = persistantStorage.get(null, 'sessionInfo');
+    const sessionInfo = persistantStorage.get('sessionInfo');
     return sessionInfo?.isExternalToken;
   };
 
   const getToken = () => {
-    const sessionInfo = persistantStorage.get(null, 'sessionInfo');
+    const sessionInfo = persistantStorage.get('sessionInfo');
     return sessionInfo?.authInfo.token
   };
 
@@ -37,21 +37,21 @@ export default function useToken() {
     var decoded = jwt_decode(authInfo.token);
     console.log(decoded);
 
-    let sessionInfo = persistantStorage.get(null, 'sessionInfo');
+    let sessionInfo = persistantStorage.get('sessionInfo');
     sessionInfo = loginInfo;
 
     const expiry = new Date(decoded.exp * 1000);
     sessionInfo.authInfo.expires = expiry;
     sessionInfo.isExternalToken = isExternalToken;
 
-    persistantStorage.save(null, 'sessionInfo', sessionInfo);
+    persistantStorage.save('sessionInfo', sessionInfo);
 
     setToken(sessionInfo.authInfo);
     setUserName(decoded.sub);
   };
 
   const session = () => {
-    const authInfoObject = persistantStorage.get(null, 'sessionInfo');
+    const authInfoObject = persistantStorage.get('sessionInfo');
     return authInfoObject;
   };
 
@@ -70,23 +70,25 @@ export default function useToken() {
     }
 
     // initialize debug/diagnostic flags
-    if (!persistantStorage.get(null, 'debug')) {
-      persistantStorage.save(null, 'debug', {
+    if (!persistantStorage.get('debug')) {
+      persistantStorage.save('debug', {
         enableWikiRendering: true,
         disableDataCaching: false
       });
     }
 
+    if (!persistantStorage.get('visit-once-nodes')) {
+      persistantStorage.save('visit-once-nodes', []);
+    }
+
+    if (!persistantStorage.get('sessionInfo')) {
+      persistantStorage.save('sessionInfo', { authInfo: { expires: 0 } });
+    }
+
   }
 
   const isExpiredSession = () => {
-    
-    const sessionInfo = persistantStorage.get(null, 'sessionInfo');
-    if ( !sessionInfo ) {
-      return false;
-    }
-
-    const { authInfo: { expires } } = sessionInfo;
+    const { authInfo: { expires } } = persistantStorage.get('sessionInfo');
     const expiryDate = new Date(expires);
     const now = new Date();
     return expiryDate < now;

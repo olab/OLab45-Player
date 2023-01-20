@@ -8,15 +8,10 @@ class PersistantStateStorage {
     return localStorage.getItem(key) != null;
   }
 
-  static get(userName, key, defaultValue = null) {
+  static get(key, defaultValue = null) {
 
     let valueObject = null;
-    let fullKey = key;
-    if ( userName ) {
-      fullKey = `${userName}:${key}`;
-    }
-
-    const value = localStorage.getItem(fullKey);
+    const value = localStorage.getItem(key);
 
     try {
       valueObject = JSON.parse(value);
@@ -31,18 +26,13 @@ class PersistantStateStorage {
     return valueObject;
   };
 
-  static save(userName, key, value) {
-
-    let fullKey = key;
-    if ( userName ) {
-      fullKey = `${userName}:${key}`;
-    }
+  static save(key, value) {
 
     if (typeof value === 'object' && value !== null) {
-      this.saveObject(fullKey, value);
+      this.saveObject(key, value);
     }
     else {
-      localStorage.setItem(fullKey, value);
+      localStorage.setItem(key, value);
     }
 
     return value;

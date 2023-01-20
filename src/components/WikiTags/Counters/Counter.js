@@ -20,7 +20,7 @@ class OlabCountersTag extends React.Component {
 
     super(props);
 
-    const debug = persistantStorage.get(null, 'debug');
+    const debug = persistantStorage.get('debug');
 
     this.state = {
       id: props.props.id,

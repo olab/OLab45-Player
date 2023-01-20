@@ -26,7 +26,7 @@ class OlabQuestionTag extends React.Component {
     super(props);
 
     let question = getQuestion(this.props.name, this.props);
-    const debug = persistantStorage.get(null, 'debug');
+    const debug = persistantStorage.get('debug');
 
     if ((question.questionType !== 3) && (question.questionType !== 2)) {
       if (question.value === null) {
