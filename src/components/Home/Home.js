@@ -45,7 +45,7 @@ class Home extends PureComponent {
 
     super(props);
 
-    const debug = persistantStorage.get('debug');
+    const debug = persistantStorage.get(null, 'debug');
 
     this.state = {
       error: null,
@@ -65,7 +65,7 @@ class Home extends PureComponent {
     this.setPageTitle();
 
     if (!this.state.disableCache) {
-      this.state.maps = persistantStorage.get('maps', []);
+      this.state.maps = persistantStorage.get(null, 'maps', []);
       this.state.mapsFiltered = this.state.maps;
     }
 

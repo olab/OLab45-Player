@@ -10,14 +10,6 @@ import useToken from './useToken';
 import { config } from '../../constants';
 import { ConsoleLogger } from '@microsoft/signalr/dist/esm/Utils';
 
-function WrapperPlayer( props ) {
-  const params = useParams();
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  return <Player navigate={navigate} params={params} location={location} {...props} />
-}
-
 function App() {
 
   const { authActions } = useToken();

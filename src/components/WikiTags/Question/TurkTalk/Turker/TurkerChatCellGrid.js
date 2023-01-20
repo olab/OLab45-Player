@@ -126,7 +126,7 @@ class TurkerChatCellGrid extends React.Component {
       });
 
       // update the slot state in storage
-      persistantStorage.save(
+      persistantStorage.save(null, 
         'slotState',
         {
           remoteSlots: this.slotManager.RemoteSlots(),
@@ -154,7 +154,7 @@ class TurkerChatCellGrid extends React.Component {
       });
 
       // update the slot state in storage
-      persistantStorage.save(
+      persistantStorage.save(null, 
         'slotState',
         {
           remoteSlots: remoteSlots,

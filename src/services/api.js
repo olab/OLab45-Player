@@ -143,7 +143,7 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/node/${nodeId}`;
   log.debug(`getMapNode(${mapId}, ${nodeId}) url: ${url})`);
-  let contextId = persistantStorage.get('contextId');
+  let contextId = persistantStorage.get(null, 'contextId');
 
   return fetch(url, {
     method: 'POST',

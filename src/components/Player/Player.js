@@ -36,7 +36,7 @@ class Player extends PureComponent {
     const { mapId, nodeId } = arguments[0].params;
     log.info(`playing map ${mapId}, node ${nodeId}`);
 
-    const debug = persistantStorage.get('debug');
+    const debug = persistantStorage.get(null, 'debug');
 
     this.state = {
       contextId: null,
@@ -61,26 +61,27 @@ class Player extends PureComponent {
     this.getNode = this.getNode.bind(this);
     this.onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
 
-    if (!this.state.disableCache) {
+    if (this.state.disableCache) {
 
-      this.state.contextId = persistantStorage.get('contextId');
-      this.state.dynamicObjects = persistantStorage.get('dynamicObjects');
-      this.state.map = persistantStorage.get('map');
-      this.state.node = persistantStorage.get('node');
-      this.state.nodesVisited = persistantStorage.get('visit-once-nodes');
-
-      this.state.scopedObjects.map = persistantStorage.get('map-so');
-      this.state.scopedObjects.node = persistantStorage.get('node-so');
-      this.state.scopedObjects.server = persistantStorage.get('server-so');
-    }
-    else {
       log.info(`disabled cache`);
 
-      persistantStorage.save('map-so', {});
-      persistantStorage.save('map', {});
-      persistantStorage.save('node-so', {});
-      persistantStorage.save('node', {});
-      persistantStorage.save('server-so', {});
+      persistantStorage.save(null, 'map-so', {});
+      persistantStorage.save(null, 'map', {});
+      persistantStorage.save(null, 'node-so', {});
+      persistantStorage.save(null, 'node', {});
+      persistantStorage.save(null, 'server-so', {});
+    }
+    else {
+
+      this.state.contextId =            persistantStorage.get(null, 'contextId');
+      this.state.dynamicObjects =       persistantStorage.get(null, 'dynamicObjects');
+      this.state.map =                  persistantStorage.get(null, 'map');
+      this.state.node =                 persistantStorage.get(null, 'node');
+      this.state.nodesVisited =         persistantStorage.get(null, 'visit-once-nodes');
+
+      this.state.scopedObjects.map =    persistantStorage.get(null, 'map-so');
+      this.state.scopedObjects.node =   persistantStorage.get(null, 'node-so');
+      this.state.scopedObjects.server = persistantStorage.get(null, 'server-so');
 
     }
 
@@ -156,7 +157,7 @@ class Player extends PureComponent {
       });
 
       if (!this.state.disableCache) {
-        persistantStorage.save('server-so', this.state.scopedObjects.server);
+        persistantStorage.save(null, 'server-so', this.state.scopedObjects.server);
       }
 
       log.debug('read server data');
@@ -198,8 +199,8 @@ class Player extends PureComponent {
       });
 
       if (!this.state.disableCache) {
-        persistantStorage.save('map-so', this.state.scopedObjects.map);
-        persistantStorage.save('map', this.state.map);
+        persistantStorage.save(null, 'map-so', this.state.scopedObjects.map);
+        persistantStorage.save(null, 'map', this.state.map);
       }
 
       log.debug('read map data');
@@ -223,8 +224,8 @@ class Player extends PureComponent {
       } = this.state;
 
       // reset nodes visited if entering map via 'root node'
-      if (nodeId === 0) {
-        persistantStorage.save('visit-once-nodes', []);
+      if (Number(nodeId) === 0) {
+        persistantStorage.save(null, 'visit-once-nodes', []);
         this.setState({ nodesVisited: [] });
       }
 
@@ -257,10 +258,10 @@ class Player extends PureComponent {
 
       // if root node, save the new contextId
       if (nodeData.typeId === 1) {
-        persistantStorage.save('contextId', nodeData.contextId);
+        persistantStorage.save(null, 'contextId', nodeData.contextId);
       }
       else {
-        nodeData.contextId = persistantStorage.get('contextId');
+        nodeData.contextId = persistantStorage.get(null, 'contextId');
       }
 
       log.info(`contextId: ${nodeData.contextId}`);
@@ -277,9 +278,9 @@ class Player extends PureComponent {
       });
 
       if (!this.state.disableCache) {
-        persistantStorage.save('node', this.state.node);
-        persistantStorage.save('dynamicObjects', this.state.dynamicObjects);
-        persistantStorage.save('node-so', this.state.scopedObjects.node);
+        persistantStorage.save(null, 'node', this.state.node);
+        persistantStorage.save(null, 'dynamicObjects', this.state.dynamicObjects);
+        persistantStorage.save(null, 'node-so', this.state.scopedObjects.node);
       }
 
       log.debug('read node data');
@@ -306,7 +307,7 @@ class Player extends PureComponent {
         dynamicObjects: scopedObjectsData
       });
 
-      persistantStorage.save('dynamic-so', this.state.dynamicObjects);
+      persistantStorage.save(null, 'dynamic-so', this.state.dynamicObjects);
 
       log.debug('read dynamic data');
 
@@ -333,7 +334,7 @@ class Player extends PureComponent {
 
   onUpdateDynamicObjects = (dynamicObjects) => {
     this.setState({ dynamicObjects: dynamicObjects });
-    persistantStorage.save('dynamicObjects', this.state.dynamicObjects);
+    persistantStorage.save(null, 'dynamicObjects', this.state.dynamicObjects);
   }
 
   onJsxParseError(arg) {
@@ -487,7 +488,7 @@ class Player extends PureComponent {
         this.setState({ nodesVisited: newNodesVisited });
 
         log.debug(`saving visited node id: ${this.state.node.id}`);
-        persistantStorage.save('visit-once-nodes', newNodesVisited);
+        persistantStorage.save(null, 'visit-once-nodes', newNodesVisited);
 
         log.debug(`Added node id ${this.state.node.id} to visitOnce list`);
       }

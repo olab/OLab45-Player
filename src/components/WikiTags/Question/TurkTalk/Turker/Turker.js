@@ -27,7 +27,7 @@ class OlabModeratorTag extends React.Component {
 
     super(props);
 
-    var atrium = persistantStorage.get(
+    var atrium = persistantStorage.get(null, 
       'atrium', {
       atriumLearners: [], selectedLearnerUserId: '0'
     });
@@ -120,7 +120,7 @@ class OlabModeratorTag extends React.Component {
 
       log.debug(`'${localInfo.connectionId}' onModeratorAssigned localInfo = ${JSON.stringify(payload, null, 2)}]`);
 
-      persistantStorage.save('connectionInfo', localInfo);
+      persistantStorage.save(null, 'connectionInfo', localInfo);
 
     } catch (error) {
       log.error(`'${localInfo.connectionId}' onModeratorAssigned exception: ${error.message}`);
@@ -287,7 +287,7 @@ class OlabModeratorTag extends React.Component {
         atriumLearners
       };
 
-      persistantStorage.save('atrium', state);
+      persistantStorage.save(null, 'atrium', state);
 
     } catch (error) {
       log.error(`'${localInfo.connectionId}' updateAtriumState exception: ${error.message}`);
