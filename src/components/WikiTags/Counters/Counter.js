@@ -12,7 +12,7 @@ import { getCounters } from '../WikiTags';
 import styles from '../styles.module.css';
 import siteStyles from '../site.module.css';
 
-const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../../../utils/PlayerState').PlayerState;
 
 class OlabCountersTag extends React.Component {
 
@@ -20,7 +20,7 @@ class OlabCountersTag extends React.Component {
 
     super(props);
 
-    const debug = persistantStorage.get( null, 'debug');
+    const debug = playerState.GetDebug();
 
     this.state = {
       id: props.props.id,
@@ -33,7 +33,7 @@ class OlabCountersTag extends React.Component {
       map: props.props.map,
       node: props.props.node,
       counterActions: props.props.scopedObjects.map.counteractions,
-      ...debug
+      debug
     };
   }
 
@@ -44,7 +44,8 @@ class OlabCountersTag extends React.Component {
     try {
       const {
         counterActions,
-        node
+        node,
+        debug
       } = this.state;
 
       let counters = getCounters(
@@ -53,7 +54,7 @@ class OlabCountersTag extends React.Component {
         counterActions
       );
 
-      if (!this.state.enableWikiRendering) {
+      if (!debug.enableWikiRendering) {
         return (
           <>
             <b>[[COUNTERS]]</b>

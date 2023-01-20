@@ -17,7 +17,7 @@ import OlabDragAndDropQuestion from './DragAndDrop/DragAndDrop';
 import OlabAttendeeTag from './TurkTalk/Turkee/Turkee';
 import OlabModeratorTag from './TurkTalk/Turker/Turker';
 
-const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../../../utils/PlayerState').PlayerState;
 
 class OlabQuestionTag extends React.Component {
 
@@ -26,7 +26,7 @@ class OlabQuestionTag extends React.Component {
     super(props);
 
     let question = getQuestion(this.props.name, this.props);
-    const debug = persistantStorage.get( null, 'debug');
+    const debug = playerState.GetDebug();
 
     if ((question.questionType !== 3) && (question.questionType !== 2)) {
       if (question.value === null) {
@@ -46,7 +46,7 @@ class OlabQuestionTag extends React.Component {
     this.state = {
       question,
       ...props.props,
-      ...debug
+      debug
     };
 
     // Binding this keyword  
@@ -80,9 +80,11 @@ class OlabQuestionTag extends React.Component {
 
   render() {
 
+    const { debug } = this.state;
+
     if (this.state.question != null) {
 
-      if (!this.state.enableWikiRendering) {
+      if (!debug.enableWikiRendering) {
         return (
           <>
             <b>{this.state.question.wiki} type {this.state.question.questionType} "{this.state.question.stem}"</b>

@@ -1,6 +1,6 @@
 import log from 'loglevel';
 import { config } from '../config';
-const persistantStorage = require('../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../utils/PlayerState').PlayerState;
 
 async function activityReport(props, contextId) {
 
@@ -143,7 +143,7 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/node/${nodeId}`;
   log.debug(`getMapNode(${mapId}, ${nodeId}) url: ${url})`);
-  let contextId = persistantStorage.get( null, 'contextId');
+  let contextId = playerState.GetContextId( null );
 
   return fetch(url, {
     method: 'POST',

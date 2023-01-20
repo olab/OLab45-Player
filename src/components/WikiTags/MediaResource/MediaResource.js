@@ -6,7 +6,7 @@ import styles from '../styles.module.css';
 import siteStyles from '../site.module.css';
 import { getFile } from '../WikiTags';
 import { getDownload } from '../../../services/api';
-const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../../../utils/PlayerState').PlayerState;
 
 class OlabMediaResourceTag extends React.Component {
 
@@ -14,10 +14,8 @@ class OlabMediaResourceTag extends React.Component {
 
     super(props);
 
-    const debug = persistantStorage.get( null, 'debug');
-    this.state = {
-      ...debug
-    };
+    const debug = playerState.GetDebug();
+    this.state = { debug };
 
   }
 
@@ -42,6 +40,8 @@ class OlabMediaResourceTag extends React.Component {
   }
 
   render() {
+
+    const { debug } = this.state;
 
     const {
       name
@@ -69,7 +69,7 @@ class OlabMediaResourceTag extends React.Component {
           sizeProps.width = item.width;
         }
         
-        if (!this.state.enableWikiRendering) {
+        if (!debug.enableWikiRendering) {
           return (
             <>
               <b>[[MR:{name}]] "{item.scopeLevel}/{item.parentId}/{item.path}"</b>

@@ -22,8 +22,9 @@ import {
   getNodeScopedObjects,
   getServerScopedObjects,
   getDynamicScopedObjects
-} from '../../services/api'
-const persistantStorage = require('../../utils/StateStorage').PersistantStateStorage;
+} from '../../services/api';
+
+const playerState = require('../../utils/PlayerState').PlayerState;
 
 class Player extends PureComponent {
 
@@ -36,24 +37,9 @@ class Player extends PureComponent {
     const { mapId, nodeId } = arguments[0].params;
     log.info(`playing map ${mapId}, node ${nodeId}`);
 
-    const debug = persistantStorage.get( null, 'debug');
-
     this.state = {
-      contextId: null,
-      dynamicObjects: null,
       isMounted: false,
-      map: null,
-      mapId: Number(mapId),
-      node: null,
-      nodeId: Number(nodeId),
-      nodesVisited: [],
-      scopedObjects: {
-        map: null,
-        node: null,
-        server: null
-      },
       signalRConnection: null,
-      ...debug
     };
 
     this.getServer = this.getServer.bind(this);
@@ -64,25 +50,17 @@ class Player extends PureComponent {
     if (this.state.disableCache) {
 
       log.info(`disabled cache`);
-
-      persistantStorage.save( null, 'map-so', {});
-      persistantStorage.save( null, 'map', {});
-      persistantStorage.save( null, 'node-so', {});
-      persistantStorage.save( null, 'node', {});
-      persistantStorage.save( null, 'server-so', {});
+      playerState.clear(null);
 
     }
     else {
 
-      this.state.contextId = persistantStorage.get( null, 'contextId');
-      this.state.dynamicObjects = persistantStorage.get( null, 'dynamicObjects');
-      this.state.map = persistantStorage.get( null, 'map');
-      this.state.node = persistantStorage.get( null, 'node');
-      this.state.nodesVisited = persistantStorage.get( null, 'visit-once-nodes');
+      const persistedState = playerState.Get();
 
-      this.state.scopedObjects.map = persistantStorage.get( null, 'map-so');
-      this.state.scopedObjects.node = persistantStorage.get( null, 'node-so');
-      this.state.scopedObjects.server = persistantStorage.get( null, 'server-so');
+      this.state = {
+        ...this.state,
+        ...persistedState
+      }
 
     }
 
@@ -158,7 +136,7 @@ class Player extends PureComponent {
       });
 
       if (!this.state.disableCache) {
-        persistantStorage.save( null, 'server-so', this.state.scopedObjects.server);
+        playerState.SetServerStatic( null, this.state.scopedObjects.server );
       }
 
       log.debug('read server data');
@@ -200,8 +178,8 @@ class Player extends PureComponent {
       });
 
       if (!this.state.disableCache) {
-        persistantStorage.save( null, 'map-so', this.state.scopedObjects.map);
-        persistantStorage.save( null, 'map', this.state.map);
+        playerState.SetMapStatic( null, this.state.scopedObjects.map );
+        playerState.SetMap( null, this.state.map);
       }
 
       log.debug('read map data');
@@ -226,14 +204,13 @@ class Player extends PureComponent {
 
       // reset nodes visited if entering map via 'root node'
       if (nodeId === 0) {
-        persistantStorage.save( null, 'visit-once-nodes', []);
         this.setState({ nodesVisited: [] });
+        playerState.SetNodesVisited(null, []);
       }
 
       // test if already have node loaded (and it's the same one)
       if (node && !disableCache) {
         if (Number(nodeId) === node.id) {
-          this.setState({ isNodeFetched: true });
           log.debug('using cached node data');
           return;
         }
@@ -259,10 +236,11 @@ class Player extends PureComponent {
 
       // if root node, save the new contextId
       if (nodeData.typeId === 1) {
-        persistantStorage.save( null, 'contextId', nodeData.contextId);
+        playerState.SetContextId( null, nodeData.contextId);
+
       }
       else {
-        nodeData.contextId = persistantStorage.get( null, 'contextId');
+        nodeData.contextId = playerState.GetContextId( null );
       }
 
       log.info(`contextId: ${nodeData.contextId}`);
@@ -279,9 +257,9 @@ class Player extends PureComponent {
       });
 
       if (!this.state.disableCache) {
-        persistantStorage.save( null, 'node', this.state.node);
-        persistantStorage.save( null, 'dynamicObjects', this.state.dynamicObjects);
-        persistantStorage.save( null, 'node-so', this.state.scopedObjects.node);
+        playerState.SetNode( null, this.state.node);
+        playerState.SetDynamicObjects( null, this.state.dynamicObjects);        
+        playerState.SetNodeStatic( null, this.state.scopedObjects.node);        
       }
 
       log.debug('read node data');
@@ -304,11 +282,10 @@ class Player extends PureComponent {
       const { data: scopedObjectsData } = await getDynamicScopedObjects(props, state.mapId, state.nodeId);
 
       this.setState({
-        isDynamicFetched: true,
         dynamicObjects: scopedObjectsData
       });
 
-      persistantStorage.save( null, 'dynamic-so', this.state.dynamicObjects);
+      playerState.SetDynamicObjects( null, this.state.dynamicObjects);
 
       log.debug('read dynamic data');
 
@@ -335,7 +312,7 @@ class Player extends PureComponent {
 
   onUpdateDynamicObjects = (dynamicObjects) => {
     this.setState({ dynamicObjects: dynamicObjects });
-    persistantStorage.save( null, 'dynamicObjects', this.state.dynamicObjects);
+    playerState.SetDynamicObjects( null, this.state.dynamicObjects);
   }
 
   onJsxParseError(arg) {
@@ -347,6 +324,7 @@ class Player extends PureComponent {
   render() {
 
     const {
+      debug,
       isMounted,
       map,
       node,
@@ -489,13 +467,13 @@ class Player extends PureComponent {
         this.setState({ nodesVisited: newNodesVisited });
 
         log.debug(`saving visited node id: ${this.state.node.id}`);
-        persistantStorage.save( null, 'visit-once-nodes', newNodesVisited);
+        playerState.SetNodesVisited(null, newNodesVisited);
 
         log.debug(`Added node id ${this.state.node.id} to visitOnce list`);
       }
 
 
-      if (this.state.enableWikiRendering) {
+      if (debug.enableWikiRendering) {
         return (
           <>
             {header}

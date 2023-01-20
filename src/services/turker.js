@@ -1,7 +1,7 @@
 import TurkTalk from './turktalk';
 import log from 'loglevel';
 var constants = require('./constants');
-const persistantStorage = require('../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../utils/PlayerState').PlayerState;
 
 class Turker extends TurkTalk {
 
@@ -62,7 +62,7 @@ class Turker extends TurkTalk {
     // get room name to persistant storage in case 
     // user refreshes the window
     let roomName = this.penName;
-    let moderator = persistantStorage.get( null, 'connectionInfo');
+    let moderator = playerState.GetConnectionInfo( null );
     if (moderator != null) {
       roomName = moderator.roomName
     }
@@ -83,9 +83,6 @@ class Turker extends TurkTalk {
     try {
       log.debug(`'${this.connectionId}' onDisconnected`);
       if (this.component.onConnectionChanged) {
-
-        // clear out session id
-        persistantStorage.save( null, 'ttalk_sessionId');
 
         if (this.component.onConnectionChanged) {
           this.component.onConnectionChanged({

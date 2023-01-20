@@ -1,20 +1,12 @@
 import log from 'loglevel';
 import Participant from '../../../../helpers/participant';
 import SlotInfo from '../../../../helpers/SlotInfo';
-const persistantStorage = require('../../../../utils/StateStorage').PersistantStateStorage;
 
 class SlotManager {
 
   // *****
   constructor(count, localTemplate = null) {
 
-    // TODO: add this for connection recovery later
-    // var { remoteSlots, localSlots } = persistantStorage.get( null, 
-    //   'slotState',
-    //   {
-    //     remoteSlots: [],
-    //     localSlots: []
-    //   });
     let remoteSlots = [];
     let localSlots = [];
 
@@ -51,16 +43,6 @@ class SlotManager {
         this.localSlots.push(slot);
 
       }
-
-      // TODO: add this for connection recovery later
-      // update the slot state in storage
-      // persistantStorage.save( null, 
-      //   'slotState',
-      //   {
-      //     remoteSlots: this.remoteSlots,
-      //     localSlots: this.localSlots
-      //   }
-      // );
 
     }
     else {

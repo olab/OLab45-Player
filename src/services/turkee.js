@@ -2,7 +2,7 @@ import TurkTalk from './turktalk';
 import log from 'loglevel';
 var constants = require('./constants');
 
-const persistantStorage = require('../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../utils/PlayerState').PlayerState;
 
 class Turkee extends TurkTalk {
 
@@ -55,7 +55,7 @@ class Turkee extends TurkTalk {
     // user refreshes the window    
     this.session.roomName = this.penName;
 
-    const connectionInfo = persistantStorage.get( null, 'connectionInfo');
+    const connectionInfo = playerState.GetConnectionInfo( null );
     if ( connectionInfo != null ) {
       this.session.roomName = connectionInfo.roomName;
     }
@@ -109,9 +109,6 @@ class Turkee extends TurkTalk {
       log.debug(`'${this.connectionId}' onDisconnected`);
 
       if (this?.component?.onConnectionChanged) {
-
-        // clear out session id
-        persistantStorage.save( null, 'ttalk_sessionId');
 
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,

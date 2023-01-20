@@ -3,7 +3,7 @@ import log from 'loglevel';
 import { config } from '../config';
 
 var constants = require('./constants');
-const persistantStorage = require('../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../utils/PlayerState').PlayerState;
 
 class TurkTalk {
 
@@ -21,7 +21,7 @@ class TurkTalk {
     this.questionSettings = JSON.parse( this.component.props.props.question.settings );
     this.penName = `${component.props.props.map.name}|${this.questionSettings.roomName}`;
 
-    const sessionInfo = persistantStorage.get( null, 'sessionInfo');
+    const sessionInfo = playerState.GetSessionInfo( null );
     const token = `${sessionInfo?.authInfo.token}`;
     const hubUrl = `${url}?access_token=${token}&contextId=${this.contextId}&mapId=${this.component.props.props.map.id}`;
     
@@ -76,7 +76,6 @@ class TurkTalk {
         this.component.onSessionIdChanged(Id);
       }
 
-      persistantStorage.save( null, 'ttalk_sessionId', Id);
     }
 
     return false;

@@ -1,9 +1,13 @@
-class PersistantStateStorage {
+class PersistantStorage {
 
-  static clear() {
+  static clear(prefix = null) {
     localStorage.clear();
   }
 
+  static all(prefix = null) {
+    return localStorage;
+  }
+  
   static have(key) {
     return localStorage.getItem(key) != null;
   }
@@ -45,4 +49,4 @@ class PersistantStateStorage {
 
 }
 
-export { PersistantStateStorage }
+export { PersistantStorage }

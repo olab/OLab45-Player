@@ -16,7 +16,7 @@ import SlotManager from '../SlotManager';
 import Session from '../../../../../services/session';
 
 var constants = require('../../../../../services/constants');
-const persistantStorage = require('../../../../../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../../../../../utils/PlayerState').PlayerState;
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -34,7 +34,7 @@ class OlabAttendeeTag extends React.Component {
     this.slotManager.RemoteSlots()[0].show = true;
 
     let session = new Session(props.props);
-    const debug = persistantStorage.get( null, 'debug');
+    const debug = playerState.GetDebug();
 
     this.state = {
       connectionStatus: null,
@@ -47,7 +47,7 @@ class OlabAttendeeTag extends React.Component {
       id: this.props.name,
       session: session,
       infoOpen: null,
-      ...debug
+      debug
     };
 
     this.turkee = new Turkee(this);
@@ -67,7 +67,6 @@ class OlabAttendeeTag extends React.Component {
   dumpConnectionState() {
     var infoState = { localInfo: this.state.localInfo, remoteInfo: null };
     log.debug(`'${this.connectionId}' onAtriumAssigned localInfo = ${JSON.stringify(infoState, null, 2)}]`);
-    persistantStorage.save( null, 'infoState', infoState);
   }
 
   handleInfoClose(event, reason) {
@@ -248,6 +247,7 @@ class OlabAttendeeTag extends React.Component {
 
     const {
       id,
+      debug,
       connectionStatus,
       remoteInfo,
       localInfo,
@@ -263,7 +263,7 @@ class OlabAttendeeTag extends React.Component {
 
     try {
 
-      if (!this.state.enableWikiRendering) {
+      if (!debug.enableWikiRendering) {
         return (
           <>
             [[ATTENDEE:{remoteInfo.RoomName}]]

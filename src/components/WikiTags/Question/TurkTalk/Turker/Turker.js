@@ -14,8 +14,8 @@ import TurkerChatStatusBar from './TurkerChatStatusBar';
 import TurkerChatCellGrid from './TurkerChatCellGrid';
 import Participant from '../../../../../helpers/participant';
 import SlotInfo from '../../../../../helpers/SlotInfo';
+const playerState = require('../../../../../utils/PlayerState').PlayerState;
 var constants = require('../../../../../services/constants');
-const persistantStorage = require('../../../../../utils/StateStorage').PersistantStateStorage;
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -27,16 +27,11 @@ class OlabModeratorTag extends React.Component {
 
     super(props);
 
-    var atrium = persistantStorage.get( null, 
-      'atrium', {
-      atriumLearners: [], selectedLearnerUserId: '0'
-    });
+    let atrium = playerState.GetAtrium();
 
     this.state = {
       connectionStatus: null,
       maxHeight: 200,
-      // selectedLearnerUserId: '0',
-      // atriumLearners: [],
       userName: props.props.authActions.getUserName(),
       width: '100%',
       localInfo: new SlotInfo(),
@@ -120,7 +115,7 @@ class OlabModeratorTag extends React.Component {
 
       log.debug(`'${localInfo.connectionId}' onModeratorAssigned localInfo = ${JSON.stringify(payload, null, 2)}]`);
 
-      persistantStorage.save( null, 'connectionInfo', localInfo);
+      playerState.SetConnectionInfo( null, localInfo );
 
     } catch (error) {
       log.error(`'${localInfo.connectionId}' onModeratorAssigned exception: ${error.message}`);
@@ -287,7 +282,7 @@ class OlabModeratorTag extends React.Component {
         atriumLearners
       };
 
-      persistantStorage.save( null, 'atrium', state);
+      playerState.SetAtrium(state);
 
     } catch (error) {
       log.error(`'${localInfo.connectionId}' updateAtriumState exception: ${error.message}`);

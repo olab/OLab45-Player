@@ -24,9 +24,8 @@ import Import from '../Import/Import'
 import {
   getMaps
 } from '../../services/api'
-import SessionHandler from '../../utils/SessionHandler';
 
-const persistantStorage = require('../../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../../utils/PlayerState').PlayerState;
 
 const HomeWrapper = styled.div`
   padding: 1rem;
@@ -45,7 +44,7 @@ class Home extends PureComponent {
 
     super(props);
 
-    const debug = persistantStorage.get( null, 'debug');
+    const debug = playerState.GetDebug();
 
     this.state = {
       error: null,
@@ -58,18 +57,17 @@ class Home extends PureComponent {
       isMapsFetching: true,
       isMapInfoFetched: false,
       sessionId: null,
-      ...debug
+      debug
     };
 
     this.listWithSearchRef = React.createRef();
     this.setPageTitle();
 
     if (!this.state.disableCache) {
-      this.state.maps = persistantStorage.get( null, 'maps', []);
+      this.state.maps = playerState.GetMaps();
       this.state.mapsFiltered = this.state.maps;
     }
 
-    SessionHandler.endSession();
   }
 
   setPageTitle = () => {
@@ -163,6 +161,8 @@ class Home extends PureComponent {
       maps: objData,
       mapsFiltered: objData,
     });
+
+    playerState.SetMaps(this.state.maps);
 
   }
 

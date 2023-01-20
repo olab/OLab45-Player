@@ -1,7 +1,5 @@
 // @flow
 import log from 'loglevel';
-const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
-import OLabClientApi from './OLabClientApi'
 
 class OlabScriptTag extends React.Component {
 

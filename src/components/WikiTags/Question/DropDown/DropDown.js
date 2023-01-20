@@ -16,7 +16,6 @@ import log from 'loglevel';
 
 import styles from '../../styles.module.css';
 import siteStyles from '../../site.module.css';
-const persistantStorage = require('../../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabDropDownQuestion extends React.Component {
 

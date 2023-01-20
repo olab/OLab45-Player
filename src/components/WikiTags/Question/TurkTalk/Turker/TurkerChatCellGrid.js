@@ -11,7 +11,7 @@ import styles from '../../../styles.module.css';
 
 import SlotManager from '../SlotManager';
 import ChatCell from '../../../../ChatCell/ChatCell'
-const persistantStorage = require('../../../../../utils/StateStorage').PersistantStateStorage;
+const persistantStorage = require('../../../../../utils/PersistantStorage').PersistantStorage;
 
 var constants = require('../../../../../services/constants');
 

@@ -6,7 +6,6 @@ import log from 'loglevel';
 import styles from '../../styles.module.css';
 import siteStyles from '../../site.module.css';
 import Spinner from '../../../../shared/assets/loading_med.gif';
-const persistantStorage = require('../../../../utils/StateStorage').PersistantStateStorage;
 
 class OlabMultilineTextQuestion extends React.Component {
 
@@ -14,18 +13,10 @@ class OlabMultilineTextQuestion extends React.Component {
 
     super(props);
     this.state = {
-      // id: props.props.id,
-      // name: props.props.name,
-      // question: props.props.question,
-      // authActions: props.props.authActions,
-      // dynamicObjects: props.props.dynamicObjects,
       onSubmitResponse: props.props.onSubmitResponse,
       showProgressSpinner: false,
       disabled: false,
-      // map: props.props.map,
-      // node: props.props.node,
       ...props.props
-
     };
 
     // Binding this keyword  

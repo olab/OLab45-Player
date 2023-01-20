@@ -6,7 +6,7 @@ import {
   ButtonGroup,
 } from '@material-ui/core';
 import log from 'loglevel';
-const persistantStorage = require('../../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../../utils/PlayerState').PlayerState;
 
 class OlabLinksTag extends React.Component {
 
@@ -14,10 +14,9 @@ class OlabLinksTag extends React.Component {
 
     super(props);
 
-    const debug = persistantStorage.get( null, 'debug');
-    this.state = {
-      ...debug
-    };
+    const debug = playerState.GetDebug();
+
+    this.state = { debug };
 
   }
 
@@ -30,20 +29,13 @@ class OlabLinksTag extends React.Component {
 
     log.debug(`navigating to ${url}`)
 
-    // save visited node to list so 'visit-once' nodes can be 
-    // suppressed later.
-    // var visitedNodes = persistantStorage.get( null, 'visit-once-nodes', []);
-    // if (!visitedNodes.includes(nodeId)) {
-    //   visitedNodes.push(nodeId);
-    //   log.debug(`saving visited node id: ${nodeId}`);
-    //   persistantStorage.save( null, 'visit-once-nodes', visitedNodes);
-    // }
-
     window.location.href = url;
   }
 
   render() {
     log.debug('OlabLinksTag render');
+
+    const { debug } = this.state;
 
     const {
       className,
@@ -67,7 +59,7 @@ class OlabLinksTag extends React.Component {
 
     }
 
-    if (this.state.enableWikiRendering) {
+    if (debug.enableWikiRendering) {
 
       return (
         <div className={className}>
