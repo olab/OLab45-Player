@@ -61,7 +61,7 @@ class Player extends PureComponent {
     this.getNode = this.getNode.bind(this);
     this.onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
 
-    if (!this.state.disableCache) {
+    if (this.state.disableCache) {
 
       log.info(`disabled cache`);
 
