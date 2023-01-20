@@ -33,6 +33,7 @@ class SlotManager {
 
         var slot = new SlotInfo();
         slot.key = index;
+        slot.slotIndex = null;
 
         this.remoteSlots.push(slot);
 
@@ -40,6 +41,7 @@ class SlotManager {
         // to a separate object
         slot = new SlotInfo();
         slot.key = index;
+        slot.slotIndex = index;
 
         // overlay template on new object
         if (localTemplate) {
@@ -223,6 +225,7 @@ class SlotManager {
     let participant = new SlotInfo(remoteInfo);
     participant.show = true;
     participant.assigned = true;
+    participant.slotIndex = index;
     remoteSlot.SetParticipant(participant);
 
     this.haveAssigned = true;
@@ -232,16 +235,18 @@ class SlotManager {
     participant = new SlotInfo(localInfo);
     participant.key = index;
     participant.show = true;    
+    participant.slotIndex = index;
     participant.assigned = true;
 
     this.LocalSlots()[index] = participant;
 
     log.debug(`assignLearner: ${participant.toString()}`);
 
-    return {
-      remoteSlots: this.RemoteSlots(),
-      localSlots: this.LocalSlots()
-    }
+    // return {
+    //   remoteSlot: remoteSlot,
+    //   localSlot: participant,
+    //   slotIndex: index
+    // }
   }
 
 };

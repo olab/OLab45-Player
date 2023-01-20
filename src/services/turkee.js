@@ -21,9 +21,9 @@ class Turkee extends TurkTalk {
   bindConnectionMessage() {
 
     super.bindConnectionMessage();
-    var self = this;
+    var turkeeSelf = this;
 
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkeeSelf.onCommand(payload) });
   }
 
   // *****

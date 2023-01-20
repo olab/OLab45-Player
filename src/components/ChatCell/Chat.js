@@ -186,7 +186,7 @@ class Chat extends React.Component {
       }
 
       this.setState({
-        senderInfo: remoteInfo,
+        // senderInfo: remoteInfo,
         session: session
       });
 

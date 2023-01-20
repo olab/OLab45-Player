@@ -60,8 +60,8 @@ class OlabModeratorTag extends React.Component {
     this.connection = this.turker.connection;
     this.connectionId = '';
 
-    var self = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
+    var turkerSelf = this;
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkerSelf.onCommand(payload) });
   }
 
   onCommand(payload) {

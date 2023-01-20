@@ -187,12 +187,12 @@ class OlabAttendeeTag extends React.Component {
       }
 
       const { localInfo } = this.state;
-      let { remoteSlots, localSlots } = this.slotManager.assignLearner(localInfo, payload.remote);
+      this.slotManager.assignLearner(localInfo, payload.remote);
 
       this.setState({
         showChatGrid: true,
-        localInfo: localSlots[0],
-        remoteInfo: remoteSlots[0]
+        localInfo: this.slotManager.LocalSlots()[0],
+        remoteInfo: this.slotManager.remoteSlots[0]
       });
 
       this.dumpConnectionState();

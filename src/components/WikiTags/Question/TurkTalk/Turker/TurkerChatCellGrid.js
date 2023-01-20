@@ -40,8 +40,8 @@ class TurkerChatCellGrid extends React.Component {
     this.connection = this.props.connection;
     this.connectionId = this.props.connection.connectionId?.slice(-3);
 
-    var self = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
+    var turkerChatCellGridSelf = this;
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkerChatCellGridSelf.onCommand(payload) });
 
   }
 
@@ -116,20 +116,21 @@ class TurkerChatCellGrid extends React.Component {
       // our own locla channel
       localInfo.commandChannel = payload.commandChannel;
 
-      let { remoteSlots, localSlots } = this.slotManager.assignLearner(localInfo, payload);
+      // let { remoteSlots, localSlots } = this.slotManager.assignLearner(localInfo, payload);
+      this.slotManager.assignLearner(localInfo, payload);
 
       this.setState({
         showChatGrid: true,
-        remoteSlots: remoteSlots,
-        localSlots: localSlots
+        remoteSlots: this.slotManager.RemoteSlots(),
+        localSlots: this.slotManager.LocalSlots()
       });
 
       // update the slot state in storage
       persistantStorage.save(
         'slotState',
         {
-          remoteSlots: remoteSlots,
-          localSlots: localSlots
+          remoteSlots: this.slotManager.RemoteSlots(),
+          localSlots: this.slotManager.LocalSlots()
         }
       );
 
@@ -281,6 +282,7 @@ class TurkerChatCellGrid extends React.Component {
               mapNodes={this.props.mapNodes}
               session={session}
               key={index}
+              index={index}
               style={chatCellWidthStyle}
               isModerator={this.props.isModerator}
               connection={this.connection}
