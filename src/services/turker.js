@@ -62,7 +62,7 @@ class Turker extends TurkTalk {
     // get room name to persistant storage in case 
     // user refreshes the window
     let roomName = this.penName;
-    let moderator = persistantStorage.get('connectionInfo');
+    let moderator = persistantStorage.get( null, 'connectionInfo');
     if (moderator != null) {
       roomName = moderator.roomName
     }
@@ -85,7 +85,7 @@ class Turker extends TurkTalk {
       if (this.component.onConnectionChanged) {
 
         // clear out session id
-        persistantStorage.save('ttalk_sessionId');
+        persistantStorage.save( null, 'ttalk_sessionId');
 
         if (this.component.onConnectionChanged) {
           this.component.onConnectionChanged({

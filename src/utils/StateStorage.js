@@ -8,7 +8,7 @@ class PersistantStateStorage {
     return localStorage.getItem(key) != null;
   }
 
-  static get(key, defaultValue = null) {
+  static get(prefix, key, defaultValue = null) {
 
     let valueObject = null;
     const value = localStorage.getItem(key);
@@ -26,7 +26,7 @@ class PersistantStateStorage {
     return valueObject;
   };
 
-  static save(key, value) {
+  static save(prefix, key, value) {
 
     if (typeof value === 'object' && value !== null) {
       this.saveObject(key, value);

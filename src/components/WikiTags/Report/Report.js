@@ -9,7 +9,7 @@ class OlabReportTag extends React.Component {
 
   constructor(props) {
 
-    const debug = persistantStorage.get('debug');
+    const debug = persistantStorage.get( null, 'debug');
     this.state = {
       ...debug
     };

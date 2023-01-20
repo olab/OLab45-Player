@@ -7,26 +7,26 @@ const mapIdKey = 'mapId',
 class SessionHandler {
 
     isInSession = () => {
-        var inSession = ( persistantStorage.get(sessionIdKey) != null );
+        var inSession = ( persistantStorage.get( null, sessionIdKey) != null );
         log.info(`in session?  ${inSession}`);
         return inSession;
     }
 
     startSession = ( mapId, sessionId ) => {
 
-        persistantStorage.save(sessionIdKey, sessionId );
+        persistantStorage.save( null, sessionIdKey, sessionId );
         log.info(`starting session for mapId = ${mapId}. sessionId = ${sessionId}`);
     }
 
     endSession = () => {
 
         log.info(`terminating session for sessionId = ${this.isInSession()}`);
-        persistantStorage.save(mapIdKey, null );
+        persistantStorage.save( null, mapIdKey, null );
 
     }
 
     getSessionId = () => {
-        return persistantStorage.get(sessionIdKey);
+        return persistantStorage.get( null, sessionIdKey);
     }
 
 }

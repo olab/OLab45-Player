@@ -14,7 +14,7 @@ class OlabLinksTag extends React.Component {
 
     super(props);
 
-    const debug = persistantStorage.get('debug');
+    const debug = persistantStorage.get( null, 'debug');
     this.state = {
       ...debug
     };
@@ -32,11 +32,11 @@ class OlabLinksTag extends React.Component {
 
     // save visited node to list so 'visit-once' nodes can be 
     // suppressed later.
-    // var visitedNodes = persistantStorage.get('visit-once-nodes', []);
+    // var visitedNodes = persistantStorage.get( null, 'visit-once-nodes', []);
     // if (!visitedNodes.includes(nodeId)) {
     //   visitedNodes.push(nodeId);
     //   log.debug(`saving visited node id: ${nodeId}`);
-    //   persistantStorage.save('visit-once-nodes', visitedNodes);
+    //   persistantStorage.save( null, 'visit-once-nodes', visitedNodes);
     // }
 
     window.location.href = url;

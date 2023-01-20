@@ -34,7 +34,7 @@ class OlabAttendeeTag extends React.Component {
     this.slotManager.RemoteSlots()[0].show = true;
 
     let session = new Session(props.props);
-    const debug = persistantStorage.get('debug');
+    const debug = persistantStorage.get( null, 'debug');
 
     this.state = {
       connectionStatus: null,
@@ -67,7 +67,7 @@ class OlabAttendeeTag extends React.Component {
   dumpConnectionState() {
     var infoState = { localInfo: this.state.localInfo, remoteInfo: null };
     log.debug(`'${this.connectionId}' onAtriumAssigned localInfo = ${JSON.stringify(infoState, null, 2)}]`);
-    persistantStorage.save('infoState', infoState);
+    persistantStorage.save( null, 'infoState', infoState);
   }
 
   handleInfoClose(event, reason) {

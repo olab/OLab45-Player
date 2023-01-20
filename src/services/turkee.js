@@ -55,7 +55,7 @@ class Turkee extends TurkTalk {
     // user refreshes the window    
     this.session.roomName = this.penName;
 
-    const connectionInfo = persistantStorage.get('connectionInfo');
+    const connectionInfo = persistantStorage.get( null, 'connectionInfo');
     if ( connectionInfo != null ) {
       this.session.roomName = connectionInfo.roomName;
     }
@@ -111,7 +111,7 @@ class Turkee extends TurkTalk {
       if (this?.component?.onConnectionChanged) {
 
         // clear out session id
-        persistantStorage.save('ttalk_sessionId');
+        persistantStorage.save( null, 'ttalk_sessionId');
 
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
