@@ -203,7 +203,7 @@ class Player extends PureComponent {
       } = this.state;
 
       // reset nodes visited if entering map via 'root node'
-      if (nodeId === 0) {
+      if (nodeId == 0) {
         this.setState({ nodesVisited: [] });
         playerState.SetNodesVisited(null, []);
       }
@@ -266,6 +266,7 @@ class Player extends PureComponent {
 
     } catch (error) {
       log.error(error);
+      
     }
 
   }

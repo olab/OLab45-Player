@@ -20,17 +20,19 @@ const getCounters = (nodeId, mapCounters, counterActions) => {
 
   try {
 
-    for (var counterAction of counterActions) {
+    for (const mapCounter of mapCounters) {
 
-      if ( ( counterAction.nodeId === nodeId ) && ( counterAction.display === 1) ) {
-
-        // eslint-disable-next-line
-        let mapCounter = mapCounters.find(x => x.id === counterAction.counterId);
-        if (mapCounter === undefined)
+      var nodeCounterAction = 
+        counterActions.find( action => ( action.nodeId == nodeId ) && ( action.counterId == mapCounter.id ) );
+      
+      if ( typeof nodeCounterAction !== "undefined" ) {
+        if ( nodeCounterAction.display !== 1 ) {
           continue;
-
-        items.push(mapCounter);
+        }        
       }
+
+      items.push(mapCounter);
+
     }
 
   } catch (error) {

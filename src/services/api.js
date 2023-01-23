@@ -155,11 +155,17 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
     body: JSON.stringify( dynamicObjects )
   })
     .then((data) => {
+
       if (data.status === 402) {
         props.authActions.logout();
       }
 
-      return data.json();
+      else if ( data.status === 200 ) {
+        return data.json();
+      }
+
+      throw new Error(`Error ${data.statusText} retrieving node ${nodeId} `);
+
     });
 }
 
