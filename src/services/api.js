@@ -2,10 +2,6 @@ import log from 'loglevel';
 import { config } from '../config';
 const playerState = require('../utils/PlayerState').PlayerState;
 
-async function activityReport(props, contextId) {
-
-}
-
 async function importer(props, fileName) {
 
   let token = props.authActions.getToken();
@@ -115,6 +111,28 @@ async function getDownload(props, file) {
       alert('Fetch error: ' + error.message);
       log.error(error);
     })
+}
+
+async function getSessionReport(props, contextId) {
+
+  let token = props.authActions.getToken();
+  let url = `${config.API_URL}/v3/report/${contextId}`;
+
+  log.debug(`getSessionReport(${mapId}) url: ${url})`);
+
+  return fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+    .then((data) => {
+      if (data.status === 402) {
+        props.authActions.logout();
+      }
+      return data.json();
+    });
 }
 
 async function getMapScopedObjects(props, mapId) {
@@ -291,15 +309,16 @@ async function postQuestionValue(state) {
 }
 
 export {
-  getMap,
-  getMaps,
+  activityReport,
   getDownload,
-  getMapScopedObjects,
+  getDynamicScopedObjects,
+  getMap,
   getMapNode,
+  getMaps,
+  getMapScopedObjects,
   getNodeScopedObjects,
   getServerScopedObjects,
-  getDynamicScopedObjects,
+  getSessionReport,  
   importer,
   postQuestionValue,
-  activityReport
 };

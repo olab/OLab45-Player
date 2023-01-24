@@ -22,26 +22,30 @@ class PlayerState {
 
   static clear(keyPrefix) {
     persistantStorage.clear(keyPrefix);
+    persistantStorage.save(KeyConstants.GLOBAL, KeyConstants.DEBUG, {
+      enableWikiRendering: true,
+      disableCache: false
+    });
   }
 
   // Get all settings as object
   static Get(keyPrefix = null) {
 
-    const debug = persistantStorage.get( null, KeyConstants.DEBUG, {
+    const debug = persistantStorage.get(null, KeyConstants.DEBUG, {
       enableWikiRendering: true,
       disableCache: false
-    } );
+    });
 
-    const contextId = persistantStorage.get( keyPrefix, KeyConstants.CONTEXT_ID, null );
-    const dynamicObjects = persistantStorage.get( keyPrefix, KeyConstants.DYNAMIC_OBJECTS, null );
-    const map = persistantStorage.get( keyPrefix, KeyConstants.MAP, null);
-    const mapStatic = persistantStorage.get( keyPrefix, KeyConstants.MAP_STATIC, null );
-    const node = persistantStorage.get( keyPrefix, KeyConstants.NODE, null );
-    const nodeStatic = persistantStorage.get( keyPrefix, KeyConstants.NODE_STATIC, null );
-    const server = persistantStorage.get( keyPrefix, KeyConstants.SERVER, null );
-    const serverStatic = persistantStorage.get( keyPrefix, KeyConstants.SERVER_STATIC, null );
-    const sessionInfo = persistantStorage.get( keyPrefix, KeyConstants.SESSION_INFO, { authInfo: { expires: 0 } } );
-    const visitOnceList = persistantStorage.get( keyPrefix, KeyConstants.VISIT_ONCE_NODE_LIST, [] );
+    const contextId = persistantStorage.get(keyPrefix, KeyConstants.CONTEXT_ID, null);
+    const dynamicObjects = persistantStorage.get(keyPrefix, KeyConstants.DYNAMIC_OBJECTS, null);
+    const map = persistantStorage.get(keyPrefix, KeyConstants.MAP, null);
+    const mapStatic = persistantStorage.get(keyPrefix, KeyConstants.MAP_STATIC, null);
+    const node = persistantStorage.get(keyPrefix, KeyConstants.NODE, null);
+    const nodeStatic = persistantStorage.get(keyPrefix, KeyConstants.NODE_STATIC, null);
+    const server = persistantStorage.get(keyPrefix, KeyConstants.SERVER, null);
+    const serverStatic = persistantStorage.get(keyPrefix, KeyConstants.SERVER_STATIC, null);
+    const sessionInfo = persistantStorage.get(keyPrefix, KeyConstants.SESSION_INFO, { authInfo: { expires: 0 } });
+    const visitOnceList = persistantStorage.get(keyPrefix, KeyConstants.VISIT_ONCE_NODE_LIST, []);
 
     return {
       debug: debug,
@@ -62,6 +66,7 @@ class PlayerState {
     }
   }
 
+
   static GetDebug(defaultValue = {
     enableWikiRendering: true,
     disableCache: false
@@ -69,7 +74,7 @@ class PlayerState {
     return persistantStorage.get(KeyConstants.GLOBAL, KeyConstants.DEBUG, defaultValue);
   }
 
-  static GetAtrium( defaultValue = [] ) {
+  static GetAtrium(defaultValue = []) {
     return persistantStorage.get(null, KeyConstants.ATRIUM, defaultValue);
   }
 

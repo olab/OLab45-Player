@@ -4,7 +4,9 @@ import parse from 'html-react-parser'
 import log from 'loglevel';
 import { getConstant } from '../WikiTags';
 const playerState = require('../../../utils/PlayerState').PlayerState;
-
+import {
+  getSession
+} from '../../../services/api';
 class OlabReportTag extends React.Component {
 
   constructor(props) {
