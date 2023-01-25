@@ -7,6 +7,8 @@ import siteStyles from '../site.module.css';
 import { getFile } from '../WikiTags';
 import { getDownload } from '../../../services/api';
 const playerState = require('../../../utils/PlayerState').PlayerState;
+import BrokenImageIcon from '@material-ui/icons/BrokenImage';
+import { Tooltip } from '@material-ui/core';
 
 class OlabMediaResourceTag extends React.Component {
 
@@ -21,7 +23,7 @@ class OlabMediaResourceTag extends React.Component {
 
   downloadFile(item) {
     try {
-      getDownload(this.props.props, item);      
+      getDownload(this.props.props, item);
     } catch (error) {
       log.error(`Unable to download file ${item.id}`);
     }
@@ -59,19 +61,26 @@ class OlabMediaResourceTag extends React.Component {
 
         let sizeProps = {};
 
-        if ( item.height !== 0 ) {
+        if (item.height !== 0) {
           sizeProps.height = item.height;
         }
-        if ( item.width !== 0 ) {
+        if (item.width !== 0) {
           sizeProps.width = item.width;
         }
-        
+
         if (!debug.enableWikiRendering) {
           return (
             <>
               <b>[[MR:{name}]] "{item.path}"</b>
             </>
           );
+        }
+
+        if (!item.path) {
+          return (
+            <Tooltip placement="top" title={item.name}>
+              <BrokenImageIcon color="error" fontSize="large" />
+            </Tooltip>);
         }
 
         if (this.isAudioType(item.mime)) {
@@ -84,7 +93,7 @@ class OlabMediaResourceTag extends React.Component {
           );
         }
 
-        else if (this.isImageType(item.mime)) {          
+        else if (this.isImageType(item.mime)) {
           return (
             <div className={`${styles['mrimage']} ${siteStyles[item.id]}`} id={`${item.id}`}>
               <img {...sizeProps} alt={item.fileName} src={item.path} />
