@@ -57,9 +57,6 @@ class OlabMediaResourceTag extends React.Component {
 
         log.debug(`file object: '${JSON.stringify(item, null, 2)}'`);
 
-        const url = `${process.env.PUBLIC_URL}/static/files/${item.scopeLevel}/${item.parentId}/${item.path}`;
-        log.debug(`file url: '${url}'`);
-
         let sizeProps = {};
 
         if ( item.height !== 0 ) {
@@ -72,7 +69,7 @@ class OlabMediaResourceTag extends React.Component {
         if (!debug.enableWikiRendering) {
           return (
             <>
-              <b>[[MR:{name}]] "{item.scopeLevel}/{item.parentId}/{item.path}"</b>
+              <b>[[MR:{name}]] "{item.path}"</b>
             </>
           );
         }
@@ -80,8 +77,8 @@ class OlabMediaResourceTag extends React.Component {
         if (this.isAudioType(item.mime)) {
           return (
             <div className={`${styles['mraudio']} ${siteStyles[item.id]}`} id={`${item.id}`}>
-              <audio alt={item.path} type={item.mime} autoPlay="autoplay" autobuffer="" controls>
-                <source src={url} />
+              <audio alt={item.fileName} type={item.mime} autoPlay="autoplay" autobuffer="" controls>
+                <source src={item.path} />
               </audio>
             </div>
           );
@@ -90,7 +87,7 @@ class OlabMediaResourceTag extends React.Component {
         else if (this.isImageType(item.mime)) {          
           return (
             <div className={`${styles['mrimage']} ${siteStyles[item.id]}`} id={`${item.id}`}>
-              <img {...sizeProps} alt={item.path} src={url} />
+              <img {...sizeProps} alt={item.fileName} src={item.path} />
             </div>
           );
         }
@@ -99,7 +96,7 @@ class OlabMediaResourceTag extends React.Component {
           return (
             <div className={`${styles['mrvideo']} ${siteStyles[item.id]}`} id={`${item.id}`}>
               <video controls>
-                <source type={item.mime} src={url} />
+                <source type={item.mime} src={item.path} />
               </video>
             </div>
           );
@@ -119,7 +116,7 @@ class OlabMediaResourceTag extends React.Component {
           return (
             <>
               <div>
-                <a id={`file-link-${item.id}`} download={item.path} href={url}>{item.path}</a>
+                <a id={`file-link-${item.id}`} download={item.path} href={item.path}>{item.fileName}</a>
               </div>
             </>
           );
