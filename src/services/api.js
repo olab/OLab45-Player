@@ -309,7 +309,6 @@ async function postQuestionValue(state) {
 }
 
 export {
-  activityReport,
   getDownload,
   getDynamicScopedObjects,
   getMap,
