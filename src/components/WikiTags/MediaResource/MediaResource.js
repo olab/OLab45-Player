@@ -55,81 +55,87 @@ class OlabMediaResourceTag extends React.Component {
 
       let item = getFile(name, this.props);
 
-      if (item != null) {
+      if (!item) {
+        const toolTip = `Unknown MR: '${name}'`;
+        return (
+          <Tooltip placement="top" title={toolTip}>
+            <BrokenImageIcon color="error" fontSize="large" />
+          </Tooltip>);
+      }
 
-        log.debug(`file object: '${JSON.stringify(item, null, 2)}'`);
+      log.debug(`file object: '${JSON.stringify(item, null, 2)}'`);
 
-        let sizeProps = {};
+      let sizeProps = {};
 
-        if (item.height !== 0) {
-          sizeProps.height = item.height;
-        }
-        if (item.width !== 0) {
-          sizeProps.width = item.width;
-        }
+      if (item.height !== 0) {
+        sizeProps.height = item.height;
+      }
+      if (item.width !== 0) {
+        sizeProps.width = item.width;
+      }
 
-        if (!debug.enableWikiRendering) {
-          return (
-            <>
-              <b>[[MR:{name}]] "{item.path}"</b>
-            </>
-          );
-        }
+      if (!debug.enableWikiRendering) {
+        return (
+          <>
+            <b>[[MR:{name}]] "{item.path}"</b>
+          </>
+        );
+      }
 
-        if (!item.path) {
-          return (
-            <Tooltip placement="top" title={item.name}>
-              <BrokenImageIcon color="error" fontSize="large" />
-            </Tooltip>);
-        }
+      if (!item.originUrl) {
+        const toolTip = `${item.scopeLevel}(${item.parentId}): '${item.name}'`;
+        return (
+          <Tooltip placement="top" title={toolTip}>
+            <BrokenImageIcon color="error" fontSize="large" />
+          </Tooltip>);
+      }
 
-        if (this.isAudioType(item.mime)) {
-          return (
-            <div className={`${styles['mraudio']} ${siteStyles[item.id]}`} id={`${item.id}`}>
-              <audio alt={item.fileName} type={item.mime} autoPlay="autoplay" autobuffer="" controls>
-                <source src={item.path} />
-              </audio>
+      if (this.isAudioType(item.mime)) {
+        return (
+          <div className={`${styles['mraudio']} ${siteStyles[item.id]}`} id={`${item.id}`}>
+            <audio alt={item.fileName} type={item.mime} autoPlay="autoplay" autobuffer="" controls>
+              <source src={item.originUrl} />
+            </audio>
+          </div>
+        );
+      }
+
+      else if (this.isImageType(item.mime)) {
+        return (
+          <div className={`${styles['mrimage']} ${siteStyles[item.id]}`} id={`${item.id}`}>
+            <img {...sizeProps} alt={item.fileName} src={item.originUrl} />
+          </div>
+        );
+      }
+
+      else if (this.isVideoType(item.mime)) {
+        return (
+          <div className={`${styles['mrvideo']} ${siteStyles[item.id]}`} id={`${item.id}`}>
+            <video controls>
+              <source type={item.mime} src={item.originUrl} />
+            </video>
+          </div>
+        );
+      }
+
+      // else if (item.isEmbedded === 1) {
+
+      //   // handle special case of PDF file
+      //   if (item.mime === "application/pdf") {
+      //     return (
+      //       <embed src={url} width="500" height="375" type='application/pdf' />
+      //     );
+      //   }
+      // }
+
+      else {
+        return (
+          <>
+            <div>
+              <a id={`file-link-${item.id}`} download={item.originUrl} href={item.originUrl}>{item.fileName}</a>
             </div>
-          );
-        }
-
-        else if (this.isImageType(item.mime)) {
-          return (
-            <div className={`${styles['mrimage']} ${siteStyles[item.id]}`} id={`${item.id}`}>
-              <img {...sizeProps} alt={item.fileName} src={item.path} />
-            </div>
-          );
-        }
-
-        else if (this.isVideoType(item.mime)) {
-          return (
-            <div className={`${styles['mrvideo']} ${siteStyles[item.id]}`} id={`${item.id}`}>
-              <video controls>
-                <source type={item.mime} src={item.path} />
-              </video>
-            </div>
-          );
-        }
-
-        // else if (item.isEmbedded === 1) {
-
-        //   // handle special case of PDF file
-        //   if (item.mime === "application/pdf") {
-        //     return (
-        //       <embed src={url} width="500" height="375" type='application/pdf' />
-        //     );
-        //   }
-        // }
-
-        else {
-          return (
-            <>
-              <div>
-                <a id={`file-link-${item.id}`} download={item.path} href={item.path}>{item.fileName}</a>
-              </div>
-            </>
-          );
-        }
+          </>
+        );
       }
 
     } catch (error) {
