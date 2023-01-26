@@ -6,7 +6,7 @@ import {
   InputLabel, Paper, Typography, Snackbar
 } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../utils/Logger';
 import styles from './styles';
 import { config } from '../../config';
 import { ReactComponent as LogoIcon } from '../../shared/assets/icons/olab4_logo.svg';
@@ -24,7 +24,7 @@ async function loginUserAsync(credentials) {
 
   let url = `${config.API_URL}/auth/login`;
 
-  log.debug(`loginUser(${credentials.username}) url: ${url})`);
+  Log(`loginUser(${credentials.username}) url: ${url})`);
 
   return fetch(url, {
     signal: AbortSignal.timeout(7500),
@@ -83,7 +83,7 @@ const Login = ({ authActions, classes }) => {
       }
 
     } catch (error) {
-      log.error(`loginUser() error: ${JSON.stringify(error, null, 2)})`);
+      LogError(`loginUser() error: ${JSON.stringify(error, null, 2)})`);
       setErrorMessage(`Login error: server not responding.`);
       setOpen(true);
     }

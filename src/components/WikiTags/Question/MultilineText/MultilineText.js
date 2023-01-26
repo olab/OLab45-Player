@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../../utils/Logger';
 
 import styles from '../../styles.module.css';
 import siteStyles from '../../site.module.css';
@@ -27,7 +27,7 @@ class OlabMultilineTextQuestion extends React.Component {
   setInProgress(inProgress) {
 
     this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
+    Log(`set progress spinner: ${inProgress}`);
   }
 
   setValue = (event) => {
@@ -40,7 +40,7 @@ class OlabMultilineTextQuestion extends React.Component {
     // if this is the case
     if ((question.numTries === -1) || (question.numTries === 1)) {
       this.setState({ disabled: true });
-      log.debug(`OlabMultilineTextQuestion disabled question '${question.id}' value = '${value}'.`);
+      Log(`OlabMultilineTextQuestion disabled question '${question.id}' value = '${value}'.`);
     }
 
     this.transmitResponse();
@@ -91,7 +91,7 @@ class OlabMultilineTextQuestion extends React.Component {
       disabled
     } = this.state;
 
-    log.debug(`OlabMultilineTextQuestion render '${name}'`);
+    Log(`OlabMultilineTextQuestion render '${name}'`);
 
     try {
 

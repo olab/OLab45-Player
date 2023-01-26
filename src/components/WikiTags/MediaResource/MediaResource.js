@@ -1,12 +1,12 @@
 // @flow
 import React from 'react';
-import log from 'loglevel';
 
 import styles from '../styles.module.css';
 import siteStyles from '../site.module.css';
 import { getFile } from '../WikiTags';
 import { getDownload } from '../../../services/api';
 const playerState = require('../../../utils/PlayerState').PlayerState;
+import { Log, LogInfo, LogError } from '../../../utils/Logger';
 import BrokenImageIcon from '@material-ui/icons/BrokenImage';
 import { Tooltip } from '@material-ui/core';
 
@@ -25,7 +25,7 @@ class OlabMediaResourceTag extends React.Component {
     try {
       getDownload(this.props.props, item);
     } catch (error) {
-      log.error(`Unable to download file ${item.id}`);
+      LogError(`Unable to download file ${item.id}`);
     }
   }
 
@@ -49,7 +49,7 @@ class OlabMediaResourceTag extends React.Component {
       name
     } = this.props;
 
-    log.debug(`OlabMediaResourceTag render '${name}'`);
+    Log(`OlabMediaResourceTag render '${name}'`);
 
     try {
 
@@ -63,7 +63,7 @@ class OlabMediaResourceTag extends React.Component {
           </Tooltip>);
       }
 
-      log.debug(`file object: '${JSON.stringify(item, null, 2)}'`);
+      Log(`file object: '${JSON.stringify(item, null, 2)}'`);
 
       let sizeProps = {};
 
@@ -140,7 +140,7 @@ class OlabMediaResourceTag extends React.Component {
 
     } catch (error) {
 
-      log.error(`OlabMediaResourceTag render error: ${JSON.stringify(error, null, 2)}`);
+      LogError(`OlabMediaResourceTag render error: ${JSON.stringify(error, null, 2)}`);
       return (
         <>
           <b>[[MR:{name}]] "{error.message}"</b>

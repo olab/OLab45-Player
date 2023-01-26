@@ -1,5 +1,5 @@
 import TurkTalk from './turktalk';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../utils/Logger';
 var constants = require('./constants');
 const playerState = require('../utils/PlayerState').PlayerState;
 
@@ -43,7 +43,7 @@ class Turker extends TurkTalk {
   // *****
   onConnected(clientObject) {
 
-    log.info(`'${this.connection.connectionId}' onConnected: connection succeeded`);
+    LogInfo(`'${this.connection.connectionId}' onConnected: connection succeeded`);
 
     this.connectionId = this.connection.connectionId.slice(-3);
 
@@ -67,7 +67,7 @@ class Turker extends TurkTalk {
       roomName = moderator.roomName
     }
 
-    log.debug(`'${this.connectionId}' registering turker for room name: ${roomName}`);
+    Log(`'${this.connectionId}' registering turker for room name: ${roomName}`);
 
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKER,
@@ -81,7 +81,7 @@ class Turker extends TurkTalk {
   onDisconnected() {
 
     try {
-      log.debug(`'${this.connectionId}' onDisconnected`);
+      Log(`'${this.connectionId}' onDisconnected`);
       if (this.component.onConnectionChanged) {
 
         if (this.component.onConnectionChanged) {
@@ -93,14 +93,14 @@ class Turker extends TurkTalk {
       }
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onDisconnected exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onDisconnected exception: ${error.message}`);
     }
 
   }
 
   onReconnecting(error) {
     try {
-      log.debug(`'${this.connectionId}' onReconnecting: ${error}`);
+      Log(`'${this.connectionId}' onReconnecting: ${error}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -109,13 +109,13 @@ class Turker extends TurkTalk {
         });
       }
     } catch (error) {
-      log.error(`'${this.connectionId}' onReconnecting exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onReconnecting exception: ${error.message}`);
     }
   }
 
   onReconnected(connectionId) {
     try {
-      log.debug(`'${this.connectionId}' onReconnected: ${connectionId}`);
+      Log(`'${this.connectionId}' onReconnected: ${connectionId}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -124,7 +124,7 @@ class Turker extends TurkTalk {
         });
       }
     } catch (error) {
-      log.error(`'${this.connectionId}' onReconnected exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onReconnected exception: ${error.message}`);
     }
   }
 
@@ -133,7 +133,7 @@ class Turker extends TurkTalk {
 
     try {
 
-      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
+      Log(`'${this.connectionId}' onCommand: ${payload.command}`);
 
       // test if command NOT handled in base class
       if (super.onCommand(payload)) {
@@ -141,11 +141,11 @@ class Turker extends TurkTalk {
       }      
 
       else {
-        log.debug(`'${this.connectionId}' onCommand unknown command: '${payload.command}'`);
+        Log(`'${this.connectionId}' onCommand unknown command: '${payload.command}'`);
       }
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onCommand exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onCommand exception: ${error.message}`);
     }
 
   }

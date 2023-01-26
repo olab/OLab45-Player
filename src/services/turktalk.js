@@ -1,5 +1,5 @@
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../utils/Logger';
 import { config } from '../config';
 
 var constants = require('./constants');
@@ -16,7 +16,7 @@ class TurkTalk {
     this.type = this.constructor.name;
     const url = config.TTALK_HUB_URL;
 
-    log.debug(`turk talk url: ${url}`);
+    Log(`turk talk url: ${url}`);
 
     this.questionSettings = JSON.parse( this.component.props.props.question.settings );
     this.penName = `${component.props.props.map.name}|${this.questionSettings.roomName}`;
@@ -41,7 +41,7 @@ class TurkTalk {
   }
 
   broadcastMessageCallback(message) {
-    log.debug(`broadcastMessageCallback:`);
+    Log(`broadcastMessageCallback:`);
   }
 
   async disconnect() {
@@ -70,7 +70,7 @@ class TurkTalk {
 
     if (payload.Command === constants.SIGNALCMD_CONNECTIONSTATUS) {
       const { Id } = payload.Data;
-      log.debug(`Id: ${Id}`);
+      Log(`Id: ${Id}`);
 
       if (this.component.onSessionIdChanged) {
         this.component.onSessionIdChanged(Id);

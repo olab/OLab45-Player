@@ -4,7 +4,7 @@ import {
   Grid, Box
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../../../utils/Logger';
 import styles from '../../../styles.module.css';
 
 class TurkerChatStatusBar extends React.Component {
@@ -41,7 +41,7 @@ class TurkerChatStatusBar extends React.Component {
 
   render() {
 
-    log.debug(`TurkerChatStatusBar render. state = ${JSON.stringify(this.state)}`);
+    Log(`TurkerChatStatusBar render. state = ${JSON.stringify(this.state)}`);
 
     try {
 

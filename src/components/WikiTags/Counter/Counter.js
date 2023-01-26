@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import parse from 'html-react-parser'
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../utils/Logger';
 import { getCounter } from '../WikiTags';
 const playerState = require('../../../utils/PlayerState').PlayerState;
 
@@ -23,7 +23,7 @@ class OlabCounterTag extends React.Component {
       name
     } = this.props;
 
-    log.debug(`OlabConstantTag render '${name}'`);
+    Log(`OlabConstantTag render '${name}'`);
 
     try {
       let item = getCounter(name, this.props.props.dynamicObjects);

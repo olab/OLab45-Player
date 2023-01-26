@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import Spinner from '../../shared/assets/loading_med.gif';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../utils/Logger';
 import styles from './styles';
 import { importer } from '../../services/api'
 import styled from 'styled-components';
@@ -61,7 +61,7 @@ class Import extends PureComponent {
             });
 
         } catch (error) {
-            log.error(error);
+            LogError(error);
         }
 
         this.setState({ importRunning: false });
@@ -96,7 +96,7 @@ class Import extends PureComponent {
             importRunning
         } = this.state;
 
-        log.debug(`Import render`);
+        Log(`Import render`);
 
         try {
 

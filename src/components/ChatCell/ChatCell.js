@@ -5,7 +5,7 @@ import {
   TableCell
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../utils/Logger';
 import styles from '../WikiTags/styles.module.css';
 
 import Chat from './Chat'
@@ -30,7 +30,7 @@ class ChatCell extends React.Component {
     var self = this;
     this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
 
-    log.debug(`ChatCell[${this.index}] ctor`);
+    Log(`ChatCell[${this.index}] ctor`);
   }
 
   componentDidUpdate(prevProps) {
@@ -41,7 +41,7 @@ class ChatCell extends React.Component {
 
   // command method listener
   onCommand(payload) {
-    // log.debug(`'${this.state.connection.connectionId?.slice(-3)}' onChatCellCommandCallback: ${payload.command}`);
+    // Log(`'${this.state.connection.connectionId?.slice(-3)}' onChatCellCommandCallback: ${payload.command}`);
   }
 
   render() {

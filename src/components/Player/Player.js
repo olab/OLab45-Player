@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { FormControl } from '@material-ui/core';
 import JsxParser from 'react-jsx-parser';
-import log from 'loglevel';
+import { Log, LogInfo, LogError, LogEnable } from '../../utils/Logger';
 
 import OlabConstantTag from '../WikiTags/Constant/Constant';
 import OlabCountersTag from '../WikiTags/Counters/Counter';
@@ -32,10 +32,10 @@ class Player extends PureComponent {
     
     super(props);
 
-    log.enableAll();
+    LogEnable();
 
     const { mapId, nodeId } = arguments[0].params;
-    log.info(`playing map ${mapId}, node ${nodeId}`);
+    LogInfo(`playing map ${mapId}, node ${nodeId}`);
 
     this.state = {
       isMounted: false,
@@ -49,7 +49,7 @@ class Player extends PureComponent {
 
     if (this.state.disableCache) {
 
-      log.info(`disabled cache`);
+      LogInfo(`disabled cache`);
       playerState.clear(null);
 
     }
@@ -101,11 +101,11 @@ class Player extends PureComponent {
       }
 
     } catch (error) {
-      log.error(error);
+      LogError(error);
     }
 
     if (theme) {
-      log.debug(`found theme: '${theme.name}' (${theme.id}). parent: '${theme.imagetype}' (${theme.parentId})`);
+      Log(`found theme: '${theme.name}' (${theme.id}). parent: '${theme.imagetype}' (${theme.parentId})`);
     }
     return theme;
 
@@ -120,7 +120,7 @@ class Player extends PureComponent {
 
       if (server && !disableCache) {
         this.setState({ isServerFetched: true });
-        log.debug('using cached server data');
+        Log('using cached server data');
         return;
       }
 
@@ -139,10 +139,10 @@ class Player extends PureComponent {
         playerState.SetServerStatic( null, this.state.scopedObjects.server );
       }
 
-      log.debug('read server data');
+      Log('read server data');
 
     } catch (error) {
-      log.error(error);
+      LogError(error);
     }
   }
 
@@ -158,7 +158,7 @@ class Player extends PureComponent {
 
         if (Number(id) === map.id) {
           this.setState({ isMapFetched: true });
-          log.debug('using cached map data');
+          Log('using cached map data');
           return;
         }
 
@@ -182,10 +182,10 @@ class Player extends PureComponent {
         playerState.SetMap( null, this.state.map);
       }
 
-      log.debug('read map data');
+      Log('read map data');
 
     } catch (error) {
-      log.error(error);
+      LogError(error);
     }
 
   }
@@ -211,7 +211,7 @@ class Player extends PureComponent {
       // test if already have node loaded (and it's the same one)
       if (node && !disableCache) {
         if (Number(nodeId) === node.id) {
-          log.debug('using cached node data');
+          Log('using cached node data');
           return;
         }
       }
@@ -243,7 +243,7 @@ class Player extends PureComponent {
         nodeData.contextId = playerState.GetContextId( null );
       }
 
-      log.info(`contextId: ${nodeData.contextId}`);
+      LogInfo(`contextId: ${nodeData.contextId}`);
 
       this.setState({
         contextId: nodeData.contextId,
@@ -262,10 +262,10 @@ class Player extends PureComponent {
         playerState.SetNodeStatic( null, this.state.scopedObjects.node);        
       }
 
-      log.debug('read node data');
+      Log('read node data');
 
     } catch (error) {
-      log.error(error);
+      LogError(error);
       
     }
 
@@ -288,10 +288,10 @@ class Player extends PureComponent {
 
       playerState.SetDynamicObjects( null, this.state.dynamicObjects);
 
-      log.debug('read dynamic data');
+      Log('read dynamic data');
 
     } catch (error) {
-      log.error(error);
+      LogError(error);
     }
 
   }
@@ -307,7 +307,7 @@ class Player extends PureComponent {
       url += `/${urlParam}`;
     }
 
-    log.debug(`navigating to ${url}`)
+    Log(`navigating to ${url}`)
     window.location.href = url;
   }
 
@@ -318,7 +318,7 @@ class Player extends PureComponent {
 
   onJsxParseError(arg) {
     const t = arg;
-    log.error(t);
+    LogError(t);
     alert(`Renderer error: ${t}`);
   }
 
@@ -467,10 +467,10 @@ class Player extends PureComponent {
         var newNodesVisited = [...new Set(nodesVisited)];
         this.setState({ nodesVisited: newNodesVisited });
 
-        log.debug(`saving visited node id: ${this.state.node.id}`);
+        Log(`saving visited node id: ${this.state.node.id}`);
         playerState.SetNodesVisited(null, newNodesVisited);
 
-        log.debug(`Added node id ${this.state.node.id} to visitOnce list`);
+        Log(`Added node id ${this.state.node.id} to visitOnce list`);
       }
 
 

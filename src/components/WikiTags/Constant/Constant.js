@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
 import parse from 'html-react-parser'
-import log from 'loglevel';
 import { getConstant } from '../WikiTags';
 const playerState = require('../../../utils/PlayerState').PlayerState;
+import { Log, LogInfo, LogError } from '../../../utils/Logger';
 
 class OlabConstantTag extends React.Component {
 
@@ -24,7 +24,7 @@ class OlabConstantTag extends React.Component {
       name
     } = this.props;
 
-    log.debug(`OlabConstantTag render '${name}'`);
+    Log(`OlabConstantTag render '${name}'`);
 
     try {
       let item = getConstant(name, this.props);

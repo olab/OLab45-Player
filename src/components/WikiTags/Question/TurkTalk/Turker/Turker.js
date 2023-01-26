@@ -4,7 +4,7 @@ import {
   Button, Grid, FormLabel, Table,
   TableBody, MenuItem, Select, TableRow, Snackbar
 } from '@material-ui/core';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../../../utils/Logger';
 import { withStyles } from '@material-ui/core/styles';
 import MuiAlert from '@material-ui/lab/Alert';
 
@@ -66,21 +66,21 @@ class OlabModeratorTag extends React.Component {
     try {
 
       if (payload.command === constants.SIGNALCMD_TURKER_ASSIGNED) {
-        log.debug(`'${localInfo.connectionId}' onCommand: ${payload.command}`);
+        Log(`'${localInfo.connectionId}' onCommand: ${payload.command}`);
         this.onModeratorAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
-        log.debug(`'${localInfo.connectionId}' onCommand: ${payload.command}`);
+        Log(`'${localInfo.connectionId}' onCommand: ${payload.command}`);
         this.onAtriumUpdate(payload.data);
       }
 
       // else {
-      //   log.debug(`'${localInfo.connectionId}' onTurkerCommandCallback unknown command: '${payload.command}'`);
+      //   Log(`'${localInfo.connectionId}' onTurkerCommandCallback unknown command: '${payload.command}'`);
       // }
 
     } catch (error) {
-      log.error(`'${localInfo.connectionId}' onTurkerCommandCallback exception: ${error.message}`);
+      LogError(`'${localInfo.connectionId}' onTurkerCommandCallback exception: ${error.message}`);
     }
 
   }
@@ -113,12 +113,12 @@ class OlabModeratorTag extends React.Component {
         mapNodes: payload.mapNodes
       });
 
-      log.debug(`'${localInfo.connectionId}' onModeratorAssigned localInfo = ${JSON.stringify(payload, null, 2)}]`);
+      Log(`'${localInfo.connectionId}' onModeratorAssigned localInfo = ${JSON.stringify(payload, null, 2)}]`);
 
       playerState.SetConnectionInfo( null, localInfo );
 
     } catch (error) {
-      log.error(`'${localInfo.connectionId}' onModeratorAssigned exception: ${error.message}`);
+      LogError(`'${localInfo.connectionId}' onModeratorAssigned exception: ${error.message}`);
     }
 
   }
@@ -150,7 +150,7 @@ class OlabModeratorTag extends React.Component {
           atriumLearners.push(learner);
         }
 
-        log.debug(`'${localInfo.connectionId}' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
+        Log(`'${localInfo.connectionId}' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
 
         if (previousAtriumCount != atriumLearners.length) {
           this.setState({
@@ -173,7 +173,7 @@ class OlabModeratorTag extends React.Component {
       }
 
     } catch (error) {
-      log.error(`'${localInfo.connectionId}' onAtriumUpdate exception: ${error.message}`);
+      LogError(`'${localInfo.connectionId}' onAtriumUpdate exception: ${error.message}`);
     }
 
   }
@@ -193,7 +193,7 @@ class OlabModeratorTag extends React.Component {
       // test for valid turkee selected from available list
       if (event.target.value !== '0') {
 
-        log.debug(`'${localInfo.connectionId}' onAtriumLearnerSelected: ${event.target.value}`);
+        Log(`'${localInfo.connectionId}' onAtriumLearnerSelected: ${event.target.value}`);
 
         // find learner in atrium list
         for (let item of this.state.atriumLearners) {
@@ -208,7 +208,7 @@ class OlabModeratorTag extends React.Component {
       }
 
     } catch (error) {
-      log.error(`'${localInfo.connectionId}' onAtriumLearnerSelected exception: ${error.message}`);
+      LogError(`'${localInfo.connectionId}' onAtriumLearnerSelected exception: ${error.message}`);
     }
 
   }
@@ -217,7 +217,7 @@ class OlabModeratorTag extends React.Component {
 
     const { localInfo } = this.state;
 
-    log.debug(`'${localInfo.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`);
+    Log(`'${localInfo.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`);
 
     // signal server to close out this room
     this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
@@ -249,7 +249,7 @@ class OlabModeratorTag extends React.Component {
 
       let { localInfo } = this.state;
 
-      log.debug(`'${localInfo.connectionId}' onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
+      Log(`'${localInfo.connectionId}' onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
 
       // signal server with assignment of turkee to this room
       this.connection.send(
@@ -261,7 +261,7 @@ class OlabModeratorTag extends React.Component {
       this.updateAtriumState();
 
     } catch (error) {
-      log.error(`'${localInfo.connectionId}' onAssignClicked exception: ${error.message}`);
+      LogError(`'${localInfo.connectionId}' onAssignClicked exception: ${error.message}`);
     }
 
   }
@@ -285,7 +285,7 @@ class OlabModeratorTag extends React.Component {
       playerState.SetAtrium(state);
 
     } catch (error) {
-      log.error(`'${localInfo.connectionId}' updateAtriumState exception: ${error.message}`);
+      LogError(`'${localInfo.connectionId}' updateAtriumState exception: ${error.message}`);
     }
 
   }
@@ -304,7 +304,7 @@ class OlabModeratorTag extends React.Component {
       });
 
     } catch (error) {
-      log.error(`'${connectionInfo.connectionId}' onConnectionChanged exception: ${error.message}`);
+      LogError(`'${connectionInfo.connectionId}' onConnectionChanged exception: ${error.message}`);
     }
 
   }
@@ -332,7 +332,7 @@ class OlabModeratorTag extends React.Component {
       mapNodes
     } = this.state;
 
-    log.debug(`'${localInfo.connectionId}' OlabTurkerTag render '${userName}'`);
+    Log(`'${localInfo.connectionId}' OlabTurkerTag render '${userName}'`);
 
     try {
 

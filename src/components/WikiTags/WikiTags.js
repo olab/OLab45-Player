@@ -1,4 +1,4 @@
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../utils/Logger';
 
 const findWikiInList = (list, wiki) => {
 
@@ -36,7 +36,7 @@ const getCounters = (nodeId, mapCounters, counterActions) => {
     }
 
   } catch (error) {
-    log.error(`error looking up counters: ${error}`)
+    LogError(`error looking up counters: ${error}`)
   }
 
   return items;
@@ -63,11 +63,11 @@ const getFile = (name, props) => {
     item = findWikiInList(array, name);
 
     if (item == null) {
-      log.error(`Could not find file '${name}'`);
+      LogError(`Could not find file '${name}'`);
     }
 
   } catch (error) {
-    log.error(`error looking up file ${name}: ${error}`)
+    LogError(`error looking up file ${name}: ${error}`)
   }
 
   return item;
@@ -90,11 +90,11 @@ const getCounter = (name, dynamicObjects) => {
     ], name);
 
     if (item == null) {
-      log.error(`Could not find counter '${name}'`);
+      LogError(`Could not find counter '${name}'`);
     }
 
   } catch (error) {
-    log.error(`error looking up constant ${name}: ${error}`)
+    LogError(`error looking up counter ${name}: ${error}`)
   }
 
   return item;
@@ -119,17 +119,12 @@ const getQuestion = (name, props) => {
     ], name);
 
     if (question == null) {
-      log.error(`Could not find question ${name}`);
+      LogError(`Could not find question ${name}`);
     }
 
   } catch (error) {
-    log.error(`error looking up constant ${name}: ${error}`)
+    LogError(`error looking up question ${name}: ${error}`)
   }
-
-  // question.previousValue = null;
-  // question.previousResponseId = null;
-  // question.value = null;
-  // question.responseId = null;
 
   return question;
 };
@@ -153,11 +148,11 @@ const getConstant = (name, props) => {
     ], name);
 
     if (item == null) {
-      log.error(`Could not find constant ${name}`);
+      LogError(`Could not find constant ${name}`);
     }
 
   } catch (error) {
-    log.error(`error looking up constant ${name}: ${error}`)
+    LogError(`error looking up constant ${name}: ${error}`)
   }
 
   return item;
@@ -166,6 +161,7 @@ const getConstant = (name, props) => {
 const combineStyles = (...styles) => {
 
   return function CombineStyles(theme) {
+    
     const outStyles = styles.map((arg) => {
       // Apply the "theme" object for style functions.
       if (typeof arg === 'function') {

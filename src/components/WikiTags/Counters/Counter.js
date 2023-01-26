@@ -7,7 +7,7 @@ import {
   ListItemText, Paper,
   TableContainer, Table, TableRow, TableHead, TableCell, TableBody
 } from '@material-ui/core';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../utils/Logger';
 import { getCounters } from '../WikiTags';
 import styles from '../styles.module.css';
 import siteStyles from '../site.module.css';
@@ -39,7 +39,7 @@ class OlabCountersTag extends React.Component {
 
   render() {
 
-    log.debug(`OlabCountersTag render`);
+    Log(`OlabCountersTag render`);
 
     try {
       const {
@@ -115,7 +115,7 @@ class OlabCountersTag extends React.Component {
 
     } catch (error) {
 
-      log.error(`OlabMediaResourceTag render error: ${error}`);
+      LogError(`OlabMediaResourceTag render error: ${error}`);
       return (
         <>
           <b>[[COUNTERS]] "{error.message}"</b>

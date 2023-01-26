@@ -6,7 +6,7 @@ import {
   TableRow
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../../../utils/Logger';
 import styles from '../../../styles.module.css';
 
 import SlotManager from '../SlotManager';
@@ -77,22 +77,22 @@ class TurkerChatCellGrid extends React.Component {
   onCommand(payload) {
 
     if (payload.command === constants.SIGNALCMD_LEARNER_ASSIGNED) {
-      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
+      Log(`'${this.connectionId}' onCommand: ${payload.command}`);
       this.onLearnerAssigned(payload.data);
     }
 
     if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
+      Log(`'${this.connectionId}' onCommand: ${payload.command}`);
       this.onRoomAssigned(payload.data);
     }
 
     else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
-      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
+      Log(`'${this.connectionId}' onCommand: ${payload.command}`);
       this.onLearnerUnassigned(payload.data);
     }
 
     else {
-      log.debug(`'${this.connectionId}' onTurkerChatGridCommandCallback ignoring command: '${payload.command}'`);
+      Log(`'${this.connectionId}' onTurkerChatGridCommandCallback ignoring command: '${payload.command}'`);
     }
 
   }
@@ -101,7 +101,7 @@ class TurkerChatCellGrid extends React.Component {
     try {
       
     } catch (error) {
-      log.error(`'${this.connectionId}' onRoomAssigned exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onRoomAssigned exception: ${error.message}`);
     }
   }
   
@@ -135,7 +135,7 @@ class TurkerChatCellGrid extends React.Component {
       );
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onLearnerAssigned exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onLearnerAssigned exception: ${error.message}`);
     }
   }
 
@@ -144,7 +144,7 @@ class TurkerChatCellGrid extends React.Component {
 
     try {
 
-      log.debug(`'${this.connectionId}' onLearnerUnassigned: connectionId '${payload}'`);
+      Log(`'${this.connectionId}' onLearnerUnassigned: connectionId '${payload}'`);
 
       let { remoteSlots, localSlots } = this.slotManager.unassignLearner(payload);
 
@@ -163,7 +163,7 @@ class TurkerChatCellGrid extends React.Component {
       );
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onLearnerUnassigned exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onLearnerUnassigned exception: ${error.message}`);
     }
   }
 
@@ -191,7 +191,7 @@ class TurkerChatCellGrid extends React.Component {
         }
       }
 
-      log.debug(`'${this.connectionId}' onLearnerList: refreshing: '${JSON.stringify(learners)}'`);
+      Log(`'${this.connectionId}' onLearnerList: refreshing: '${JSON.stringify(learners)}'`);
 
       // re-initialize property manager with array of Participant objects
       this.slotManager = new SlotManager(this.MAX_TURKEES);
@@ -206,7 +206,7 @@ class TurkerChatCellGrid extends React.Component {
       this.setState({ slotInfos: slotInfos });
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onLearnerList exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onLearnerList exception: ${error.message}`);
     }
 
   }
@@ -245,7 +245,7 @@ class TurkerChatCellGrid extends React.Component {
 
     let chatRows = [];
 
-    log.debug(`'${this.connectionId}' generateChatGrid:`);
+    Log(`'${this.connectionId}' generateChatGrid:`);
 
     // calculate chat cell width
     let chatCellWidthStyle = this.calculateChatCellWidth(localSlots);
@@ -270,7 +270,7 @@ class TurkerChatCellGrid extends React.Component {
             foundConnectedChat = true;
           }
 
-          log.debug(`   ${rowIndex}:${columnIndex}: '${remoteSlot.commandChannel}' show? '${localSlot.show}'`);
+          Log(`   ${rowIndex}:${columnIndex}: '${remoteSlot.commandChannel}' show? '${localSlot.show}'`);
 
           var session = {
             contextId: null

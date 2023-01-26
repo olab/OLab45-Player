@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import parse from 'html-react-parser'
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../utils/Logger';
 import { getConstant } from '../WikiTags';
 const playerState = require('../../../utils/PlayerState').PlayerState;
 import {
@@ -20,7 +20,7 @@ class OlabReportTag extends React.Component {
 
     const { debug } = this.state;
 
-    log.debug(`OlabReportTag render`);
+    Log(`OlabReportTag render`);
 
     try {
 

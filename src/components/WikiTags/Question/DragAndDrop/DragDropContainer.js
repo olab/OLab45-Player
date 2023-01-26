@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card } from './Card';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../../utils/Logger';
 
 class DragDropContainer extends React.Component {
 
@@ -15,7 +15,7 @@ class DragDropContainer extends React.Component {
 
   moveCard = (dragIndex, hoverIndex) => {
 
-    log.debug(`DragDropContainer swapping '${this.state.responses[dragIndex].response}' -> position ${hoverIndex + 1}`);
+    Log(`DragDropContainer swapping '${this.state.responses[dragIndex].response}' -> position ${hoverIndex + 1}`);
 
     this.setState(state => {
       const responses = state.responses;

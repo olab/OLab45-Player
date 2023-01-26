@@ -1,4 +1,4 @@
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../utils/Logger';
 import { config } from '../config';
 const playerState = require('../utils/PlayerState').PlayerState;
 
@@ -6,7 +6,7 @@ async function importer(props, fileName) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/import/post`;
-  log.debug(`importer(${fileName}) url: ${url})`);
+  Log(`importer(${fileName}) url: ${url})`);
 
   var body = { fileName: fileName };
 
@@ -30,7 +30,7 @@ async function getMap(props, mapId) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}`;
-  log.debug(`getMap(${mapId}) url: ${url})`);
+  Log(`getMap(${mapId}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -51,7 +51,7 @@ async function getMaps(props) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps`;
-  log.debug(`getMaps() url: ${url})`);
+  Log(`getMaps() url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -80,7 +80,7 @@ async function getDownload(props, file) {
   var anchorTagId = `file-link-${file.id}`;
   let anchorElement = document.getElementById(anchorTagId);
 
-  log.debug(`getDownload(${file.id}) url: ${url})`);
+  Log(`getDownload(${file.id}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -109,7 +109,7 @@ async function getDownload(props, file) {
     })
     .catch(function (error) {
       alert('Fetch error: ' + error.message);
-      log.error(error);
+      LogError(error);
     })
 }
 
@@ -118,7 +118,7 @@ async function getSessionReport(props, contextId) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/v3/report/${contextId}`;
 
-  log.debug(`getSessionReport(${mapId}) url: ${url})`);
+  Log(`getSessionReport(${mapId}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -139,7 +139,7 @@ async function getMapScopedObjects(props, mapId) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/scopedObjects`;
-  log.debug(`getMapScopedObjects(${mapId}) url: ${url})`);
+  Log(`getMapScopedObjects(${mapId}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -160,7 +160,7 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/node/${nodeId}`;
-  log.debug(`getMapNode(${mapId}, ${nodeId}) url: ${url})`);
+  Log(`getMapNode(${mapId}, ${nodeId}) url: ${url})`);
   let contextId = playerState.GetContextId( null );
 
   return fetch(url, {
@@ -191,7 +191,7 @@ async function getNodeScopedObjects(props, nodeId) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/nodes/${nodeId}/scopedObjects`;
-  log.debug(`getNodeScopedObjects(${nodeId}) url: ${url})`);
+  Log(`getNodeScopedObjects(${nodeId}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -212,7 +212,7 @@ async function getDynamicScopedObjects(props, mapId, nodeId) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/nodes/${nodeId}/dynamicobjects`;
-  log.debug(`getDynamicScopedObjects(${nodeId}) url: ${url})`);
+  Log(`getDynamicScopedObjects(${nodeId}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -233,7 +233,7 @@ async function getServerScopedObjects(props, serverId) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/servers/${serverId}/scopedObjects`;
-  log.debug(`getServerScopedObjects(${serverId}) url: ${url})`);
+  Log(`getServerScopedObjects(${serverId}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -266,7 +266,7 @@ async function postQuestionValue(state) {
   let token = authActions.getToken();
   let url = `${config.API_URL}/response/${question.id}`;
 
-  log.debug(`postQuestionValue(${question.id}, ${responseId}, ${value}, [func]) url: ${url})`);
+  Log(`postQuestionValue(${question.id}, ${responseId}, ${value}, [func]) url: ${url})`);
 
   // signal to caller that we are starting the work
   if (setInProgress) { setInProgress(true); }

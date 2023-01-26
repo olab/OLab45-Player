@@ -11,7 +11,7 @@ import {
   Button,
   Tooltip,
 } from '@material-ui/core';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../utils/Logger';
 
 import styles from './styles';
 import ListWithSearch from '../ListWithSearch/ListWithSearch';
@@ -150,7 +150,7 @@ class Home extends PureComponent {
     var { maps } = this.state;
     if (maps.length > 0) {
       this.setState({ isMapsFetching: false });
-      log.debug('using cached maps data');
+      Log('using cached maps data');
       return;
     }
 

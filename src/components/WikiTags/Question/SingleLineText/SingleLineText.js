@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../../utils/Logger';
 
 import styles from '../../styles.module.css';
 import siteStyles from '../../site.module.css';
@@ -39,7 +39,7 @@ class OlabSinglelineTextQuestion extends React.Component {
     if ((question.numTries === -1) || (question.numTries === 1)) {
       this.setState(state => {
         disabled = true;
-        log.debug(`OlabSinglelineTextQuestion disabled question '${question.id}' value = '${value}'.`);
+        Log(`OlabSinglelineTextQuestion disabled question '${question.id}' value = '${value}'.`);
         return ({ disabled });
       });
     }
@@ -77,13 +77,13 @@ class OlabSinglelineTextQuestion extends React.Component {
   setInProgress(inProgress) {
 
     this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
+    Log(`set progress spinner: ${inProgress}`);
   }
 
   setIsDisabled(disabled) {
 
     this.setState({ disabled: disabled });
-    log.debug(`set disabled: ${disabled}`);
+    Log(`set disabled: ${disabled}`);
   }
 
   handleChange = (event) => {
@@ -107,7 +107,7 @@ class OlabSinglelineTextQuestion extends React.Component {
       // disabled
     } = this.state;
 
-    log.debug(`OlabSinglePickQuestion render '${name}'`);
+    Log(`OlabSinglePickQuestion render '${name}'`);
 
     try {
 

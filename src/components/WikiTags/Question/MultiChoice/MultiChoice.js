@@ -8,7 +8,7 @@ import {
   FormControl,
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../../utils/Logger';
 
 import CloseIcon from '@material-ui/icons/Close';
 import CheckIcon from '@material-ui/icons/Check';
@@ -90,7 +90,7 @@ class OlabMultiPickQuestion extends React.Component {
       value = this.createValueFromArray(choiceArray);
     }
 
-    log.debug(`OlabMultiPickQuestion set question '${question.id}' value = '${value}'`);
+    Log(`OlabMultiPickQuestion set question '${question.id}' value = '${value}'`);
 
     // if single try question, disabled it
     if (question.numTries > 0) {
@@ -138,13 +138,13 @@ class OlabMultiPickQuestion extends React.Component {
   setInProgress(inProgress) {
 
     this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
+    Log(`set progress spinner: ${inProgress}`);
   }
 
   setIsDisabled(disabled) {
 
     this.setState({ disabled: disabled });
-    log.debug(`set disabled: ${disabled}`);
+    Log(`set disabled: ${disabled}`);
   }
 
   buildQuestionResponses(question, currentChoices) {
@@ -198,7 +198,7 @@ class OlabMultiPickQuestion extends React.Component {
       question
     } = this.state;
 
-    log.debug(`OlabMultiPickQuestion render '${name}'`);
+    Log(`OlabMultiPickQuestion render '${name}'`);
 
     try {
       let row = question.layoutType === 1 ? true : false;

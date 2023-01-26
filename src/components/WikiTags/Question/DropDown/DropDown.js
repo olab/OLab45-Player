@@ -12,7 +12,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import CheckIcon from '@material-ui/icons/Check';
 
 import { withStyles } from '@material-ui/core/styles';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../../utils/Logger';
 
 import styles from '../../styles.module.css';
 import siteStyles from '../../site.module.css';
@@ -40,7 +40,7 @@ class OlabDropDownQuestion extends React.Component {
 
     this.setState(state => {
       question.value = value;
-      log.debug(`OlabDropDownQuestion set question '${question.id}' value = '${value}'.`);
+      Log(`OlabDropDownQuestion set question '${question.id}' value = '${value}'.`);
       return ({ question });
     });
 
@@ -61,7 +61,7 @@ class OlabDropDownQuestion extends React.Component {
     question.responseId = response.id;
     question.value = question.responseId;
 
-    log.debug(`OlabSinglePickQuestion set question '${question.id}' value = '${value}'`);
+    Log(`OlabSinglePickQuestion set question '${question.id}' value = '${value}'`);
 
     // if single try question, disabled it
     if (question.numTries > 0) {
@@ -104,13 +104,13 @@ class OlabDropDownQuestion extends React.Component {
   setInProgress(inProgress) {
 
     this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
+    Log(`set progress spinner: ${inProgress}`);
   }
 
   setIsDisabled(disabled) {
 
     this.setState({ disabled: disabled });
-    log.debug(`set disabled: ${disabled}`);
+    Log(`set disabled: ${disabled}`);
   }
 
   buildQuestionResponses(question) {
@@ -135,7 +135,7 @@ class OlabDropDownQuestion extends React.Component {
       question
     } = this.state;
 
-    log.debug(`OlabDropDownQuestion render '${name}'`);
+    Log(`OlabDropDownQuestion render '${name}'`);
     try {
 
       let progressButtonHtml = '';

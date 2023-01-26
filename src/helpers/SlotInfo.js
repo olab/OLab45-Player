@@ -1,4 +1,4 @@
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../utils/Logger';
 import Participant from './participant';
 
 class SlotInfo {

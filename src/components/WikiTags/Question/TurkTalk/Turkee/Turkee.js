@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../../../utils/Logger';
 import { withStyles } from '@material-ui/core/styles';
 import {
   Table, TableBody, TableRow,
@@ -66,7 +66,7 @@ class OlabAttendeeTag extends React.Component {
 
   dumpConnectionState() {
     var infoState = { localInfo: this.state.localInfo, remoteInfo: null };
-    log.debug(`'${this.connectionId}' onAtriumAssigned localInfo = ${JSON.stringify(infoState, null, 2)}]`);
+    Log(`'${this.connectionId}' onAtriumAssigned localInfo = ${JSON.stringify(infoState, null, 2)}]`);
   }
 
   handleInfoClose(event, reason) {
@@ -83,26 +83,26 @@ class OlabAttendeeTag extends React.Component {
     try {
 
       if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
+        Log(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onRoomAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
-        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
+        Log(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onAtriumAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_JUMP_NODE) {
-        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
+        Log(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onJumpNode(payload);
       }
 
       // else {
-      //   log.debug(`'${this.connectionId}' onTurkeeCommandCallback unknown command: '${payload.command}'`);
+      //   Log(`'${this.connectionId}' onTurkeeCommandCallback unknown command: '${payload.command}'`);
       // }
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onTurkeeCommandCallback exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onTurkeeCommandCallback exception: ${error.message}`);
     }
 
   }
@@ -114,7 +114,7 @@ class OlabAttendeeTag extends React.Component {
       url += `/${urlParam}`;
     }
 
-    log.debug(`navigating to ${url}`)
+    Log(`navigating to ${url}`)
 
     window.location.href = url;
   }
@@ -138,7 +138,7 @@ class OlabAttendeeTag extends React.Component {
 
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onJumpNode exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onJumpNode exception: ${error.message}`);
     }
   }
 
@@ -169,7 +169,7 @@ class OlabAttendeeTag extends React.Component {
       this.dumpConnectionState();
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onAtriumAssigned exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onAtriumAssigned exception: ${error.message}`);
     }
 
   }
@@ -197,7 +197,7 @@ class OlabAttendeeTag extends React.Component {
       this.dumpConnectionState();
 
     } catch (error) {
-      log.error(`'${this.connectionId}' onRoomAssigned exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onRoomAssigned exception: ${error.message}`);
     }
 
   }
@@ -208,7 +208,7 @@ class OlabAttendeeTag extends React.Component {
 
   async componentWillUnmount() {
 
-    log.debug(`'${this.connectionId}' OlabAttendeeTag unmounting`);
+    Log(`'${this.connectionId}' OlabAttendeeTag unmounting`);
 
     this.componentMounted = false;
 
@@ -259,7 +259,7 @@ class OlabAttendeeTag extends React.Component {
 
     const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
 
-    log.debug(`'${localInfo.connectionId}' OlabTurkeeTag render '${userName}'`);
+    Log(`'${localInfo.connectionId}' OlabTurkeeTag render '${userName}'`);
 
     try {
 

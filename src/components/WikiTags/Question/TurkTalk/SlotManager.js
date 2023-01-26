@@ -1,4 +1,4 @@
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../../utils/Logger';
 import Participant from '../../../../helpers/participant';
 import SlotInfo from '../../../../helpers/SlotInfo';
 
@@ -99,10 +99,10 @@ class SlotManager {
           return item;
       }
 
-      log.error(`could not find chat info for connection Id ${connectionId}`);
+      LogError(`could not find chat info for connection Id ${connectionId}`);
 
     } catch (error) {
-      log.error(`getSlotByConnectionId exception: ${error.message}`);
+      LogError(`getSlotByConnectionId exception: ${error.message}`);
     }
 
     return null;
@@ -118,10 +118,10 @@ class SlotManager {
           return item;
       }
 
-      log.error(`could not find chat info for userId ${userId}`);
+      LogError(`could not find chat info for userId ${userId}`);
 
     } catch (error) {
-      log.error(`getSlotByUserId exception: ${error.message}`);
+      LogError(`getSlotByUserId exception: ${error.message}`);
     }
 
     return null;
@@ -137,10 +137,10 @@ class SlotManager {
           return item;
       }
 
-      log.error(`could not find chat info for key ${key}`);
+      LogError(`could not find chat info for key ${key}`);
 
     } catch (error) {
-      log.error(`getSlotByKey exception: ${error.message}`);
+      LogError(`getSlotByKey exception: ${error.message}`);
     }
 
     return null;
@@ -167,7 +167,7 @@ class SlotManager {
       }
 
     } catch (error) {
-      log.error(`getOpenInfoSlot exception: ${error.message}`);
+      LogError(`getOpenInfoSlot exception: ${error.message}`);
     }
 
     return null;
@@ -201,7 +201,7 @@ class SlotManager {
       throw new Error(`No available slots to assign learner ${remoteInfo.userId} `);
     }
 
-    log.debug(`assigning '${remoteInfo.userId}' to slot ${index}`);
+    Log(`assigning '${remoteInfo.userId}' to slot ${index}`);
 
     let remoteSlot = this.RemoteSlots()[index];
     let participant = new SlotInfo(remoteInfo);
@@ -222,7 +222,7 @@ class SlotManager {
 
     this.LocalSlots()[index] = participant;
 
-    log.debug(`assignLearner: ${participant.toString()}`);
+    Log(`assignLearner: ${participant.toString()}`);
 
     // return {
     //   remoteSlot: remoteSlot,

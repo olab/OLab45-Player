@@ -6,7 +6,7 @@ import {
   Slider,
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../../../utils/Logger';
 
 import styles from '../../styles.module.css';
 import siteStyles from '../../site.module.css';
@@ -40,7 +40,7 @@ class OlabSliderQuestion extends React.Component {
   setValue = (event, value) => {
 
     const question = this.state.question;
-    log.debug(`OlabSliderQuestion set question '${question.id}' value = '${value}'`);
+    Log(`OlabSliderQuestion set question '${question.id}' value = '${value}'`);
 
     this.setState(state => {
 
@@ -81,7 +81,7 @@ class OlabSliderQuestion extends React.Component {
   setInProgress(inProgress) {
 
     this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
+    Log(`set progress spinner: ${inProgress}`);
   }
 
   render() {
@@ -93,7 +93,7 @@ class OlabSliderQuestion extends React.Component {
       // disabled
     } = this.state;
 
-    log.debug(`OlabSliderQuestion render '${name}'`);
+    Log(`OlabSliderQuestion render '${name}'`);
 
     try {
 

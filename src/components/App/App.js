@@ -4,7 +4,7 @@ import './App.css';
 import Home from '../Home/Home';
 import Header from '../Header/Header';
 import Login from '../Login/Login';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../utils/Logger';
 import Player from '../Player/Player';
 import useToken from './useToken';
 import { config } from '../../constants';
@@ -37,7 +37,7 @@ function App() {
 
     if (!token) {
 
-      log.debug(`useEffect: token: ${token}`);
+      Log(`useEffect: token: ${token}`);
 
       const localToken = authActions.getToken();
       if (localToken) {
@@ -64,7 +64,7 @@ function App() {
   const isExpired = authActions.isExpiredSession();
   const reactVersion = process.env.REACT_APP_VERSION;
 
-  log.debug(`render: token: ${token}`);
+  Log(`render: token: ${token}`);
 
   if (!token || isExpired) {
     return <Login authActions={authActions} />
@@ -86,7 +86,7 @@ function App() {
 function processCookieForTokenAsync(cookieString) {
 
   if (!cookieString) {
-    log.debug(`No external cookies set`);
+    Log(`No external cookies set`);
     return null;
   }
 
@@ -97,7 +97,7 @@ function processCookieForTokenAsync(cookieString) {
 
   let url = `${config.API_URL}/auth/loginexternal`;
 
-  log.debug(`loginExternal(${token}) url: ${url})`);
+  Log(`loginExternal(${token}) url: ${url})`);
 
   var body = {
     "ExternalToken": token
@@ -120,7 +120,7 @@ function extractExternalToken(cookieStr) {
 
   try {
 
-    log.debug(`parsing: '${cookieStr}')`);
+    Log(`parsing: '${cookieStr}')`);
 
     const parseCookie = str =>
       str
@@ -132,17 +132,17 @@ function extractExternalToken(cookieStr) {
         }, {});
 
     let cookies = parseCookie(cookieStr);
-    log.debug(`Cookie: ${JSON.stringify(cookies, null, 2)}`);
+    Log(`Cookie: ${JSON.stringify(cookies, null, 2)}`);
 
     if ('external_token' in cookies) {
-      log.debug(`External token: ${cookies.external_token}`);
+      Log(`External token: ${cookies.external_token}`);
       return cookies.external_token;
     }
 
     return null;
 
   } catch (error) {
-    log.error(error);
+    LogError(error);
   }
 }
 

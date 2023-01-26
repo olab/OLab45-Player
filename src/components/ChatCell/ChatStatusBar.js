@@ -4,7 +4,7 @@ import {
   Grid
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from '../../utils/Logger';
 import styles from '../WikiTags/styles.module.css';
 import { connect } from 'formik';
 import { LastPageOutlined } from '@material-ui/icons';
@@ -64,14 +64,14 @@ class ChatStatusBar extends React.Component {
   // command method listener
   onCommand(payload) {
 
-    log.debug(`'${this.connectionId}' onChatStatusBarCommandCallback: ${payload.command}`);
+    Log(`'${this.connectionId}' onChatStatusBarCommandCallback: ${payload.command}`);
 
     if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
       this.onLearnerUnassigned(payload.data);
     }
 
     else {
-      log.debug(`'${this.connectionId}' onChatStatusBarCommandCallback: ignoring command: '${payload.command}'`);
+      Log(`'${this.connectionId}' onChatStatusBarCommandCallback: ignoring command: '${payload.command}'`);
     }
 
   }
@@ -125,7 +125,7 @@ class ChatStatusBar extends React.Component {
       if (!messageTimer) {
 
         messageTimer = setInterval(this.onMessageTimer, 5000);
-        log.debug(`'${this.connectionId}' setting timer ${messageTimer}. Room '${localInfo.commandChannel}'`);
+        Log(`'${this.connectionId}' setting timer ${messageTimer}. Room '${localInfo.commandChannel}'`);
         this.setState({ messageTimer: messageTimer });
 
       }
@@ -143,7 +143,7 @@ class ChatStatusBar extends React.Component {
         messageTimer: null
       });
 
-      log.debug(`'${this.connectionId}' clearing timer. Room '${localInfo.commandChannel}'`);
+      Log(`'${this.connectionId}' clearing timer. Room '${localInfo.commandChannel}'`);
 
     }
 
@@ -172,7 +172,7 @@ class ChatStatusBar extends React.Component {
       centerStatusString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
-    log.debug(`'${this.connectionId}'  timer ${messageTimer} fired.  Room '${localInfo.commandChannel}'. seconds: ${diffSeconds}`);
+    Log(`'${this.connectionId}'  timer ${messageTimer} fired.  Room '${localInfo.commandChannel}'. seconds: ${diffSeconds}`);
 
     this.setState({ centerStatusString: centerStatusString });
 

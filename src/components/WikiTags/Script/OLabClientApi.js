@@ -16,7 +16,7 @@ class OlabClientAPI {
       log: vm.player.instance.log
     };
 
-    vm.player.utilities.log.debug("Created OlabClientAPI.");
+    vm.player.utilities.Log("Created OlabClientAPI.");
 
     return vm.service;
   }
@@ -32,7 +32,7 @@ class OlabClientAPI {
 
     } catch (e) {
 
-      vm.player.utilities.log.error(e.message);
+      vm.player.utilities.LogError(e.message);
 
     }
 
@@ -51,7 +51,7 @@ class OlabClientAPI {
 
     } catch (e) {
 
-      vm.player.utilities.log.error(e.message);
+      vm.player.utilities.LogError(e.message);
 
     }
 
@@ -81,7 +81,7 @@ class OlabClientAPI {
 
     } catch (e) {
 
-      vm.player.utilities.log.error(e.message);
+      vm.player.utilities.LogError(e.message);
 
     }
 
