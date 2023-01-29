@@ -30,6 +30,7 @@ class OlabModeratorTag extends React.Component {
     let atrium = playerState.GetAtrium();
 
     this.state = {
+      atriumLearners: [],
       connectionStatus: null,
       maxHeight: 200,
       userName: props.props.authActions.getUserName(),

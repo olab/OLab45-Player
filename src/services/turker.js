@@ -62,9 +62,11 @@ class Turker extends TurkTalk {
     // get room name to persistant storage in case 
     // user refreshes the window
     let roomName = this.penName;
-    let moderator = playerState.GetConnectionInfo( null );
+    let moderator = playerState.GetConnectionInfo(null);
     if (moderator != null) {
-      roomName = moderator.roomName
+      if (moderator.roomName) {
+        roomName = moderator.roomName
+      }
     }
 
     Log(`'${this.connectionId}' registering turker for room name: ${roomName}`);
@@ -138,7 +140,7 @@ class Turker extends TurkTalk {
       // test if command NOT handled in base class
       if (super.onCommand(payload)) {
         return;
-      }      
+      }
 
       else {
         Log(`'${this.connectionId}' onCommand unknown command: '${payload.command}'`);
