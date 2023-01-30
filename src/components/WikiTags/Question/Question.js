@@ -81,7 +81,11 @@ class OlabQuestionTag extends React.Component {
   render() {
 
     const { debug } = this.state;
-
+    const questionDivStyle = {
+      paddingTop: '10px',
+      paddingBottom: '10px',
+    };
+    
     if (this.state.question != null) {
 
       if (!debug.enableWikiRendering) {
@@ -111,23 +115,33 @@ class OlabQuestionTag extends React.Component {
       switch (questionType) {
         case 1:
           return (
-            <OlabSinglelineTextQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabSinglelineTextQuestion props={props} />
+            </div>
           );
         case 2:
           return (
-            <OlabMultilineTextQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabMultilineTextQuestion props={props} />
+            </div>
           );
         case 3:
           return (
-            <OlabMultiPickQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabMultiPickQuestion props={props} />
+            </div>
           );
         case 4:
           return (
-            <OlabSinglePickQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabSinglePickQuestion props={props} />
+            </div>
           );
         case 5:
           return (
-            <OlabSliderQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabSliderQuestion props={props} />
+            </div>
           );
         case 6:
           return (
