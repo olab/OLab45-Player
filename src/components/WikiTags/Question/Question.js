@@ -131,19 +131,27 @@ class OlabQuestionTag extends React.Component {
           );
         case 6:
           return (
-            <OlabDragAndDropQuestion props={props} />
-          );
-        case 15:
-          return (
-            <OlabModeratorTag props={props} />
-          );
-        case 12:
-          return (
-            <OlabDropDownQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabDragAndDropQuestion props={props} />
+            </div>
           );
         case 11:
           return (
-            <OlabAttendeeTag props={props} />
+            <div style={questionDivStyle}>
+              <OlabModeratorTag props={props} />
+            </div>
+          );
+        case 12:
+          return (
+            <div style={questionDivStyle}>
+              <OlabDropDownQuestion props={props} />
+            </div>
+          );
+        case 15:
+          return (
+            <div style={questionDivStyle}>
+              <OlabAttendeeTag props={props} />
+            </div>
           );
         default:
           return (
