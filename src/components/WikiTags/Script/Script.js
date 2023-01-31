@@ -1,5 +1,6 @@
 // @flow
 import { Log, LogInfo, LogError } from '../../utils/Logger';
+import log from 'loglevel';
 
 class OlabScriptTag extends React.Component {
 
@@ -9,7 +10,7 @@ class OlabScriptTag extends React.Component {
       name
     } = this.props;
 
-    Log(`OlabConstantTag render '${name}'`);
+    log.debug(`OlabConstantTag render '${name}'`);
 
     try {
 

@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { Log, LogInfo, LogError } from '../../../../utils/Logger';
+import log from 'loglevel';
 
 import CloseIcon from '@material-ui/icons/Close';
 import CheckIcon from '@material-ui/icons/Check';
@@ -90,7 +91,7 @@ class OlabMultiPickQuestion extends React.Component {
       value = this.createValueFromArray(choiceArray);
     }
 
-    Log(`OlabMultiPickQuestion set question '${question.id}' value = '${value}'`);
+    log.debug(`OlabMultiPickQuestion set question '${question.id}' value = '${value}'`);
 
     // if single try question, disabled it
     if (question.numTries > 0) {
@@ -138,13 +139,13 @@ class OlabMultiPickQuestion extends React.Component {
   setInProgress(inProgress) {
 
     this.setState({ showProgressSpinner: inProgress });
-    Log(`set progress spinner: ${inProgress}`);
+    log.debug(`set progress spinner: ${inProgress}`);
   }
 
   setIsDisabled(disabled) {
 
     this.setState({ disabled: disabled });
-    Log(`set disabled: ${disabled}`);
+    log.debug(`set disabled: ${disabled}`);
   }
 
   buildQuestionResponses(question, currentChoices) {
@@ -198,7 +199,7 @@ class OlabMultiPickQuestion extends React.Component {
       question
     } = this.state;
 
-    Log(`OlabMultiPickQuestion render '${name}'`);
+    log.debug(`OlabMultiPickQuestion render '${name}'`);
 
     try {
       let row = question.layoutType === 1 ? true : false;

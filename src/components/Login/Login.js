@@ -7,6 +7,7 @@ import {
 } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import { Log, LogInfo, LogError } from '../../utils/Logger';
+import log from 'loglevel';
 import styles from './styles';
 import { config } from '../../config';
 import { ReactComponent as LogoIcon } from '../../shared/assets/icons/olab4_logo.svg';
@@ -24,7 +25,7 @@ async function loginUserAsync(credentials) {
 
   let url = `${config.API_URL}/auth/login`;
 
-  Log(`loginUser(${credentials.username}) url: ${url})`);
+  log.debug(`loginUser(${credentials.username}) url: ${url})`);
 
   return fetch(url, {
     signal: AbortSignal.timeout(7500),

@@ -18,6 +18,8 @@ import OlabAttendeeTag from './TurkTalk/Turkee/Turkee';
 import OlabModeratorTag from './TurkTalk/Turker/Turker';
 
 const playerState = require('../../../utils/PlayerState').PlayerState;
+import { Log, LogInfo, LogError } from '../../../utils/Logger';
+import log from 'loglevel';
 
 class OlabQuestionTag extends React.Component {
 
@@ -85,7 +87,9 @@ class OlabQuestionTag extends React.Component {
       paddingTop: '10px',
       paddingBottom: '10px',
     };
-    
+
+    log.debug(`rendering question '${this.state.question.name}' typeid: ${this.state.question.questionType}`);
+
     if (this.state.question != null) {
 
       if (!debug.enableWikiRendering) {

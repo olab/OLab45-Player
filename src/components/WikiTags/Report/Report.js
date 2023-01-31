@@ -2,6 +2,7 @@
 import React from 'react';
 import parse from 'html-react-parser'
 import { Log, LogInfo, LogError } from '../../utils/Logger';
+import log from 'loglevel';
 import { getConstant } from '../WikiTags';
 const playerState = require('../../../utils/PlayerState').PlayerState;
 import {
@@ -20,7 +21,7 @@ class OlabReportTag extends React.Component {
 
     const { debug } = this.state;
 
-    Log(`OlabReportTag render`);
+    log.debug(`OlabReportTag render`);
 
     try {
 

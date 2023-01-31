@@ -5,6 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { withStyles } from '@material-ui/core/styles';
 import { Log, LogInfo, LogError } from '../../../../utils/Logger';
+import log from 'loglevel';
 import DragDropContainer from './DragDropContainer';
 
 import styles from '../../styles.module.css';
@@ -28,12 +29,12 @@ class OlabDragAndDropQuestion extends React.Component {
   setValue = (responses) => {
 
     const question = this.state.question;    
-    Log(`responses`);
+    log.debug(`responses`);
 
     let values = [];
 
     for (const iterator of responses) {
-      Log(` ${iterator.response}(${iterator.id})`);
+      log.debug(` ${iterator.response}(${iterator.id})`);
       values.push(iterator.id);
     }    
 
@@ -46,7 +47,7 @@ class OlabDragAndDropQuestion extends React.Component {
 
     question.value = values.join(',');
 
-    Log(`OlabSinglePickQuestion set question '${question.id}' value = '${question.value}'.`);
+    log.debug(`OlabSinglePickQuestion set question '${question.id}' value = '${question.value}'.`);
 
     this.setState({ question });
     this.transmitResponse();
@@ -79,13 +80,13 @@ class OlabDragAndDropQuestion extends React.Component {
   setInProgress(inProgress) {
 
     this.setState({ showProgressSpinner: inProgress });
-    Log(`set progress spinner: ${inProgress}`);
+    log.debug(`set progress spinner: ${inProgress}`);
   }
 
   setIsDisabled(disabled) {
 
     this.setState({ disabled: disabled });
-    Log(`set disabled: ${disabled}`);
+    log.debug(`set disabled: ${disabled}`);
   }
 
   render() {
@@ -97,7 +98,7 @@ class OlabDragAndDropQuestion extends React.Component {
       // disabled
     } = this.state;
 
-    Log(`OlabDragAndDropQuestion render '${name}'`);
+    log.debug(`OlabDragAndDropQuestion render '${name}'`);
 
     try {
 

@@ -16,7 +16,7 @@ class OlabClientAPI {
       log: vm.player.instance.log
     };
 
-    vm.player.utilities.Log("Created OlabClientAPI.");
+    vm.player.utilities.log.debug("Created OlabClientAPI.");
 
     return vm.service;
   }

@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Log, LogInfo, LogError } from '../../../../../utils/Logger';
+import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
 import {
   Table, TableBody, TableRow,
@@ -37,17 +38,17 @@ class OlabAttendeeTag extends React.Component {
     const debug = playerState.GetDebug();
 
     this.state = {
+      ...debug,
       connectionStatus: null,
-      slotInfos: this.slotManager.RemoteSlots(),
+      index: 0,
+      infoOpen: null,
+      localInfo: new SlotInfo({ connectionId: '???' }),
       maxHeight: 200,
       remoteInfo: new SlotInfo(),
-      localInfo: new SlotInfo({ connectionId: '???' }),
+      session: session,
+      slotInfos: this.slotManager.RemoteSlots(),
       userName: props.props.authActions.getUserName(),
       width: '100%',
-      id: this.props.name,
-      session: session,
-      infoOpen: null,
-      debug
     };
 
     this.turkee = new Turkee(this);
@@ -58,15 +59,14 @@ class OlabAttendeeTag extends React.Component {
     this.handleInfoClose = this.handleInfoClose.bind(this);
     this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
     this.onJumpNode = this.onJumpNode.bind(this);
-    
+
     var turkeeSelf = this;
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkeeSelf.onCommand(payload) });
-
   }
 
   dumpConnectionState() {
     var infoState = { localInfo: this.state.localInfo, remoteInfo: null };
-    Log(`'${this.connectionId}' onAtriumAssigned localInfo = ${JSON.stringify(infoState, null, 2)}]`);
+    log.debug(`'${this.connectionId}' dumpConnectionState localInfo = ${JSON.stringify(infoState, null, 2)}]`);
   }
 
   handleInfoClose(event, reason) {
@@ -83,22 +83,22 @@ class OlabAttendeeTag extends React.Component {
     try {
 
       if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-        Log(`'${this.connectionId}' onCommand: ${payload.command}`);
+        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onRoomAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
-        Log(`'${this.connectionId}' onCommand: ${payload.command}`);
+        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onAtriumAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_JUMP_NODE) {
-        Log(`'${this.connectionId}' onCommand: ${payload.command}`);
+        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onJumpNode(payload);
       }
 
       // else {
-      //   Log(`'${this.connectionId}' onTurkeeCommandCallback unknown command: '${payload.command}'`);
+      //   log.debug(`'${this.connectionId}' onTurkeeCommandCallback unknown command: '${payload.command}'`);
       // }
 
     } catch (error) {
@@ -114,7 +114,7 @@ class OlabAttendeeTag extends React.Component {
       url += `/${urlParam}`;
     }
 
-    Log(`navigating to ${url}`)
+    log.debug(`navigating to ${url}`)
 
     window.location.href = url;
   }
@@ -128,13 +128,13 @@ class OlabAttendeeTag extends React.Component {
 
       this.setState({
         infoOpen: true,
-        infoMessage: `Moderator is sending you to '${nodeName}'` 
+        infoMessage: `Moderator is sending you to '${nodeName}'`
       });
 
       // pause for 5 seconds
       await new Promise(r => setTimeout(r, 4000));
 
-      this.onNavigateToNode( mapId, nodeId );
+      this.onNavigateToNode(mapId, nodeId);
 
 
     } catch (error) {
@@ -208,7 +208,7 @@ class OlabAttendeeTag extends React.Component {
 
   async componentWillUnmount() {
 
-    Log(`'${this.connectionId}' OlabAttendeeTag unmounting`);
+    log.debug(`'${this.connectionId}' OlabAttendeeTag unmounting`);
 
     this.componentMounted = false;
 
@@ -246,24 +246,26 @@ class OlabAttendeeTag extends React.Component {
   render() {
 
     const {
-      id,
-      debug,
+      index,
       connectionStatus,
+      enableWikiRendering,
       remoteInfo,
       localInfo,
       userName,
       session,
       infoOpen,
-      infoMessage   
+      infoMessage
     } = this.state;
 
-    const tableLayout = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
+    const tableStyle = { border: '2px solid black', backgroundColor: '#3333', width: '100%' };
+    const chatCellStyle = { width: '100%' };
+    const stemStyle = { paddingBottom: '5px' };
 
-    Log(`'${localInfo.connectionId}' OlabTurkeeTag render '${userName}'`);
+    log.debug(`'${localInfo.connectionId}' OlabTurkeeTag render '${userName}'`);
 
     try {
 
-      if (!debug.enableWikiRendering) {
+      if (!enableWikiRendering) {
         return (
           <>
             [[ATTENDEE:{remoteInfo.RoomName}]]
@@ -273,20 +275,22 @@ class OlabAttendeeTag extends React.Component {
 
       // prevent anything interesting happening
       // until we are connected
-      if (!connectionStatus) {
-        return (<></>);
-      }
+      // if (!connectionStatus) {
+      //   return (<></>);
+      // }
 
       return (
         <>
-          {this.props.props.question.stem}
-          <Table style={tableLayout}>
+          <div style={stemStyle}>
+            {this.props.props.question.stem}
+          </div>
+          <Table style={tableStyle}>
             <TableBody>
               <TableRow>
                 <ChatCell
-                  key={0}
+                  index={index}
                   isModerator={localInfo.isModerator}
-                  style={{ width: '100%' }}
+                  style={chatCellStyle}
                   connection={this.connection}
                   localInfo={localInfo}
                   senderInfo={remoteInfo}
@@ -295,7 +299,6 @@ class OlabAttendeeTag extends React.Component {
               </TableRow>
             </TableBody>
           </Table>
-          <br />
           {(infoOpen === true) && (
             <Snackbar open={infoOpen} autoHideDuration={3000} onClose={this.handleInfoClose}>
               <Alert onClose={this.handleInfoClose} severity="info">

@@ -1,4 +1,5 @@
 import { Log, LogInfo, LogError } from '../../utils/Logger';
+import log from 'loglevel';
 
 const findWikiInList = (list, wiki) => {
 

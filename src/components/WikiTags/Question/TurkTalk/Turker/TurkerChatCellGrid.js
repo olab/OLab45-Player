@@ -7,6 +7,7 @@ import {
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { Log, LogInfo, LogError } from '../../../../../utils/Logger';
+import log from 'loglevel';
 import styles from '../../../styles.module.css';
 
 import SlotManager from '../SlotManager';
@@ -77,22 +78,22 @@ class TurkerChatCellGrid extends React.Component {
   onCommand(payload) {
 
     if (payload.command === constants.SIGNALCMD_LEARNER_ASSIGNED) {
-      Log(`'${this.connectionId}' onCommand: ${payload.command}`);
+      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
       this.onLearnerAssigned(payload.data);
     }
 
     if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-      Log(`'${this.connectionId}' onCommand: ${payload.command}`);
+      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
       this.onRoomAssigned(payload.data);
     }
 
     else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
-      Log(`'${this.connectionId}' onCommand: ${payload.command}`);
+      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
       this.onLearnerUnassigned(payload.data);
     }
 
     else {
-      Log(`'${this.connectionId}' onTurkerChatGridCommandCallback ignoring command: '${payload.command}'`);
+      log.debug(`'${this.connectionId}' onTurkerChatGridCommandCallback ignoring command: '${payload.command}'`);
     }
 
   }
@@ -144,7 +145,7 @@ class TurkerChatCellGrid extends React.Component {
 
     try {
 
-      Log(`'${this.connectionId}' onLearnerUnassigned: connectionId '${payload}'`);
+      log.debug(`'${this.connectionId}' onLearnerUnassigned: connectionId '${payload}'`);
 
       let { remoteSlots, localSlots } = this.slotManager.unassignLearner(payload);
 
@@ -191,7 +192,7 @@ class TurkerChatCellGrid extends React.Component {
         }
       }
 
-      Log(`'${this.connectionId}' onLearnerList: refreshing: '${JSON.stringify(learners)}'`);
+      log.debug(`'${this.connectionId}' onLearnerList: refreshing: '${JSON.stringify(learners)}'`);
 
       // re-initialize property manager with array of Participant objects
       this.slotManager = new SlotManager(this.MAX_TURKEES);
@@ -245,7 +246,7 @@ class TurkerChatCellGrid extends React.Component {
 
     let chatRows = [];
 
-    Log(`'${this.connectionId}' generateChatGrid:`);
+    log.debug(`'${this.connectionId}' generateChatGrid:`);
 
     // calculate chat cell width
     let chatCellWidthStyle = this.calculateChatCellWidth(localSlots);
@@ -270,7 +271,7 @@ class TurkerChatCellGrid extends React.Component {
             foundConnectedChat = true;
           }
 
-          Log(`   ${rowIndex}:${columnIndex}: '${remoteSlot.commandChannel}' show? '${localSlot.show}'`);
+          log.debug(`   ${rowIndex}:${columnIndex}: '${remoteSlot.commandChannel}' show? '${localSlot.show}'`);
 
           var session = {
             contextId: null

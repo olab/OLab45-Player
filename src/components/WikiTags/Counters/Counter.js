@@ -8,6 +8,7 @@ import {
   TableContainer, Table, TableRow, TableHead, TableCell, TableBody
 } from '@material-ui/core';
 import { Log, LogInfo, LogError } from '../../../utils/Logger';
+import log from 'loglevel';
 import { getCounters } from '../WikiTags';
 import styles from '../styles.module.css';
 import siteStyles from '../site.module.css';
@@ -39,7 +40,7 @@ class OlabCountersTag extends React.Component {
 
   render() {
 
-    Log(`OlabCountersTag render`);
+    log.debug(`OlabCountersTag render`);
 
     try {
       const {

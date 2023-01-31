@@ -1,4 +1,5 @@
 import { Log, LogInfo, LogError } from '../utils/Logger';
+import log from 'loglevel';
 import { config } from '../config';
 const playerState = require('../utils/PlayerState').PlayerState;
 
@@ -6,7 +7,7 @@ async function importer(props, fileName) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/import/post`;
-  Log(`importer(${fileName}) url: ${url})`);
+  log.debug(`importer(${fileName}) url: ${url})`);
 
   var body = { fileName: fileName };
 
@@ -30,7 +31,7 @@ async function getMap(props, mapId) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}`;
-  Log(`getMap(${mapId}) url: ${url})`);
+  log.debug(`getMap(${mapId}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -51,7 +52,7 @@ async function getMaps(props) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps`;
-  Log(`getMaps() url: ${url})`);
+  log.debug(`getMaps() url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -80,7 +81,7 @@ async function getDownload(props, file) {
   var anchorTagId = `file-link-${file.id}`;
   let anchorElement = document.getElementById(anchorTagId);
 
-  Log(`getDownload(${file.id}) url: ${url})`);
+  log.debug(`getDownload(${file.id}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -118,7 +119,7 @@ async function getSessionReport(props, contextId) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/v3/report/${contextId}`;
 
-  Log(`getSessionReport(${mapId}) url: ${url})`);
+  log.debug(`getSessionReport(${mapId}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -139,7 +140,7 @@ async function getMapScopedObjects(props, mapId) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/scopedObjects`;
-  Log(`getMapScopedObjects(${mapId}) url: ${url})`);
+  log.debug(`getMapScopedObjects(${mapId}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -160,7 +161,7 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/node/${nodeId}`;
-  Log(`getMapNode(${mapId}, ${nodeId}) url: ${url})`);
+  log.debug(`getMapNode(${mapId}, ${nodeId}) url: ${url})`);
   let contextId = playerState.GetContextId( null );
 
   return fetch(url, {
@@ -191,7 +192,7 @@ async function getNodeScopedObjects(props, nodeId) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/nodes/${nodeId}/scopedObjects`;
-  Log(`getNodeScopedObjects(${nodeId}) url: ${url})`);
+  log.debug(`getNodeScopedObjects(${nodeId}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -212,7 +213,7 @@ async function getDynamicScopedObjects(props, mapId, nodeId) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/nodes/${nodeId}/dynamicobjects`;
-  Log(`getDynamicScopedObjects(${nodeId}) url: ${url})`);
+  log.debug(`getDynamicScopedObjects(${nodeId}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -233,7 +234,7 @@ async function getServerScopedObjects(props, serverId) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/servers/${serverId}/scopedObjects`;
-  Log(`getServerScopedObjects(${serverId}) url: ${url})`);
+  log.debug(`getServerScopedObjects(${serverId}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -266,7 +267,7 @@ async function postQuestionValue(state) {
   let token = authActions.getToken();
   let url = `${config.API_URL}/response/${question.id}`;
 
-  Log(`postQuestionValue(${question.id}, ${responseId}, ${value}, [func]) url: ${url})`);
+  log.debug(`postQuestionValue(${question.id}, ${responseId}, ${value}, [func]) url: ${url})`);
 
   // signal to caller that we are starting the work
   if (setInProgress) { setInProgress(true); }

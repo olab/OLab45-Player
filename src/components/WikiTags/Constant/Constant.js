@@ -4,6 +4,7 @@ import parse from 'html-react-parser'
 import { getConstant } from '../WikiTags';
 const playerState = require('../../../utils/PlayerState').PlayerState;
 import { Log, LogInfo, LogError } from '../../../utils/Logger';
+import log from 'loglevel';
 
 class OlabConstantTag extends React.Component {
 
@@ -24,7 +25,7 @@ class OlabConstantTag extends React.Component {
       name
     } = this.props;
 
-    Log(`OlabConstantTag render '${name}'`);
+    log.debug(`OlabConstantTag render '${name}'`);
 
     try {
       let item = getConstant(name, this.props);

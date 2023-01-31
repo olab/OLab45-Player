@@ -6,6 +6,7 @@ import {
   ButtonGroup,
 } from '@material-ui/core';
 import { Log, LogInfo, LogError } from '../../utils/Logger';
+import log from 'loglevel';
 const playerState = require('../../utils/PlayerState').PlayerState;
 
 class OlabLinksTag extends React.Component {
@@ -27,13 +28,13 @@ class OlabLinksTag extends React.Component {
       url += `/${urlParam}`;
     }
 
-    Log(`navigating to ${url}`)
+    log.debug(`navigating to ${url}`)
 
     window.location.href = url;
   }
 
   render() {
-    Log('OlabLinksTag render');
+    log.debug('OlabLinksTag render');
 
     const { debug } = this.state;
 

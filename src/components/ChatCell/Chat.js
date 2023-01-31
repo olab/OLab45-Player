@@ -7,16 +7,13 @@ import {
   Select, Menu, MenuItem, FormLabel
 } from '@material-ui/core';
 import { Log, LogInfo, LogError } from '../../utils/Logger';
+import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
 import styles from '../WikiTags/styles.module.css';
 import { HubConnectionState } from '@microsoft/signalr';
 
 import SendIcon from '@material-ui/icons/Send';
-import ClearIcon from '@material-ui/icons/Clear';
-import CheckIcon from '@material-ui/icons/Check';
 import CancelIcon from '@material-ui/icons/Cancel';
-import CancelPresentationIcon from '@material-ui/icons/CancelPresentation';
-import BlockIcon from '@material-ui/icons/Block';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 import SlotInfo from '../../helpers/SlotInfo';
@@ -40,7 +37,6 @@ class Chat extends React.Component {
       ...this.props
     };
 
-    this.index = this.props.localInfo.key;
     this.connection = this.props.connection;
     this.connectionId = this.props.connection.connectionId?.slice(-3);
 
@@ -63,7 +59,7 @@ class Chat extends React.Component {
     this.connection.on(constants.SIGNALMETHOD_MESSAGE, (payload) => { chatSelf.onMessage(payload) });
     this.connection.on(constants.SIGNALMETHOD_SYSTEM_MESSAGE, (payload) => { chatSelf.onSystemMessage(payload) });
 
-    Log(`Chat[${this.index}] ctor`);
+    log.debug(`Chat[${this.props.index}] ctor`);
 
     this.messageRef = React.createRef();
   }
@@ -91,36 +87,36 @@ class Chat extends React.Component {
       let { isModerator, localInfo, senderInfo } = this.state;
 
       if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
-        Log(`'onCommand[${this.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
+        log.debug(`'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
         this.onAtriumAssigned(payload);
       }
 
       if (payload.command === constants.SIGNALCMD_TURKER_ASSIGNED) {
-        Log(`'onCommand[${this.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
+        log.debug(`'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
         this.onModeratorAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-        Log(`'onCommand[${this.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
+        log.debug(`'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
         this.onParticipantAssigned(payload);
       }
 
       else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
-        Log(`'onCommand[${this.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
+        log.debug(`'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
         this.onLearnerUnassigned(payload);
       }
 
       else if (payload.command === constants.SIGNALCMD_TURKER_DISCONNECTED) {
-        Log(`'onCommand[${this.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
+        log.debug(`'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
         this.onModeratorUnassigned(payload.data);
       }
 
       // else {
-      //   Log(`'${localInfo?.connectionId}' onCommand ignoring command: '${payload.command}'`);
+      //   log.debug(`'${localInfo?.connectionId}' onCommand ignoring command: '${payload.command}'`);
       // }
 
     } catch (error) {
-      LogError(`onCommand[${this.index}] exception: ${error.message}`);
+      LogError(`onCommand[${this.props.index}] exception: ${error.message}`);
     }
 
   }
@@ -134,7 +130,7 @@ class Chat extends React.Component {
       });
 
     } catch (error) {
-      LogError(`onModeratorAssigned[${this.index}] exception: ${error.message}`);
+      LogError(`onModeratorAssigned[${this.props.index}] exception: ${error.message}`);
     }
 
   }
@@ -147,7 +143,7 @@ class Chat extends React.Component {
 
       let { localInfo, isModerator } = this.state;
 
-      LogInfo(`'onAtriumAssigned[${this.index}] (${JSON.stringify(payload, null, 1)})`);
+      LogInfo(`'onAtriumAssigned[${this.props.index}] (${JSON.stringify(payload, null, 1)})`);
 
       // only learners (non-moderators) get this waiting message
       if (!isModerator) {
@@ -158,7 +154,7 @@ class Chat extends React.Component {
       }
 
     } catch (error) {
-      LogError(`onAtriumAssigned[${this.index}] exception: ${error.message}`);
+      LogError(`onAtriumAssigned[${this.props.index}] exception: ${error.message}`);
     }
   }
 
@@ -172,7 +168,7 @@ class Chat extends React.Component {
       let remoteInfo = {};
       let session = {};
 
-      LogInfo(`'onParticipantAssigned[${this.index}] (${JSON.stringify(payload, null, 1)})`);
+      LogInfo(`'onParticipantAssigned[${this.props.index}] (${JSON.stringify(payload, null, 1)})`);
 
       if (isModerator) {
         remoteInfo = new SlotInfo(payload.data.local);
@@ -198,7 +194,7 @@ class Chat extends React.Component {
       });
 
     } catch (error) {
-      LogError(`onParticipantAssigned[${this.index}] exception: ${error.message}`);
+      LogError(`onParticipantAssigned[${this.props.index}] exception: ${error.message}`);
     }
   }
 
@@ -233,7 +229,7 @@ class Chat extends React.Component {
       });
 
     } catch (error) {
-      LogError(`onLearnerUnassigned[${this.index}] exception: ${error.message}`);
+      LogError(`onLearnerUnassigned[${this.props.index}] exception: ${error.message}`);
     }
   }
 
@@ -244,13 +240,13 @@ class Chat extends React.Component {
 
       let { localInfo } = this.state;
 
-      LogInfo(`'onSystemMessage[${this.index}] (${JSON.stringify(payload, null, 1)})`);
+      LogInfo(`'onSystemMessage[${this.props.index}] (${JSON.stringify(payload, null, 1)})`);
 
       payload.isSystemMessage = true;
       this.onMessage(payload);
 
     } catch (error) {
-      LogError(`onSystemMessage[${this.index}] exception: ${error.message}`);
+      LogError(`onSystemMessage[${this.props.index}] exception: ${error.message}`);
     }
 
   }
@@ -266,7 +262,7 @@ class Chat extends React.Component {
         senderInfo
       } = this.state;
 
-      LogInfo(`'onMessage[${this.index}] (${JSON.stringify(payload, null, 1)})`);
+      LogInfo(`'onMessage[${this.props.index}] (${JSON.stringify(payload, null, 1)})`);
 
       // ensure the message was for this chat box
       if (payload.commandChannel !== localInfo.commandChannel) {
@@ -304,7 +300,7 @@ class Chat extends React.Component {
       this.scrollToBottom();
 
     } catch (error) {
-      LogError(`onMessage[${this.index}] exception: ${error.message}`);
+      LogError(`onMessage[${this.props.index}] exception: ${error.message}`);
     }
 
   }
@@ -328,14 +324,14 @@ class Chat extends React.Component {
         }
       };
 
-      LogInfo(`'onClickJumpNode[${this.index}] (${JSON.stringify(payload, null, 1)})`);
+      LogInfo(`'onClickJumpNode[${this.props.index}] (${JSON.stringify(payload, null, 1)})`);
 
       this.connection.send(constants.SIGNALCMD_JUMP_NODE, payload);
 
       this.setState({ inJumpNodeMode: false });
 
     } catch (error) {
-      LogError(`onClickJumpNode[${this.index}] exception: ${error.message}`);
+      LogError(`onClickJumpNode[${this.props.index}] exception: ${error.message}`);
     }
   }
 
@@ -356,7 +352,7 @@ class Chat extends React.Component {
       // test for valid turkee selected from available list
       if (event.target.value !== '0') {
 
-        LogInfo(`'onSelectNode[${this.index}] (${event.target.value})`);
+        LogInfo(`'onSelectNode[${this.props.index}] (${event.target.value})`);
 
         // find learner in atrium list
         for (let item of mapNodes) {
@@ -371,7 +367,7 @@ class Chat extends React.Component {
       }
 
     } catch (error) {
-      LogError(`onSelectNode[${this.index}] exception: ${error.message}`);
+      LogError(`onSelectNode[${this.props.index}] exception: ${error.message}`);
     }
 
   }
@@ -405,7 +401,7 @@ class Chat extends React.Component {
           Data: message
         };
 
-        LogInfo(`'onSendClicked[${this.index}] (${JSON.stringify(messagePayload, null, 1)})`);
+        LogInfo(`'onSendClicked[${this.props.index}] (${JSON.stringify(messagePayload, null, 1)})`);
 
         this.connection.send(constants.SIGNALMETHOD_MESSAGE, messagePayload);
       }
@@ -414,7 +410,7 @@ class Chat extends React.Component {
       this.setState({ message: '' });
 
     } catch (error) {
-      LogError(`onSendClicked[${this.index}] exception: ${error.message}`);
+      LogError(`onSendClicked[${this.props.index}] exception: ${error.message}`);
     }
 
   }
@@ -459,7 +455,7 @@ class Chat extends React.Component {
       this.setState({ message: newMsg });
 
     } catch (error) {
-      LogError(`evaluateMacro[${this.index}] exception: ${error.message}`);
+      LogError(`evaluateMacro[${this.props.index}] exception: ${error.message}`);
     }
 
   }
@@ -475,12 +471,12 @@ class Chat extends React.Component {
 
     else if (event.key === '~') {
       this.setState({ inMacroMode: true });
-      LogInfo(`'onMessageKeyDown[${this.index}] entering macro mode`);
+      LogInfo(`'onMessageKeyDown[${this.props.index}] entering macro mode`);
     }
 
     else if ((event.key === " ") && inMacroMode) {
-      LogInfo(`'onMessageKeyDown[${this.index}] evaluating macro ${message}`);
-      
+      LogInfo(`'onMessageKeyDown[${this.props.index}] evaluating macro ${message}`);
+
       this.setState({ inMacroMode: false });
       this.evaluateMacro();
     }
@@ -510,16 +506,16 @@ class Chat extends React.Component {
 
     let {
       conversation,
-      maxHeight,
-      message,
-      width,
+      inJumpNodeMode,
       isModerator,
       localInfo,
+      mapNodes,
+      maxHeight,
+      message,
+      selectedNodeId,
       senderInfo,
       show,
-      mapNodes,
-      inJumpNodeMode,
-      selectedNodeId
+      width,
     } = this.state;
 
     if (!show) {
@@ -527,6 +523,30 @@ class Chat extends React.Component {
     }
 
     const divLayout = { width: '100%', border: '2px solid black', backgroundColor: '#3333' };
+    const systemMessageStyle = {
+      border: 'none',
+      backgroundColor: 'grey',
+      color: 'white',
+      borderRadius: '25px',
+      fontSize: '14px',
+      padding: '10px'
+    };
+    const localMessageStyle = {
+      border: 'none',
+      color: 'white',
+      fontSize: '16px',
+      padding: '10px',
+      lineHeight: '1.8'
+    };
+    const remoteMessageStyle = {
+      border: 'none',
+      backgroundColor: 'grey',
+      color: 'white',
+      fontSize: '16px',
+      padding: '10px',
+      lineHeight: '1.8'
+    };
+
     const tableContainerStyle = { maxHeight: 300 };
     let disabled = true;
 
@@ -546,84 +566,51 @@ class Chat extends React.Component {
             <Table stickyHeader size="small">
               <TableBody>
                 {conversation.map((conversationItem) => (
-                  <TableRow name="convrow" style={{ bottomBorder: '0px' }} key={conversationItem.key}>
+
+                  <TableRow name="convrow" key={conversationItem.key}>
+                    
                     {(conversationItem.isLocalMessage == null) && (
                       <TableCell style={{ borderBottom: "none" }} align="center">
-                        <span
-                          style={{
-                            border: 'none',
-                            backgroundColor: 'grey',
-                            color: 'white',
-                            borderRadius: '25px',
-                            fontSize: '14px',
-                            padding: '10px'
-                          }}
-                        >
+                        <span style={systemMessageStyle}>
                           {conversationItem.message}
                         </span>
                       </TableCell>
                     )}
-                    {(conversationItem.isLocalMessage === true) && (
-                      <TableCell style={{ borderBottom: "none" }} align="left">
 
+                    {(conversationItem.isLocalMessage === true) && (
+                      <TableCell style={{ borderBottom: "none" }} align="right">
                         <Table stickyHeader size="small">
                           <TableBody>
                             <TableRow>
-                              <TableCell style={{ width: '10%' }}>
-                                <b>You</b>
-                              </TableCell>
+                              <TableCell style={{ width: '10%' }}/>
                               <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'blue' }}>
-                                <span
-                                  style={{
-                                    border: 'none',
-                                    color: 'white',
-                                    fontSize: '16px',
-                                    padding: '10px',
-                                    lineHeight: '1.8'
-                                  }}
-                                >
+                                <span style={localMessageStyle}>
                                   {conversationItem.message}
                                 </span>
-                              </TableCell>
-                              <TableCell style={{ width: '15%' }}>
-                                <b>&nbsp;</b>
                               </TableCell>
                             </TableRow>
                           </TableBody>
                         </Table>
                       </TableCell>
                     )}
+
                     {(conversationItem.isLocalMessage === false) && (
                       <TableCell style={{ borderBottom: "none" }}>
-
                         <Table stickyHeader size="small">
                           <TableBody>
                             <TableRow>
-                              <TableCell style={{ width: '15%' }}>
-                                <b>&nbsp;</b>
-                              </TableCell>
-                              <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'green' }}>
-                                <span
-                                  style={{
-                                    border: 'none',
-                                    backgroundColor: 'green',
-                                    color: 'white',
-                                    fontSize: '16px',
-                                    padding: '10px',
-                                    lineHeight: '1.8'
-                                  }}
-                                >
+                              <TableCell align="left" style={{ borderRadius: '25px', backgroundColor: 'gray' }}>
+                                <span style={remoteMessageStyle}>
                                   {conversationItem.message}
                                 </span>
                               </TableCell>
-                              <TableCell style={{ width: '10%' }}>
-                                <b>{!isModerator ? "Moderator" : "Them"}&nbsp;</b>
-                              </TableCell>
+                              <TableCell style={{ width: '10%' }}/>
                             </TableRow>
                           </TableBody>
                         </Table>
                       </TableCell>
                     )}
+
                   </TableRow>
                 ))}
               </TableBody>

@@ -2,6 +2,7 @@
 import React from 'react';
 import parse from 'html-react-parser'
 import { Log, LogInfo, LogError } from '../../../utils/Logger';
+import log from 'loglevel';
 import { getCounter } from '../WikiTags';
 const playerState = require('../../../utils/PlayerState').PlayerState;
 
@@ -23,7 +24,7 @@ class OlabCounterTag extends React.Component {
       name
     } = this.props;
 
-    Log(`OlabConstantTag render '${name}'`);
+    log.debug(`OlabConstantTag render '${name}'`);
 
     try {
       let item = getCounter(name, this.props.props.dynamicObjects);

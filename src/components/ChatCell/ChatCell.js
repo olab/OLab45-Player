@@ -6,6 +6,7 @@ import {
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { Log, LogInfo, LogError } from '../../utils/Logger';
+import log from 'loglevel';
 import styles from '../WikiTags/styles.module.css';
 
 import Chat from './Chat'
@@ -23,14 +24,13 @@ class ChatCell extends React.Component {
       lastMessageTime: null,
     };
 
-    this.index = this.props.localInfo.slotIndex;
-    this.onCommand = this.onCommand.bind(this);
+    // this.onCommand = this.onCommand.bind(this);
     this.connectionId = this.state.connection.connectionId?.slice(-3);
 
-    var self = this;
-    this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
+    // var self = this;
+    // this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
 
-    Log(`ChatCell[${this.index}] ctor`);
+    log.debug(`ChatCell[${this.props.index}] ctor`);
   }
 
   componentDidUpdate(prevProps) {
@@ -40,9 +40,9 @@ class ChatCell extends React.Component {
   }
 
   // command method listener
-  onCommand(payload) {
-    // Log(`'${this.state.connection.connectionId?.slice(-3)}' onChatCellCommandCallback: ${payload.command}`);
-  }
+  // onCommand(payload) {
+    // log.debug(`'${this.state.connection.connectionId?.slice(-3)}' onChatCellCommandCallback: ${payload.command}`);
+  // }
 
   render() {
 
@@ -63,7 +63,7 @@ class ChatCell extends React.Component {
     return (
       <TableCell style={cellStyling}>
         <Chat
-          key={localInfo.key}
+          index={this.props.index}
           mapNodes={this.props.mapNodes}
           session={session}
           show={localInfo.show}
@@ -73,7 +73,7 @@ class ChatCell extends React.Component {
           senderInfo={senderInfo}
           playerProps={playerProps} />
         <ChatStatusBar
-          key={this.props.key}
+          index={this.props.index}
           show={localInfo.show}
           isModerator={this.props.isModerator}
           connection={connection}

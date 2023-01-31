@@ -8,6 +8,14 @@ const LogEnable = () => {
   log.enableAll();
 }
 
+const getLocation = () => {
+  var err = getErrorObject();
+  var caller_line = err.stack.split("\n")[4];
+  var index = caller_line.indexOf("at ");
+  var location = caller_line.slice(index+2, caller_line.length);      
+  return location;
+}
+
 const LogError = (message) => {
 
   try {

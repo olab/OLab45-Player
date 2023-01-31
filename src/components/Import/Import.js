@@ -11,6 +11,7 @@ import {
 import { withStyles } from '@material-ui/core/styles';
 import Spinner from '../../shared/assets/loading_med.gif';
 import { Log, LogInfo, LogError } from '../../utils/Logger';
+import log from 'loglevel';
 import styles from './styles';
 import { importer } from '../../services/api'
 import styled from 'styled-components';
@@ -96,7 +97,7 @@ class Import extends PureComponent {
             importRunning
         } = this.state;
 
-        Log(`Import render`);
+        log.debug(`Import render`);
 
         try {
 

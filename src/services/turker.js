@@ -1,5 +1,6 @@
 import TurkTalk from './turktalk';
 import { Log, LogInfo, LogError } from '../utils/Logger';
+import log from 'loglevel';
 var constants = require('./constants');
 const playerState = require('../utils/PlayerState').PlayerState;
 
@@ -59,8 +60,8 @@ class Turker extends TurkTalk {
       });
     }
 
-    // get room name to persistant storage in case 
-    // user refreshes the window
+    // get room name from persistant storage in case 
+    // user refreshes the window    
     let roomName = this.penName;
     let moderator = playerState.GetConnectionInfo(null);
     if (moderator != null) {
@@ -69,7 +70,7 @@ class Turker extends TurkTalk {
       }
     }
 
-    Log(`'${this.connectionId}' registering turker for room name: ${roomName}`);
+    log.debug(`'${this.connectionId}' registering turker for room name: ${roomName}`);
 
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKER,
@@ -83,7 +84,7 @@ class Turker extends TurkTalk {
   onDisconnected() {
 
     try {
-      Log(`'${this.connectionId}' onDisconnected`);
+      log.debug(`'${this.connectionId}' onDisconnected`);
       if (this.component.onConnectionChanged) {
 
         if (this.component.onConnectionChanged) {
@@ -102,7 +103,7 @@ class Turker extends TurkTalk {
 
   onReconnecting(error) {
     try {
-      Log(`'${this.connectionId}' onReconnecting: ${error}`);
+      log.debug(`'${this.connectionId}' onReconnecting: ${error}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -117,7 +118,7 @@ class Turker extends TurkTalk {
 
   onReconnected(connectionId) {
     try {
-      Log(`'${this.connectionId}' onReconnected: ${connectionId}`);
+      log.debug(`'${this.connectionId}' onReconnected: ${connectionId}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -135,7 +136,7 @@ class Turker extends TurkTalk {
 
     try {
 
-      Log(`'${this.connectionId}' onCommand: ${payload.command}`);
+      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
 
       // test if command NOT handled in base class
       if (super.onCommand(payload)) {
@@ -143,7 +144,7 @@ class Turker extends TurkTalk {
       }
 
       else {
-        Log(`'${this.connectionId}' onCommand unknown command: '${payload.command}'`);
+        log.debug(`'${this.connectionId}' onCommand unknown command: '${payload.command}'`);
       }
 
     } catch (error) {

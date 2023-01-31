@@ -7,6 +7,7 @@ import { getFile } from '../WikiTags';
 import { getDownload } from '../../../services/api';
 const playerState = require('../../../utils/PlayerState').PlayerState;
 import { Log, LogInfo, LogError } from '../../../utils/Logger';
+import log from 'loglevel';
 import BrokenImageIcon from '@material-ui/icons/BrokenImage';
 import { Tooltip } from '@material-ui/core';
 
@@ -49,7 +50,7 @@ class OlabMediaResourceTag extends React.Component {
       name
     } = this.props;
 
-    Log(`OlabMediaResourceTag render '${name}'`);
+    log.debug(`OlabMediaResourceTag render '${name}'`);
 
     try {
 
@@ -63,7 +64,7 @@ class OlabMediaResourceTag extends React.Component {
           </Tooltip>);
       }
 
-      Log(`file object: '${JSON.stringify(item, null, 2)}'`);
+      log.debug(`file object: '${JSON.stringify(item, null, 2)}'`);
 
       let sizeProps = {};
 

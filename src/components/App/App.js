@@ -5,10 +5,10 @@ import Home from '../Home/Home';
 import Header from '../Header/Header';
 import Login from '../Login/Login';
 import { Log, LogInfo, LogError } from '../../utils/Logger';
+import log from 'loglevel';
 import Player from '../Player/Player';
 import useToken from './useToken';
 import { config } from '../../constants';
-import { ConsoleLogger } from '@microsoft/signalr/dist/esm/Utils';
 
 function WrapperPlayer( props ) {
   const params = useParams();
@@ -37,7 +37,7 @@ function App() {
 
     if (!token) {
 
-      Log(`useEffect: token: ${token}`);
+      log.debug(`useEffect: token: ${token}`);
 
       const localToken = authActions.getToken();
       if (localToken) {
@@ -64,7 +64,7 @@ function App() {
   const isExpired = authActions.isExpiredSession();
   const reactVersion = process.env.REACT_APP_VERSION;
 
-  Log(`render: token: ${token}`);
+  log.debug(`render: token: ${token}`);
 
   if (!token || isExpired) {
     return <Login authActions={authActions} />
@@ -86,7 +86,7 @@ function App() {
 function processCookieForTokenAsync(cookieString) {
 
   if (!cookieString) {
-    Log(`No external cookies set`);
+    log.debug(`No external cookies set`);
     return null;
   }
 
@@ -97,7 +97,7 @@ function processCookieForTokenAsync(cookieString) {
 
   let url = `${config.API_URL}/auth/loginexternal`;
 
-  Log(`loginExternal(${token}) url: ${url})`);
+  log.debug(`loginExternal(${token}) url: ${url})`);
 
   var body = {
     "ExternalToken": token
@@ -120,7 +120,7 @@ function extractExternalToken(cookieStr) {
 
   try {
 
-    Log(`parsing: '${cookieStr}')`);
+    log.debug(`parsing: '${cookieStr}')`);
 
     const parseCookie = str =>
       str
@@ -132,10 +132,10 @@ function extractExternalToken(cookieStr) {
         }, {});
 
     let cookies = parseCookie(cookieStr);
-    Log(`Cookie: ${JSON.stringify(cookies, null, 2)}`);
+    log.debug(`Cookie: ${JSON.stringify(cookies, null, 2)}`);
 
     if ('external_token' in cookies) {
-      Log(`External token: ${cookies.external_token}`);
+      log.debug(`External token: ${cookies.external_token}`);
       return cookies.external_token;
     }
 

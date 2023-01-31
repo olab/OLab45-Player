@@ -1,4 +1,5 @@
 import { Log, LogInfo, LogError } from '../../../../utils/Logger';
+import log from 'loglevel';
 import Participant from '../../../../helpers/participant';
 import SlotInfo from '../../../../helpers/SlotInfo';
 
@@ -201,7 +202,7 @@ class SlotManager {
       throw new Error(`No available slots to assign learner ${remoteInfo.userId} `);
     }
 
-    Log(`assigning '${remoteInfo.userId}' to slot ${index}`);
+    log.debug(`assigning '${remoteInfo.userId}' to slot ${index}`);
 
     let remoteSlot = this.RemoteSlots()[index];
     let participant = new SlotInfo(remoteInfo);
@@ -222,7 +223,7 @@ class SlotManager {
 
     this.LocalSlots()[index] = participant;
 
-    Log(`assignLearner: ${participant.toString()}`);
+    log.debug(`assignLearner: ${participant.toString()}`);
 
     // return {
     //   remoteSlot: remoteSlot,

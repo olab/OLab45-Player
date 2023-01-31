@@ -5,6 +5,7 @@ import {
   TableBody, MenuItem, Select, TableRow, Snackbar
 } from '@material-ui/core';
 import { Log, LogInfo, LogError } from '../../../../../utils/Logger';
+import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
 import MuiAlert from '@material-ui/lab/Alert';
 
@@ -67,17 +68,17 @@ class OlabModeratorTag extends React.Component {
     try {
 
       if (payload.command === constants.SIGNALCMD_TURKER_ASSIGNED) {
-        Log(`'${localInfo.connectionId}' onCommand: ${payload.command}`);
+        log.debug(`'${localInfo.connectionId}' onCommand: ${payload.command}`);
         this.onModeratorAssigned(payload.data);
       }
 
       else if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
-        Log(`'${localInfo.connectionId}' onCommand: ${payload.command}`);
+        log.debug(`'${localInfo.connectionId}' onCommand: ${payload.command}`);
         this.onAtriumUpdate(payload.data);
       }
 
       // else {
-      //   Log(`'${localInfo.connectionId}' onTurkerCommandCallback unknown command: '${payload.command}'`);
+      //   log.debug(`'${localInfo.connectionId}' onTurkerCommandCallback unknown command: '${payload.command}'`);
       // }
 
     } catch (error) {
@@ -114,7 +115,7 @@ class OlabModeratorTag extends React.Component {
         mapNodes: payload.mapNodes
       });
 
-      Log(`'${localInfo.connectionId}' onModeratorAssigned localInfo = ${JSON.stringify(payload, null, 2)}]`);
+      log.debug(`'${localInfo.connectionId}' onModeratorAssigned localInfo = ${JSON.stringify(payload, null, 2)}]`);
 
       playerState.SetConnectionInfo( null, localInfo );
 
@@ -151,7 +152,7 @@ class OlabModeratorTag extends React.Component {
           atriumLearners.push(learner);
         }
 
-        Log(`'${localInfo.connectionId}' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
+        log.debug(`'${localInfo.connectionId}' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
 
         if (previousAtriumCount != atriumLearners.length) {
           this.setState({
@@ -194,7 +195,7 @@ class OlabModeratorTag extends React.Component {
       // test for valid turkee selected from available list
       if (event.target.value !== '0') {
 
-        Log(`'${localInfo.connectionId}' onAtriumLearnerSelected: ${event.target.value}`);
+        log.debug(`'${localInfo.connectionId}' onAtriumLearnerSelected: ${event.target.value}`);
 
         // find learner in atrium list
         for (let item of this.state.atriumLearners) {
@@ -218,7 +219,7 @@ class OlabModeratorTag extends React.Component {
 
     const { localInfo } = this.state;
 
-    Log(`'${localInfo.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`);
+    log.debug(`'${localInfo.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`);
 
     // signal server to close out this room
     this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
@@ -250,7 +251,7 @@ class OlabModeratorTag extends React.Component {
 
       let { localInfo } = this.state;
 
-      Log(`'${localInfo.connectionId}' onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
+      log.debug(`'${localInfo.connectionId}' onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
 
       // signal server with assignment of turkee to this room
       this.connection.send(
@@ -333,7 +334,7 @@ class OlabModeratorTag extends React.Component {
       mapNodes
     } = this.state;
 
-    Log(`'${localInfo.connectionId}' OlabTurkerTag render '${userName}'`);
+    log.debug(`'${localInfo.connectionId}' OlabTurkerTag render '${userName}'`);
 
     try {
 

@@ -56,7 +56,7 @@ export class OLabCounter extends OLabClientObject {
       this.onStartedUser = onStarted;
       this.onCompletedUser = onCompleted;
 
-      this.player.instance.Log("Setting counter " + this.target.id + " = " + value);
+      this.player.instance.log.debug("Setting counter " + this.target.id + " = " + value);
 
       var url = this.player.instance.restApiUrl + "/counters/value/" + this.target.id;
       var payload = { "data": { "value": value } };
@@ -84,7 +84,7 @@ export class OLabCounter extends OLabClientObject {
         this.onStartedUser();
       }
 
-      this.player.instance.Log("Counter " + this.target.id + " update started");
+      this.player.instance.log.debug("Counter " + this.target.id + " update started");
 
     } catch (e) {
       alert(e.message);
@@ -101,7 +101,7 @@ export class OLabCounter extends OLabClientObject {
         context.progressTarget.hide();
       }
 
-      context.player.instance.Log("Counter " + context.target.id +
+      context.player.instance.log.debug("Counter " + context.target.id +
         " set successfully. value = " + data.data.value);
 
       var counter = context.player.getCounter(context.target.id);
@@ -130,7 +130,7 @@ export class OLabCounter extends OLabClientObject {
         this.onCompletedUser();
       }
 
-      this.player.instance.Log("Counter " + this.target.id + " update error");
+      this.player.instance.log.debug("Counter " + this.target.id + " update error");
 
     } catch (e) {
       alert(e.message);

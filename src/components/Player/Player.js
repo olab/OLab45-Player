@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { FormControl } from '@material-ui/core';
 import JsxParser from 'react-jsx-parser';
 import { Log, LogInfo, LogError, LogEnable } from '../../utils/Logger';
+import log from 'loglevel';
 
 import OlabConstantTag from '../WikiTags/Constant/Constant';
 import OlabCountersTag from '../WikiTags/Counters/Counter';
@@ -105,7 +106,7 @@ class Player extends PureComponent {
     }
 
     if (theme) {
-      Log(`found theme: '${theme.name}' (${theme.id}). parent: '${theme.imagetype}' (${theme.parentId})`);
+      log.debug(`found theme: '${theme.name}' (${theme.id}). parent: '${theme.imagetype}' (${theme.parentId})`);
     }
     return theme;
 
@@ -120,7 +121,7 @@ class Player extends PureComponent {
 
       if (server && !disableCache) {
         this.setState({ isServerFetched: true });
-        Log('using cached server data');
+        log.debug('using cached server data');
         return;
       }
 
@@ -139,7 +140,7 @@ class Player extends PureComponent {
         playerState.SetServerStatic( null, this.state.scopedObjects.server );
       }
 
-      Log('read server data');
+      log.debug('read server data');
 
     } catch (error) {
       LogError(error);
@@ -158,7 +159,7 @@ class Player extends PureComponent {
 
         if (Number(id) === map.id) {
           this.setState({ isMapFetched: true });
-          Log('using cached map data');
+          log.debug('using cached map data');
           return;
         }
 
@@ -182,7 +183,7 @@ class Player extends PureComponent {
         playerState.SetMap( null, this.state.map);
       }
 
-      Log('read map data');
+      log.debug('read map data');
 
     } catch (error) {
       LogError(error);
@@ -211,7 +212,7 @@ class Player extends PureComponent {
       // test if already have node loaded (and it's the same one)
       if (node && !disableCache) {
         if (Number(nodeId) === node.id) {
-          Log('using cached node data');
+          log.debug('using cached node data');
           return;
         }
       }
@@ -262,7 +263,7 @@ class Player extends PureComponent {
         playerState.SetNodeStatic( null, this.state.scopedObjects.node);        
       }
 
-      Log('read node data');
+      log.debug('read node data');
 
     } catch (error) {
       LogError(error);
@@ -288,7 +289,7 @@ class Player extends PureComponent {
 
       playerState.SetDynamicObjects( null, this.state.dynamicObjects);
 
-      Log('read dynamic data');
+      log.debug('read dynamic data');
 
     } catch (error) {
       LogError(error);
@@ -307,7 +308,7 @@ class Player extends PureComponent {
       url += `/${urlParam}`;
     }
 
-    Log(`navigating to ${url}`)
+    log.debug(`navigating to ${url}`)
     window.location.href = url;
   }
 
@@ -467,10 +468,10 @@ class Player extends PureComponent {
         var newNodesVisited = [...new Set(nodesVisited)];
         this.setState({ nodesVisited: newNodesVisited });
 
-        Log(`saving visited node id: ${this.state.node.id}`);
+        log.debug(`saving visited node id: ${this.state.node.id}`);
         playerState.SetNodesVisited(null, newNodesVisited);
 
-        Log(`Added node id ${this.state.node.id} to visitOnce list`);
+        log.debug(`Added node id ${this.state.node.id} to visitOnce list`);
       }
 
 

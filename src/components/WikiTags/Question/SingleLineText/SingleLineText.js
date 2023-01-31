@@ -2,6 +2,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { Log, LogInfo, LogError } from '../../../../utils/Logger';
+import log from 'loglevel';
 
 import styles from '../../styles.module.css';
 import siteStyles from '../../site.module.css';
@@ -39,7 +40,7 @@ class OlabSinglelineTextQuestion extends React.Component {
     if ((question.numTries === -1) || (question.numTries === 1)) {
       this.setState(state => {
         disabled = true;
-        Log(`OlabSinglelineTextQuestion disabled question '${question.id}' value = '${value}'.`);
+        log.debug(`OlabSinglelineTextQuestion disabled question '${question.id}' value = '${value}'.`);
         return ({ disabled });
       });
     }
@@ -77,13 +78,13 @@ class OlabSinglelineTextQuestion extends React.Component {
   setInProgress(inProgress) {
 
     this.setState({ showProgressSpinner: inProgress });
-    Log(`set progress spinner: ${inProgress}`);
+    log.debug(`set progress spinner: ${inProgress}`);
   }
 
   setIsDisabled(disabled) {
 
     this.setState({ disabled: disabled });
-    Log(`set disabled: ${disabled}`);
+    log.debug(`set disabled: ${disabled}`);
   }
 
   handleChange = (event) => {
@@ -107,7 +108,7 @@ class OlabSinglelineTextQuestion extends React.Component {
       // disabled
     } = this.state;
 
-    Log(`OlabSinglePickQuestion render '${name}'`);
+    log.debug(`OlabSinglePickQuestion render '${name}'`);
 
     try {
 
