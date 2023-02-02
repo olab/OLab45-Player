@@ -1,9 +1,8 @@
 // @flow
 import React from 'react';
-import parse from 'html-react-parser'
-import { Log, LogInfo, LogError } from '../../utils/Logger';
+import { Log, LogInfo, LogError } from '../../../utils/Logger';
 import log from 'loglevel';
-import { getConstant } from '../WikiTags';
+
 const playerState = require('../../../utils/PlayerState').PlayerState;
 import {
   getSession
@@ -13,7 +12,7 @@ class OlabReportTag extends React.Component {
   constructor(props) {
 
     const debug = playerState.GetDebug();
-    this.state = { debug };
+    this.state = { ...debug };
 
   }
 
@@ -25,21 +24,21 @@ class OlabReportTag extends React.Component {
 
     try {
 
-        if (!debug.enableWikiRendering) {
-          return (
-            <>
-              <b>[[REPORT]]</b>
-            </>
-          );
-        }
-
+      if (!enableWikiRendering) {
         return (
           <>
-              <b>[[REPORT]]</b>
+            <b>[[REPORT]]</b>
           </>
         );
       }
-    } catch (error) {
+
+      return (
+        <>
+          <b>[[REPORT]]</b>
+        </>
+      );
+    }
+    catch (error) {
       return (
         <>
           <b>[[REPORT]] "{error.message}"</b>

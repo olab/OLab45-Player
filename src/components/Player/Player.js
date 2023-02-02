@@ -9,6 +9,7 @@ import OlabConstantTag from '../WikiTags/Constant/Constant';
 import OlabCountersTag from '../WikiTags/Counters/Counter';
 import OlabCounterTag from '../WikiTags/Counter/Counter';
 import OlabLinksTag from '../WikiTags/Links';
+import OlabReportTag from '../WikiTags/Report/Report';
 import OlabMediaResourceTag from '../WikiTags/MediaResource/MediaResource';
 import OlabQuestionTag from '../WikiTags/Question/Question';
 import OlabAttendeeTag from '../WikiTags/Question/TurkTalk/Turkee/Turkee';
@@ -379,6 +380,7 @@ class Player extends PureComponent {
                 OlabLinksTag,
                 OlabMediaResourceTag,
                 OlabModeratorTag,
+                OlabReportTag,
                 OlabQuestionTag,
               }}
               jsx={theme?.header}
@@ -415,6 +417,7 @@ class Player extends PureComponent {
                 OlabLinksTag,
                 OlabMediaResourceTag,
                 OlabModeratorTag,
+                OlabReportTag,
                 OlabQuestionTag,
               }}
               jsx={theme?.footer}
@@ -452,6 +455,7 @@ class Player extends PureComponent {
               OlabLinksTag,
               OlabMediaResourceTag,
               OlabModeratorTag,
+              OlabReportTag,
               OlabQuestionTag,
             }}
             jsx={node.text}
