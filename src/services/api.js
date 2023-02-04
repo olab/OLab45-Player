@@ -114,28 +114,6 @@ async function getDownload(props, file) {
     })
 }
 
-async function getSessionReport(props, contextId) {
-
-  let token = props.authActions.getToken();
-  let url = `${config.API_URL}/v3/report/${contextId}`;
-
-  log.debug(`getSessionReport(${mapId}) url: ${url})`);
-
-  return fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  })
-    .then((data) => {
-      if (data.status === 402) {
-        props.authActions.logout();
-      }
-      return data.json();
-    });
-}
-
 async function getMapScopedObjects(props, mapId) {
 
   let token = props.authActions.getToken();
@@ -318,7 +296,6 @@ export {
   getMapScopedObjects,
   getNodeScopedObjects,
   getServerScopedObjects,
-  getSessionReport,  
   importer,
   postQuestionValue,
 };

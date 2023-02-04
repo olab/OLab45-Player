@@ -15,7 +15,8 @@ const KeyConstants = {
   SERVER_STATIC: 'server-static',
   SERVER: 'server',
   SESSION_INFO: 'session-info',
-  VISIT_ONCE_NODE_LIST: 'visit-once-node-list'
+  VISIT_ONCE_NODE_LIST: 'visit-once-node-list',
+  SESSION_REPORT: 'session-report',
 }
 
 class PlayerState {
@@ -168,6 +169,20 @@ class PlayerState {
 
   static GetNodesVisited(keyPrefix, defaultValue = null) {
     return persistantStorage.get(keyPrefix, KeyConstants.VISIT_ONCE_NODE_LIST, defaultValue);
+  }
+
+  static SetSessionReport(keyPrefix, obj) {
+    // since the underlying .save method discards the keyPrefix, we'll have for now
+    // to send the full-key in the 2nd parameter
+    const key = [KeyConstants.SESSION_REPORT, keyPrefix].join(':')
+    persistantStorage.save(keyPrefix, key, obj);
+  }
+
+  static GetSessionReport(keyPrefix, defaultValue = null) {
+    // since the underlying .save method discards the keyPrefix, we'll have for now
+    // to send the full-key in the 2nd parameter
+    const key = [KeyConstants.SESSION_REPORT, keyPrefix].join(':')
+    return persistantStorage.get(keyPrefix, key, defaultValue);
   }
 }
 

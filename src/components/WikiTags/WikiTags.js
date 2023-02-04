@@ -1,5 +1,6 @@
 import { Log, LogInfo, LogError } from '../../utils/Logger';
 import log from 'loglevel';
+import { config } from '../../config';
 
 const findWikiInList = (list, wiki) => {
 
@@ -176,6 +177,34 @@ const combineStyles = (...styles) => {
   };
 };
 
+async function getSessionReport(props, contextId) {
+
+  let token = props.authActions.getToken();
+  let url = `${config.API_URL}/v3/report/${contextId}`;
+
+  if ( true ) { // @Corey we're using mock data for now until the endpoint is ready
+    url = 'https://jsonblob.com/api/jsonBlob/1071301883255341056';
+  }
+
+  log.debug(`getSessionReport(${props.map?.id}) url: ${url})`);
+
+  return fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+    .then((data) => {
+      if (data.status === 402) {
+        props.authActions.logout();
+      }
+      return data.json();
+    })
+    // @Corey, I've added this line to catch any misc HTTP errors meanwhile
+    .catch((error) => void log.debug(`getSessionReport(${props.map?.id}) error: ${error.stack})`))
+}
+
 export {
   findWikiInList,
   getConstant,
@@ -184,4 +213,5 @@ export {
   getCounters,
   getFile,
   combineStyles,
+  getSessionReport,
 };
