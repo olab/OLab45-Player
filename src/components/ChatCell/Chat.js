@@ -225,7 +225,7 @@ class Chat extends React.Component {
 
       this.onSystemMessage({
         commandChannel: localInfo?.commandChannel,
-        data: `'${payload.data.nickName}' has disconnected`
+        data: `'${payload.data.nickName}' was disconnected`
       });
 
     } catch (error) {
