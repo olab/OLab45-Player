@@ -1,6 +1,7 @@
 import { Log, LogInfo, LogError } from '../../utils/Logger';
 import log from 'loglevel';
 import { config } from '../../config';
+import { SAMPLE_REPORT_DATA } from '../../constants';
 
 const findWikiInList = (list, wiki) => {
 
@@ -179,17 +180,19 @@ const combineStyles = (...styles) => {
 
 async function getSessionReport(props, contextId) {
 
-  let token = props.authActions.getToken();
-  let url = `${config.API_URL}/v3/report/${contextId}`;
-
-  if ( true ) { // @Corey we're using mock data for now until the endpoint is ready
-    url = 'https://jsonblob.com/api/jsonBlob/1071301883255341056';
+  if ( !0 ) {
+    // fake latency
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return SAMPLE_REPORT_DATA;
   }
+
+  let token = props.authActions.getToken();
+  let url = `${config.API_URL}/report/${contextId}`;
 
   log.debug(`getSessionReport(${props.map?.id}) url: ${url})`);
 
   return fetch(url, {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`

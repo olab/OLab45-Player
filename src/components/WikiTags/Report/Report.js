@@ -3,9 +3,11 @@ import React from 'react';
 import { Log, LogInfo, LogError } from '../../../utils/Logger';
 import log from 'loglevel';
 import hashString from '../../../helpers/hashString';
+import calculateTimeTaken from '../../../helpers/calculateTimeTaken';
 import { CircularProgress } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import { getSessionReport } from '../../WikiTags/WikiTags';
+import { ReportWrapper, ReportTopSection } from './styles';
 
 const playerState = require('../../../utils/PlayerState').PlayerState;
 
@@ -106,17 +108,38 @@ export const Report = (props) => {
   }
 
   // invalid or no data fetched
-  if ( ! report ) {
+  if ( ! report?.data ) {
     return (
       <Alert severity="error" style={{ marginTop: 15 }}>Report not found.</Alert>
     );
   }
 
+  const { data } = report;
+
   // render report contents
   return (
-    <>
-      <h3>Session Report</h3>
-      <p><small>checksum: {report.session.checkSum}</small></p>
-    </>
+    <ReportWrapper>
+      <div className="report-header">
+        <ReportTopSection>
+          <p><strong>User:</strong> {props.props.authActions.getUserName()}</p>
+          <p><strong>Session ID:</strong> {data.sessionId}</p>
+          <p><strong>Map Name:</strong> {props.props.map?.name || '-'}</p>
+          <p><strong>Map ID:</strong> {props.props.map?.id || '-'}</p>
+          <p><strong>Start Time:</strong> {data.start}</p>
+          <p><strong>Time Taken:</strong> {calculateTimeTaken(data.start, data.end)}</p>
+          <p><strong>Nodes Visited:</strong> {data.nodes ? data.nodes.length : 0}</p>
+        </ReportTopSection>
+        <ReportTopSection>
+          <p><strong>Grade:</strong> __</p>
+          <p><strong>Letter Grade:</strong> __</p>
+          <p><strong>Percentile Grade:</strong> __</p>
+          <p><strong>Class Average:</strong> __</p>
+        </ReportTopSection>
+      </div>
+
+      <h3>Questions:</h3>
+
+      <p><small><strong>Checksum:</strong> {data.checkSum}</small></p>
+    </ReportWrapper>
   )
 }
