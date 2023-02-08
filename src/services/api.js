@@ -1,6 +1,7 @@
 import { Log, LogInfo, LogError } from '../utils/Logger';
 import log from 'loglevel';
 import { config } from '../config';
+import { SAMPLE_REPORT_DATA } from '../constants';
 const playerState = require('../utils/PlayerState').PlayerState;
 
 async function importer(props, fileName) {
@@ -112,6 +113,36 @@ async function getDownload(props, file) {
       alert('Fetch error: ' + error.message);
       LogError(error);
     })
+}
+
+async function getSessionReport(props, contextId) {
+
+  if ( !0 ) {
+    // fake latency
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return SAMPLE_REPORT_DATA;
+  }
+
+  let token = props.authActions.getToken();
+  let url = `${config.API_URL}/report/${contextId}`;
+
+  log.debug(`getSessionReport(${props.map?.id}) url: ${url})`);
+
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+    .then((data) => {
+      if (data.status === 402) {
+        props.authActions.logout();
+      }
+      return data.json();
+    })
+    // @Corey, I've added this line to catch any misc HTTP errors meanwhile
+    .catch((error) => void log.debug(`getSessionReport(${props.map?.id}) error: ${error.stack})`))
 }
 
 async function getMapScopedObjects(props, mapId) {
@@ -296,6 +327,7 @@ export {
   getMapScopedObjects,
   getNodeScopedObjects,
   getServerScopedObjects,
+  getSessionReport,
   importer,
   postQuestionValue,
 };
