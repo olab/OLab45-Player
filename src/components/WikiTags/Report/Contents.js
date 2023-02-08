@@ -6,19 +6,16 @@ import Alert from '@material-ui/lab/Alert';
 import { ReportWrapper, ReportTopSection } from './styles';
 import calculateTimeTaken from '../../../helpers/calculateTimeTaken';
 import { DARK_GREY } from '../../../shared/colors';
-
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper }  from '@material-ui/core';
-
-const playerState = require('../../../utils/PlayerState').PlayerState;
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper }  from '@material-ui/core';
 
 export default class OlabReportContents extends React.Component {
-
-  constructor(props) {
-    super(props);
-    const debug = playerState.GetDebug();
-    this.state = { debug };
-  }
-
   render() {
     const { report } = this.props;
 
@@ -42,12 +39,18 @@ export default class OlabReportContents extends React.Component {
 
     const { data } = report;
 
+    log.debug('session report data', data);
+
     // @Corey as I am not sure what's the criteria for extracting questions, this may need an improvement
     const questions = data.nodes.find(node => node.responses?.length > 0)?.responses || [];
 
     // find the counter object in data.counters array, extract its value if any
-    const getCounterValue = (key, defaultValue) => {
-      const counter = data.counters?.find(c => c.name == key);
+    const getCounterValue = (name, defaultValue) => {
+      const counter = data.counters?.find(c => c.name == name);
+
+      if ( counter === undefined )
+        log.debug(`report counter not found: ${name}`);
+
       return counter != undefined ? counter.value : defaultValue;
     }
 
@@ -92,7 +95,7 @@ export default class OlabReportContents extends React.Component {
                   </TableCell>
                 </TableRow> }
 
-              {questions.map((question, i) => (
+              { questions.map((question, i) => (
                 <TableRow key={i} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>{question.questionId}</TableCell>
                   <TableCell>{question.questionStem || '-'}</TableCell>
@@ -102,7 +105,7 @@ export default class OlabReportContents extends React.Component {
                   ) : String(question.isCorrect)}</TableCell>
                   <TableCell>{question.feedback || '-'}</TableCell>
                 </TableRow>
-              ))}
+              )) }
             </TableBody>
           </Table>
         </TableContainer>
