@@ -15,7 +15,7 @@ const KeyConstants = {
   SERVER_STATIC: 'server-static',
   SERVER: 'server',
   SESSION_INFO: 'session-info',
-  VISIT_ONCE_NODE_LIST: 'visit-once-node-list'
+  VISIT_ONCE_NODE_LIST: 'visit-once-node-list',
 }
 
 class PlayerState {
