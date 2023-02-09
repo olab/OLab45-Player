@@ -115,11 +115,10 @@ async function getDownload(props, file) {
 }
 
 async function getSessionReport(props, contextId) {
+  const token = props.authActions.getToken();
+  const url = `${config.API_URL}/reports/${contextId}`;
 
-  let token = props.authActions.getToken();
-  let url = `${config.API_URL}/v3/report/${contextId}`;
-
-  log.debug(`getSessionReport(${mapId}) url: ${url})`);
+  log.debug(`getSessionReport(${props.map?.id}) url: ${url})`);
 
   return fetch(url, {
     method: 'GET',
@@ -133,7 +132,15 @@ async function getSessionReport(props, contextId) {
         props.authActions.logout();
       }
       return data.json();
-    });
+    })
+    // @Corey, I've added this line to catch any misc HTTP errors meanwhile
+    .catch((error) => void log.debug(`getSessionReport(${props.map?.id}) error: ${error.stack})`))
+}
+
+async function getSessionReportDownloadUrl(props, contextId) {
+  // @Corey, this will need backend implementation for an application/octet-stream download (excel)
+  const url = `${config.API_URL}/reports/${contextId}/excel`;
+  return url;
 }
 
 async function getMapScopedObjects(props, mapId) {
@@ -318,7 +325,8 @@ export {
   getMapScopedObjects,
   getNodeScopedObjects,
   getServerScopedObjects,
-  getSessionReport,  
+  getSessionReport,
+  getSessionReportDownloadUrl,
   importer,
   postQuestionValue,
 };

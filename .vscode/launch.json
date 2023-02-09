@@ -13,6 +13,13 @@
       "type": "chrome",
       "url": "http://localhost:3000/player/player/1649/0",
       "webRoot": "${workspaceFolder}"
-    }    
+    },
+    {
+      "name": "External",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost:3000/player/player/1649/0?token=<token>",
+      "webRoot": "${workspaceFolder}"
+    }        
   ]
 }
