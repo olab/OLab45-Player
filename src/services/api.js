@@ -1,7 +1,6 @@
 import { Log, LogInfo, LogError } from '../utils/Logger';
 import log from 'loglevel';
 import { config } from '../config';
-import { SAMPLE_REPORT_DATA } from '../constants';
 const playerState = require('../utils/PlayerState').PlayerState;
 
 async function importer(props, fileName) {
@@ -116,20 +115,13 @@ async function getDownload(props, file) {
 }
 
 async function getSessionReport(props, contextId) {
-
-  if ( !0 ) {
-    // fake latency
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return SAMPLE_REPORT_DATA;
-  }
-
-  let token = props.authActions.getToken();
-  let url = `${config.API_URL}/report/${contextId}`;
+  const token = props.authActions.getToken();
+  const url = `${config.API_URL}/reports/${contextId}`;
 
   log.debug(`getSessionReport(${props.map?.id}) url: ${url})`);
 
   return fetch(url, {
-    method: 'POST',
+    method: 'GET',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
@@ -143,6 +135,12 @@ async function getSessionReport(props, contextId) {
     })
     // @Corey, I've added this line to catch any misc HTTP errors meanwhile
     .catch((error) => void log.debug(`getSessionReport(${props.map?.id}) error: ${error.stack})`))
+}
+
+async function getSessionReportDownloadUrl(props, contextId) {
+  // @Corey, this will need backend implementation for an application/octet-stream download (excel)
+  const url = `${config.API_URL}/reports/${contextId}/excel`;
+  return url;
 }
 
 async function getMapScopedObjects(props, mapId) {
@@ -328,6 +326,7 @@ export {
   getNodeScopedObjects,
   getServerScopedObjects,
   getSessionReport,
+  getSessionReportDownloadUrl,
   importer,
   postQuestionValue,
 };

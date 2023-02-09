@@ -23,4 +23,18 @@ export const ReportWrapper = styled.div`
 export const ReportTopSection = styled.div`
   margin-top: 12px;
   margin-left: 12px;
+
+  div.report-actions {
+    margin-top: 10px;
+    margin-left: -5px;
+
+    > button {
+      margin-left: 5px;
+      margin-top: 3px;
+
+      .MuiButton-startIcon {
+        margin-right: 4px;
+      }
+    }
+  }
 `;

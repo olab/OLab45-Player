@@ -7,6 +7,7 @@ import { ReportWrapper, ReportTopSection } from './styles';
 import calculateTimeTaken from '../../../helpers/calculateTimeTaken';
 import { DARK_GREY } from '../../../shared/colors';
 import {
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -14,8 +15,24 @@ import {
   TableHead,
   TableRow,
   Paper }  from '@material-ui/core';
+import PrintIcon from '@material-ui/icons/Print';
+import DownloadIcon from '@material-ui/icons/GetApp';
+import { getSessionReportDownloadUrl } from '../../../services/api';
 
 export default class OlabReportContents extends React.Component {
+  printReport(e)
+  {
+    e.preventDefault();
+    window.print();
+  }
+
+  async downloadReport(e)
+  {
+    e.preventDefault();
+    const url = await getSessionReportDownloadUrl(this.props, this.props.contextId);
+    location.assign(url);
+  }
+
   render() {
     const { report } = this.props;
 
@@ -42,7 +59,10 @@ export default class OlabReportContents extends React.Component {
     log.debug('session report data', data);
 
     // @Corey as I am not sure what's the criteria for extracting questions, this may need an improvement
-    const questions = data.nodes.find(node => node.responses?.length > 0)?.responses || [];
+    const questions = data.nodes
+      .filter(node => node.responses?.length > 0)
+      .map(q => q.responses || [])
+      .reduce((a, b) => a.concat(b), []);
 
     // find the counter object in data.counters array, extract its value if any
     const getCounterValue = (name, defaultValue) => {
@@ -72,6 +92,19 @@ export default class OlabReportContents extends React.Component {
             <p><strong>Letter Grade:</strong> {getCounterValue('LetterGrade', '-')}</p>
             <p><strong>Percentile Grade:</strong> {getCounterValue('PercentileGrade', '-')}</p>
             <p><strong>Class Average:</strong> {getCounterValue('ClassAverage', '-')}</p>
+
+            <div className="report-actions">
+              <Button size="small" variant="outlined" startIcon={<PrintIcon />} color="primary"
+                onClick={this.printReport.bind(this)}>
+                Print
+              </Button>
+
+              <Button size="small" variant="outlined" startIcon={<DownloadIcon />} color="primary"
+                onClick={this.downloadReport.bind(this)}>
+                Export to Excel
+              </Button>
+            </div>
+
           </ReportTopSection>
         </div>
 
