@@ -133,9 +133,7 @@ export default class OlabReportContents extends React.Component {
                   <TableCell>{question.questionId}</TableCell>
                   <TableCell>{question.questionStem || '-'}</TableCell>
                   <TableCell>{question.responseText || question.response || '-'}</TableCell>
-                  <TableCell>{ 'boolean' == typeof question.isCorrect ? (
-                    question.isCorrect ? 'Yes' : 'No'
-                  ) : String(question.isCorrect)}</TableCell>
+                  <TableCell>{question.correctResponse || '-'}</TableCell>
                   <TableCell>{question.feedback || '-'}</TableCell>
                 </TableRow>
               )) }
