@@ -3,6 +3,50 @@ import log from 'loglevel';
 import { config } from '../config';
 const playerState = require('../utils/PlayerState').PlayerState;
 
+async function loginUserAsync(credentials) {
+
+  var payload = {
+    "UserName": credentials.username,
+    "Password": credentials.password
+  };
+
+  let url = `${config.API_URL}/auth/login`;
+
+  log.debug(`loginUser(${credentials.username}) url: ${url})`);
+
+  return fetch(url, {
+    signal: AbortSignal.timeout(7500),
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+    .then(
+      data => data.json()
+    )
+}
+
+async function loginExternalUserAsync(token) {
+
+  let url = `${config.API_URL}/auth/loginexternal`;
+  let payload = { 'ExternalToken' : token };
+
+  log.debug(`loginExternal(${token}) url: ${url})`);
+
+  return fetch(url, {
+    signal: AbortSignal.timeout(7500),
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+    .then(
+      data => data.json()
+    )
+}
+
 async function importer(props, fileName) {
 
   let token = props.authActions.getToken();
@@ -128,10 +172,25 @@ async function getSessionReport(props, contextId) {
     }
   })
     .then((data) => {
+
       if (data.status === 402) {
         props.authActions.logout();
       }
-      return data.json();
+
+      else if (data.status === 200) {
+        return data.json();
+      }
+
+      let message = data.status;
+      if ( data.status == 401 ) {
+        message = "Not Authorized";
+      }
+
+      throw new Error(
+        `Error ${data.statusText} retrieving map. Reason: ${message}`,
+        { cause: data }
+      );
+      
     })
     // @Corey, I've added this line to catch any misc HTTP errors meanwhile
     .catch((error) => void log.debug(`getSessionReport(${props.map?.id}) error: ${error.stack})`))
@@ -169,7 +228,7 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/node/${nodeId}`;
   log.debug(`getMapNode(${mapId}, ${nodeId}) url: ${url})`);
-  let contextId = playerState.GetContextId( null );
+  let contextId = playerState.GetContextId(null);
 
   return fetch(url, {
     method: 'POST',
@@ -178,7 +237,7 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
       'Authorization': `Bearer ${token}`,
       'OLabSessionId': contextId
     },
-    body: JSON.stringify( dynamicObjects )
+    body: JSON.stringify(dynamicObjects)
   })
     .then((data) => {
 
@@ -186,11 +245,19 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
         props.authActions.logout();
       }
 
-      else if ( data.status === 200 ) {
+      else if (data.status === 200) {
         return data.json();
       }
 
-      throw new Error(`Error ${data.statusText} retrieving node ${nodeId} `);
+      let message = data.status;
+      if ( data.status == 401 ) {
+        message = "Not Authorized";
+      }
+
+      throw new Error(
+        `Error ${data.statusText} retrieving node. Reason: ${message}`,
+        { cause: data }
+      );
 
     });
 }
@@ -260,15 +327,15 @@ async function getServerScopedObjects(props, serverId) {
 
 async function postQuestionValue(state) {
 
-  const { 
-    map, 
-    node, 
-    authActions, 
-    dynamicObjects, 
-    question, 
-    responseId, 
-    value, 
-    setInProgress, 
+  const {
+    map,
+    node,
+    authActions,
+    dynamicObjects,
+    question,
+    responseId,
+    value,
+    setInProgress,
     contextId } = state;
 
   let token = authActions.getToken();
@@ -318,6 +385,8 @@ async function postQuestionValue(state) {
 
 export {
   getDownload,
+  loginUserAsync,
+  loginExternalUserAsync,
   getDynamicScopedObjects,
   getMap,
   getMapNode,

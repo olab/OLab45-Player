@@ -9,6 +9,7 @@ import log from 'loglevel';
 import Player from '../Player/Player';
 import useToken from './useToken';
 import { config } from '../../constants';
+import { loginExternalUserAsync } from '../../services/api';
 
 function App() {
 
@@ -26,48 +27,31 @@ function App() {
 
   useEffect(() => {
 
-    // async function processCookieAsync(cookies) {
-
-    //   if (!cookies) {
-    //     return null;
-    //   }
-    //   return await processCookieForTokenAsync(cookies);
-    // }
-
     if (!token) {
 
-      log.debug(`useEffect: token: ${token}`);
+      const submitExternalToken = async (queryToken) => {
+        let data = await loginExternalUserAsync(queryToken);
+        return data;
+      }
 
-      // try and get access token from querystring
+      // try and get access token from querystring first
       if (queryToken) {
-        authActions.setToken({ authInfo: { token: queryToken } }, true);
-        setToken(authActions.getToken());
+
+        let accessToken = submitExternalToken(queryToken)
+          .then((data) => {
+            if (data) {
+              authActions.setToken({ authInfo: { token: data.authInfo.token } }, true);
+            }
+          });
       }
 
-      // else try and get from authActions, which is set 
-      // in the Login component
-      else {
-
-        const localToken = authActions.getToken();
-        if (localToken) {
-          setToken(localToken);
-        }
-
-        // else {
-
-        //   processCookieAsync(document.cookie).then(tokenResponse => {
-        //     if (tokenResponse) {
-        //       authActions.setToken(tokenResponse, true);
-        //       // set the token in the component state
-        //       setToken(authActions.getToken());
-        //       // delete the external cookie
-        //       document.cookie = `external_token=; domain=.olab.ca; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-        //     }
-        //   }).catch(e => {
-        //     console.log(e)
-        //   });
-        // }
+      const localToken = authActions.getToken();
+      if (localToken) {
+        setToken(localToken);
       }
+
+      log.debug(`useEffect: token: ${authActions.getToken()}`);
+
     }
 
   }, [token, authActions]);

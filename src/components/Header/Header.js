@@ -18,20 +18,18 @@ const Header = ({ version, authActions, isScreenBusy }) => (
         &nbsp;
       </CenterPlaceholder>
       <VersionWrapper>
-        User: {authActions.getUserName()}<br/>
+        User: {authActions.getUserName()}<br />
         Version: {version}
       </VersionWrapper>
-      {!authActions.isExternalToken() &&
-        <Button
-          variant="outlined"
-          color="primary"
-          size="large"
-          aria-label="Return to Home"
-          onClick={() => { authActions.logout(); }}
-        >
-          &nbsp;Logout&nbsp;
-        </Button>
-      }
+      <Button
+        variant="outlined"
+        color="primary"
+        size="large"
+        aria-label="Return to Home"
+        onClick={() => { authActions.logout(); }}
+      >
+        &nbsp;Logout&nbsp;
+      </Button>
     </div>
     {isScreenBusy ? <LinearProgress /> : <FakeProgress />}
   </HeaderWrapper>

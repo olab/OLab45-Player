@@ -11,34 +11,35 @@ import log from 'loglevel';
 import styles from './styles';
 import { config } from '../../config';
 import { ReactComponent as LogoIcon } from '../../shared/assets/icons/olab4_logo.svg';
+import { loginUserAsync } from '../../services/api';
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-async function loginUserAsync(credentials) {
+// async function loginUserAsync(credentials) {
 
-  var creds = {
-    "UserName": credentials.username,
-    "Password": credentials.password
-  };
+//   var creds = {
+//     "UserName": credentials.username,
+//     "Password": credentials.password
+//   };
 
-  let url = `${config.API_URL}/auth/login`;
+//   let url = `${config.API_URL}/auth/login`;
 
-  log.debug(`loginUser(${credentials.username}) url: ${url})`);
+//   log.debug(`loginUser(${credentials.username}) url: ${url})`);
 
-  return fetch(url, {
-    signal: AbortSignal.timeout(7500),
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(creds)
-  })
-    .then(
-      data => data.json()
-    )
-}
+//   return fetch(url, {
+//     signal: AbortSignal.timeout(7500),
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify(creds)
+//   })
+//     .then(
+//       data => data.json()
+//     )
+// }
 
 const Login = ({ authActions, classes }) => {
 
