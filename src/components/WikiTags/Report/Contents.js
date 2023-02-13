@@ -1,5 +1,6 @@
 // @flow
 import React from 'react';
+import Parser from 'html-react-parser';
 import log from 'loglevel';
 import { CircularProgress } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
@@ -132,7 +133,7 @@ export default class OlabReportContents extends React.Component {
                 <TableRow key={i} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>{question.questionId}</TableCell>
                   <TableCell>{question.questionStem || '-'}</TableCell>
-                  <TableCell>{question.responseText || question.response || '-'}</TableCell>
+                  <TableCell>{Parser(question.responseText) || question.response || '-'}</TableCell>
                   <TableCell>{question.correctResponse || '-'}</TableCell>
                   <TableCell>{question.feedback || '-'}</TableCell>
                 </TableRow>
