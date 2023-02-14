@@ -1,6 +1,13 @@
 {
   "configurations": [
     {
+      "name": "General",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost:3000/player",
+      "webRoot": "${workspaceFolder}"
+    },    
+    {
       "name": "Moderator",
       "request": "launch",
       "type": "chrome",
@@ -18,7 +25,7 @@
       "name": "External",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:3000/player/player/1649/0?token=<token>",
+      "url": "http://logan.cardinalcreek.ca/player/player/1649/0?token=<token>",
       "webRoot": "${workspaceFolder}"
     }        
   ]
