@@ -7,7 +7,12 @@ import {
   RadioGroup,
   FormControl,
 } from '@material-ui/core';
+
+import CloseIcon from '@material-ui/icons/Close';
+import CheckIcon from '@material-ui/icons/Check';
+
 import { withStyles } from '@material-ui/core/styles';
+import { Log, LogInfo, LogError } from '../../../../utils/Logger';
 import log from 'loglevel';
 
 import styles from '../../styles.module.css';
@@ -21,12 +26,7 @@ class OlabSinglePickQuestion extends React.Component {
     super(props);
 
     this.state = {
-      id: props.props.id,
-      name: props.props.name,
-      question: props.props.question,
-      dynamicObjects: props.props.dynamicObjects,
-      showProgressSpinner: false,
-      disabled: false
+      ...props.props
     };
 
     // Binding this keyword  
@@ -52,36 +52,44 @@ class OlabSinglePickQuestion extends React.Component {
       }
     }
 
-    this.setState(state => {
+    if (typeof question.responseId == 'undefined')
+      question.previousResponseId = null;
+    else
+      question.previousResponseId = question.responseId;
 
-      if (typeof question.responseId == 'undefined')
-        question.previousResponseId = null;
-      else
-        question.previousResponseId = question.responseId;
-        
-      question.responseId = response.id;      
-      question.value = question.responseId;
+    question.responseId = response.id;
+    question.value = question.responseId;
 
-      return ({ question });
-    },
-      () => this.transmitResponse()
-    );
+    log.debug(`OlabSinglePickQuestion set question '${question.id}' value = '${value}'`);
 
-    // if (typeof onSubmitResponse !== 'undefined') {
-    //   this.transmitResponse(value);
-    // }
+    // if single try question, disabled it
+    if ( question.numTries > 0 ) {
+      question.disabled = true;
+    }
+    
+    // first attempt to answer, so show answer
+    // indicators, if called on
+    question.showAnswerIndicators = true;
 
+    this.setState({ question });
+    this.transmitResponse();
   }
 
   transmitResponse() {
 
-    const { onSubmitResponse, authActions, map, node } = this.props.props;
+    const {
+      onSubmitResponse,
+      authActions,
+      map,
+      node,
+      contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
       authActions,
       map,
       node,
+      contextId,
       setInProgress: this.setInProgress,
       setIsDisabled: this.setIsDisabled
     };
@@ -103,13 +111,63 @@ class OlabSinglePickQuestion extends React.Component {
     log.debug(`set disabled: ${disabled}`);
   }
 
+  buildQuestionResponses(question) {
+
+    let responses = [];
+    let key = 0;
+    for (const response of question.responses) {
+      var item = (
+        <div key={key++}>
+          {this.buildQuestionResponse(question, response)}
+        </div>
+      );
+      responses.push(item);
+    }
+
+    return responses;
+  }
+
+  buildQuestionResponse(question, response) {
+
+    let choice = (
+      <FormControlLabel
+        id={`qr-${response.id}`}
+        value={response.id}
+        control={<Radio />}
+        label={response.response}
+      />
+    );
+
+    let correctnessIndicator = (<></>);
+
+    if (question.showAnswer) {
+
+      // test for 'correct' answer
+      if ((response.isCorrect > 0) && question.showAnswerIndicators) {
+        correctnessIndicator = (<CheckIcon style={{ color: 'green' }} />);
+      }
+
+      // test for 'incorrect' answer
+      if ((response.isCorrect == 0) && question.showAnswerIndicators) {
+        correctnessIndicator = (<CloseIcon style={{ color: 'red' }} />);
+      }
+    }
+
+    return (
+      <>
+        {choice}
+        {correctnessIndicator}
+      </>
+    );
+
+  }
+
   render() {
 
     const {
       id,
       name,
       question,
-      disabled
     } = this.state;
 
     log.debug(`OlabSinglePickQuestion render '${name}'`);
@@ -123,9 +181,12 @@ class OlabSinglePickQuestion extends React.Component {
         progressButtonHtml = <img style={{ float: 'left', width: 40, height: 40 }} src={Spinner} alt="" />;
       }
 
+      var responses = this.buildQuestionResponses(question);
+      var disabled = question.disabled == 0 ? false : true;
+
       return (
         <div className={`${styles['qusinglechoice']} ${siteStyles[id]}`} id={`${id}`}>
-          <FormControl component="fieldset">
+          <FormControl component="fieldset" disabled={disabled}>
             <FormLabel component="legend">{question.stem}</FormLabel>
             <RadioGroup
               style={{ float: 'left' }}
@@ -134,15 +195,7 @@ class OlabSinglePickQuestion extends React.Component {
               row={row}
               value={question.value}
             >
-              {question.responses.map((response) => (
-                <FormControlLabel
-                  id={`qr-${response.id}`}
-                  value={response.id}
-                  control={<Radio />}
-                  label={response.response}
-                  disabled={disabled}
-                />
-              ))}
+              {responses}
             </RadioGroup>
             {progressButtonHtml}
           </FormControl>

@@ -6,6 +6,7 @@ import {
   Slider,
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
+import { Log, LogInfo, LogError } from '../../../../utils/Logger';
 import log from 'loglevel';
 
 import styles from '../../styles.module.css';
@@ -18,12 +19,7 @@ class OlabSliderQuestion extends React.Component {
     super(props);
 
     this.state = {
-      id: props.props.id,
-      name: props.props.name,
-      question: props.props.question,
-      dynamicObjects: props.props.dynamicObjects,
-      showProgressSpinner: false,
-      disabled: false
+      ...props.props
     };
 
     // post initial value to server if initializine
@@ -61,13 +57,19 @@ class OlabSliderQuestion extends React.Component {
 
   transmitResponse() {
 
-    const { onSubmitResponse, authActions, map, node } = this.props.props;
-
+    const {
+      onSubmitResponse,
+      authActions,
+      map,
+      node,
+      contextId } = this.props.props;
+      
     let responseState = {
       ...this.state,
       authActions,
       map,
       node,
+      contextId,
       setInProgress: this.setInProgress,
       setIsDisabled: this.setIsDisabled
     };
@@ -87,11 +89,12 @@ class OlabSliderQuestion extends React.Component {
 
     const {
       id,
+      name,
       question,
       // disabled
     } = this.state;
 
-    log.debug(`OlabSliderQuestion render '${this.props.name}'`);
+    log.debug(`OlabSliderQuestion render '${name}'`);
 
     try {
 
@@ -104,7 +107,11 @@ class OlabSliderQuestion extends React.Component {
             <Typography id={`${id}-stem`} component="div" gutterBottom>
               {question.stem}
             </Typography>
-            <input readOnly className={`${styles['quslider-value']}`} id={`${id}-value`} value={question.value}></input>
+            <input 
+              readOnly 
+              className={`${styles['quslider-value']}`} 
+              id={`${id}-value`} 
+              value={question.value}></input>
             <Slider
               defaultValue={question.value}
               onChangeCommitted={(event, value) => this.setValue(event, value)}
@@ -113,7 +120,7 @@ class OlabSliderQuestion extends React.Component {
               name={`${id}-slider`}
               min={Number(settings.minValue)}
               max={Number(settings.maxValue)}
-              track={true}
+              track={false}
               valueLabelDisplay="auto"
             />
           </Box>

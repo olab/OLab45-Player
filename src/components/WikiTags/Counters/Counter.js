@@ -4,20 +4,25 @@ import {
   Box,
   List,
   ListItem,
-  ListItemText
+  ListItemText, Paper,
+  TableContainer, Table, TableRow, TableHead, TableCell, TableBody
 } from '@material-ui/core';
+import { Log, LogInfo, LogError } from '../../../utils/Logger';
 import log from 'loglevel';
 import { getCounters } from '../WikiTags';
 import styles from '../styles.module.css';
 import siteStyles from '../site.module.css';
 
-const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../../../utils/PlayerState').PlayerState;
 
 class OlabCountersTag extends React.Component {
 
   constructor(props) {
 
     super(props);
+
+    const debug = playerState.GetDebug();
+
     this.state = {
       id: props.props.id,
       name: props.props.name,
@@ -28,7 +33,8 @@ class OlabCountersTag extends React.Component {
       disabled: false,
       map: props.props.map,
       node: props.props.node,
-      counterActions: props.props.scopedObjects.map.counteractions
+      counterActions: props.props.scopedObjects.map.counteractions,
+      debug
     };
   }
 
@@ -39,7 +45,8 @@ class OlabCountersTag extends React.Component {
     try {
       const {
         counterActions,
-        node
+        node,
+        debug
       } = this.state;
 
       let counters = getCounters(
@@ -48,7 +55,7 @@ class OlabCountersTag extends React.Component {
         counterActions
       );
 
-      if (persistantStorage.get('dbg-disableWikiRendering')) {
+      if (!debug.enableWikiRendering) {
         return (
           <>
             <b>[[COUNTERS]]</b>
@@ -61,29 +68,55 @@ class OlabCountersTag extends React.Component {
         );
       }
 
-      if (counters.length === 0) {
+      if (counters.length > 0) {
         return (
-          <div className={`${styles['counters']} ${siteStyles['counters']}`}>
-            <Box width="300px;">
-              <List component="span" dense={true}>
-                {counters.map((counter) => (
-                  <ListItem>
-                    <ListItemText
-                      primary={`${counter.name}: ${counter.value}`}
-                    />
-                  </ListItem>
+          <TableContainer component={Paper}>
+            <Table aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Scope (Id)</TableCell>
+                  <TableCell align="right">Name (Id)</TableCell>
+                  <TableCell align="right">Value</TableCell>
+                  <TableCell align="right">Last Update</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {counters.map((row) => (
+                  <TableRow key={row.name}>
+                    <TableCell component="th" scope="row">
+                      {row.scopeLevel} ({row.parentId})
+                    </TableCell>
+                    <TableCell align="right">{row.name} ({row.id})</TableCell>
+                    <TableCell align="right">{row.value}</TableCell>
+                    <TableCell align="right">{row.updatedat}</TableCell>
+                  </TableRow>
                 ))}
-              </List>
-            </Box>
-          </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
         );
+        // return (
+        //   <div className={`${styles['counters']} ${siteStyles['counters']}`}>
+        //     <Box width="300px;">
+        //       <List component="span" dense={true}>
+        //         {counters.map((counter) => (
+        //           <ListItem>
+        //             <ListItemText
+        //               primary={`${counter.name}: ${counter.value}`}
+        //             />
+        //           </ListItem>
+        //         ))}
+        //       </List>
+        //     </Box>
+        //   </div>
+        // );
       }
 
-      return ( <></> );
+      return (<></>);
 
     } catch (error) {
 
-      log.error(`OlabMediaResourceTag render error: ${error}`);
+      LogError(`OlabMediaResourceTag render error: ${error}`);
       return (
         <>
           <b>[[COUNTERS]] "{error.message}"</b>

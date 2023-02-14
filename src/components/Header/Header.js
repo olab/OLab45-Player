@@ -5,7 +5,7 @@ import { LinearProgress, Button } from '@material-ui/core';
 import { ReactComponent as LogoIcon } from '../../shared/assets/icons/olab4_logo.svg';
 import { Logo, HeaderWrapper, FakeProgress, CenterPlaceholder, VersionWrapper } from './styles';
 
-const Header = ({ authActions, isScreenBusy }) => (
+const Header = ({ version, authActions, isScreenBusy }) => (
   <HeaderWrapper>
     <div>
       <Link to={`${process.env.PUBLIC_URL}/`} className="route-link">
@@ -18,7 +18,8 @@ const Header = ({ authActions, isScreenBusy }) => (
         &nbsp;
       </CenterPlaceholder>
       <VersionWrapper>
-        User: {authActions.getUserName()}
+        User: {authActions.getUserName()}<br/>
+        Version: {version}
       </VersionWrapper>
       {!authActions.isExternalToken() &&
         <Button

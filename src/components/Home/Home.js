@@ -11,6 +11,7 @@ import {
   Button,
   Tooltip,
 } from '@material-ui/core';
+import { Log, LogInfo, LogError } from '../../utils/Logger';
 import log from 'loglevel';
 
 import styles from './styles';
@@ -24,9 +25,8 @@ import Import from '../Import/Import'
 import {
   getMaps
 } from '../../services/api'
-import SessionHandler from '../../utils/SessionHandler';
 
-const persistantStorage = require('../../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../../utils/PlayerState').PlayerState;
 
 const HomeWrapper = styled.div`
   padding: 1rem;
@@ -44,6 +44,9 @@ class Home extends PureComponent {
   constructor(props) {
 
     super(props);
+
+    const debug = playerState.GetDebug();
+
     this.state = {
       error: null,
       mapId: null,
@@ -54,21 +57,18 @@ class Home extends PureComponent {
       isButtonsDisabled: false,
       isMapsFetching: true,
       isMapInfoFetched: false,
-      sessionId: null
+      sessionId: null,
+      debug
     };
 
     this.listWithSearchRef = React.createRef();
     this.setPageTitle();
 
-    this.state.enableWikiTranslation = !persistantStorage.get('dbg-disableWikiRendering');
-    this.state.disableCache = persistantStorage.get('dbg-disableDataCaching');
-
     if (!this.state.disableCache) {
-      this.state.maps = persistantStorage.get('maps', []);
+      this.state.maps = playerState.GetMaps();
       this.state.mapsFiltered = this.state.maps;
     }
 
-    SessionHandler.endSession();
   }
 
   setPageTitle = () => {
@@ -86,7 +86,8 @@ class Home extends PureComponent {
 
   handleMapPlayClick = (map, nodeId) => {
     this.setState({ mapId: map.id, nodeId: nodeId });
-    window.location.href = `/player/${map.id}/${nodeId}`;
+    const url = `/player/player/${map.id}/${nodeId}`;
+    window.location.href = url;
   }
 
   handleMapInfoClick = async map => {
@@ -161,6 +162,8 @@ class Home extends PureComponent {
       maps: objData,
       mapsFiltered: objData,
     });
+
+    playerState.SetMaps(this.state.maps);
 
   }
 

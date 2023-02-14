@@ -1,14 +1,14 @@
 {
-  "name": "olab45player",
+  "name": "olab46player",
   "homepage": "/player",
-  "version": "2022.8.24-2",
+  "version": "23.2.2-0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^4.12.3",
-    "@material-ui/icons": "^4.11.2",
-    "@material-ui/styles": "^4.11.4",
-    "@microsoft/signalr": "^6.0.2",
-    "@testing-library/jest-dom": "^5.14.1",
+    "@material-ui/core": "latest",
+    "@material-ui/icons": "^4.11.3",
+    "@material-ui/lab": "latest",
+    "@material-ui/styles": "latest",
+    "@microsoft/signalr": "^7.0.0",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "axios": "^0.21.4",
@@ -21,34 +21,33 @@
     "jsonwebtoken": "^8.5.1",
     "jwt-decode": "^3.1.2",
     "lodash.merge": "^4.6.2",
+    "loglevel": "^1.8.1",
     "postcss-loader": "^6.1.1",
     "query-string": "^7.0.1",
     "react": "^17.0.2",
     "react-css-modules": "^4.7.11",
-    "react-dev-utils": "^11.0.4",
+    "react-dev-utils": "^12.0.1",
     "react-dnd": "^14.0.4",
     "react-dnd-html5-backend": "^14.0.2",
     "react-dom": "^17.0.2",
-    "react-jsx-parser": "^1.28.4",
-    "react-native-svg": "^12.1.1",
+    "react-jsx-parser": "^1.29.0",
     "react-redux": "^7.2.4",
-    "react-router-dom": "^5.3.0",
-    "react-scripts": "4.0.3",
+    "react-router-dom": "^6.4.3",
+    "react-scripts": "^5.0.1",
     "styled-components": "^5.3.1",
-    "svg-intersections": "^0.4.0",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
+    "clean": "rm -Rf build/*",
     "start": "react-scripts start",
-    "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build": "dotenv -e .env.production react-scripts build",
+    "build:dev": "npm --no-git-tag-version version prerelease",
+    "build:prod": "npm --no-git-tag-version version `date +%y.%m.%d-0`"
   },
   "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "extends": []
   },
   "browserslist": {
     "production": [
@@ -63,6 +62,6 @@
     ]
   },
   "devDependencies": {
-    "react-svg-loader": "^3.0.3"
+    "dotenv-cli": "^6.0.0"
   }
 }

@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
+import { Log, LogInfo, LogError } from '../../../../utils/Logger';
 import log from 'loglevel';
 
 import styles from '../../styles.module.css';
@@ -13,12 +14,13 @@ class OlabSinglelineTextQuestion extends React.Component {
     super(props);
 
     this.state = {
-      id: props.props.id,
-      name: props.props.name,
-      question: props.props.question,
-      dynamicObjects: props.props.dynamicObjects,
+      // id: props.props.id,
+      // name: props.props.name,
+      // question: props.props.question,
+      // dynamicObjects: props.props.dynamicObjects,
       showProgressSpinner: false,
-      disabled: false
+      disabled: false,
+      ...props.props
     };
 
     // Binding this keyword  
@@ -51,13 +53,19 @@ class OlabSinglelineTextQuestion extends React.Component {
 
   transmitResponse() {
 
-    const { onSubmitResponse, authActions, map, node } = this.props.props;
+    const {
+      onSubmitResponse,
+      authActions,
+      map,
+      node,
+      contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
       authActions,
       map,
       node,
+      contextId,
       setInProgress: this.setInProgress,
       setIsDisabled: this.setIsDisabled
     };

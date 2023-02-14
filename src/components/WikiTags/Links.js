@@ -5,28 +5,30 @@ import {
   Button,
   ButtonGroup,
 } from '@material-ui/core';
+import { Log, LogInfo, LogError } from '../../utils/Logger';
 import log from 'loglevel';
-const persistantStorage = require('../../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../../utils/PlayerState').PlayerState;
 
 class OlabLinksTag extends React.Component {
 
+  constructor(props) {
+
+    super(props);
+
+    const debug = playerState.GetDebug();
+
+    this.state = { debug };
+
+  }
+
   onNavigateToNode = (mapId, nodeId, urlParam) => {
 
-    let url = `/player/${mapId}/${nodeId}`;
+    let url = `/player/player/${mapId}/${nodeId}`;
     if (urlParam) {
       url += `/${urlParam}`;
     }
 
     log.debug(`navigating to ${url}`)
-
-    // save visited node to list so 'visit-once' nodes can be 
-    // suppressed later.
-    // var visitedNodes = persistantStorage.get('visit-once-nodes', []);
-    // if (!visitedNodes.includes(nodeId)) {
-    //   visitedNodes.push(nodeId);
-    //   log.debug(`saving visited node id: ${nodeId}`);
-    //   persistantStorage.save('visit-once-nodes', visitedNodes);
-    // }
 
     window.location.href = url;
   }
@@ -34,11 +36,12 @@ class OlabLinksTag extends React.Component {
   render() {
     log.debug('OlabLinksTag render');
 
+    const { debug } = this.state;
+
     const {
       className,
       props: {
         urlParam,
-        // linkHandler,
         map: {
           id: mapId,
         },
@@ -57,7 +60,7 @@ class OlabLinksTag extends React.Component {
 
     }
 
-    if (!persistantStorage.get('dbg-disableWikiRendering')) {
+    if (debug.enableWikiRendering) {
 
       return (
         <div className={className}>

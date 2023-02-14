@@ -10,6 +10,7 @@ import {
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import Spinner from '../../shared/assets/loading_med.gif';
+import { Log, LogInfo, LogError } from '../../utils/Logger';
 import log from 'loglevel';
 import styles from './styles';
 import { importer } from '../../services/api'
@@ -61,7 +62,7 @@ class Import extends PureComponent {
             });
 
         } catch (error) {
-            log.error(error);
+            LogError(error);
         }
 
         this.setState({ importRunning: false });

@@ -1,18 +1,20 @@
 import React, { PureComponent } from 'react';
-import { withRouter } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { FormControl } from '@material-ui/core';
 import JsxParser from 'react-jsx-parser';
+import { Log, LogInfo, LogError, LogEnable } from '../../utils/Logger';
 import log from 'loglevel';
 
 import OlabConstantTag from '../WikiTags/Constant/Constant';
 import OlabCountersTag from '../WikiTags/Counters/Counter';
 import OlabCounterTag from '../WikiTags/Counter/Counter';
 import OlabLinksTag from '../WikiTags/Links';
+import OlabReportTag from '../WikiTags/Report/Report';
 import OlabMediaResourceTag from '../WikiTags/MediaResource/MediaResource';
 import OlabQuestionTag from '../WikiTags/Question/Question';
-import OlabAttendeeTag from '../WikiTags/Turkee/Turkee';
-import OlabModeratorTag from '../WikiTags/Turker/Turker';
+import OlabAttendeeTag from '../WikiTags/Question/TurkTalk/Turkee/Turkee';
+import OlabModeratorTag from '../WikiTags/Question/TurkTalk/Turker/Turker';
+import { withParams } from "../ComponentWrapper";
 
 import styles from './styles';
 import {
@@ -22,66 +24,67 @@ import {
   getNodeScopedObjects,
   getServerScopedObjects,
   getDynamicScopedObjects
-} from '../../services/api'
-const persistantStorage = require('../../utils/StateStorage').PersistantStateStorage;
+} from '../../services/api';
+
+const playerState = require('../../utils/PlayerState').PlayerState;
 
 class Player extends PureComponent {
 
   constructor(props) {
+    
     super(props);
 
-    log.enableAll();
+    LogEnable();
 
-    const { params: { mapId, nodeId, param } } = this.props.match;
-    log.info(`playing map ${mapId}, node ${nodeId}, param ${param}`);
+    const { mapId, nodeId } = arguments[0].params;
+    LogInfo(`playing map ${mapId}, node ${nodeId}`);
 
     this.state = {
-      scopedObjects: {
-        map: null,
-        node: null,
-        server: null
-      },
-      disableCache: false,
-      enableWikiTranslation: true,
-      isDynamicFetched: false,
-      isMapFetched: false,
-      isNodeFetched: false,
-      isScopedObjectsFetched: false,
-      isServerFetched: false,
-      map: null,
-      mapId: Number(mapId),
-      node: null,
-      nodesVisited: [],
-      nodeId: Number(nodeId),
-      urlParam: param,
-      sessionId: null,
-      signalRConnection: null
+      isMounted: false,
+      signalRConnection: null,
     };
 
-    this.state.enableWikiTranslation = !persistantStorage.get('dbg-disableWikiRendering');
-    this.state.disableCache = persistantStorage.get('dbg-disableDataCaching');
+    this.getServer = this.getServer.bind(this);
+    this.getMap = this.getMap.bind(this);
+    this.getNode = this.getNode.bind(this);
+    this.onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
 
-    if (!this.state.disableCache) {
+    if (this.state.disableCache) {
 
-      this.state.map = persistantStorage.get('map');
-      this.state.node = persistantStorage.get('node');
+      LogInfo(`disabled cache`);
+      playerState.clear(null);
 
-      this.state.scopedObjects.server = persistantStorage.get('server-so');
-      this.state.scopedObjects.map = persistantStorage.get('map-so');
-      this.state.scopedObjects.node = persistantStorage.get('node-so');
-      this.state.nodesVisited = persistantStorage.get('visit-once-nodes');
     }
     else {
-      log.info(`disabled cache`);
+
+      const persistedState = playerState.Get();
+
+      this.state = {
+        ...this.state,
+        ...persistedState
+      }
+
     }
 
     // eslint-disable-next-line
     window.addEventListener('popstate', function (event) {
       // eslint-disable-next-line
       history.pushState(null, document.title, location.href);
-      alert('Back button disabled during map play.');
+      alert('Back button disabled during case play.');
     });
 
+  }
+
+  async componentDidMount() {
+
+    this.setState({ mapId: this.props.params.mapId });
+    this.setState({ nodeId: this.props.params.nodeId });
+
+    await this.getServer(this.props, 1);
+    await this.getMap(this.props);
+    await this.getNode(this.props);
+
+    this.setState({ isMounted: true });
   }
 
   lookupTheme = () => {
@@ -100,7 +103,7 @@ class Player extends PureComponent {
       }
 
     } catch (error) {
-      log.error(error);
+      LogError(error);
     }
 
     if (theme) {
@@ -117,23 +120,16 @@ class Player extends PureComponent {
       // test if already have server loaded
       var { scopedObjects: { server }, disableCache } = this.state;
 
-      if (this.state.disableCache) {
-        persistantStorage.save('server-so', {});
-      }
-
       if (server && !disableCache) {
         this.setState({ isServerFetched: true });
         log.debug('using cached server data');
         return;
       }
 
-      this.setState({ isServerFetched: false });
-
       const { data: scopedObjectsData } = await getServerScopedObjects(props, id);
       const { scopedObjects } = this.state;
 
       this.setState({
-        isServerFetched: true,
         scopedObjects: {
           map: scopedObjects.map,
           node: scopedObjects.node,
@@ -142,27 +138,23 @@ class Player extends PureComponent {
       });
 
       if (!this.state.disableCache) {
-        persistantStorage.save('server-so', this.state.scopedObjects.server);
+        playerState.SetServerStatic( null, this.state.scopedObjects.server );
       }
 
       log.debug('read server data');
 
     } catch (error) {
-      log.error(error);
+      LogError(error);
     }
   }
 
-  getMap = async (props, id) => {
+  getMap = async (props) => {
 
     try {
 
       // test if already have map loaded (and it's the same one)
       var { map, disableCache } = this.state;
-
-      if (this.state.disableCache) {
-        persistantStorage.save('map-so', {});
-        persistantStorage.save('map', {});
-      }
+      let { mapId: id } = this.state;
 
       if (map && !disableCache) {
 
@@ -174,14 +166,11 @@ class Player extends PureComponent {
 
       }
 
-      this.setState({ isMapFetched: false });
-
       const { data: objData } = await getMap(props, id);
       const { data: scopedObjectsData } = await getMapScopedObjects(props, id);
       const { scopedObjects } = this.state;
 
       this.setState({
-        isMapFetched: true,
         map: objData,
         scopedObjects: {
           map: scopedObjectsData,
@@ -191,54 +180,77 @@ class Player extends PureComponent {
       });
 
       if (!this.state.disableCache) {
-        persistantStorage.save('map-so', this.state.scopedObjects.map);
-        persistantStorage.save('map', this.state.map);
+        playerState.SetMapStatic( null, this.state.scopedObjects.map );
+        playerState.SetMap( null, this.state.map);
       }
 
       log.debug('read map data');
 
     } catch (error) {
-      log.error(error);
+      LogError(error);
     }
 
   }
 
-  getNode = async (props, mapId, nodeId) => {
+  getNode = async (props) => {
 
     try {
 
-      if (this.state.disableCache) {
-        persistantStorage.save('node', {});
-        persistantStorage.save('node-so', {});
-      }
-      else {
-        // reset nodes visited if entering map via 'root node'
-        if (nodeId === 0) {
-          persistantStorage.save('visit-once-nodes', []);
-          this.setState({ nodesVisited: [] });
-        }
+      let {
+        mapId,
+        nodeId,
+        dynamicObjects,
+        node,
+        disableCache
+      } = this.state;
+
+      // reset nodes visited if entering map via 'root node'
+      if (nodeId == 0) {
+        this.setState({ nodesVisited: [] });
+        playerState.SetNodesVisited(null, []);
       }
 
       // test if already have node loaded (and it's the same one)
-      var { node, disableCache } = this.state;
       if (node && !disableCache) {
         if (Number(nodeId) === node.id) {
-          this.setState({ isNodeFetched: true });
           log.debug('using cached node data');
           return;
         }
       }
 
-      this.setState({ isNodeFetched: false });
+      // if no dynamic objects yet, initialize an object
+      if (!dynamicObjects) {
+        dynamicObjects = {
+          map: null,
+          node: null,
+          server: null
+        };
+      }
 
-      const { data: objData } = await getMapNode(props, mapId, nodeId);
-      const { data: scopedObjectsData } = await getNodeScopedObjects(props, objData.id);
+      const { data: nodeData } = await getMapNode(props, mapId, nodeId, dynamicObjects);
+      const { data: scopedObjectsData } = await getNodeScopedObjects(props, nodeData.id);
       const { scopedObjects } = this.state;
 
+      // delete the dynamic objects that piggy-back 
+      // on the node object
+      dynamicObjects = nodeData.dynamicObjects;
+      delete nodeData.dynamicObjects;
+
+      // if root node, save the new contextId
+      if (nodeData.typeId === 1) {
+        playerState.SetContextId( null, nodeData.contextId);
+
+      }
+      else {
+        nodeData.contextId = playerState.GetContextId( null );
+      }
+
+      LogInfo(`contextId: ${nodeData.contextId}`);
+
       this.setState({
-        isNodeFetched: true,
-        node: objData,
-        sessionId: objData.sessionId,
+        contextId: nodeData.contextId,
+        node: nodeData,
+        dynamicObjects: dynamicObjects,
         scopedObjects: {
           map: scopedObjects.map,
           node: scopedObjectsData,
@@ -247,24 +259,22 @@ class Player extends PureComponent {
       });
 
       if (!this.state.disableCache) {
-        persistantStorage.save('node', this.state.node);
-        persistantStorage.save('node-so', this.state.scopedObjects.node);
-      }
-
-      if ( nodeId === 0 ) {
-        persistantStorage.save('sessionId', objData.sessionId);
+        playerState.SetNode( null, this.state.node);
+        playerState.SetDynamicObjects( null, this.state.dynamicObjects);        
+        playerState.SetNodeStatic( null, this.state.scopedObjects.node);        
       }
 
       log.debug('read node data');
 
     } catch (error) {
-      log.error(error);
+      LogError(error);
+      
     }
 
   }
 
-  setCounterChange = ( state ) => {
-    alert( state );
+  setCounterChange = (state) => {
+    alert(state);
   }
 
   getDynamic = async (props, state) => {
@@ -275,16 +285,15 @@ class Player extends PureComponent {
       const { data: scopedObjectsData } = await getDynamicScopedObjects(props, state.mapId, state.nodeId);
 
       this.setState({
-        isDynamicFetched: true,
         dynamicObjects: scopedObjectsData
       });
 
-      persistantStorage.save('dynamic-so', this.state.dynamicObjects);
+      playerState.SetDynamicObjects( null, this.state.dynamicObjects);
 
       log.debug('read dynamic data');
 
     } catch (error) {
-      log.error(error);
+      LogError(error);
     }
 
   }
@@ -304,38 +313,29 @@ class Player extends PureComponent {
     window.location.href = url;
   }
 
-  async componentDidMount() {
-    await this.getServer(this.props, 1);
-    await this.getMap(this.props, this.state.mapId);
-    await this.getNode(this.props, this.state.mapId, this.state.nodeId);
-    await this.getDynamic(this.props, this.state);
-  }
-
   onUpdateDynamicObjects = (dynamicObjects) => {
     this.setState({ dynamicObjects: dynamicObjects });
-    persistantStorage.save('dynamic-so', this.state.dynamicObjects);
+    playerState.SetDynamicObjects( null, this.state.dynamicObjects);
   }
 
   onJsxParseError(arg) {
     const t = arg;
-    log.error(t);
+    LogError(t);
     alert(`Renderer error: ${t}`);
   }
 
   render() {
 
     const {
-      isMapFetched,
-      isNodeFetched,
-      isServerFetched,
-      isDynamicFetched,
+      debug,
+      isMounted,
       map,
       node,
       nodesVisited,
       scopedObjects,
       dynamicObjects,
       urlParam,
-      sessionId
+      contextId
     } = this.state;
 
     const {
@@ -343,12 +343,12 @@ class Player extends PureComponent {
       authActions,
     } = this.props;
 
-    if (isServerFetched && isMapFetched && isNodeFetched && isDynamicFetched) {
+    if (isMounted) {
 
       const linkHandler = this.onNavigateToNode;
+      const onUpdateDynamicObjects = this.onUpdateDynamicObjects;
       const theme = this.lookupTheme();
       const haveTheme = (theme != null);
-      const onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
 
       document.title = node.title;
       this.setPageTitle(map.name, node.title);
@@ -361,17 +361,28 @@ class Player extends PureComponent {
               showWarnings
               bindings={{
                 props: {
-                  linkHandler,
+                  contextId,
+                  dynamicObjects,
                   history,
+                  linkHandler,
                   map,
                   node,
+                  nodesVisited,
                   scopedObjects,
                   urlParam,
-                  nodesVisited,
-                  sessionId
                 },
               }}
-              components={{ OlabConstantTag, OlabQuestionTag, OlabLinksTag, OlabCountersTag, OlabCounterTag, OlabMediaResourceTag, OlabAttendeeTag, OlabModeratorTag }}
+              components={{
+                OlabAttendeeTag,
+                OlabConstantTag,
+                OlabCountersTag,
+                OlabCounterTag,
+                OlabLinksTag,
+                OlabMediaResourceTag,
+                OlabModeratorTag,
+                OlabReportTag,
+                OlabQuestionTag,
+              }}
               jsx={theme?.header}
               onError={(arg) => this.onJsxParseError(arg)}
             />
@@ -387,18 +398,28 @@ class Player extends PureComponent {
               showWarnings
               bindings={{
                 props: {
-                  linkHandler,
+                  contextId,
+                  dynamicObjects,
                   history,
+                  linkHandler,
                   map,
                   node,
-                  scopedObjects,
-                  dynamicObjects,
-                  urlParam,
                   nodesVisited,
-                  sessionId
+                  scopedObjects,
+                  urlParam,
                 },
               }}
-              components={{ OlabConstantTag, OlabQuestionTag, OlabLinksTag, OlabCountersTag, OlabCounterTag, OlabMediaResourceTag, OlabAttendeeTag, OlabModeratorTag }}
+              components={{
+                OlabAttendeeTag,
+                OlabConstantTag,
+                OlabCountersTag,
+                OlabCounterTag,
+                OlabLinksTag,
+                OlabMediaResourceTag,
+                OlabModeratorTag,
+                OlabReportTag,
+                OlabQuestionTag,
+              }}
               jsx={theme?.footer}
               onError={(arg) => this.onJsxParseError(arg)}
             />
@@ -423,10 +444,20 @@ class Player extends PureComponent {
                 dynamicObjects,
                 urlParam,
                 nodesVisited,
-                sessionId
+                contextId
               },
             }}
-            components={{ OlabConstantTag, OlabQuestionTag, OlabLinksTag, OlabCountersTag, OlabCounterTag, OlabMediaResourceTag, OlabAttendeeTag, OlabModeratorTag }}
+            components={{
+              OlabAttendeeTag,
+              OlabConstantTag,
+              OlabCountersTag,
+              OlabCounterTag,
+              OlabLinksTag,
+              OlabMediaResourceTag,
+              OlabModeratorTag,
+              OlabReportTag,
+              OlabQuestionTag,
+            }}
             jsx={node.text}
             onError={(arg) => this.onJsxParseError(arg)}
           />
@@ -438,17 +469,17 @@ class Player extends PureComponent {
         nodesVisited.push(this.state.node.id);
 
         // remove any duplicates.
-        var newNodesVisited = [ ...new Set(nodesVisited) ];        
+        var newNodesVisited = [...new Set(nodesVisited)];
         this.setState({ nodesVisited: newNodesVisited });
-        
+
         log.debug(`saving visited node id: ${this.state.node.id}`);
-        persistantStorage.save('visit-once-nodes', newNodesVisited);
+        playerState.SetNodesVisited(null, newNodesVisited);
 
         log.debug(`Added node id ${this.state.node.id} to visitOnce list`);
       }
 
 
-      if (!persistantStorage.get('dbg-disableWikiRendering')) {
+      if (debug.enableWikiRendering) {
         return (
           <>
             {header}
@@ -489,5 +520,4 @@ class Player extends PureComponent {
   }
 }
 
-// export default withStyles(styles)(Player);
-export default withRouter((withStyles(styles)(Player)))
+export default withParams((withStyles(styles)(Player)));

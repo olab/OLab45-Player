@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import { getQuestion } from '../WikiTags';
 import {
-  submitQuestionValue
+  postQuestionValue
 } from '../../../services/api'
 import styles from '../styles.module.css';
 import OlabMultilineTextQuestion from './MultilineText/MultilineText';
@@ -14,9 +14,12 @@ import OlabMultiPickQuestion from './MultiChoice/MultiChoice';
 import OlabSliderQuestion from './Slider/Slider';
 import OlabDropDownQuestion from './DropDown/DropDown';
 import OlabDragAndDropQuestion from './DragAndDrop/DragAndDrop';
+import OlabAttendeeTag from './TurkTalk/Turkee/Turkee';
+import OlabModeratorTag from './TurkTalk/Turker/Turker';
 
-
-const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../../../utils/PlayerState').PlayerState;
+import { Log, LogInfo, LogError } from '../../../utils/Logger';
+import log from 'loglevel';
 
 class OlabQuestionTag extends React.Component {
 
@@ -24,15 +27,8 @@ class OlabQuestionTag extends React.Component {
 
     super(props);
 
-    const {
-      name,
-      props: {
-        map,
-        node
-      }
-    } = this.props;
-
-    let question = getQuestion(name, this.props);
+    let question = getQuestion(this.props.name, this.props);
+    const debug = playerState.GetDebug();
 
     if ((question.questionType !== 3) && (question.questionType !== 2)) {
       if (question.value === null) {
@@ -50,10 +46,9 @@ class OlabQuestionTag extends React.Component {
     }
 
     this.state = {
-      question: question,
-      map,
-      node,
-      dynamicObjects: this.props.props.dynamicObjects
+      question,
+      ...props.props,
+      debug
     };
 
     // Binding this keyword  
@@ -71,18 +66,33 @@ class OlabQuestionTag extends React.Component {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+
   onSubmitResponse = async (newState) => {
-    var { data } = await submitQuestionValue(newState);
-    if (data != null) {
+
+    // send question response to server and get the
+    // new dynamic objects state
+    var { data } = await postQuestionValue(newState);
+
+    // bubble up the dynamic object to player since the
+    // dynamic objects may be shared to other components
+    if ((data != null) && (this.props.props.onUpdateDynamicObjects)) {
       this.props.props.onUpdateDynamicObjects(data);
     }
   }
 
   render() {
 
+    const { debug } = this.state;
+    const questionDivStyle = {
+      paddingTop: '10px',
+      paddingBottom: '10px',
+    };
+
+    log.debug(`rendering question '${this.state.question.name}' typeid: ${this.state.question.questionType}`);
+
     if (this.state.question != null) {
 
-      if (persistantStorage.get('dbg-disableWikiRendering')) {
+      if (!debug.enableWikiRendering) {
         return (
           <>
             <b>{this.state.question.wiki} type {this.state.question.questionType} "{this.state.question.stem}"</b>
@@ -100,7 +110,8 @@ class OlabQuestionTag extends React.Component {
         question: this.state.question,
         map: this.state.map,
         node: this.state.node,
-        dynamicObjects: this.state.dynamicObjects
+        dynamicObjects: this.state.dynamicObjects,
+        contextId: this.props.props.contextId
       };
 
       let questionType = props.question.questionType;
@@ -108,31 +119,57 @@ class OlabQuestionTag extends React.Component {
       switch (questionType) {
         case 1:
           return (
-            <OlabSinglelineTextQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabSinglelineTextQuestion props={props} />
+            </div>
           );
         case 2:
           return (
-            <OlabMultilineTextQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabMultilineTextQuestion props={props} />
+            </div>
           );
         case 3:
           return (
-            <OlabMultiPickQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabMultiPickQuestion props={props} />
+            </div>
           );
         case 4:
           return (
-            <OlabSinglePickQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabSinglePickQuestion props={props} />
+            </div>
           );
         case 5:
           return (
-            <OlabSliderQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabSliderQuestion props={props} />
+            </div>
           );
         case 6:
           return (
-            <OlabDragAndDropQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabDragAndDropQuestion props={props} />
+            </div>
+          );
+        case 11:
+          return (
+            <div style={questionDivStyle}>
+              <OlabModeratorTag props={props} />
+            </div>
           );
         case 12:
           return (
-            <OlabDropDownQuestion props={props} />
+            <div style={questionDivStyle}>
+              <OlabDropDownQuestion props={props} />
+            </div>
+          );
+        case 15:
+          return (
+            <div style={questionDivStyle}>
+              <OlabAttendeeTag props={props} />
+            </div>
           );
         default:
           return (

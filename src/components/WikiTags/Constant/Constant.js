@@ -1,13 +1,25 @@
 // @flow
 import React from 'react';
 import parse from 'html-react-parser'
-import log from 'loglevel';
 import { getConstant } from '../WikiTags';
-const persistantStorage = require('../../../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../../../utils/PlayerState').PlayerState;
+import { Log, LogInfo, LogError } from '../../../utils/Logger';
+import log from 'loglevel';
 
 class OlabConstantTag extends React.Component {
 
+  constructor(props) {
+
+    super(props);
+    
+    const debug = playerState.GetDebug();
+    this.state = { debug };
+
+  }
+
   render() {
+
+    const { debug } = this.state;
 
     const {
       name
@@ -20,7 +32,7 @@ class OlabConstantTag extends React.Component {
 
       if (item != null) {
 
-        if (persistantStorage.get('dbg-disableWikiRendering')) {
+        if (!debug.enableWikiRendering) {
           return (
             <>
               <b>[[CONST:{name}]] "{item.value}"</b>

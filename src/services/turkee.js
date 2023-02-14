@@ -1,7 +1,9 @@
 import TurkTalk from './turktalk';
+import { Log, LogInfo, LogError } from '../utils/Logger';
 import log from 'loglevel';
 var constants = require('./constants');
-const persistantStorage = require('../utils/StateStorage').PersistantStateStorage;
+
+const playerState = require('../utils/PlayerState').PlayerState;
 
 class Turkee extends TurkTalk {
 
@@ -9,19 +11,20 @@ class Turkee extends TurkTalk {
   constructor(component) {
 
     super(component);
+
+    this.session = component.state.session;
     this.bindConnectionMessage(this.connection);
     this.onDisconnected = this.onDisconnected.bind(this);
     this.playerState = component.props.props;
-    this.penName = `${component.props.props.map.name}|${component.props.name}`;
   }
 
   // *****
   bindConnectionMessage() {
 
     super.bindConnectionMessage();
-    var self = this;
+    var turkeeSelf = this;
 
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommandCallback(payload) });
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkeeSelf.onCommand(payload) });
   }
 
   // *****
@@ -33,9 +36,9 @@ class Turkee extends TurkTalk {
   // *****
   onConnected(clientObject) {
 
-    log.info(`onConnected: connection succeeded.  Id = '${this.connection.connectionId}'`);
+    LogInfo(`'${this.connection.connectionId}' onConnected: connection succeeded`);
 
-    this.connectionId = this.connection.connectionId;
+    this.connectionId = this.connection.connectionId.slice(-3);
 
     this.connection.onclose(clientObject.onDisconnected);
     this.connection.onreconnecting(clientObject.onReconnecting);
@@ -44,23 +47,31 @@ class Turkee extends TurkTalk {
     if (this.component.onConnectionChanged) {
       this.component.onConnectionChanged({
         connectionStatus: this.connection._connectionState,
-        ConnectionId: this.connectionId,
+        connectionId: this.connectionId,
         Name: this.username
       });
     }
 
-    const sessionId = persistantStorage.get('ttalk_sessionId');
+    // get room name from persistant storage in case 
+    // user refreshes the window    
+    this.session.roomName = this.penName;
+    let learner = playerState.GetConnectionInfo(null);
+    if (learner != null) {
+      if (learner.roomName) {
+        this.session.roomName = learner.roomName
+      }
+    }
+
+    log.debug(`'${this.connectionId}' registering turker for session: ${JSON.stringify(this.session, null, 1)}`);
 
     clientObject.connection.send(
       constants.SIGNALCMD_REGISTERTURKEE,
-      clientObject.username,
-      this.penName,
-      sessionId);
+      this.session);
   }
 
   onReconnecting(error) {
     try {
-      log.debug(`onReconnecting: ${error}`);
+      log.debug(`'${this.connectionId}' onReconnecting: ${error}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -69,13 +80,13 @@ class Turkee extends TurkTalk {
         });
       }
     } catch (error) {
-      log.error(`onReconnecting exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onReconnecting exception: ${error.message}`);
     }
   }
 
   onReconnected(connectionId) {
     try {
-      log.debug(`onReconnected: ${connectionId}`);
+      log.debug(`'${connectionId}' onReconnected`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -84,7 +95,7 @@ class Turkee extends TurkTalk {
         });
       }
     } catch (error) {
-      log.error(`onReconnected exception: ${error.message}`);
+      LogError(`'${connectionId}' onReconnected exception: ${error.message}`);
     }
   }
 
@@ -92,51 +103,73 @@ class Turkee extends TurkTalk {
   onDisconnected() {
 
     try {
-      log.debug(`onDisconnected`);
-      if (this.component.onConnectionChanged) {
 
-        // clear out session id
-        persistantStorage.save('ttalk_sessionId');
+      if ( !this?.component?.componentMounted ) {
+        return;
+      }
+
+      log.debug(`'${this.connectionId}' onDisconnected`);
+
+      if (this?.component?.onConnectionChanged) {
 
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
-          ConnectionId: '',
+          connectionId: '',
           Name: this.username
         });
       }
 
     } catch (error) {
-      log.error(`onDisconnected exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onDisconnected exception: ${error.message}`);
     }
 
   }
 
   // *****
-  onCommandCallback(payloadJson) {
+  onCommand(payload) {
 
     try {
 
-      let payload = JSON.parse(payloadJson);
-
-      log.debug(`onCommandCallback: ${payload.Command}, ${JSON.stringify(payload.Data, null, 2)}]`);
+      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
 
       // test if command NOT handled in base class
-      if (super.onCommandCallback(payload)) {
+      if (super.onCommand(payload)) {
         return;
       }
 
+      // if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
 
-      if (payload.Command === constants.SIGNALCMD_ASSIGNED) {
+      //   if (this.component.onRoomAssigned) {
+      //     this.component.onRoomAssigned(payload.data);
+      //   }
 
-        if (this.component.onAssigned) {
-          this.component.onAssigned(payload.Data);
+      //   return true;
+      // }
+
+      if (payload.command === constants.SIGNALCMD_MODERATOR_STATUS) {
+
+        if (this.component.onModeratorStatus) {
+          this.component.onModeratorStatus(payload.data);
         }
 
         return true;
       }
 
+      // else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
+
+      //   if (this.component.onAtriumAssigned) {
+      //     this.component.onAtriumAssigned(payload.data);
+      //   }
+
+      //   return true;
+      // }
+
+      else {
+        log.debug(`'${this.connectionId}' onCommand unknown command: '${payload.command}'`);
+      }
+
     } catch (error) {
-      log.error(`onCommandCallback exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onCommand exception: ${error.message}`);
     }
 
   }

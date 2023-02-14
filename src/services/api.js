@@ -1,6 +1,7 @@
+import { Log, LogInfo, LogError } from '../utils/Logger';
 import log from 'loglevel';
 import { config } from '../config';
-const persistantStorage = require('../utils/StateStorage').PersistantStateStorage;
+const playerState = require('../utils/PlayerState').PlayerState;
 
 async function importer(props, fileName) {
 
@@ -109,8 +110,37 @@ async function getDownload(props, file) {
     })
     .catch(function (error) {
       alert('Fetch error: ' + error.message);
-      log.error(error);
+      LogError(error);
     })
+}
+
+async function getSessionReport(props, contextId) {
+  const token = props.authActions.getToken();
+  const url = `${config.API_URL}/reports/${contextId}`;
+
+  log.debug(`getSessionReport(${props.map?.id}) url: ${url})`);
+
+  return fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+    .then((data) => {
+      if (data.status === 402) {
+        props.authActions.logout();
+      }
+      return data.json();
+    })
+    // @Corey, I've added this line to catch any misc HTTP errors meanwhile
+    .catch((error) => void log.debug(`getSessionReport(${props.map?.id}) error: ${error.stack})`))
+}
+
+async function getSessionReportDownloadUrl(props, contextId) {
+  // @Corey, this will need backend implementation for an application/octet-stream download (excel)
+  const url = `${config.API_URL}/reports/${contextId}/excel`;
+  return url;
 }
 
 async function getMapScopedObjects(props, mapId) {
@@ -134,26 +164,34 @@ async function getMapScopedObjects(props, mapId) {
     });
 }
 
-async function getMapNode(props, mapId, nodeId) {
+async function getMapNode(props, mapId, nodeId, dynamicObjects) {
 
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/node/${nodeId}`;
   log.debug(`getMapNode(${mapId}, ${nodeId}) url: ${url})`);
-  let sessionId = persistantStorage.get('sessionId');
+  let contextId = playerState.GetContextId( null );
 
   return fetch(url, {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
-      'OLabSessionId': sessionId
-    }
+      'OLabSessionId': contextId
+    },
+    body: JSON.stringify( dynamicObjects )
   })
     .then((data) => {
+
       if (data.status === 402) {
         props.authActions.logout();
       }
-      return data.json();
+
+      else if ( data.status === 200 ) {
+        return data.json();
+      }
+
+      throw new Error(`Error ${data.statusText} retrieving node ${nodeId} `);
+
     });
 }
 
@@ -220,19 +258,26 @@ async function getServerScopedObjects(props, serverId) {
     });
 }
 
-async function submitQuestionValue(state) {
+async function postQuestionValue(state) {
 
-  const { map, node, authActions, dynamicObjects, question, responseId, value, setInProgress } = state;
+  const { 
+    map, 
+    node, 
+    authActions, 
+    dynamicObjects, 
+    question, 
+    responseId, 
+    value, 
+    setInProgress, 
+    contextId } = state;
 
   let token = authActions.getToken();
   let url = `${config.API_URL}/response/${question.id}`;
-  let sessionId = persistantStorage.get('sessionId');
 
-  log.debug(`submitQuestionValue(${question.id}, ${responseId}, ${value}, [func]) url: ${url})`);
+  log.debug(`postQuestionValue(${question.id}, ${responseId}, ${value}, [func]) url: ${url})`);
 
-  if (typeof setInProgress !== 'undefined') {
-    setInProgress(true);
-  }
+  // signal to caller that we are starting the work
+  if (setInProgress) { setInProgress(true); }
 
   let body = {
     mapId: map.id,
@@ -242,7 +287,7 @@ async function submitQuestionValue(state) {
     previousResponseId: question.previousResponseId,
     value: question.value,
     previousValue: question.previousValue,
-    dynamicObjects: dynamicObjects,
+    dynamicObjects: dynamicObjects
   };
 
   return fetch(url, {
@@ -250,15 +295,14 @@ async function submitQuestionValue(state) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
-      'OLabSessionId': sessionId
+      'OLabSessionId': contextId
     },
     body: JSON.stringify(body)
   })
     .then((data) => {
 
-      if (typeof setInProgress !== 'undefined') {
-        setInProgress(false);
-      }
+      // signal to caller that we are done the work
+      if (!setInProgress) { setInProgress(false); }
 
       if (data.status === 402) {
         authActions.logout();
@@ -273,14 +317,16 @@ async function submitQuestionValue(state) {
 }
 
 export {
-  getMap,
-  getMaps,
   getDownload,
-  getMapScopedObjects,
+  getDynamicScopedObjects,
+  getMap,
   getMapNode,
+  getMaps,
+  getMapScopedObjects,
   getNodeScopedObjects,
   getServerScopedObjects,
-  getDynamicScopedObjects,
+  getSessionReport,
+  getSessionReportDownloadUrl,
   importer,
-  submitQuestionValue
+  postQuestionValue,
 };

@@ -8,7 +8,11 @@ import {
   FormControl,
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
+import { Log, LogInfo, LogError } from '../../../../utils/Logger';
 import log from 'loglevel';
+
+import CloseIcon from '@material-ui/icons/Close';
+import CheckIcon from '@material-ui/icons/Check';
 
 import styles from '../../styles.module.css';
 import siteStyles from '../../site.module.css';
@@ -20,12 +24,7 @@ class OlabMultiPickQuestion extends React.Component {
     super(props);
 
     this.state = {
-      id: props.props.id,
-      name: props.props.name,
-      question: props.props.question,
-      dynamicObjects: props.props.dynamicObjects,
-      showProgressSpinner: false,
-      disabled: false
+      ...props.props
     };
 
     // Binding this keyword  
@@ -94,9 +93,18 @@ class OlabMultiPickQuestion extends React.Component {
 
     log.debug(`OlabMultiPickQuestion set question '${question.id}' value = '${value}'`);
 
+    // if single try question, disabled it
+    if (question.numTries > 0) {
+      question.disabled = true;
+    }
+
+    // first attempt to answer, so show answer
+    // indicators, if called on
+    question.showAnswerIndicators = true;
+
     this.setState(state => {
       question.previousValue = question.value;
-      question.value = value;  
+      question.value = value;
       return ({ question });
     },
       () => this.transmitResponse()
@@ -106,13 +114,19 @@ class OlabMultiPickQuestion extends React.Component {
 
   transmitResponse() {
 
-    const { onSubmitResponse, authActions, map, node } = this.props.props;
+    const {
+      onSubmitResponse,
+      authActions,
+      map,
+      node,
+      contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
       authActions,
       map,
       node,
+      contextId,
       setInProgress: this.setInProgress,
       setIsDisabled: this.setIsDisabled
     };
@@ -134,13 +148,55 @@ class OlabMultiPickQuestion extends React.Component {
     log.debug(`set disabled: ${disabled}`);
   }
 
+  buildQuestionResponses(question, currentChoices) {
+
+    let responses = [];
+
+    for (const response of question.responses) {
+      let responseHtml = this.buildQuestionResponse(question, response, currentChoices);
+      responses.push(responseHtml);
+    }
+
+    return responses;
+  }
+
+  buildQuestionResponse(question, response, currentChoices) {
+
+    let correctnessIndicator = (<>{response.response}</>);
+
+    if (question.showAnswer) {
+
+      // test for 'correct' answer
+      if ((response.isCorrect > 0) && question.showAnswerIndicators) {
+        correctnessIndicator = (<>{response.response}<CheckIcon style={{ color: 'green' }} /></>);
+      }
+
+      // test for 'incorrect' answer
+      if ((response.isCorrect == 0) && question.showAnswerIndicators) {
+        correctnessIndicator = (<>{response.response}<CloseIcon style={{ color: 'red' }} /></>);
+      }
+    }
+
+    let responseHtml = (
+      <FormControlLabel
+        onChange={(event) => this.setValue(event, currentChoices, response.id.toString())}
+        key={response.id}
+        control={<Checkbox name={`qr-${response.id}`} />}
+        label={correctnessIndicator}
+        checked={currentChoices.includes(response.id.toString())}
+      />
+    );
+
+    return responseHtml;
+
+  }
+
   render() {
 
     const {
       id,
       name,
-      question,
-      disabled
+      question
     } = this.state;
 
     log.debug(`OlabMultiPickQuestion render '${name}'`);
@@ -149,24 +205,15 @@ class OlabMultiPickQuestion extends React.Component {
       let row = question.layoutType === 1 ? true : false;
       let currentChoices = this.createArrayFromValue(question.value);
 
+      var responses = this.buildQuestionResponses(question, currentChoices);
+      var disabled = question.disabled == 0 ? false : true;
+
       return (
         <div className={`${styles['qumultichoice']} ${siteStyles[id]}`} id={`${id}`}>
-          <FormControl component="fieldset">
+          <FormControl component="fieldset" disabled={disabled}>
             <FormLabel component="legend">{question.stem}</FormLabel>
-            <FormGroup
-              row={row}
-            >
-              {question.responses.map((response) => (
-                <FormControlLabel
-                  onChange={(event) => this.setValue(event, currentChoices, response.id.toString())}
-                  key={response.id.toString()}
-                  control={<Checkbox name={`qr-${response.id}`} />}
-                  label={response.response}
-                  checked={currentChoices.includes(response.id.toString())}
-                  disabled={disabled}
-                />
-              ))}
-
+            <FormGroup row={row} >
+              {responses}
             </FormGroup>
           </FormControl>
 
