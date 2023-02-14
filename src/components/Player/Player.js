@@ -5,6 +5,7 @@ import JsxParser from 'react-jsx-parser';
 import { Log, LogInfo, LogError, LogEnable } from '../../utils/Logger';
 import log from 'loglevel';
 
+import ErrorPopup from '../ErrorPopup/ErrorPopup';
 import OlabConstantTag from '../WikiTags/Constant/Constant';
 import OlabCountersTag from '../WikiTags/Counters/Counter';
 import OlabCounterTag from '../WikiTags/Counter/Counter';
@@ -47,6 +48,8 @@ class Player extends PureComponent {
     this.getServer = this.getServer.bind(this);
     this.getMap = this.getMap.bind(this);
     this.getNode = this.getNode.bind(this);
+    this.onErrorDismissed = this.onErrorDismissed.bind(this);
+    
     this.onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
 
     if (this.state.disableCache) {
@@ -60,6 +63,8 @@ class Player extends PureComponent {
       const persistedState = playerState.Get();
 
       this.state = {
+        errorFound: false,
+        errorMessage: null,
         ...this.state,
         ...persistedState
       }
@@ -267,8 +272,7 @@ class Player extends PureComponent {
       log.debug('read node data');
 
     } catch (error) {
-      LogError(error);
-      
+      this.setState({ errorFound: true, errorMessage: error.message });      
     }
 
   }
@@ -324,6 +328,11 @@ class Player extends PureComponent {
     alert(`Renderer error: ${t}`);
   }
 
+  onErrorDismissed() {
+    log.debug(`navigating to /player`);
+    window.location.href = '/player';    
+  }
+
   render() {
 
     const {
@@ -335,13 +344,24 @@ class Player extends PureComponent {
       scopedObjects,
       dynamicObjects,
       urlParam,
-      contextId
+      contextId,
+      errorFound,
+      errorMessage
     } = this.state;
 
     const {
       history,
       authActions,
     } = this.props;
+
+    // paint an error box
+    if ( errorFound ) {
+      return (<ErrorPopup props={{
+        onErrorDismissed: this.onErrorDismissed,
+        openErrorBox: errorFound,
+        errorMessage: errorMessage  
+      }}/>);
+    }
 
     if (isMounted) {
 
