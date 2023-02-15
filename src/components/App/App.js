@@ -24,6 +24,7 @@ function App() {
   const searchParams = new URLSearchParams(document.location.search);
   const queryToken = searchParams.get("token");
   const isExternal = (queryToken != null);
+  const [externalLoginStatus, setExternalLoginStatus] = useState(null);
 
   useEffect(() => {
 
@@ -40,7 +41,14 @@ function App() {
         let accessToken = submitExternalToken(queryToken)
           .then((data) => {
             if (data) {
-              authActions.setToken({ authInfo: { token: data.authInfo.token } }, true);
+              if (data.statusCode != 200) {
+                log.error(`Error on externalLogin ${JSON.stringify(data)}`);
+                setExternalLoginStatus(false);
+              }
+              else {
+                authActions.setToken({ authInfo: { token: data.authInfo.token } }, true);
+                setExternalLoginStatus(true);
+              }
             }
           });
       }
@@ -63,7 +71,7 @@ function App() {
   if (isExternal) {
 
     // need non-expired external token in order to invoke Player
-    if (token && !isExpired) {
+    if (token && !isExpired && externalLoginStatus) {
       return (
         <div className="wrapper">
           <Header version={reactVersion} authActions={authActions} />
@@ -75,7 +83,11 @@ function App() {
       );
     }
     else {
-      return (<></>);
+      if ( externalLoginStatus == false ) {
+        return <Login message="Login failed" authActions={authActions} />
+      }
+
+      return (<></>);      
     }
   }
 

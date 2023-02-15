@@ -41,12 +41,12 @@ function Alert(props) {
 //     )
 // }
 
-const Login = ({ authActions, classes }) => {
+const Login = ({ message, authActions, classes }) => {
 
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
-  const [open, setOpen] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState(false);
+  const [open, setOpen] = React.useState(message != null);
+  const [errorMessage, setErrorMessage] = React.useState(message);
   const [inProgress, setInProgress] = React.useState(false);
 
   const handleClose = (event, reason) => {
