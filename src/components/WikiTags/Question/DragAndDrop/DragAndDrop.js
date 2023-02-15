@@ -33,12 +33,12 @@ class OlabDragAndDropQuestion extends React.Component {
     this.setState({ showProgressSpinner: inProgress });
     log.debug(`set progress spinner: ${inProgress}`);
   }
-  
+
   setValue = (responses) => {
 
     const question = this.state.question;
     log.debug(`responses`);
-
+    
     let values = [];
 
     for (const iterator of responses) {
@@ -57,6 +57,8 @@ class OlabDragAndDropQuestion extends React.Component {
 
     log.debug(`OlabSinglePickQuestion set question '${question.id}' value = '${question.value}'.`);
 
+    question.responses = responses;
+    
     this.setState({ question });
     this.transmitResponse();
   }
