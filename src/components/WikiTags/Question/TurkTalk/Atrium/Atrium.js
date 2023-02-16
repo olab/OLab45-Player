@@ -31,10 +31,10 @@ class Atrium extends React.Component {
       localInfo: new SlotInfo()
     };
 
-    this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
-    this.onTurkeeSelected = this.onAtriumLearnerSelected.bind(this);
     this.onAssignClicked = this.onAssignClicked.bind(this);
     this.onAtriumLearnerSelected = this.onAtriumLearnerSelected.bind(this);
+    this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
+    this.onTurkeeSelected = this.onAtriumLearnerSelected.bind(this);
 
     var atriumSelf = this;
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { atriumSelf.onCommand(payload) });

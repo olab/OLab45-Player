@@ -9,7 +9,6 @@ import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
 import MuiAlert from '@material-ui/lab/Alert';
 
-import Atrium from '../Atrium/Atrium';
 import Turker from '../../../../../services/turker';
 import styles from '../../../styles.module.css';
 import TurkerChatCellGrid from './TurkerChatCellGrid';
@@ -43,7 +42,6 @@ class OlabModeratorTag extends React.Component {
     this.handleInfoClose = this.handleInfoClose.bind(this);
     this.onModeratorAssigned = this.onModeratorAssigned.bind(this);
     this.onCloseClicked = this.onCloseClicked.bind(this);
-    this.onAtriumAssignClicked = this.onAtriumAssignClicked.bind(this);
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
 
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
@@ -141,6 +139,13 @@ class OlabModeratorTag extends React.Component {
 
   }
 
+  onAtriumUpdate(currentAtrium) {
+    this.setState({
+      infoOpen: true,
+      infoMessage: 'Atrium Updated'
+    });
+  }
+
   handleInfoClose(event, reason) {
 
     if (reason === 'clickaway') {
@@ -149,26 +154,6 @@ class OlabModeratorTag extends React.Component {
     this.setState({ infoOpen: false });
 
   };
-
-  onAtriumAssignClicked(selectedLearner) {
-
-    let { localInfo } = this.state;
-    log.debug(`'${localInfo.connectionId}' onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
-
-    // signal server with assignment of turkee to this room
-    this.connection.send(
-      constants.SIGNALCMD_ASSIGNTURKEE,
-      selectedLearner,
-      localInfo.roomName);
-
-  }
-
-  onAtriumUpdate(currentAtrium) {
-    this.setState({
-      infoOpen: true,
-      infoMessage: 'Atrium Updated'
-    });
-  }
 
   render() {
 
@@ -197,43 +182,19 @@ class OlabModeratorTag extends React.Component {
           <Grid container item xs={12}>
 
             <TurkerChatCellGrid
+              onAtriumUpdate={this.onAtriumUpdate}
+              userName={userName}
               isModerator={true}
               connection={this.connection}
               roomName={localInfo.roomName}
               localInfo={localInfo}
               mapNodes={mapNodes}
             />
-
-            <Grid container>
-              <div><br /></div>
-            </Grid>
-
-            <Grid container>
-              <Grid container item xs={6}>
-                <Atrium
-                  userName={userName}
-                  connection={this.turker.connection}
-                  onAtriumAssignClicked={this.onAtriumAssignClicked}
-                  onAtriumUpdate={this.onAtriumUpdate}
-                />
-              </Grid>
-              <Grid container item xs={2}>
-                &nbsp;
-              </Grid>
-              <Grid container justifyContent="flex-end" item xs={4}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  style={{ verticalAlign: 'center', height: '30px' }}
-                  onClick={this.onCloseClicked}
-                >
-                  &nbsp;Close Room&nbsp;
-                </Button>
-              </Grid>
-            </Grid>
+            
           </Grid>
+
           <br />
+
           {(infoOpen === true) && (
             <Snackbar open={infoOpen} autoHideDuration={3000} onClose={this.handleInfoClose}>
               <Alert onClose={this.handleInfoClose} severity="info">

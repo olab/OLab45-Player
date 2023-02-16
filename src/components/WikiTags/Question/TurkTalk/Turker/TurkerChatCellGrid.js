@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import {
+  Button,
   Table,
   TableBody,
   TableRow,
@@ -11,6 +12,7 @@ import { Log, LogInfo, LogError } from '../../../../../utils/Logger';
 import log from 'loglevel';
 import styles from '../../../styles.module.css';
 import TurkerChatStatusBar from './TurkerChatStatusBar';
+import Atrium from '../Atrium/Atrium';
 
 import SlotManager from '../SlotManager';
 import ChatCell from '../../../../ChatCell/ChatCell'
@@ -38,11 +40,15 @@ class TurkerChatCellGrid extends React.Component {
       remoteSlots: this.slotManager.RemoteSlots(),
       localInfo: this.props.localInfo,
       showChatGrid: false,
-      sessionId: null
+      sessionId: null,
+      userName: this.props.userName
     };
 
     this.connection = this.props.connection;
     this.connectionId = this.props.connection.connectionId?.slice(-3);
+
+    this.onAtriumAssignClicked = this.onAtriumAssignClicked.bind(this);
+    this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
 
     var turkerChatCellGridSelf = this;
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkerChatCellGridSelf.onCommand(payload) });
@@ -322,9 +328,28 @@ class TurkerChatCellGrid extends React.Component {
 
   }
 
+  onAtriumAssignClicked(selectedLearner) {
+
+    let { localInfo } = this.state;
+    log.debug(`'${localInfo.connectionId}' onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
+
+    // signal server with assignment of turkee to this room
+    this.connection.send(
+      constants.SIGNALCMD_ASSIGNTURKEE,
+      selectedLearner,
+      localInfo.roomName);
+
+  }
+
+  onAtriumUpdate(currentAtrium) {
+    if (this.props.onAtriumUpdate) {
+      this.props.onAtriumUpdate(currentAtrium);
+    }
+  }
+
   render() {
 
-    const { showChatGrid, localInfo, sessionId } = this.state;
+    const { showChatGrid, localInfo, sessionId, userName } = this.state;
 
     if (!showChatGrid) {
       const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
@@ -339,6 +364,35 @@ class TurkerChatCellGrid extends React.Component {
             sessionId={sessionId}
             connection={this.connection}
             localInfo={localInfo} />
+
+          <Grid container>
+            <div><br /></div>
+          </Grid>
+
+          <Grid container>
+            <Grid container item xs={6}>
+              <Atrium
+                userName={userName}
+                connection={this.connection}
+                onAtriumAssignClicked={this.onAtriumAssignClicked}
+                onAtriumUpdate={this.onAtriumUpdate}
+              />
+            </Grid>
+            <Grid container item xs={2}>
+              &nbsp;
+            </Grid>
+            <Grid container justifyContent="flex-end" item xs={4}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                style={{ verticalAlign: 'center', height: '30px' }}
+                onClick={this.onCloseClicked}
+              >
+                &nbsp;Close Room&nbsp;
+              </Button>
+            </Grid>
+          </Grid>
         </Grid>
       );
     }
@@ -352,7 +406,38 @@ class TurkerChatCellGrid extends React.Component {
           sessionId={sessionId}
           connection={this.connection}
           localInfo={localInfo} />
+
+        <Grid container>
+          <div><br /></div>
+        </Grid>
+
+        <Grid container>
+          <Grid container item xs={6}>
+            <Atrium
+              userName={userName}
+              connection={this.connection}
+              onAtriumAssignClicked={this.onAtriumAssignClicked}
+              onAtriumUpdate={this.onAtriumUpdate}
+            />
+          </Grid>
+          <Grid container item xs={2}>
+            &nbsp;
+          </Grid>
+          <Grid container justifyContent="flex-end" item xs={4}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              style={{ verticalAlign: 'center', height: '30px' }}
+              onClick={this.onCloseClicked}
+            >
+              &nbsp;Close Room&nbsp;
+            </Button>
+          </Grid>
+        </Grid>
+
       </Grid>
+
     );
 
   } catch(error) {
