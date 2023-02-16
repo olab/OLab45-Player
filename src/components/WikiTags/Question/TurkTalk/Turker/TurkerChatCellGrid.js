@@ -3,12 +3,14 @@ import * as React from 'react';
 import {
   Table,
   TableBody,
-  TableRow
+  TableRow,
+  Grid
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { Log, LogInfo, LogError } from '../../../../../utils/Logger';
 import log from 'loglevel';
 import styles from '../../../styles.module.css';
+import TurkerChatStatusBar from './TurkerChatStatusBar';
 
 import SlotManager from '../SlotManager';
 import ChatCell from '../../../../ChatCell/ChatCell'
@@ -35,7 +37,8 @@ class TurkerChatCellGrid extends React.Component {
       localSlots: this.slotManager.LocalSlots(),
       remoteSlots: this.slotManager.RemoteSlots(),
       localInfo: this.props.localInfo,
-      showChatGrid: false
+      showChatGrid: false,
+      sessionId: null
     };
 
     this.connection = this.props.connection;
@@ -100,12 +103,12 @@ class TurkerChatCellGrid extends React.Component {
 
   onRoomAssigned(payload) {
     try {
-      
+
     } catch (error) {
       LogError(`'${this.connectionId}' onRoomAssigned exception: ${error.message}`);
     }
   }
-  
+
   // learner has been assigned to the room
   onLearnerAssigned(payload) {
 
@@ -127,7 +130,7 @@ class TurkerChatCellGrid extends React.Component {
       });
 
       // update the slot state in storage
-      persistantStorage.save( null, 
+      persistantStorage.save(null,
         'slotState',
         {
           remoteSlots: this.slotManager.RemoteSlots(),
@@ -155,7 +158,7 @@ class TurkerChatCellGrid extends React.Component {
       });
 
       // update the slot state in storage
-      persistantStorage.save( null, 
+      persistantStorage.save(null,
         'slotState',
         {
           remoteSlots: remoteSlots,
@@ -321,20 +324,36 @@ class TurkerChatCellGrid extends React.Component {
 
   render() {
 
-    const { showChatGrid } = this.state;
+    const { showChatGrid, localInfo, sessionId } = this.state;
 
-    if ( !showChatGrid ) {
+    if (!showChatGrid) {
       const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
 
       return (
-        <div style={emptyGridLayout} >
-          <h3>Waiting for Participant</h3>
-        </div>
+        <Grid container>
+          <div style={emptyGridLayout} >
+            <h3>Waiting for Participant</h3>
+          </div>
+          <TurkerChatStatusBar
+            isModerator={true}
+            sessionId={sessionId}
+            connection={this.connection}
+            localInfo={localInfo} />
+        </Grid>
       );
     }
 
     let chatRows = this.generateChatGrid();
-    return chatRows;
+    return (
+      <Grid container>
+        {chatRows}
+        <TurkerChatStatusBar
+          isModerator={true}
+          sessionId={sessionId}
+          connection={this.connection}
+          localInfo={localInfo} />
+      </Grid>
+    );
 
   } catch(error) {
     return (

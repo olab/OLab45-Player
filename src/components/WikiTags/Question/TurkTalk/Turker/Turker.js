@@ -12,7 +12,6 @@ import MuiAlert from '@material-ui/lab/Alert';
 import Atrium from '../Atrium/Atrium';
 import Turker from '../../../../../services/turker';
 import styles from '../../../styles.module.css';
-import TurkerChatStatusBar from './TurkerChatStatusBar';
 import TurkerChatCellGrid from './TurkerChatCellGrid';
 import Participant from '../../../../../helpers/participant';
 import SlotInfo from '../../../../../helpers/SlotInfo';
@@ -46,7 +45,7 @@ class OlabModeratorTag extends React.Component {
     this.onCloseClicked = this.onCloseClicked.bind(this);
     this.onAtriumAssignClicked = this.onAtriumAssignClicked.bind(this);
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
-    
+
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
 
     this.turker = new Turker(this);
@@ -164,7 +163,7 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  onAtriumUpdate( currentAtrium ) {
+  onAtriumUpdate(currentAtrium) {
     this.setState({
       infoOpen: true,
       infoMessage: 'Atrium Updated'
@@ -197,22 +196,13 @@ class OlabModeratorTag extends React.Component {
         <>
           <Grid container item xs={12}>
 
-            <Grid container>
-              <TurkerChatCellGrid
-                isModerator={true}
-                connection={this.connection}
-                roomName={localInfo.roomName}
-                localInfo={localInfo}
-                mapNodes={mapNodes}
-              />
-
-              <TurkerChatStatusBar
-                isModerator={true}
-                sessionId={sessionId}
-                connection={this.turker.connection}
-                localInfo={localInfo} />
-
-            </Grid>
+            <TurkerChatCellGrid
+              isModerator={true}
+              connection={this.connection}
+              roomName={localInfo.roomName}
+              localInfo={localInfo}
+              mapNodes={mapNodes}
+            />
 
             <Grid container>
               <div><br /></div>

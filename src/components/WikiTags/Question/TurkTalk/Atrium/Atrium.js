@@ -52,7 +52,7 @@ class Atrium extends React.Component {
       }
 
     } catch (error) {
-      LogError(`'${localInfo.connectionId}' onTurkerCommandCallback exception: ${error.message}`);
+      LogError(`'${localInfo.connectionId}' onAtriumCommandCallback exception: ${error.message}`);
     }
 
   }
