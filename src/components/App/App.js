@@ -31,8 +31,15 @@ function App() {
     if (!token) {
 
       const submitExternalToken = async (queryToken) => {
-        let data = await loginExternalUserAsync(queryToken);
-        return data;
+        try {
+
+          let data = await loginExternalUserAsync(queryToken);
+          data.statusCode = 200;
+          return data;            
+          
+        } catch (error) {
+          return { statusCode: 500, message: error.message };
+        }
       }
 
       // try and get access token from querystring first
@@ -46,7 +53,7 @@ function App() {
                 setExternalLoginStatus(false);
               }
               else {
-                authActions.setToken({ authInfo: { token: data.authInfo.token } }, true);
+                authActions.setToken( data, true);
                 setExternalLoginStatus(true);
               }
             }
