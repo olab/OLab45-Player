@@ -8,13 +8,14 @@ import {
   Grid
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import { Log, LogInfo, LogError } from '../../../../../utils/Logger';
+import { Log, LogInfo, LogError, LogException } from '../../../../../utils/Logger';
 import log from 'loglevel';
 import styles from '../../../styles.module.css';
 import TurkerChatStatusBar from './TurkerChatStatusBar';
 import Atrium from '../Atrium/Atrium';
 
 import SlotManager from '../SlotManager';
+import ChatCellManager from '../ChatCellManager';
 import ChatCell from '../../../../ChatCell/ChatCell'
 const persistantStorage = require('../../../../../utils/PersistantStorage').PersistantStorage;
 
@@ -32,6 +33,17 @@ class TurkerChatCellGrid extends React.Component {
     this.numColumns = this.MAX_TURKEES / this.NUM_ROWS;
 
     this.slotManager = this.buildSlotManager();
+
+    this.chatCellManager = new ChatCellManager(
+      {
+        totalCount: this.MAX_TURKEES,
+        numRows:  this.NUM_ROWS,
+        jumpMapNodes: this.props.mapNodes,
+        moderator: true,
+        connection: this.props.connection,
+        localInfo: this.props.localInfo
+      }
+    );
 
     this.roomName = this.props.roomName;
 
@@ -124,8 +136,8 @@ class TurkerChatCellGrid extends React.Component {
       // our own locla channel
       localInfo.commandChannel = payload.commandChannel;
 
-      // let { remoteSlots, localSlots } = this.slotManager.assignLearner(localInfo, payload);
       this.slotManager.assignLearner(localInfo, payload);
+      this.chatCellManager.assignChatParticipant(payload);
 
       this.setState({
         showChatGrid: true,
@@ -143,7 +155,7 @@ class TurkerChatCellGrid extends React.Component {
       );
 
     } catch (error) {
-      LogError(`'${this.connectionId}' onLearnerAssigned exception: ${error.message}`);
+      LogException(`'${this.connectionId}' onLearnerAssigned`, error);
     }
   }
 

@@ -16,6 +16,10 @@ const getLocation = () => {
   return location;
 }
 
+const LogException = ( message, error ) => {
+  log.error(`ERR: ${message} at ${JSON.stringify(error, null, 2)}`);
+}
+
 const LogError = (message) => {
 
   try {
@@ -40,6 +44,7 @@ const Log = (message) => {
 }
 
 export {
+  LogException,
   LogEnable,
   LogError,
   LogInfo,
