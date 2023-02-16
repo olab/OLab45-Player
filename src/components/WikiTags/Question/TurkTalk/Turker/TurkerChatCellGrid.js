@@ -70,18 +70,15 @@ class TurkerChatCellGrid extends React.Component {
       return this.slotManager;
     }
 
-    // test if moderator is connected
-    if (this.props.localInfo) {
+    var tempInfo = Object.assign({}, this.props.localInfo);
+    tempInfo.commandChannel = null;
+    tempInfo.assigned = false;
+    tempInfo.show = false;
 
-      var tempInfo = Object.assign({}, this.props.localInfo);
-      tempInfo.commandChannel = null;
-      tempInfo.assigned = false;
-      tempInfo.show = false;
+    return new SlotManager(
+      this.MAX_TURKEES,
+      tempInfo);
 
-      return new SlotManager(
-        this.MAX_TURKEES,
-        tempInfo);
-    }
   }
 
   // *****
@@ -362,7 +359,7 @@ class TurkerChatCellGrid extends React.Component {
 
     const { showChatGrid, localInfo, sessionId, userName } = this.state;
 
-    let atrium = (
+    let common = (
       <Grid container>
         <Grid container item xs={6}>
           <Atrium
@@ -409,7 +406,7 @@ class TurkerChatCellGrid extends React.Component {
             <div><br /></div>
           </Grid>
 
-          {atrium}
+          {common}
 
         </Grid>
       );
@@ -429,7 +426,7 @@ class TurkerChatCellGrid extends React.Component {
           <div><br /></div>
         </Grid>
 
-        {atrium}
+        {common}
 
       </Grid>
 
