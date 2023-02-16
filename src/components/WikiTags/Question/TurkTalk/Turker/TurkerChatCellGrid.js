@@ -342,8 +342,8 @@ class TurkerChatCellGrid extends React.Component {
   }
 
   onAtriumUpdate(currentAtrium) {
-    if (this.props.onAtriumUpdate) {
-      this.props.onAtriumUpdate(currentAtrium);
+    if (this.props.onScreenPopup) {
+      this.props.onScreenPopup('Atrium Updated');
     }
   }
 

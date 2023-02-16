@@ -42,7 +42,7 @@ class OlabModeratorTag extends React.Component {
     this.handleInfoClose = this.handleInfoClose.bind(this);
     this.onModeratorAssigned = this.onModeratorAssigned.bind(this);
     this.onCloseClicked = this.onCloseClicked.bind(this);
-    this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
+    this.onScreenPopup = this.onScreenPopup.bind(this);
 
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
 
@@ -139,10 +139,10 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  onAtriumUpdate(currentAtrium) {
+  onScreenPopup(message) {
     this.setState({
       infoOpen: true,
-      infoMessage: 'Atrium Updated'
+      infoMessage: message
     });
   }
 
@@ -182,7 +182,7 @@ class OlabModeratorTag extends React.Component {
           <Grid container item xs={12}>
 
             <TurkerChatCellGrid
-              onAtriumUpdate={this.onAtriumUpdate}
+              onScreenPopup={this.onScreenPopup}
               userName={userName}
               isModerator={true}
               connection={this.connection}
