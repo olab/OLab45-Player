@@ -30,7 +30,7 @@ async function loginUserAsync(credentials) {
 async function loginExternalUserAsync(token) {
 
   let url = `${config.API_URL}/auth/loginexternal`;
-  let payload = { 'ExternalToken' : token };
+  let payload = { 'ExternalToken': token };
 
   log.debug(`loginExternal(${token}) url: ${url})`);
 
@@ -42,9 +42,14 @@ async function loginExternalUserAsync(token) {
     },
     body: JSON.stringify(payload)
   })
-    .then(
-      data => data.json()
-    )
+    .then(function (response) {
+      
+      console.log(response.status); // Will show you the status
+      if (!response.ok) {
+        throw new Error("HTTP status " + response.status);
+      }
+      return response.json();
+    })
 }
 
 async function importer(props, fileName) {
@@ -182,7 +187,7 @@ async function getSessionReport(props, contextId) {
       }
 
       let message = data.status;
-      if ( data.status == 401 ) {
+      if (data.status == 401) {
         message = "Not Authorized";
       }
 
@@ -190,7 +195,7 @@ async function getSessionReport(props, contextId) {
         `Error ${data.statusText} retrieving map. Reason: ${message}`,
         { cause: data }
       );
-      
+
     })
     // @Corey, I've added this line to catch any misc HTTP errors meanwhile
     .catch((error) => void log.debug(`getSessionReport(${props.map?.id}) error: ${error.stack})`))
@@ -250,7 +255,7 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
       }
 
       let message = data.status;
-      if ( data.status == 401 ) {
+      if (data.status == 401) {
         message = "Not Authorized";
       }
 
