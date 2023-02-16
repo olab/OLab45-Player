@@ -139,10 +139,10 @@ class OlabModeratorTag extends React.Component {
 
   }
 
-  onScreenPopup(message) {
+  onScreenPopup(props) {
     this.setState({
       infoOpen: true,
-      infoMessage: message
+      infoMessage: props.message
     });
   }
 
