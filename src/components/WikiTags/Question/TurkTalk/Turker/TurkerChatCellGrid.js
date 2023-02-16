@@ -351,10 +351,39 @@ class TurkerChatCellGrid extends React.Component {
 
     const { showChatGrid, localInfo, sessionId, userName } = this.state;
 
+    let atrium = (
+      <Grid container>
+        <Grid container item xs={6}>
+          <Atrium
+            userName={userName}
+            connection={this.connection}
+            onAtriumAssignClicked={this.onAtriumAssignClicked}
+            onAtriumUpdate={this.onAtriumUpdate}
+          />
+        </Grid>
+        <Grid container item xs={2}>
+          &nbsp;
+        </Grid>
+        <Grid container justifyContent="flex-end" item xs={4}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            style={{ verticalAlign: 'center', height: '30px' }}
+            onClick={this.onCloseClicked}
+          >
+            &nbsp;Close Room&nbsp;
+          </Button>
+        </Grid>
+      </Grid>
+    );
+
     if (!showChatGrid) {
+
       const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
 
       return (
+        
         <Grid container>
           <div style={emptyGridLayout} >
             <h3>Waiting for Participant</h3>
@@ -369,30 +398,8 @@ class TurkerChatCellGrid extends React.Component {
             <div><br /></div>
           </Grid>
 
-          <Grid container>
-            <Grid container item xs={6}>
-              <Atrium
-                userName={userName}
-                connection={this.connection}
-                onAtriumAssignClicked={this.onAtriumAssignClicked}
-                onAtriumUpdate={this.onAtriumUpdate}
-              />
-            </Grid>
-            <Grid container item xs={2}>
-              &nbsp;
-            </Grid>
-            <Grid container justifyContent="flex-end" item xs={4}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="small"
-                style={{ verticalAlign: 'center', height: '30px' }}
-                onClick={this.onCloseClicked}
-              >
-                &nbsp;Close Room&nbsp;
-              </Button>
-            </Grid>
-          </Grid>
+          {atrium}
+
         </Grid>
       );
     }
@@ -411,30 +418,7 @@ class TurkerChatCellGrid extends React.Component {
           <div><br /></div>
         </Grid>
 
-        <Grid container>
-          <Grid container item xs={6}>
-            <Atrium
-              userName={userName}
-              connection={this.connection}
-              onAtriumAssignClicked={this.onAtriumAssignClicked}
-              onAtriumUpdate={this.onAtriumUpdate}
-            />
-          </Grid>
-          <Grid container item xs={2}>
-            &nbsp;
-          </Grid>
-          <Grid container justifyContent="flex-end" item xs={4}>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              style={{ verticalAlign: 'center', height: '30px' }}
-              onClick={this.onCloseClicked}
-            >
-              &nbsp;Close Room&nbsp;
-            </Button>
-          </Grid>
-        </Grid>
+        {atrium}
 
       </Grid>
 
