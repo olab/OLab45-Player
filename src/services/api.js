@@ -43,8 +43,7 @@ async function loginExternalUserAsync(token) {
     body: JSON.stringify(payload)
   })
     .then(function (response) {
-      
-      console.log(response.status); // Will show you the status
+
       if (!response.ok) {
         throw new Error("HTTP status " + response.status);
       }
