@@ -168,12 +168,12 @@ class OlabMultiPickQuestion extends React.Component {
 
       // test for 'correct' answer
       if ( (response.isCorrect == 1) && ( question.showAnswerIndicators ) ) {
-        correctnessIndicator = (<>{response.response}<CheckIcon style={{ color: 'green' }} /></>);
+        correctnessIndicator = (<>{response.response}<CheckIcon style={{ color: 'green' }} />{response.feedback}</>);
       }
 
       // test for 'incorrect' answer
       if ( (response.isCorrect == 0) && ( question.showAnswerIndicators ) )  {
-        correctnessIndicator = (<>{response.response}<CloseIcon style={{ color: 'red' }} /></>);
+        correctnessIndicator = (<>{response.response}<CloseIcon style={{ color: 'red' }} />{response.feedback}</>);
       }
     }
 
