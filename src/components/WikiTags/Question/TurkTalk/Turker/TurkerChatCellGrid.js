@@ -49,6 +49,7 @@ class TurkerChatCellGrid extends React.Component {
 
     this.onAtriumAssignClicked = this.onAtriumAssignClicked.bind(this);
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
+    this.onCloseClicked = this.onCloseClicked.bind(this);
 
     var turkerChatCellGridSelf = this;
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { turkerChatCellGridSelf.onCommand(payload) });
@@ -347,6 +348,16 @@ class TurkerChatCellGrid extends React.Component {
     }
   }
 
+  onCloseClicked(event) {
+
+    const { localInfo } = this.state;
+
+    log.debug(`'${localInfo.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`);
+
+    // signal server to close out this room
+    this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
+  }
+
   render() {
 
     const { showChatGrid, localInfo, sessionId, userName } = this.state;
@@ -383,7 +394,7 @@ class TurkerChatCellGrid extends React.Component {
       const emptyGridLayout = { border: '2px solid black', width: '100%', textAlign: 'center' };
 
       return (
-        
+
         <Grid container>
           <div style={emptyGridLayout} >
             <h3>Waiting for Participant</h3>

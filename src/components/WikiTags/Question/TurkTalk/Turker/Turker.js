@@ -41,7 +41,6 @@ class OlabModeratorTag extends React.Component {
 
     this.handleInfoClose = this.handleInfoClose.bind(this);
     this.onModeratorAssigned = this.onModeratorAssigned.bind(this);
-    this.onCloseClicked = this.onCloseClicked.bind(this);
     this.onScreenPopup = this.onScreenPopup.bind(this);
 
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
@@ -108,16 +107,6 @@ class OlabModeratorTag extends React.Component {
       LogError(`'${localInfo.connectionId}' onModeratorAssigned exception: ${error.message}`);
     }
 
-  }
-
-  onCloseClicked(event) {
-
-    const { localInfo } = this.state;
-
-    log.debug(`'${localInfo.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`);
-
-    // signal server to close out this room
-    this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
   }
 
   // applies changes to connection status
