@@ -53,7 +53,7 @@ function App() {
                 setExternalLoginStatus(false);
               }
               else {
-                authActions.setToken({ authInfo: { token: data.authInfo.token } }, true);
+                authActions.setToken( data, true);
                 setExternalLoginStatus(true);
               }
             }
