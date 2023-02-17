@@ -27,7 +27,18 @@ class OlabModeratorTag extends React.Component {
 
     super(props);
 
-    let atrium = playerState.GetAtrium();
+    let atrium = playerState.GetAtrium(null);
+
+    const questionSettings = JSON.parse(this.props.props.question.settings);
+
+    // test if we are on a room that's different from what's
+    // in local storage.  Reset it if it's different.
+    const mapName = `${props.props.map.name}/${questionSettings.roomName}`;
+    if ( atrium && !atrium.roomName.includes( mapName )  ) {
+      atrium = {};
+      playerState.SetAtrium(null);
+      playerState.SetConnectionInfo(null, null);
+    }
 
     this.state = {
       connectionStatus: null,

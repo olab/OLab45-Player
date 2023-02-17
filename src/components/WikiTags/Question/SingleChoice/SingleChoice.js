@@ -115,10 +115,16 @@ class OlabSinglePickQuestion extends React.Component {
 
     let responses = [];
     let key = 0;
+    let selectedIndex = null;
+
+    if ( this.state.question.value ) {
+      selectedIndex = Number(this.state.question.value);
+    }
+
     for (const response of question.responses) {
       var item = (
         <div key={key++}>
-          {this.buildQuestionResponse(question, response)}
+          {this.buildQuestionResponse(question, response, selectedIndex)}
         </div>
       );
       responses.push(item);
@@ -127,7 +133,7 @@ class OlabSinglePickQuestion extends React.Component {
     return responses;
   }
 
-  buildQuestionResponse(question, response) {
+  buildQuestionResponse(question, response, selectedIndex) {
 
     let choice = (
       <FormControlLabel
@@ -138,18 +144,23 @@ class OlabSinglePickQuestion extends React.Component {
       />
     );
 
+    let feedback = null;
+    if ( selectedIndex == response.id ) {
+      feedback = response.feedback;
+    }
+
     let correctnessIndicator = (<></>);
 
     if (question.showAnswer) {
 
       // test for 'correct' answer
       if ((response.isCorrect > 0) && question.showAnswerIndicators) {
-        correctnessIndicator = (<CheckIcon style={{ color: 'green' }} />);
+        correctnessIndicator = (<>{response.response}<CheckIcon style={{ color: 'green' }} />{feedback}</>);
       }
 
       // test for 'incorrect' answer
       if ((response.isCorrect == 0) && question.showAnswerIndicators) {
-        correctnessIndicator = (<CloseIcon style={{ color: 'red' }} />);
+        correctnessIndicator = (<>{response.response}<CloseIcon style={{ color: 'red' }} />{feedback}</>);
       }
     }
 
