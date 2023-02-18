@@ -6,12 +6,11 @@ import {
   TableHead, TableRow, TextField, Tooltip,
   Select, Menu, MenuItem, FormLabel
 } from '@material-ui/core';
-import { Log, LogInfo, LogError } from '../../utils/Logger';
+import { Log, LogInfo, LogError, LogException } from '../../utils/Logger';
 import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
 import styles from '../WikiTags/styles.module.css';
-import { HubConnectionState } from '@microsoft/signalr';
-
+import { checkText } from 'smile2emoji'
 import SendIcon from '@material-ui/icons/Send';
 import CancelIcon from '@material-ui/icons/Cancel';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
@@ -103,7 +102,7 @@ class Chat extends React.Component {
 
       else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
         log.debug(`'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`);
-        this.onLearnerUnassigned(payload);
+        this.onParticipantUnassigned(payload);
       }
 
       else if (payload.command === constants.SIGNALCMD_TURKER_DISCONNECTED) {
@@ -203,22 +202,29 @@ class Chat extends React.Component {
 
   }
 
-  onLearnerUnassigned(payload) {
+  onParticipantUnassigned(payload) {
 
     try {
 
-      let { isModerator, localInfo, senderInfo } = this.state;
+      let { isModerator, localInfo, senderInfo, index } = this.state;
+
+      // test if assignment is for this cell
+      if ( payload.data.slotIndex != index ) {
+        return;        
+      }
 
       // gatekeep if this chat instance has no learner assigned
       if (isModerator && !senderInfo?.userId) {
         return;
       }
 
+      LogInfo(`'onParticipantUnassigned[${this.props.index}] (${JSON.stringify(payload, null, 1)})`);
+
       // ensure the message was for this chat box
-      if (payload.commandChannel !== localInfo.commandChannel) {
-        LogInfo(`'${localInfo.connectionId}' onLearnerUnassigned message not for '${localInfo.commandChannel}'`);
-        return;
-      }
+      // if (payload.data.participant.commandChannel !== localInfo.commandChannel) {
+      //   LogInfo(`'${localInfo.connectionId}' onParticipantUnassigned message not for '${localInfo.commandChannel}'`);
+      //   return;
+      // }
 
       localInfo.assigned = false;
 
@@ -226,11 +232,11 @@ class Chat extends React.Component {
 
       this.onSystemMessage({
         commandChannel: localInfo?.commandChannel,
-        data: `'${payload.data.nickName}' was disconnected`
+        data: `'${payload.data.participant.nickName}' was disconnected`
       });
 
-    } catch (error) {
-      LogError(`onLearnerUnassigned[${this.props.index}] exception: ${error.message}`);
+    } catch (error) {      
+      LogException(`onLearnerUnassigned[${this.props.index}]`, error);
     }
   }
 
@@ -247,7 +253,7 @@ class Chat extends React.Component {
       this.onMessage(payload);
 
     } catch (error) {
-      LogError(`onSystemMessage[${this.props.index}] exception: ${error.message}`);
+      LogException(`onSystemMessage[${this.props.index}]`, error);
     }
 
   }
@@ -301,7 +307,7 @@ class Chat extends React.Component {
       this.scrollToBottom();
 
     } catch (error) {
-      LogError(`onMessage[${this.props.index}] exception: ${error.message}`);
+      LogException(`onMessage[${this.props.index}]`, error);
     }
 
   }
@@ -332,7 +338,7 @@ class Chat extends React.Component {
       this.setState({ inJumpNodeMode: false });
 
     } catch (error) {
-      LogError(`onClickJumpNode[${this.props.index}] exception: ${error.message}`);
+      LogException(`onClickJumpNode[${this.props.index}]`, error);
     }
   }
 
@@ -368,7 +374,7 @@ class Chat extends React.Component {
       }
 
     } catch (error) {
-      LogError(`onSelectNode[${this.props.index}] exception: ${error.message}`);
+      LogException(`onSelectNode[${this.props.index}]`, error);
     }
 
   }
@@ -411,7 +417,7 @@ class Chat extends React.Component {
       this.setState({ message: '' });
 
     } catch (error) {
-      LogError(`onSendClicked[${this.props.index}] exception: ${error.message}`);
+      LogException(`onSendClicked[${this.props.index}]`, error);
     }
 
   }
@@ -456,7 +462,7 @@ class Chat extends React.Component {
       this.setState({ message: newMsg });
 
     } catch (error) {
-      LogError(`evaluateMacro[${this.props.index}] exception: ${error.message}`);
+      LogException(`evaluateMacro[${this.props.index}]`, error);
     }
 
   }
@@ -486,6 +492,9 @@ class Chat extends React.Component {
 
   onMessageTextChanged = (event) => {
     let message = this.state.message;
+
+    // test for smiley emoji
+    event.target.value = checkText(event.target.value);    
 
     this.setState(state => {
       message = event.target.value;
@@ -726,6 +735,8 @@ class Chat extends React.Component {
       );
 
     } catch (error) {
+
+      LogException(`render[${this.props.index}]`, error);
       return (
         <>
           <b>"{error.message}"</b>

@@ -155,7 +155,7 @@ class TurkerChatCellGrid extends React.Component {
       );
 
     } catch (error) {
-      LogException(`'${this.connectionId}' onLearnerAssigned`, error);
+      LogException(`onLearnerAssigned '${this.connectionId}'`, error);
     }
   }
 
@@ -164,9 +164,9 @@ class TurkerChatCellGrid extends React.Component {
 
     try {
 
-      log.debug(`'${this.connectionId}' onLearnerUnassigned: connectionId '${payload}'`);
+      log.debug(`'${this.connectionId}' onLearnerUnassigned: connectionId '${JSON.stringify(payload, null, 1)}'`);
 
-      let { remoteSlots, localSlots } = this.slotManager.unassignLearner(payload);
+      let { remoteSlots, localSlots } = this.slotManager.unassignLearner(payload.participant);
 
       this.setState({
         remoteSlots: remoteSlots,
@@ -183,7 +183,7 @@ class TurkerChatCellGrid extends React.Component {
       );
 
     } catch (error) {
-      LogError(`'${this.connectionId}' onLearnerUnassigned exception: ${error.message}`);
+      LogException(`onLearnerUnassigned '${this.connectionId}'`, error);
     }
   }
 
@@ -226,7 +226,7 @@ class TurkerChatCellGrid extends React.Component {
       this.setState({ slotInfos: slotInfos });
 
     } catch (error) {
-      LogError(`'${this.connectionId}' onLearnerList exception: ${error.message}`);
+      LogException(`onLearnerList '${this.connectionId}'`, error);
     }
 
   }
@@ -346,13 +346,13 @@ class TurkerChatCellGrid extends React.Component {
     // re-assign a slot to put the participant in 
     // and send that to the server
     const slotIndex = this.slotManager.getSlotIndex(selectedLearner);
+    selectedLearner.slotIndex = slotIndex;
 
     // signal server with assignment of turkee to this room
     this.connection.send(
       constants.SIGNALCMD_ASSIGNTURKEE,
       selectedLearner,
-      localInfo.roomName,
-      slotIndex);
+      localInfo.roomName);
 
   }
 
