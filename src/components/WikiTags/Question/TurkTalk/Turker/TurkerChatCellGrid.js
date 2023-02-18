@@ -134,10 +134,10 @@ class TurkerChatCellGrid extends React.Component {
 
       // the connected learner's command channel becomes
       // our own locla channel
-      localInfo.commandChannel = payload.commandChannel;
+      localInfo.commandChannel = payload.learner.commandChannel;
 
-      this.slotManager.assignLearner(localInfo, payload);
-      this.chatCellManager.assignChatParticipant(payload);
+      this.slotManager.assignLearner(localInfo, payload.learner);
+      this.chatCellManager.assignChatParticipant(payload.learner);
 
       this.setState({
         showChatGrid: true,
@@ -343,11 +343,16 @@ class TurkerChatCellGrid extends React.Component {
     let { localInfo } = this.state;
     log.debug(`'${localInfo.connectionId}' onAssignClicked: learner = '${JSON.stringify(selectedLearner, null, 2)}' `);
 
+    // re-assign a slot to put the participant in 
+    // and send that to the server
+    const slotIndex = this.slotManager.getSlotIndex(selectedLearner);
+
     // signal server with assignment of turkee to this room
     this.connection.send(
       constants.SIGNALCMD_ASSIGNTURKEE,
       selectedLearner,
-      localInfo.roomName);
+      localInfo.roomName,
+      slotIndex);
 
   }
 

@@ -111,10 +111,6 @@ class Chat extends React.Component {
         this.onModeratorUnassigned(payload.data);
       }
 
-      // else {
-      //   log.debug(`'${localInfo?.connectionId}' onCommand ignoring command: '${payload.command}'`);
-      // }
-
     } catch (error) {
       LogError(`onCommand[${this.props.index}] exception: ${error.message}`);
     }
@@ -164,9 +160,14 @@ class Chat extends React.Component {
 
     try {
 
-      let { isModerator, localInfo } = this.state;
+      let { isModerator, localInfo, index } = this.state;
       let remoteInfo = {};
       let session = {};
+
+      // test if assignment is for this cell
+      if ( payload.data.slotIndex != index ) {
+        return;        
+      }
 
       LogInfo(`'onParticipantAssigned[${this.props.index}] (${JSON.stringify(payload, null, 1)})`);
 

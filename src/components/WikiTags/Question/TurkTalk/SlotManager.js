@@ -223,7 +223,7 @@ class SlotManager {
 
     this.LocalSlots()[index] = participant;
 
-    log.debug(`assignLearner: ${participant.toString()}`);
+    log.debug(`assignLearner: ${JSON.stringify(participant)}`);
 
     // return {
     //   remoteSlot: remoteSlot,
