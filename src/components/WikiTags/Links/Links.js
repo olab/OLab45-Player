@@ -5,9 +5,9 @@ import {
   Button,
   ButtonGroup,
 } from '@material-ui/core';
-import { Log, LogInfo, LogError } from '../../utils/Logger';
+import { Log, LogInfo, LogError } from '../../../utils/Logger';
 import log from 'loglevel';
-const playerState = require('../../utils/PlayerState').PlayerState;
+const playerState = require('../../../utils/PlayerState').PlayerState;
 
 class OlabLinksTag extends React.Component {
 
@@ -73,6 +73,7 @@ class OlabLinksTag extends React.Component {
             {links.map((link) => (
               <Button
                 key={link.id}
+                style={{textTransform: "none"}}
                 onClick={() => { this.onNavigateToNode(mapId, link.destinationId, urlParam); }}
               >
                 {link.linkText}

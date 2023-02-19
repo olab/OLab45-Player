@@ -9,7 +9,7 @@ import ErrorPopup from '../ErrorPopup/ErrorPopup';
 import OlabConstantTag from '../WikiTags/Constant/Constant';
 import OlabCountersTag from '../WikiTags/Counters/Counter';
 import OlabCounterTag from '../WikiTags/Counter/Counter';
-import OlabLinksTag from '../WikiTags/Links';
+import OlabLinksTag from '../WikiTags/Links/Links';
 import OlabReportTag from '../WikiTags/Report/Report';
 import OlabMediaResourceTag from '../WikiTags/MediaResource/MediaResource';
 import OlabQuestionTag from '../WikiTags/Question/Question';
