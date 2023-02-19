@@ -1,0 +1,25 @@
+.emptyGridLayout { 
+  border: 2px solid black; 
+  width: 100%; 
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.17em;
+}
+
+.emptyGridLabel {
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+
+.mainTableLayout { 
+  border: 2px solid black;
+  background-color: #3333;
+  width: 100%;
+};
+
+.closeButton { 
+  vertical-align: center;
+  height: 20px;
+}
