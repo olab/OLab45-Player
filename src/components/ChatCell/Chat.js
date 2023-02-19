@@ -163,8 +163,9 @@ class Chat extends React.Component {
       let remoteInfo = {};
       let session = {};
 
-      // test if assignment is for this cell
-      if ( payload.data.slotIndex != index ) {
+      // test if assignment is for this cell (moderators only,
+      // since routing to a specific chat is required)
+      if ( isModerator && ( payload.data.slotIndex != index ) ) {
         return;        
       }
 
@@ -208,8 +209,9 @@ class Chat extends React.Component {
 
       let { isModerator, localInfo, senderInfo, index } = this.state;
 
-      // test if assignment is for this cell
-      if ( payload.data.slotIndex != index ) {
+      // test if assignment is for this cell (moderators only,
+      // since routing to a specific chat is required)
+      if ( isModerator && ( payload.data.slotIndex != index ) ) {
         return;        
       }
 

@@ -7,8 +7,7 @@ import {
 import { Log, LogInfo, LogError } from '../../../../../utils/Logger';
 import log from 'loglevel';
 import { withStyles } from '@material-ui/core/styles';
-import MuiAlert from '@material-ui/lab/Alert';
-
+import localCss from './Atrium.module.css';
 import styles from '../../../styles.module.css';
 import Participant from '../../../../../helpers/participant';
 import SlotInfo from '../../../../../helpers/SlotInfo';
@@ -23,6 +22,7 @@ class Atrium extends React.Component {
 
     let atrium = playerState.GetAtrium();
     this.connection = this.props.connection;
+    this.connectionId = this.props.connection.connectionId?.slice(-3);
 
     this.state = {
       atriumLearners: [],
@@ -47,12 +47,12 @@ class Atrium extends React.Component {
     try {
 
       if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
-        log.debug(`'${localInfo.connectionId}' onCommand: ${payload.command}`);
+        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onAtriumUpdate(payload.data);
       }
 
     } catch (error) {
-      LogError(`'${localInfo.connectionId}' onAtriumCommandCallback exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onAtriumCommandCallback exception: ${error.message}`);
     }
 
   }
@@ -84,7 +84,7 @@ class Atrium extends React.Component {
           atriumLearners.push(learner);
         }
 
-        log.debug(`'${localInfo.connectionId}' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
+        log.debug(`'${this.connectionId}' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`);
 
         if (previousAtriumCount != atriumLearners.length) {
 
@@ -110,7 +110,7 @@ class Atrium extends React.Component {
       }
 
     } catch (error) {
-      LogError(`'${localInfo.connectionId}' onAtriumUpdate exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onAtriumUpdate exception: ${error.message}`);
     }
 
   }
@@ -148,7 +148,7 @@ class Atrium extends React.Component {
       this.updateAtriumState();
 
     } catch (error) {
-      LogError(`'${localInfo.connectionId}' onAssignClicked exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onAssignClicked exception: ${error.message}`);
     }
 
   }
@@ -168,7 +168,7 @@ class Atrium extends React.Component {
       // test for valid turkee selected from available list
       if (event.target.value !== '0') {
 
-        log.debug(`'${localInfo.connectionId}' onAtriumLearnerSelected: ${event.target.value}`);
+        log.debug(`onAtriumLearnerSelected '${this.connectionId}': ${event.target.value}`);
 
         // find learner in atrium list
         for (let item of this.state.atriumLearners) {
@@ -183,7 +183,7 @@ class Atrium extends React.Component {
       }
 
     } catch (error) {
-      LogError(`'${localInfo.connectionId}' onAtriumLearnerSelected exception: ${error.message}`);
+      LogError(`'${this.connectionId}' onAtriumLearnerSelected exception: ${error.message}`);
     }
 
   }
@@ -207,7 +207,7 @@ class Atrium extends React.Component {
       playerState.SetAtrium(state);
 
     } catch (error) {
-      LogError(`'${localInfo.connectionId}' updateAtriumState exception: ${error.message}`);
+      LogError(`'${this.connectionId}' updateAtriumState exception: ${error.message}`);
     }
 
   }
@@ -242,10 +242,10 @@ class Atrium extends React.Component {
         </Grid>
         <Grid container item xs={1}>
           <Button
-            variant="outlined"
+            variant="contained"
             color="primary"
             size="small"
-            style={{ verticalAlign: 'center', height: '30px' }}
+            className={localCss.assignButton}
             onClick={this.onAssignClicked}
           >
             &nbsp;Assign&nbsp;
