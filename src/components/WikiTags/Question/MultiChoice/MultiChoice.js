@@ -24,7 +24,8 @@ class OlabMultiPickQuestion extends React.Component {
     super(props);
 
     this.state = {
-      ...props.props
+      ...props.props,
+      hasInitialAnswer: false
     };
 
     // Binding this keyword  
