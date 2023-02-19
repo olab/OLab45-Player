@@ -154,7 +154,7 @@ class OlabMultiPickQuestion extends React.Component {
     let responses = [];
     let selectedIndexStrings = [];
 
-    if ( this.state.question.value ) {
+    if (this.state.question.value) {
       selectedIndexStrings = this.state.question.value.split(',');
     }
 
@@ -177,21 +177,27 @@ class OlabMultiPickQuestion extends React.Component {
     let correctnessIndicator = (<>{response.response}</>);
     let feedback = null;
 
-    if ( responseIndexes.includes( response.id )) {
+    if (responseIndexes.includes(response.id)) {
       feedback = response.feedback;
     }
 
     if (question.showAnswer) {
 
-      // test for 'correct' answer
-      if ((response.isCorrect == 1) && (question.showAnswerIndicators)) {
-        correctnessIndicator = (<>{response.response}<CheckIcon style={{ color: 'green' }} />{feedback}</>);
+      // check if response is selected, meaning we display
+      // is_correct and feedback.
+      if (currentChoices.includes(`${response.id}`)) {
+
+        // test for 'correct' answer
+        if ((response.isCorrect == 1) && (question.showAnswerIndicators)) {
+          correctnessIndicator = (<>{response.response}<CheckIcon style={{ color: 'green' }} />{feedback}</>);
+        }
+
+        // test for 'incorrect' answer
+        if ((response.isCorrect == 0) && (question.showAnswerIndicators)) {
+          correctnessIndicator = (<>{response.response}<CloseIcon style={{ color: 'red' }} />{feedback}</>);
+        }
       }
 
-      // test for 'incorrect' answer
-      if ((response.isCorrect == 0) && (question.showAnswerIndicators)) {
-        correctnessIndicator = (<>{response.response}<CloseIcon style={{ color: 'red' }} />{feedback}</>);
-      }
     }
 
     let responseHtml = (
