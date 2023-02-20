@@ -27,14 +27,21 @@ class OlabModeratorTag extends React.Component {
 
     super(props);
 
-    let atrium = playerState.GetAtrium({ roomName: ''});
+    let atrium = playerState.GetAtrium({ roomName: '' });
 
     const questionSettings = JSON.parse(this.props.props.question.settings);
 
     // test if we are on a room that's different from what's
-    // in local storage.  Reset it if it's different.
-    const mapName = `${props.props.map.name}/${questionSettings.roomName}`;
-    if ( atrium && atrium.roomName && !atrium.roomName.includes( mapName )  ) {
+    // in local storage.  Reset it if it's different.    
+    const { roomName: newRoomName } = questionSettings;
+    if (!newRoomName) {
+      this.onScreenPopup({ message: 'No room name defined' });
+    }
+
+    const { roomName: previousRoomName } 
+      = playerState.GetConnectionInfo(null, { roomName: '' });
+
+    if (newRoomName != previousRoomName) {
       atrium = {};
       playerState.SetAtrium(null);
       playerState.SetConnectionInfo(null, null);
@@ -229,7 +236,7 @@ class OlabModeratorTag extends React.Component {
       const { selectedLearnerUserId } = this.state;
       let selectedLearner = null;
 
-      if ((selectedLearnerUserId == undefined) || (selectedLearnerUserId == '0') ) {
+      if ((selectedLearnerUserId == undefined) || (selectedLearnerUserId == '0')) {
         return;
       }
 
@@ -250,8 +257,8 @@ class OlabModeratorTag extends React.Component {
 
       // signal server with assignment of turkee to this room
       this.connection.send(
-        constants.SIGNALCMD_ASSIGNTURKEE, 
-        selectedLearner, 
+        constants.SIGNALCMD_ASSIGNTURKEE,
+        selectedLearner,
         localInfo.roomName,
         0);
 
@@ -358,7 +365,7 @@ class OlabModeratorTag extends React.Component {
               localInfo={localInfo}
               mapNodes={mapNodes}
             />
-            
+
           </Grid>
 
           <br />
