@@ -63,10 +63,10 @@ class OlabSinglePickQuestion extends React.Component {
     log.debug(`OlabSinglePickQuestion set question '${question.id}' value = '${value}'`);
 
     // if single try question, disabled it
-    if ( question.numTries > 0 ) {
+    if (question.numTries > 0) {
       question.disabled = true;
     }
-    
+
     // first attempt to answer, so show answer
     // indicators, if called on
     question.showAnswerIndicators = true;
@@ -117,7 +117,7 @@ class OlabSinglePickQuestion extends React.Component {
     let key = 0;
     let selectedIndex = null;
 
-    if ( this.state.question.value ) {
+    if (this.state.question.value) {
       selectedIndex = Number(this.state.question.value);
     }
 
@@ -145,7 +145,7 @@ class OlabSinglePickQuestion extends React.Component {
     );
 
     let feedback = null;
-    if ( selectedIndex == response.id ) {
+    if (selectedIndex == response.id) {
       feedback = response.feedback;
     }
 
@@ -153,14 +153,20 @@ class OlabSinglePickQuestion extends React.Component {
 
     if (question.showAnswer) {
 
-      // test for 'correct' answer
-      if ((response.isCorrect > 0) && question.showAnswerIndicators) {
-        correctnessIndicator = (<>{response.response}<CheckIcon style={{ color: 'green' }} />{feedback}</>);
-      }
+      // check if response is selected, meaning we display
+      // is_correct and feedback.
+      if (selectedIndex == response.id) {
 
-      // test for 'incorrect' answer
-      if ((response.isCorrect == 0) && question.showAnswerIndicators) {
-        correctnessIndicator = (<>{response.response}<CloseIcon style={{ color: 'red' }} />{feedback}</>);
+        // test for 'correct' answer
+        if ((response.isCorrect > 0) && question.showAnswerIndicators) {
+          correctnessIndicator = (<>{response.response}<CheckIcon style={{ color: 'green' }} />{feedback}</>);
+        }
+
+        // test for 'incorrect' answer
+        if ((response.isCorrect == 0) && question.showAnswerIndicators) {
+          correctnessIndicator = (<>{response.response}<CloseIcon style={{ color: 'red' }} />{feedback}</>);
+        }
+
       }
     }
 
