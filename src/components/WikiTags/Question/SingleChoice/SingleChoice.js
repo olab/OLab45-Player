@@ -159,12 +159,12 @@ class OlabSinglePickQuestion extends React.Component {
 
         // test for 'correct' answer
         if ((response.isCorrect > 0) && question.showAnswerIndicators) {
-          correctnessIndicator = (<>{response.response}<CheckIcon style={{ color: 'green' }} />{feedback}</>);
+          correctnessIndicator = (<><CheckIcon style={{ color: 'green' }} />{feedback}</>);
         }
 
         // test for 'incorrect' answer
         if ((response.isCorrect == 0) && question.showAnswerIndicators) {
-          correctnessIndicator = (<>{response.response}<CloseIcon style={{ color: 'red' }} />{feedback}</>);
+          correctnessIndicator = (<><CloseIcon style={{ color: 'red' }} />{feedback}</>);
         }
 
       }
