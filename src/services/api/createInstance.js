@@ -1,6 +1,6 @@
-import axios from 'axios';
-import merge from 'lodash.merge';
-import defaultConfig from './apiConfig';
+import axios from "axios";
+import merge from "lodash.merge";
+import defaultConfig from "./apiConfig";
 
 const createInstance = (customConfig = {}) => {
   const newConfig = merge(customConfig, defaultConfig);

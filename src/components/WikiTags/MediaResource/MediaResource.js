@@ -1,25 +1,22 @@
 // @flow
-import React from 'react';
+import React from "react";
 
-import styles from '../styles.module.css';
-import siteStyles from '../site.module.css';
-import { getFile } from '../WikiTags';
-import { getDownload } from '../../../services/api';
-const playerState = require('../../../utils/PlayerState').PlayerState;
-import { Log, LogInfo, LogError } from '../../../utils/Logger';
-import log from 'loglevel';
-import BrokenImageIcon from '@material-ui/icons/BrokenImage';
-import { Tooltip } from '@material-ui/core';
+import styles from "../styles.module.css";
+import siteStyles from "../site.module.css";
+import { getFile } from "../WikiTags";
+import { getDownload } from "../../../services/api";
+const playerState = require("../../../utils/PlayerState").PlayerState;
+import { Log, LogInfo, LogError } from "../../../utils/Logger";
+import log from "loglevel";
+import BrokenImageIcon from "@material-ui/icons/BrokenImage";
+import { Tooltip } from "@material-ui/core";
 
 class OlabMediaResourceTag extends React.Component {
-
   constructor(props) {
-
     super(props);
 
     const debug = playerState.GetDebug();
     this.state = { debug };
-
   }
 
   downloadFile(item) {
@@ -31,29 +28,25 @@ class OlabMediaResourceTag extends React.Component {
   }
 
   isAudioType(mimeType) {
-    return (mimeType.indexOf("audio/") !== -1);
+    return mimeType.indexOf("audio/") !== -1;
   }
 
   isImageType(mimeType) {
-    return (mimeType.indexOf("image/") !== -1);
+    return mimeType.indexOf("image/") !== -1;
   }
 
   isVideoType(mimeType) {
-    return (mimeType.indexOf("video/") !== -1);
+    return mimeType.indexOf("video/") !== -1;
   }
 
   render() {
-
     const { debug } = this.state;
 
-    const {
-      name
-    } = this.props;
+    const { name } = this.props;
 
     log.debug(`OlabMediaResourceTag render '${name}'`);
 
     try {
-
       let item = getFile(name, this.props);
 
       if (!item) {
@@ -61,7 +54,8 @@ class OlabMediaResourceTag extends React.Component {
         return (
           <Tooltip placement="top" title={toolTip}>
             <BrokenImageIcon color="error" fontSize="large" />
-          </Tooltip>);
+          </Tooltip>
+        );
       }
 
       log.debug(`file object: '${JSON.stringify(item, null, 2)}'`);
@@ -78,7 +72,9 @@ class OlabMediaResourceTag extends React.Component {
       if (!debug.enableWikiRendering) {
         return (
           <>
-            <b>[[MR:{name}]] "{item.path}"</b>
+            <b>
+              [[MR:{name}]] "{item.path}"
+            </b>
           </>
         );
       }
@@ -88,30 +84,42 @@ class OlabMediaResourceTag extends React.Component {
         return (
           <Tooltip placement="top" title={toolTip}>
             <BrokenImageIcon color="error" fontSize="large" />
-          </Tooltip>);
+          </Tooltip>
+        );
       }
 
       if (this.isAudioType(item.mime)) {
         return (
-          <div className={`${styles['mraudio']} ${siteStyles[item.id]}`} id={`${item.id}`}>
-            <audio alt={item.fileName} type={item.mime} autoPlay="autoplay" autobuffer="" controls>
+          <div
+            className={`${styles["mraudio"]} ${siteStyles[item.id]}`}
+            id={`${item.id}`}
+          >
+            <audio
+              alt={item.fileName}
+              type={item.mime}
+              autoPlay="autoplay"
+              autobuffer=""
+              controls
+            >
               <source src={item.originUrl} />
             </audio>
           </div>
         );
-      }
-
-      else if (this.isImageType(item.mime)) {
+      } else if (this.isImageType(item.mime)) {
         return (
-          <div className={`${styles['mrimage']} ${siteStyles[item.id]}`} id={`${item.id}`}>
+          <div
+            className={`${styles["mrimage"]} ${siteStyles[item.id]}`}
+            id={`${item.id}`}
+          >
             <img {...sizeProps} alt={item.fileName} src={item.originUrl} />
           </div>
         );
-      }
-
-      else if (this.isVideoType(item.mime)) {
+      } else if (this.isVideoType(item.mime)) {
         return (
-          <div className={`${styles['mrvideo']} ${siteStyles[item.id]}`} id={`${item.id}`}>
+          <div
+            className={`${styles["mrvideo"]} ${siteStyles[item.id]}`}
+            id={`${item.id}`}
+          >
             <video controls>
               <source type={item.mime} src={item.originUrl} />
             </video>
@@ -128,23 +136,30 @@ class OlabMediaResourceTag extends React.Component {
       //     );
       //   }
       // }
-
       else {
         return (
           <>
             <div>
-              <a id={`file-link-${item.id}`} download={item.originUrl} href={item.originUrl}>{item.fileName}</a>
+              <a
+                id={`file-link-${item.id}`}
+                download={item.originUrl}
+                href={item.originUrl}
+              >
+                {item.fileName}
+              </a>
             </div>
           </>
         );
       }
-
     } catch (error) {
-
-      LogError(`OlabMediaResourceTag render error: ${JSON.stringify(error, null, 2)}`);
+      LogError(
+        `OlabMediaResourceTag render error: ${JSON.stringify(error, null, 2)}`
+      );
       return (
         <>
-          <b>[[MR:{name}]] "{error.message}"</b>
+          <b>
+            [[MR:{name}]] "{error.message}"
+          </b>
         </>
       );
     }

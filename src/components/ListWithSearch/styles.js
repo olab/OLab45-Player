@@ -1,6 +1,6 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-import { GREY, DARK_GREY } from '../../shared/colors';
+import { GREY, DARK_GREY } from "../../shared/colors";
 
 export const SearchWrapper = styled.div`
   position: relative;
@@ -19,67 +19,67 @@ export const ListItemContentWrapper = styled.div`
 const styles = () => ({
   list: {
     marginBottom: 10,
-    '&::-webkit-scrollbar': {
+    "&::-webkit-scrollbar": {
       width: 7,
       backgroundColor: GREY,
     },
-    '&::-webkit-scrollbar-thumb': {
+    "&::-webkit-scrollbar-thumb": {
       backgroundColor: DARK_GREY,
       borderRadius: 4,
     },
-    '&::-webkit-scrollbar-button': {
+    "&::-webkit-scrollbar-button": {
       width: 0,
       height: 0,
-      display: 'none',
+      display: "none",
     },
-    '&::-webkit-scrollbar-corner': {
-      backgroundColor: 'transparent',
+    "&::-webkit-scrollbar-corner": {
+      backgroundColor: "transparent",
     },
   },
   listLimits: {
-    maxHeight: '40vh',
-    minHeight: '40vh',
-    maxWidth: '40vw',
-    minWidth: '40vw',
-    overflowY: 'auto',
+    maxHeight: "40vh",
+    minHeight: "40vh",
+    maxWidth: "40vw",
+    minWidth: "40vw",
+    overflowY: "auto",
   },
   listEmpty: {
     marginTop: 10,
   },
   listItem: {
-    padding: '.15rem',
-    justifyContent: 'flex-end',
+    padding: ".15rem",
+    justifyContent: "flex-end",
   },
   listButton: {
-    position: 'relative',
-    width: '100%',
-    textTransform: 'initial',
-    textAlign: 'initial',
+    position: "relative",
+    width: "100%",
+    textTransform: "initial",
+    textAlign: "initial",
   },
   searchField: {
     marginBottom: 5,
   },
   searchIcon: {
-    position: 'absolute',
+    position: "absolute",
     right: 0,
     bottom: 7,
     padding: 3,
-    fill: 'rgba(0, 0, 0, 0.42)',
-    boxSizing: 'content-box',
+    fill: "rgba(0, 0, 0, 0.42)",
+    boxSizing: "content-box",
   },
   deleteIcon: {
-    position: 'absolute',
+    position: "absolute",
     opacity: 0,
     right: 10,
-    top: '50%',
+    top: "50%",
     padding: 5,
-    transform: 'translate(0, -50%)',
-    transition: 'opacity .25s ease',
+    transform: "translate(0, -50%)",
+    transition: "opacity .25s ease",
   },
   secondaryText: {
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   },
 });
 

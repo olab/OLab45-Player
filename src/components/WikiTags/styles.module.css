@@ -49,7 +49,7 @@
 
 .qusingleline-label {
   color: black;
-  width: 100%
+  width: 100%;
 }
 
 .qusingleline-value {
@@ -59,7 +59,7 @@
 
 .qumultiline {
   background-color: rgb(240, 240, 240);
-  color: black;  
+  color: black;
   width: 95%;
   padding: 10px;
 }
@@ -91,7 +91,7 @@
 .quslider-value {
   width: 25px;
   padding: 5px;
-  height: 20px;  
+  height: 20px;
 }
 
 .MuiTableCell-root {

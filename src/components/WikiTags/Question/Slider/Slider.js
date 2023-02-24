@@ -1,69 +1,56 @@
 // @flow
-import React from 'react';
-import {
-  Box,
-  Typography,
-  Slider,
-} from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
-import { Log, LogInfo, LogError } from '../../../../utils/Logger';
-import log from 'loglevel';
+import React from "react";
+import { Box, Typography, Slider } from "@material-ui/core";
+import { withStyles } from "@material-ui/core/styles";
+import { Log, LogInfo, LogError } from "../../../../utils/Logger";
+import log from "loglevel";
 
-import styles from '../../styles.module.css';
-import siteStyles from '../../site.module.css';
+import styles from "../../styles.module.css";
+import siteStyles from "../../site.module.css";
 
 class OlabSliderQuestion extends React.Component {
-
   constructor(props) {
-
     super(props);
 
     this.state = {
-      ...props.props
+      ...props.props,
     };
 
     // post initial value to server if initializine
     // question value
     if (typeof this.state.question.previousValue == "undefined") {
-
-      // eslint-disable-next-line      
+      // eslint-disable-next-line
       const settings = JSON.parse(this.state.question.settings);
       this.state.question.value = Number(settings.defaultValue);
-
     }
 
-    // Binding this keyword  
+    // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);
     this.setValue = this.setValue.bind(this);
     this.transmitResponse = this.transmitResponse.bind(this);
   }
 
   setValue = (event, value) => {
-
     const question = this.state.question;
-    log.debug(`OlabSliderQuestion set question '${question.id}' value = '${value}'`);
-
-    this.setState(state => {
-
-      question.previousValue = question.value;
-      question.value = value;
-
-      return ({ question });
-    },
-      () => this.transmitResponse()
+    log.debug(
+      `OlabSliderQuestion set question '${question.id}' value = '${value}'`
     );
 
-  }
+    this.setState(
+      (state) => {
+        question.previousValue = question.value;
+        question.value = value;
+
+        return { question };
+      },
+      () => this.transmitResponse()
+    );
+  };
 
   transmitResponse() {
+    const { onSubmitResponse, authActions, map, node, contextId } =
+      this.props.props;
 
-    const {
-      onSubmitResponse,
-      authActions,
-      map,
-      node,
-      contextId } = this.props.props;
-      
     let responseState = {
       ...this.state,
       authActions,
@@ -71,22 +58,20 @@ class OlabSliderQuestion extends React.Component {
       node,
       contextId,
       setInProgress: this.setInProgress,
-      setIsDisabled: this.setIsDisabled
+      setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== 'undefined') {
+    if (typeof onSubmitResponse !== "undefined") {
       onSubmitResponse(responseState);
     }
   }
 
   setInProgress(inProgress) {
-
     this.setState({ showProgressSpinner: inProgress });
     log.debug(`set progress spinner: ${inProgress}`);
   }
 
   render() {
-
     const {
       id,
       name,
@@ -97,21 +82,21 @@ class OlabSliderQuestion extends React.Component {
     log.debug(`OlabSliderQuestion render '${name}'`);
 
     try {
-
       // eslint-disable-next-line
       const settings = JSON.parse(question.settings);
 
       return (
-        <div className={`${styles['quslider']} ${siteStyles[id]}`} id={`${id}`}>
+        <div className={`${styles["quslider"]} ${siteStyles[id]}`} id={`${id}`}>
           <Box width={question.width}>
             <Typography id={`${id}-stem`} component="div" gutterBottom>
               {question.stem}
             </Typography>
-            <input 
-              readOnly 
-              className={`${styles['quslider-value']}`} 
-              id={`${id}-value`} 
-              value={question.value}></input>
+            <input
+              readOnly
+              className={`${styles["quslider-value"]}`}
+              id={`${id}-value`}
+              value={question.value}
+            ></input>
             <Slider
               defaultValue={question.value}
               onChangeCommitted={(event, value) => this.setValue(event, value)}
@@ -126,16 +111,16 @@ class OlabSliderQuestion extends React.Component {
           </Box>
         </div>
       );
-
     } catch (error) {
       return (
         <>
-          <b>[[QU:{id}]] "{error.message}"</b>
+          <b>
+            [[QU:{id}]] "{error.message}"
+          </b>
         </>
       );
     }
   }
-
 }
 
 export default withStyles(styles)(OlabSliderQuestion);

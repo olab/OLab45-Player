@@ -1,8 +1,6 @@
 ﻿// main view class
 class OlabClientAPI {
-
   constructor(params) {
-
     var vm = this;
 
     vm.player = params.olabPlayer;
@@ -13,7 +11,7 @@ class OlabClientAPI {
       getConstant: getConstant,
       getQuestion: getQuestion,
       getCounter: getCounter,
-      log: vm.player.instance.log
+      log: vm.player.instance.log,
     };
 
     vm.player.utilities.log.debug("Created OlabClientAPI.");
@@ -22,47 +20,33 @@ class OlabClientAPI {
   }
 
   getConstant(id) {
-
     try {
-
       var params = [];
       params.id = id;
 
       return new OLabConstant(vm, params);
-
     } catch (e) {
-
       vm.player.utilities.LogError(e.message);
-
     }
 
     return null;
-
   }
 
   getCounter(id) {
-
     try {
-
       var params = [];
       params.id = id;
 
       return new OLabCounter(vm, params);
-
     } catch (e) {
-
       vm.player.utilities.LogError(e.message);
-
     }
 
     return null;
-
   }
 
   getQuestion(id) {
-
     try {
-
       var params = [];
       params.id = id;
 
@@ -71,30 +55,23 @@ class OlabClientAPI {
 
       if (questionType === 1) {
         return new OLabQuestionSingleLine(vm, params);
-      }
-      else if (questionType === 3) {
+      } else if (questionType === 3) {
         return new OLabQuestionMultipleChoice(vm, params);
-      }
-      else if (questionType === 4) {
+      } else if (questionType === 4) {
         return new OLabQuestionRadio(vm, params);
       }
-
     } catch (e) {
-
       vm.player.utilities.LogError(e.message);
-
     }
 
     return null;
   }
 
   hello() {
-
     alert("hello from OlabClientAPI.");
     var t = vm.player.getConstant("SystemTime");
-    alert("time is: " + t['value']);
+    alert("time is: " + t["value"]);
   }
-
-};
+}
 
 export default OlabClientAPI;

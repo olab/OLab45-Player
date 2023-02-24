@@ -4,4 +4,4 @@ export const SIZES = {
   LARGE: 100,
 };
 
-export const DEFAULT_LABEL = 'Data is being fetched...';
+export const DEFAULT_LABEL = "Data is being fetched...";

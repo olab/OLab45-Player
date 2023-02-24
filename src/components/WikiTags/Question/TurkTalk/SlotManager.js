@@ -1,13 +1,11 @@
-import { Log, LogInfo, LogError } from '../../../../utils/Logger';
-import log from 'loglevel';
-import Participant from '../../../../helpers/participant';
-import SlotInfo from '../../../../helpers/SlotInfo';
+import { Log, LogInfo, LogError } from "../../../../utils/Logger";
+import log from "loglevel";
+import Participant from "../../../../helpers/participant";
+import SlotInfo from "../../../../helpers/SlotInfo";
 
 class SlotManager {
-
   // *****
   constructor(count, localTemplate = null) {
-
     let remoteSlots = [];
     let localSlots = [];
 
@@ -16,14 +14,12 @@ class SlotManager {
     this.remoteSlots = [];
     this.localSlots = [];
 
-    // if have no saved slots, initialize a 
+    // if have no saved slots, initialize a
     // new list of slots
     if (localSlots.length == 0) {
-
-      // initialize slot (either use default or 
+      // initialize slot (either use default or
       // use the template passed in)
       for (let index = 0; index < count; index++) {
-
         var slot = new SlotInfo();
         slot.key = index;
         slot.slotIndex = null;
@@ -42,16 +38,11 @@ class SlotManager {
         }
 
         this.localSlots.push(slot);
-
       }
-
-    }
-    else {
-
+    } else {
       // make objects read from storage full
       // SlotInfo objects again
       for (let index = 0; index < count; index++) {
-
         this.remoteSlots.push(new SlotInfo(remoteSlots[index]));
         this.localSlots.push(new SlotInfo(localSlots[index]));
 
@@ -62,7 +53,6 @@ class SlotManager {
         }
       }
     }
-
   }
 
   // *****
@@ -76,32 +66,25 @@ class SlotManager {
   }
 
   assignLocalInfo(localInfo) {
-
     // make copy of localInfo so it can be modified per slot
 
     for (let index = 0; index < this.LocalSlots().length; index++) {
-
       // overwrite the local info array
       let slotLocalInfo = new SlotInfo(localInfo);
       slotLocalInfo.key = index;
 
       this.LocalSlots()[index] = slotLocalInfo;
     }
-
   }
 
   // *****
   getRemoteSlotByConnectionId(connectionId) {
-
     try {
-
       for (let item of this.RemoteSlots()) {
-        if (item.connectionId === connectionId)
-          return item;
+        if (item.connectionId === connectionId) return item;
       }
 
       LogError(`could not find chat info for connection Id ${connectionId}`);
-
     } catch (error) {
       LogError(`getSlotByConnectionId exception: ${error.message}`);
     }
@@ -111,16 +94,12 @@ class SlotManager {
 
   // *****
   getRemoteSlotByUserId(userId) {
-
     try {
-
       for (let item of this.RemoteSlots()) {
-        if (item.userId === userId)
-          return item;
+        if (item.userId === userId) return item;
       }
 
       LogError(`could not find chat info for userId ${userId}`);
-
     } catch (error) {
       LogError(`getSlotByUserId exception: ${error.message}`);
     }
@@ -130,16 +109,12 @@ class SlotManager {
 
   // *****
   getRemoteSlotByKey(key) {
-
     try {
-
       for (let item of this.RemoteSlots()) {
-        if (item.key === key)
-          return item;
+        if (item.key === key) return item;
       }
 
       LogError(`could not find chat info for key ${key}`);
-
     } catch (error) {
       LogError(`getSlotByKey exception: ${error.message}`);
     }
@@ -150,13 +125,11 @@ class SlotManager {
   // Get index of next open chat control or
   // find one user was already in
   getSlotIndex(remoteInfo) {
-
     try {
-
       // first check to see if we are re-using a slot
-      // the learner was already in 
+      // the learner was already in
       for (let slot of this.RemoteSlots()) {
-        if ( (!slot.assigned) && (remoteInfo.userId == slot.userId) ) {
+        if (!slot.assigned && remoteInfo.userId == slot.userId) {
           return slot.key;
         }
       }
@@ -166,7 +139,6 @@ class SlotManager {
           return slot.key;
         }
       }
-
     } catch (error) {
       LogError(`getOpenInfoSlot exception: ${error.message}`);
     }
@@ -176,7 +148,6 @@ class SlotManager {
 
   // unassign a (remote) conversation
   unassignLearner(payload) {
-
     // get chat for connection id.  when found, mark the chat
     // as disconnected.
     let slotInfo = this.getRemoteSlotByConnectionId(payload.connectionId);
@@ -189,17 +160,17 @@ class SlotManager {
 
     return {
       remoteSlots: this.RemoteSlots(),
-      localSlots: this.LocalSlots()
-    }
-
+      localSlots: this.LocalSlots(),
+    };
   }
 
   // *****
   assignLearner(localInfo, remoteInfo) {
-
     let index = this.getSlotIndex(remoteInfo);
     if (index == null) {
-      throw new Error(`No available slots to assign learner ${remoteInfo.userId} `);
+      throw new Error(
+        `No available slots to assign learner ${remoteInfo.userId} `
+      );
     }
 
     log.debug(`assigning '${remoteInfo.userId}' to slot ${index}`);
@@ -217,7 +188,7 @@ class SlotManager {
     // per slot
     participant = new SlotInfo(localInfo);
     participant.key = index;
-    participant.show = true;    
+    participant.show = true;
     participant.slotIndex = index;
     participant.assigned = true;
 
@@ -231,7 +202,6 @@ class SlotManager {
     //   slotIndex: index
     // }
   }
-
-};
+}
 
 export default SlotManager;

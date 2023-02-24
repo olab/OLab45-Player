@@ -1,32 +1,25 @@
-import React, { PureComponent } from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import React, { PureComponent } from "react";
+import { withStyles } from "@material-ui/core/styles";
 import {
   Info as MapInfoIcon,
   PlayArrow as MapPlayIcon,
   PauseSharp as MapResumeIcon,
-} from '@material-ui/icons';
-import {
-  ButtonGroup,
-  Grid,
-  Button,
-  Tooltip,
-} from '@material-ui/core';
-import { Log, LogInfo, LogError } from '../../utils/Logger';
-import log from 'loglevel';
+} from "@material-ui/icons";
+import { ButtonGroup, Grid, Button, Tooltip } from "@material-ui/core";
+import { Log, LogInfo, LogError } from "../../utils/Logger";
+import log from "loglevel";
 
-import styles from './styles';
-import ListWithSearch from '../ListWithSearch/ListWithSearch';
-import styled from 'styled-components';
-import { PAGE_TITLES } from '../config';
-import filterByName from '../../helpers/filterByName';
-import filterByIndex from '../../helpers/filterByIndex';
-import { getMap } from '../../services/api'
-import Import from '../Import/Import'
-import {
-  getMaps
-} from '../../services/api'
+import styles from "./styles";
+import ListWithSearch from "../ListWithSearch/ListWithSearch";
+import styled from "styled-components";
+import { PAGE_TITLES } from "../config";
+import filterByName from "../../helpers/filterByName";
+import filterByIndex from "../../helpers/filterByIndex";
+import { getMap } from "../../services/api";
+import Import from "../Import/Import";
+import { getMaps } from "../../services/api";
 
-const playerState = require('../../utils/PlayerState').PlayerState;
+const playerState = require("../../utils/PlayerState").PlayerState;
 
 const HomeWrapper = styled.div`
   padding: 1rem;
@@ -40,9 +33,7 @@ const MapListWrapper = styled.div`
 `;
 
 class Home extends PureComponent {
-
   constructor(props) {
-
     super(props);
 
     const debug = playerState.GetDebug();
@@ -58,7 +49,7 @@ class Home extends PureComponent {
       isMapsFetching: true,
       isMapInfoFetched: false,
       sessionId: null,
-      debug
+      debug,
     };
 
     this.listWithSearchRef = React.createRef();
@@ -68,62 +59,58 @@ class Home extends PureComponent {
       this.state.maps = playerState.GetMaps();
       this.state.mapsFiltered = this.state.maps;
     }
-
   }
 
   setPageTitle = () => {
     document.title = PAGE_TITLES.HOME;
-  }
+  };
 
   toggleDisableButtons = () => {
     this.setState(({ isButtonsDisabled }) => ({
       isButtonsDisabled: !isButtonsDisabled,
     }));
-  }
+  };
 
-  handleMapItemClick = (scopeLevel) => {
-  }
+  handleMapItemClick = (scopeLevel) => {};
 
   handleMapPlayClick = (map, nodeId) => {
     this.setState({ mapId: map.id, nodeId: nodeId });
     const url = `/player/player/${map.id}/${nodeId}`;
     window.location.href = url;
-  }
+  };
 
-  handleMapInfoClick = async map => {
+  handleMapInfoClick = async (map) => {
     this.setState({ isMapInfoFetched: false });
     const { data } = await getMap(this.props, map.id);
     this.setState({
       isMapInfoFetched: true,
-      mapDetails: data
+      mapDetails: data,
     });
-  }
+  };
 
-  handleMapResumeClick = (map) => {
-  }
+  handleMapResumeClick = (map) => {};
 
   handleItemsSearch = (query) => {
     const { maps } = this.state;
     const scopedObjectsNameFiltered = filterByName(maps, query);
     const scopedObjectsIndexFiltered = filterByIndex(maps, query);
-    const mapsFiltered = [...scopedObjectsNameFiltered, ...scopedObjectsIndexFiltered];
+    const mapsFiltered = [
+      ...scopedObjectsNameFiltered,
+      ...scopedObjectsIndexFiltered,
+    ];
 
     this.setState({ mapsFiltered });
-  }
+  };
 
   clearSearchInput = () => {
     const { maps: mapsFiltered } = this.state;
     this.setState({ mapsFiltered });
-  }
+  };
 
   componentDidUpdate(prevProps) {
-
-    const {
-      mapId, maps, history, isMapDetailsFetching,
-    } = this.props;
-    const {
-      maps: mapsPrev, isMapDetailsFetching: isMapDetailsFetchingPrev,
-    } = prevProps;
+    const { mapId, maps, history, isMapDetailsFetching } = this.props;
+    const { maps: mapsPrev, isMapDetailsFetching: isMapDetailsFetchingPrev } =
+      prevProps;
 
     const isFetchingStopped = isMapDetailsFetchingPrev && !isMapDetailsFetching;
     const isMapRetrieved = isFetchingStopped && mapId;
@@ -146,12 +133,11 @@ class Home extends PureComponent {
   }
 
   async componentDidMount() {
-
     // test if already have node loaded (and it's the same one)
     var { maps } = this.state;
     if (maps.length > 0) {
       this.setState({ isMapsFetching: false });
-      log.debug('using cached maps data');
+      log.debug("using cached maps data");
       return;
     }
 
@@ -164,47 +150,59 @@ class Home extends PureComponent {
     });
 
     playerState.SetMaps(this.state.maps);
-
   }
 
   getIcon = (showIcons, scopedObject) => {
     if (showIcons && scopedObject.id) {
       return (
-        <div style={{ marginTop: '10px' }}>
-          <ButtonGroup size="small" color="primary" aria-label="small outlined button group">
+        <div style={{ marginTop: "10px" }}>
+          <ButtonGroup
+            size="small"
+            color="primary"
+            aria-label="small outlined button group"
+          >
             <Tooltip title="Get map info">
               <Button>
                 <MapInfoIcon
-                  onClick={() => { this.handleMapInfoClick(scopedObject); }}
+                  onClick={() => {
+                    this.handleMapInfoClick(scopedObject);
+                  }}
                 />
               </Button>
             </Tooltip>
             <Tooltip title="Play map">
               <Button>
                 <MapPlayIcon
-                  onClick={() => { this.handleMapPlayClick(scopedObject, 0); }}
+                  onClick={() => {
+                    this.handleMapPlayClick(scopedObject, 0);
+                  }}
                 />
               </Button>
             </Tooltip>
             <Tooltip title="Resume map">
               <Button>
                 <MapResumeIcon
-                  onClick={() => { this.handleMapResumeClick(scopedObject); }}
+                  onClick={() => {
+                    this.handleMapResumeClick(scopedObject);
+                  }}
                 />
               </Button>
             </Tooltip>
-
           </ButtonGroup>
         </div>
       );
     }
-    return '';
+    return "";
   };
 
   render() {
-
     const {
-      maps, mapsFiltered, isMapsFetching, isButtonsDisabled, mapDetails, isMapInfoFetched,
+      maps,
+      mapsFiltered,
+      isMapsFetching,
+      isButtonsDisabled,
+      mapDetails,
+      isMapInfoFetched,
     } = this.state;
 
     var role = this.props.authActions.getRole();
@@ -237,7 +235,7 @@ class Home extends PureComponent {
               &nbsp;maps.
             </Grid>
             <Grid item xs={2}>
-              {isMapInfoFetched && mapDetails && (mapDetails.id !== null) && (
+              {isMapInfoFetched && mapDetails && mapDetails.id !== null && (
                 <>
                   <h4>Map Details</h4>
                   <small>
@@ -273,7 +271,7 @@ class Home extends PureComponent {
               )}
             </Grid>
           </Grid>
-          {role === "olab:superuser" && (<Import props={this.props} />)}
+          {role === "olab:superuser" && <Import props={this.props} />}
         </HomeWrapper>
       </>
     );

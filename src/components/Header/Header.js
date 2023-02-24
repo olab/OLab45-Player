@@ -1,9 +1,15 @@
 // @flow
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { LinearProgress, Button } from '@material-ui/core';
-import { ReactComponent as LogoIcon } from '../../shared/assets/icons/olab4_logo.svg';
-import { Logo, HeaderWrapper, FakeProgress, CenterPlaceholder, VersionWrapper } from './styles';
+import React from "react";
+import { Link } from "react-router-dom";
+import { LinearProgress, Button } from "@material-ui/core";
+import { ReactComponent as LogoIcon } from "../../shared/assets/icons/olab4_logo.svg";
+import {
+  Logo,
+  HeaderWrapper,
+  FakeProgress,
+  CenterPlaceholder,
+  VersionWrapper,
+} from "./styles";
 
 const Header = ({ version, authActions, isScreenBusy }) => (
   <HeaderWrapper>
@@ -14,11 +20,10 @@ const Header = ({ version, authActions, isScreenBusy }) => (
           <h1>OLab4</h1>
         </Logo>
       </Link>
-      <CenterPlaceholder>
-        &nbsp;
-      </CenterPlaceholder>
+      <CenterPlaceholder>&nbsp;</CenterPlaceholder>
       <VersionWrapper>
-        User: {authActions.getUserName()}<br />
+        User: {authActions.getUserName()}
+        <br />
         Version: {version}
       </VersionWrapper>
       <Button
@@ -26,7 +31,9 @@ const Header = ({ version, authActions, isScreenBusy }) => (
         color="primary"
         size="large"
         aria-label="Return to Home"
-        onClick={() => { authActions.logout(); }}
+        onClick={() => {
+          authActions.logout();
+        }}
       >
         &nbsp;Logout&nbsp;
       </Button>
@@ -36,4 +43,3 @@ const Header = ({ version, authActions, isScreenBusy }) => (
 );
 
 export default Header;
-

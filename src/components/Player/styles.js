@@ -1,5 +1,5 @@
-const styles = theme => ({
-  backgroundColor: 'blue'  
+const styles = (theme) => ({
+  backgroundColor: "blue",
 });
 
 export default styles;

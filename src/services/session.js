@@ -1,7 +1,5 @@
 class Session {
-
   constructor(source = null) {
-
     this.contextId = source?.contextId;
     this.mapId = source?.map?.id;
     this.nodeId = source?.node?.id;

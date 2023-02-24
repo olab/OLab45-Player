@@ -1,22 +1,17 @@
 // @flow
-import * as React from 'react';
-import {
-  Grid,
-  TableCell
-} from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
-import { Log, LogInfo, LogError } from '../../utils/Logger';
-import log from 'loglevel';
-import styles from '../WikiTags/styles.module.css';
+import * as React from "react";
+import { Grid, TableCell } from "@material-ui/core";
+import { withStyles } from "@material-ui/core/styles";
+import { Log, LogInfo, LogError } from "../../utils/Logger";
+import log from "loglevel";
+import styles from "../WikiTags/styles.module.css";
 
-import Chat from './Chat'
-import ChatStatusBar from './ChatStatusBar';
-var constants = require('../../services/constants');
+import Chat from "./Chat";
+import ChatStatusBar from "./ChatStatusBar";
+var constants = require("../../services/constants");
 
 class ChatCell extends React.Component {
-
   constructor(props) {
-
     super(props);
 
     this.state = {
@@ -41,23 +36,22 @@ class ChatCell extends React.Component {
 
   // command method listener
   // onCommand(payload) {
-    // log.debug(`'${this.state.connection.connectionId?.slice(-3)}' onChatCellCommandCallback: ${payload.command}`);
+  // log.debug(`'${this.state.connection.connectionId?.slice(-3)}' onChatCellCommandCallback: ${payload.command}`);
   // }
 
   render() {
-
     const {
       connection,
       senderInfo,
       localInfo,
       playerProps,
       lastMessageTime,
-      session
+      session,
     } = this.state;
 
     let cellStyling = Object.assign({ padding: 7 }, this.props.style);
     if (!localInfo.show) {
-      cellStyling = { display: 'none', padding: 7 };
+      cellStyling = { display: "none", padding: 7 };
     }
 
     return (
@@ -71,7 +65,8 @@ class ChatCell extends React.Component {
           connection={connection}
           localInfo={localInfo}
           senderInfo={senderInfo}
-          playerProps={playerProps} />
+          playerProps={playerProps}
+        />
         <ChatStatusBar
           index={this.props.index}
           show={localInfo.show}
@@ -79,15 +74,13 @@ class ChatCell extends React.Component {
           connection={connection}
           localInfo={localInfo}
           lastMessageTime={lastMessageTime}
-          senderInfo={senderInfo} />
+          senderInfo={senderInfo}
+        />
       </TableCell>
     );
-
-
-  } catch(error) {
-    return (
-      <b>TurkerStatusBar: {error.message}</b>
-    );
+  }
+  catch(error) {
+    return <b>TurkerStatusBar: {error.message}</b>;
   }
 }
 

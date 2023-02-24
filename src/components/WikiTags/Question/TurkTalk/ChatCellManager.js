@@ -1,40 +1,33 @@
-import { Log, LogInfo, LogError, LogException } from '../../../../utils/Logger';
-import log from 'loglevel';
-import Participant from '../../../../helpers/participant';
-import SlotInfo from '../../../../helpers/SlotInfo';
-import ChatCell from '../../../ChatCell/ChatCell'
+import { Log, LogInfo, LogError, LogException } from "../../../../utils/Logger";
+import log from "loglevel";
+import Participant from "../../../../helpers/participant";
+import SlotInfo from "../../../../helpers/SlotInfo";
+import ChatCell from "../../../ChatCell/ChatCell";
 
 class ChatCellData {
-
   constructor(key, localInfo, remoteInfo = null) {
-
     this.key = key;
     this.show = false;
     this.assigned = false;
     this.session = {
-      contextId: null
+      contextId: null,
     };
 
     this.localInfo = new SlotInfo(localInfo);
     if (!remoteInfo) {
       this.remoteInfo = new SlotInfo(remoteInfo);
-    }
-    else {
+    } else {
       this.remoteInfo = remoteInfo;
     }
-
   }
 
   toString() {
     return `${JSON.stringify(this, null, 1)}`;
   }
-
 }
 
 class ChatCellManager {
-
   constructor(props) {
-
     this.props = props;
     this.chatCells = [];
     this.chatDatas = [];
@@ -50,7 +43,7 @@ class ChatCellManager {
 
     this.isModerator = this.props.moderator;
     this.connection = this.props.connection;
-    
+
     // initialize chat cell width
     this.chatCellWidthStyle = this.#calculateChatCellWidth(this.#chatDatas());
 
@@ -58,23 +51,19 @@ class ChatCellManager {
     this.#initializeChatCells(this.MAX_TURKEES, this.props.localInfo);
 
     Log(`ChatCellManager: initialized ${this.props.totalCount} chat cells`);
-
   }
 
   // *****
   chatCells(index = null) {
-
     if (index == null) {
       return this.chatCells;
     }
 
     return this.chatCells[index];
-
   }
 
   // *****
   #chatDatas(index = null) {
-
     if (index == null) {
       return this.chatDatas;
     }
@@ -85,7 +74,6 @@ class ChatCellManager {
   // recalculate the chat cell width based on the number
   // that are supposed to be active/showing
   #calculateChatCellWidth(chatDatas) {
-
     let width = {};
 
     let totalToShow = 0;
@@ -96,27 +84,20 @@ class ChatCellManager {
     }
 
     if (!totalToShow) {
-      width = { width: '100%' };
-    }
-
-    else if (totalToShow < this.numColumns) {
+      width = { width: "100%" };
+    } else if (totalToShow < this.numColumns) {
       width = { width: `${Math.floor(100 / totalToShow)}%` };
+    } else {
+      width = { width: "25%" };
     }
 
-    else {
-      width = { width: '25%' };
-    }
-
-    Log( `ChatCellManager width style: ${JSON.stringify(width, null, 1 )}`);
+    Log(`ChatCellManager width style: ${JSON.stringify(width, null, 1)}`);
     return width;
-
   }
 
   // initialize chat cell jsx
   #initializeChatCells(count, localInfoTemplate) {
-
     for (let index = 0; index < count; index++) {
-
       let chatData = new ChatCellData(index, localInfoTemplate);
       this.chatDatas.push(chatData);
 
@@ -137,11 +118,9 @@ class ChatCellManager {
         />
       );
     }
-
   }
 
   #recalculateChatCell(index) {
-
     let chatData = this.#chatDatas(index);
     Log(`recalc cell[${index}]: ${JSON.stringify(chatData, null, 1)}`);
 
@@ -162,19 +141,19 @@ class ChatCellManager {
         senderInfo={chatData.remoteInfo}
       />
     );
-
   }
 
   // Get index of next open chat cell or
   // find one user was already in
   #getSlotIndex(remoteInfo) {
-
     try {
-
       // first check to see if we are re-using a slot
-      // the learner was already in 
+      // the learner was already in
       for (let chatData of this.#chatDatas()) {
-        if ((!chatData.assigned) && (chatData.remoteInfo.userId == remoteInfo.userId)) {
+        if (
+          !chatData.assigned &&
+          chatData.remoteInfo.userId == remoteInfo.userId
+        ) {
           return chatData.key;
         }
       }
@@ -185,7 +164,6 @@ class ChatCellManager {
           return chatData.key;
         }
       }
-
     } catch (error) {
       LogError(`#getOpenInfoSlot exception: ${error.message}`);
     }
@@ -195,9 +173,7 @@ class ChatCellManager {
 
   // *****
   #getSlotIndexByconnectionId(connectionId) {
-
     try {
-
       let index = 0;
       for (let chatData of this.#chatDatas()) {
         if (chatData.remoteInfo.connectionId === connectionId) {
@@ -207,7 +183,6 @@ class ChatCellManager {
       }
 
       LogError(`could not find chat info for connection Id ${connectionId}`);
-
     } catch (error) {
       LogError(`getSlotIndexByconnectionId exception: ${error.message}`);
     }
@@ -216,14 +191,14 @@ class ChatCellManager {
   }
 
   assignChatParticipant(remoteInfo) {
-
     try {
-
       Log(`assigning ${JSON.stringify(remoteInfo, null, 2)} participant`);
 
       let index = this.#getSlotIndex(remoteInfo);
       if (index == null) {
-        throw new Error(`No available slots to assign learner ${remoteInfo.userId} `);
+        throw new Error(
+          `No available slots to assign learner ${remoteInfo.userId} `
+        );
       }
 
       log.debug(`assigning '${remoteInfo.userId}' to slot ${index}`);
@@ -233,8 +208,8 @@ class ChatCellManager {
       chatData.remoteInfo = {
         ...remoteInfo,
         show: true,
-        assigned: true
-      }
+        assigned: true,
+      };
 
       chatData.localInfo.show = true;
       chatData.localInfo.assigned = true;
@@ -242,7 +217,6 @@ class ChatCellManager {
       log.debug(`assignChatParticipant: ${chatData.toString()}`);
 
       this.#recalculateChatCell(index);
-
     } catch (error) {
       LogException(`assignChatParticipant`, error);
     }
@@ -250,9 +224,7 @@ class ChatCellManager {
 
   // unassign a (remote) conversation
   unassignChatParticipant(payload) {
-
     try {
-
       Log(`unassigning ${JSON.stringify(payload, null, 2)} participant`);
 
       // get chat for connection id. when found, mark the chat
@@ -260,7 +232,6 @@ class ChatCellManager {
       let index = this.#getSlotIndexByconnectionId(payload.connectionId);
 
       if (index != null) {
-
         let chatData = this.#chatDatas(index);
         // blank out slot
         chatData.assigned = false;
@@ -268,14 +239,10 @@ class ChatCellManager {
       }
 
       this.#recalculateChatCell(index);
-
     } catch (error) {
       LogError(`unassignChatParticipant exception: ${error.message}`);
-
     }
-
   }
-
 }
 
 export default ChatCellManager;

@@ -1,16 +1,14 @@
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
-import { Log, LogInfo, LogError } from '../utils/Logger';
-import log from 'loglevel';
-import { config } from '../config';
+import { Log, LogInfo, LogError } from "../utils/Logger";
+import log from "loglevel";
+import { config } from "../config";
 
-var constants = require('./constants');
-const playerState = require('../utils/PlayerState').PlayerState;
+var constants = require("./constants");
+const playerState = require("../utils/PlayerState").PlayerState;
 
 class TurkTalk {
-
   // *****
   constructor(component) {
-
     this.component = component;
     this.contextId = component.props.props.contextId;
 
@@ -19,13 +17,15 @@ class TurkTalk {
 
     log.debug(`turk talk url: ${url}`);
 
-    this.questionSettings = JSON.parse( this.component.props.props.question.settings );
+    this.questionSettings = JSON.parse(
+      this.component.props.props.question.settings
+    );
     this.penName = `${component.props.props.map.name}|${this.questionSettings.roomName}`;
 
-    const sessionInfo = playerState.GetSessionInfo( null );
+    const sessionInfo = playerState.GetSessionInfo(null);
     const token = `${sessionInfo?.authInfo.token}`;
     const hubUrl = `${url}?access_token=${token}&contextId=${this.contextId}&mapId=${this.component.props.props.map.id}`;
-    
+
     this.connection = new HubConnectionBuilder()
       .withUrl(hubUrl)
       // .withUrl(url, { accessTokenFactory: () => this.token })
@@ -38,7 +38,10 @@ class TurkTalk {
 
   // *****
   bindConnectionMessage() {
-    this.connection.on(constants.SIGNALCMD_BROADCAST, this.broadcastMessageCallback);
+    this.connection.on(
+      constants.SIGNALCMD_BROADCAST,
+      this.broadcastMessageCallback
+    );
   }
 
   broadcastMessageCallback(message) {
@@ -47,20 +50,18 @@ class TurkTalk {
 
   async disconnect() {
     await this.connection.stop();
-    console.log('disconnection');
+    console.log("disconnection");
   }
 
   // *****
   connect(clientObject) {
-
-    this.connection.start()
+    this.connection
+      .start()
       .then(function () {
-
         if (clientObject?.onConnected) {
           // call onConnected method on 'derived' class
           clientObject.onConnected(clientObject);
         }
-        
       })
       .catch(function (error) {
         console.error(error.message);
@@ -68,7 +69,6 @@ class TurkTalk {
   }
 
   onCommand(payload) {
-
     if (payload.Command === constants.SIGNALCMD_CONNECTIONSTATUS) {
       const { Id } = payload.Data;
       log.debug(`Id: ${Id}`);
@@ -76,12 +76,10 @@ class TurkTalk {
       if (this.component.onSessionIdChanged) {
         this.component.onSessionIdChanged(Id);
       }
-
     }
 
     return false;
   }
-
-};
+}
 
 export default TurkTalk;

@@ -1,5 +1,4 @@
 class PersistantStorage {
-
   static clear(prefix = null) {
     localStorage.clear();
   }
@@ -7,13 +6,12 @@ class PersistantStorage {
   static all(prefix = null) {
     return localStorage;
   }
-  
+
   static have(key) {
     return localStorage.getItem(key) != null;
   }
 
   static get(prefix, key, defaultValue = null) {
-
     let valueObject = null;
     const value = localStorage.getItem(key);
 
@@ -23,30 +21,26 @@ class PersistantStorage {
       valueObject = value;
     }
 
-    if ( valueObject == null ) {
+    if (valueObject == null) {
       valueObject = defaultValue;
     }
 
     return valueObject;
-  };
+  }
 
   static save(prefix, key, value) {
-
-    if (typeof value === 'object' && value !== null) {
+    if (typeof value === "object" && value !== null) {
       this.saveObject(key, value);
-    }
-    else {
+    } else {
       localStorage.setItem(key, value);
     }
 
     return value;
-
-  };
+  }
 
   static saveObject(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
-  };
-
+  }
 }
 
-export { PersistantStorage }
+export { PersistantStorage };

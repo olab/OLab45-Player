@@ -1,33 +1,30 @@
-import { Log, LogInfo, LogError } from '../utils/Logger';
-import log from 'loglevel';
-import Participant from './participant';
+import { Log, LogInfo, LogError } from "../utils/Logger";
+import log from "loglevel";
+import Participant from "./participant";
 
 class SlotInfo {
-
   constructor(source) {
     this.key = null;
     this.show = false;
     this.assigned = false;
-    this.lastMessageTime = '-';
+    this.lastMessageTime = "-";
 
     var tmp = new Participant();
-    Object.assign(this, { ...this, ...tmp });   
-        
+    Object.assign(this, { ...this, ...tmp });
+
     if (source) {
       Object.assign(this, { ...this, ...source });
     }
- 
   }
 
   isOpen() {
     return !this.assigned;
   }
 
-  SetParticipant(learner)
-  {
+  SetParticipant(learner) {
     // save the key from being overwriten
     var slotKey = this.key;
-    Object.assign(this, { ...this, ...learner });        
+    Object.assign(this, { ...this, ...learner });
     this.key = slotKey;
   }
 

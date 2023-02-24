@@ -1,40 +1,33 @@
 // @flow
-import React from 'react';
+import React from "react";
 // import { withStyles } from '@material-ui/core/styles';
-import {
-  Button,
-  ButtonGroup,
-} from '@material-ui/core';
-import { Log, LogInfo, LogError } from '../../../utils/Logger';
-import log from 'loglevel';
-const playerState = require('../../../utils/PlayerState').PlayerState;
+import { Button, ButtonGroup } from "@material-ui/core";
+import { Log, LogInfo, LogError } from "../../../utils/Logger";
+import log from "loglevel";
+const playerState = require("../../../utils/PlayerState").PlayerState;
 
 class OlabLinksTag extends React.Component {
-
   constructor(props) {
-
     super(props);
 
     const debug = playerState.GetDebug();
 
     this.state = { debug };
-
   }
 
   onNavigateToNode = (mapId, nodeId, urlParam) => {
-
     let url = `/player/player/${mapId}/${nodeId}`;
     if (urlParam) {
       url += `/${urlParam}`;
     }
 
-    log.debug(`navigating to ${url}`)
+    log.debug(`navigating to ${url}`);
 
     window.location.href = url;
-  }
+  };
 
   render() {
-    log.debug('OlabLinksTag render');
+    log.debug("OlabLinksTag render");
 
     const { debug } = this.state;
 
@@ -42,12 +35,8 @@ class OlabLinksTag extends React.Component {
       className,
       props: {
         urlParam,
-        map: {
-          id: mapId,
-        },
-        node: {
-          links,
-        },
+        map: { id: mapId },
+        node: { links },
         nodesVisited,
       },
     } = this.props;
@@ -57,11 +46,9 @@ class OlabLinksTag extends React.Component {
       if (nodesVisited.includes(link.destinationId)) {
         links.splice(index, 1);
       }
-
     }
 
     if (debug.enableWikiRendering) {
-
       return (
         <div className={className}>
           <ButtonGroup
@@ -73,8 +60,10 @@ class OlabLinksTag extends React.Component {
             {links.map((link) => (
               <Button
                 key={link.id}
-                style={{textTransform: "none"}}
-                onClick={() => { this.onNavigateToNode(mapId, link.destinationId, urlParam); }}
+                style={{ textTransform: "none" }}
+                onClick={() => {
+                  this.onNavigateToNode(mapId, link.destinationId, urlParam);
+                }}
               >
                 {link.linkText}
               </Button>
@@ -82,10 +71,7 @@ class OlabLinksTag extends React.Component {
           </ButtonGroup>
         </div>
       );
-
-    }
-    else {
-
+    } else {
       return (
         <div className={className}>
           <ButtonGroup
@@ -97,15 +83,17 @@ class OlabLinksTag extends React.Component {
             {links.map((link) => (
               <Button
                 key={link.id}
-                onClick={() => { this.onNavigateToNode(mapId, link.destinationId, urlParam); }}
+                onClick={() => {
+                  this.onNavigateToNode(mapId, link.destinationId, urlParam);
+                }}
               >
-                {link.destinationTitle} (id: {link.id} -&gt; {link.destinationId})
+                {link.destinationTitle} (id: {link.id} -&gt;{" "}
+                {link.destinationId})
               </Button>
             ))}
           </ButtonGroup>
         </div>
       );
-
     }
   }
 }

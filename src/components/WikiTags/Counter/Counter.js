@@ -1,15 +1,13 @@
 // @flow
-import React from 'react';
-import parse from 'html-react-parser'
-import { Log, LogInfo, LogError } from '../../../utils/Logger';
-import log from 'loglevel';
-import { getCounter } from '../WikiTags';
-const playerState = require('../../../utils/PlayerState').PlayerState;
+import React from "react";
+import parse from "html-react-parser";
+import { Log, LogInfo, LogError } from "../../../utils/Logger";
+import log from "loglevel";
+import { getCounter } from "../WikiTags";
+const playerState = require("../../../utils/PlayerState").PlayerState;
 
 class OlabCounterTag extends React.Component {
-
   constructor(props) {
-
     super(props);
 
     const debug = playerState.GetDebug();
@@ -17,12 +15,9 @@ class OlabCounterTag extends React.Component {
   }
 
   render() {
-
     const { debug } = this.state;
 
-    const {
-      name
-    } = this.props;
+    const { name } = this.props;
 
     log.debug(`OlabConstantTag render '${name}'`);
 
@@ -30,35 +25,33 @@ class OlabCounterTag extends React.Component {
       let item = getCounter(name, this.props.props.dynamicObjects);
 
       if (item != null) {
-
         if (!debug.enableWikiRendering) {
           return (
             <>
-              <b>[[CR:{name}]] "{item.value}"</b>
+              <b>
+                [[CR:{name}]] "{item.value}"
+              </b>
             </>
           );
         }
 
-        if ( item.value == null ) {
+        if (item.value == null) {
           item.value = "";
         }
 
-        return (
-          <>
-            {parse(item.value)}
-          </>
-        );
+        return <>{parse(item.value)}</>;
       }
-
     } catch (error) {
       return (
         <>
-          <b>[[CR:{name}]] "{error.message}"</b>
+          <b>
+            [[CR:{name}]] "{error.message}"
+          </b>
         </>
       );
     }
 
-    return '';
+    return "";
   }
 }
 

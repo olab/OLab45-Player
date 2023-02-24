@@ -5,15 +5,13 @@
  * @param {string} end datetime string
  * @returns {string} pretty time diff in hh:mm::ss format
  */
-export default function calculateTimeTaken(start, end)
-{
+export default function calculateTimeTaken(start, end) {
   const startMs = Date.parse(start);
   const endMs = Date.parse(end);
 
-  if ( ! ( startMs > 0 ) || ! ( endMs > 0 ) )
-    return '-';
+  if (!(startMs > 0) || !(endMs > 0)) return "-";
 
   const diff = endMs - startMs;
 
-  return new Date(diff).toISOString().substring(11, 11+8);
+  return new Date(diff).toISOString().substring(11, 11 + 8);
 }

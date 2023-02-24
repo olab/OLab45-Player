@@ -44,7 +44,8 @@
     "eject": "react-scripts eject",
     "build": "dotenv -e .env.production react-scripts build",
     "build:dev": "npm --no-git-tag-version version prerelease",
-    "build:prod": "npm --no-git-tag-version version `date +%y.%m.%d-0`"
+    "build:prod": "npm --no-git-tag-version version `date +%y.%m.%d-0`",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": []
@@ -62,6 +63,13 @@
     ]
   },
   "devDependencies": {
-    "dotenv-cli": "^6.0.0"
+    "dotenv-cli": "^6.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.2",
+    "prettier": "2.8.4"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown",
+    "*.{js,css,md}": "prettier --write"
   }
 }

@@ -1,29 +1,23 @@
 // @flow
-import React from 'react';
-import parse from 'html-react-parser'
-import { getConstant } from '../WikiTags';
-const playerState = require('../../../utils/PlayerState').PlayerState;
-import { Log, LogInfo, LogError } from '../../../utils/Logger';
-import log from 'loglevel';
+import React from "react";
+import parse from "html-react-parser";
+import { getConstant } from "../WikiTags";
+const playerState = require("../../../utils/PlayerState").PlayerState;
+import { Log, LogInfo, LogError } from "../../../utils/Logger";
+import log from "loglevel";
 
 class OlabConstantTag extends React.Component {
-
   constructor(props) {
-
     super(props);
-    
+
     const debug = playerState.GetDebug();
     this.state = { debug };
-
   }
 
   render() {
-
     const { debug } = this.state;
 
-    const {
-      name
-    } = this.props;
+    const { name } = this.props;
 
     log.debug(`OlabConstantTag render '${name}'`);
 
@@ -31,25 +25,24 @@ class OlabConstantTag extends React.Component {
       let item = getConstant(name, this.props);
 
       if (item != null) {
-
         if (!debug.enableWikiRendering) {
           return (
             <>
-              <b>[[CONST:{name}]] "{item.value}"</b>
+              <b>
+                [[CONST:{name}]] "{item.value}"
+              </b>
             </>
           );
         }
 
-        return (
-          <>
-            {parse(item.value)}
-          </>
-        );
+        return <>{parse(item.value)}</>;
       }
     } catch (error) {
       return (
         <>
-          <b>[[CONST:{name}]] "{error.message}"</b>
+          <b>
+            [[CONST:{name}]] "{error.message}"
+          </b>
         </>
       );
     }

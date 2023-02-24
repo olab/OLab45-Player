@@ -1,10 +1,8 @@
-import { Log, LogInfo, LogError } from '../utils/Logger';
-import log from 'loglevel';
+import { Log, LogInfo, LogError } from "../utils/Logger";
+import log from "loglevel";
 
 class Participant {
-
   constructor(source = null) {
-
     this.userId = null;
     this.topicName = null;
     this.nickName = null;
@@ -19,7 +17,9 @@ class Participant {
   }
 
   toString() {
-    return `${this.userId} ${this.connectionId?.slice(-3)} moderator? ${this.isModerator}`;
+    return `${this.userId} ${this.connectionId?.slice(-3)} moderator? ${
+      this.isModerator
+    }`;
   }
 }
 

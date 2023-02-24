@@ -1,28 +1,33 @@
 // @flow
-import React, { PureComponent } from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import classNames from 'classnames';
+import React, { PureComponent } from "react";
+import { withStyles } from "@material-ui/core/styles";
+import classNames from "classnames";
 import {
   Close as CloseIcon,
   Search as SearchIcon,
   FilterVintage as DefaultIcon,
   FilterVintageOutlined as DefaultOutlinedIcon,
-} from '@material-ui/icons';
+} from "@material-ui/icons";
 
 import {
-  Grid, List, ListItem, ListItemText, IconButton, TextField, Typography,
-} from '@material-ui/core';
+  Grid,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  TextField,
+  Typography,
+} from "@material-ui/core";
 
-import CircularSpinnerWithText from '../CircularSpinnerWithText/CircularSpinnerWithText';
-import removeHTMLTags from '../../helpers/removeHTMLTags';
+import CircularSpinnerWithText from "../CircularSpinnerWithText/CircularSpinnerWithText";
+import removeHTMLTags from "../../helpers/removeHTMLTags";
 
-import styles, { SearchWrapper, ListItemContentWrapper } from './styles';
+import styles, { SearchWrapper, ListItemContentWrapper } from "./styles";
 
 class ListWithSearch extends PureComponent {
-
   static defaultProps = {
-    getIcon: () => '',
-    getIconTooltip: () => '',
+    getIcon: () => "",
+    getIconTooltip: () => "",
     iconEven: DefaultIcon,
     iconOdd: DefaultOutlinedIcon,
     isForModal: false,
@@ -36,7 +41,7 @@ class ListWithSearch extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      query: ''
+      query: "",
     };
   }
 
@@ -44,8 +49,8 @@ class ListWithSearch extends PureComponent {
     const { onClear } = this.props;
 
     onClear();
-    this.setState({ query: '' });
-  }
+    this.setState({ query: "" });
+  };
 
   onInputChange = (e) => {
     const { onSearch } = this.props;
@@ -53,7 +58,7 @@ class ListWithSearch extends PureComponent {
 
     onSearch(value);
     this.setState({ [name]: value });
-  }
+  };
 
   render() {
     const { query } = this.state;
@@ -76,7 +81,7 @@ class ListWithSearch extends PureComponent {
     const listClassNames = classNames(
       classes.list,
       { [classes.listLimits]: isForModal },
-      { [classes.listEmpty]: isHideSearch },
+      { [classes.listEmpty]: isHideSearch }
     );
 
     const isShowSpinner = isWithSpinner && isItemsFetching;
@@ -105,17 +110,12 @@ class ListWithSearch extends PureComponent {
                 <CloseIcon />
               </IconButton>
             ) : (
-              <SearchIcon
-                classes={{ root: classes.searchIcon }}
-              />
+              <SearchIcon classes={{ root: classes.searchIcon }} />
             )}
           </SearchWrapper>
         )}
 
-        <List
-          classes={{ root: listClassNames }}
-          disablePadding
-        >
+        <List classes={{ root: listClassNames }} disablePadding>
           {list.map((listItem) => (
             <ListItem
               key={listItem.id}
@@ -123,17 +123,17 @@ class ListWithSearch extends PureComponent {
               disabled={isItemsDisabled}
             >
               <ListItemContentWrapper>
-                <div
-                  disabled={isItemsDisabled}
-                >
+                <div disabled={isItemsDisabled}>
                   <Grid container spacing={0}>
-                    <Grid item xs={3} style={{ minWidth: '125px' }}>
+                    <Grid item xs={3} style={{ minWidth: "125px" }}>
                       {getIcon(showIcons, listItem)}
                     </Grid>
                     <Grid item xs={9}>
                       <ListItemText
                         primary={primarytext(listItem)}
-                        secondary={removeHTMLTags(secondarytext(listItem) || '')}
+                        secondary={removeHTMLTags(
+                          secondarytext(listItem) || ""
+                        )}
                         classes={{ secondary: classes.secondaryText }}
                       />
                     </Grid>
@@ -152,7 +152,13 @@ class ListWithSearch extends PureComponent {
           )}
         </List>
 
-        {isShowSpinner && <CircularSpinnerWithText text="Updating list from the server..." centered large />}
+        {isShowSpinner && (
+          <CircularSpinnerWithText
+            text="Updating list from the server..."
+            centered
+            large
+          />
+        )}
       </div>
     );
   }

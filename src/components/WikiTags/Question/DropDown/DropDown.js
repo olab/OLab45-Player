@@ -1,48 +1,47 @@
 // @flow
-import React from 'react';
+import React from "react";
 import {
   Box,
   FormControl,
   InputLabel,
   Select,
-  MenuItem
-} from '@material-ui/core';
+  MenuItem,
+} from "@material-ui/core";
 
-import CloseIcon from '@material-ui/icons/Close';
-import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from "@material-ui/icons/Close";
+import CheckIcon from "@material-ui/icons/Check";
 
-import { withStyles } from '@material-ui/core/styles';
-import { Log, LogInfo, LogError } from '../../../../utils/Logger';
-import log from 'loglevel';
+import { withStyles } from "@material-ui/core/styles";
+import { Log, LogInfo, LogError } from "../../../../utils/Logger";
+import log from "loglevel";
 
-import styles from '../../styles.module.css';
-import siteStyles from '../../site.module.css';
+import styles from "../../styles.module.css";
+import siteStyles from "../../site.module.css";
 
 class OlabDropDownQuestion extends React.Component {
-
   constructor(props) {
-
     super(props);
 
     this.state = {
-      ...props.props
+      ...props.props,
     };
 
-    // Binding this keyword  
-    this.setInProgress = this.setInProgress.bind(this)
+    // Binding this keyword
+    this.setInProgress = this.setInProgress.bind(this);
     this.setValue = this.setValue.bind(this);
     this.transmitResponse = this.transmitResponse.bind(this);
   }
 
   setValue = (event, setInProgress, setIsDisabled) => {
-
     const value = Number(event.target.value);
     const question = this.state.question;
 
-    this.setState(state => {
+    this.setState((state) => {
       question.value = value;
-      log.debug(`OlabDropDownQuestion set question '${question.id}' value = '${value}'.`);
-      return ({ question });
+      log.debug(
+        `OlabDropDownQuestion set question '${question.id}' value = '${value}'.`
+      );
+      return { question };
     });
 
     let response = null;
@@ -54,15 +53,16 @@ class OlabDropDownQuestion extends React.Component {
       }
     }
 
-    if (typeof question.responseId == 'undefined')
+    if (typeof question.responseId == "undefined")
       question.previousResponseId = null;
-    else
-      question.previousResponseId = question.responseId;
+    else question.previousResponseId = question.responseId;
 
     question.responseId = response.id;
     question.value = question.responseId;
 
-    log.debug(`OlabSinglePickQuestion set question '${question.id}' value = '${value}'`);
+    log.debug(
+      `OlabSinglePickQuestion set question '${question.id}' value = '${value}'`
+    );
 
     // if single try question, disabled it
     if (question.numTries > 0) {
@@ -75,17 +75,11 @@ class OlabDropDownQuestion extends React.Component {
 
     this.setState({ question });
     this.transmitResponse();
-
-  }
+  };
 
   transmitResponse() {
-
-    const {
-      onSubmitResponse,
-      authActions,
-      map,
-      node,
-      contextId } = this.props.props;
+    const { onSubmitResponse, authActions, map, node, contextId } =
+      this.props.props;
 
     let responseState = {
       ...this.state,
@@ -94,33 +88,32 @@ class OlabDropDownQuestion extends React.Component {
       node,
       contextId,
       setInProgress: this.setInProgress,
-      setIsDisabled: this.setIsDisabled
+      setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== 'undefined') {
+    if (typeof onSubmitResponse !== "undefined") {
       onSubmitResponse(responseState);
     }
   }
 
   setInProgress(inProgress) {
-
     this.setState({ showProgressSpinner: inProgress });
     log.debug(`set progress spinner: ${inProgress}`);
   }
 
   setIsDisabled(disabled) {
-
     this.setState({ disabled: disabled });
     log.debug(`set disabled: ${disabled}`);
   }
 
   buildQuestionResponses(question) {
-
     let responses = [];
     let key = 0;
     for (const response of question.responses) {
       var item = (
-        <MenuItem key={key++} value={Number(response.id)}>{response.response}</MenuItem>
+        <MenuItem key={key++} value={Number(response.id)}>
+          {response.response}
+        </MenuItem>
       );
       responses.push(item);
     }
@@ -129,33 +122,38 @@ class OlabDropDownQuestion extends React.Component {
   }
 
   render() {
-
-    const {
-      id,
-      name,
-      question
-    } = this.state;
+    const { id, name, question } = this.state;
 
     log.debug(`OlabDropDownQuestion render '${name}'`);
     try {
-
-      let progressButtonHtml = '';
+      let progressButtonHtml = "";
       if (this.state.showProgressSpinner) {
-        progressButtonHtml = <img style={{ float: 'left', width: 40, height: 40 }} src={Spinner} alt="" />;
+        progressButtonHtml = (
+          <img
+            style={{ float: "left", width: 40, height: 40 }}
+            src={Spinner}
+            alt=""
+          />
+        );
       }
 
       var responses = this.buildQuestionResponses(question);
       var disabled = question.disabled == 0 ? false : true;
 
       return (
-        <div className={`${styles['quddropdown']} ${siteStyles[id]}`} id={`${id}`}>
+        <div
+          className={`${styles["quddropdown"]} ${siteStyles[id]}`}
+          id={`${id}`}
+        >
           <Box width={question.width}>
             <FormControl fullWidth disabled={disabled}>
               <InputLabel id={`${id}-label`}>{question.stem}</InputLabel>
               <Select
                 id={`${id}-select`}
                 value={question.value}
-                onChange={(event) => this.setValue(event, this.setInProgress, this.setIsDisabled)}
+                onChange={(event) =>
+                  this.setValue(event, this.setInProgress, this.setIsDisabled)
+                }
                 disabled={disabled}
                 autowidth
               >
@@ -166,17 +164,16 @@ class OlabDropDownQuestion extends React.Component {
           </Box>
         </div>
       );
-
     } catch (error) {
       return (
         <>
-          <b>[[QU:{id}]] "{error.message}"</b>
+          <b>
+            [[QU:{id}]] "{error.message}"
+          </b>
         </>
       );
     }
-
   }
-
 }
 
 export default withStyles(styles)(OlabDropDownQuestion);

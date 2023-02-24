@@ -6,7 +6,7 @@
       "type": "chrome",
       "url": "http://localhost:3000/player",
       "webRoot": "${workspaceFolder}"
-    },    
+    },
     {
       "name": "Moderator",
       "request": "launch",
@@ -27,6 +27,6 @@
       "type": "chrome",
       "url": "http://logan.cardinalcreek.ca/player/player/1649/0?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Im9sYWI0cyIsInJvbGUiOiJvbGFic3VwZXJ1c2VyIiwibmFtZSI6Ik9sYWIgSiBVc2VyIiwic3ViIjoib2xhYjRzIiwiaWQiOiIxMSIsIm5iZiI6MTY3NjM5NjExMywiZXhwIjoxNjc3MDAwOTEzLCJpYXQiOjE2NzYzOTYxMTMsImlzcyI6Im9sYWIiLCJhdWQiOiJodHRwczovL3d3dy5vbGFiLmNhIn0.hgRzfhusaPx7E6kq32s9M9QgrIp1ddDYbCVUKwJmAec",
       "webRoot": "${workspaceFolder}"
-    }        
+    }
   ]
 }

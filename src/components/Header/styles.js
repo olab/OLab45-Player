@@ -1,7 +1,5 @@
-import styled from 'styled-components';
-import {
-  DARK_BLUE, WHITE, BLUE, BLUE_GREY,
-} from '../../shared/colors';
+import styled from "styled-components";
+import { DARK_BLUE, WHITE, BLUE, BLUE_GREY } from "../../shared/colors";
 
 export const HeaderWrapper = styled.header`
   background-color: ${WHITE};
@@ -25,10 +23,10 @@ export const CenterPlaceholder = styled.div`
 `;
 
 export const VersionWrapper = styled.div`
-    font-size: 16px;
-    color: #0089EC;
-    align-items: right;
-    min-width: 140px;
+  font-size: 16px;
+  color: #0089ec;
+  align-items: right;
+  min-width: 140px;
 `;
 
 export const Logo = styled.div`

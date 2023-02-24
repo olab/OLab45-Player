@@ -1,24 +1,28 @@
 // @flow
-import React from 'react';
+import React from "react";
 import {
   Box,
   List,
   ListItem,
-  ListItemText, Paper,
-  TableContainer, Table, TableRow, TableHead, TableCell, TableBody
-} from '@material-ui/core';
-import { Log, LogInfo, LogError } from '../../../utils/Logger';
-import log from 'loglevel';
-import { getCounters } from '../WikiTags';
-import styles from '../styles.module.css';
-import siteStyles from '../site.module.css';
+  ListItemText,
+  Paper,
+  TableContainer,
+  Table,
+  TableRow,
+  TableHead,
+  TableCell,
+  TableBody,
+} from "@material-ui/core";
+import { Log, LogInfo, LogError } from "../../../utils/Logger";
+import log from "loglevel";
+import { getCounters } from "../WikiTags";
+import styles from "../styles.module.css";
+import siteStyles from "../site.module.css";
 
-const playerState = require('../../../utils/PlayerState').PlayerState;
+const playerState = require("../../../utils/PlayerState").PlayerState;
 
 class OlabCountersTag extends React.Component {
-
   constructor(props) {
-
     super(props);
 
     const debug = playerState.GetDebug();
@@ -34,20 +38,15 @@ class OlabCountersTag extends React.Component {
       map: props.props.map,
       node: props.props.node,
       counterActions: props.props.scopedObjects.map.counteractions,
-      debug
+      debug,
     };
   }
 
   render() {
-
     log.debug(`OlabCountersTag render`);
 
     try {
-      const {
-        counterActions,
-        node,
-        debug
-      } = this.state;
+      const { counterActions, node, debug } = this.state;
 
       let counters = getCounters(
         node.id,
@@ -61,7 +60,12 @@ class OlabCountersTag extends React.Component {
             <b>[[COUNTERS]]</b>
             <Box width="300px;">
               {counters.map((counter) => (
-                <p>&nbsp;<b>[[CR:{counter.name}]]: {counter.value}</b></p>
+                <p>
+                  &nbsp;
+                  <b>
+                    [[CR:{counter.name}]]: {counter.value}
+                  </b>
+                </p>
               ))}
             </Box>
           </>
@@ -86,7 +90,9 @@ class OlabCountersTag extends React.Component {
                     <TableCell component="th" scope="row">
                       {row.scopeLevel} ({row.parentId})
                     </TableCell>
-                    <TableCell align="right">{row.name} ({row.id})</TableCell>
+                    <TableCell align="right">
+                      {row.name} ({row.id})
+                    </TableCell>
                     <TableCell align="right">{row.value}</TableCell>
                     <TableCell align="right">{row.updatedat}</TableCell>
                   </TableRow>
@@ -112,10 +118,8 @@ class OlabCountersTag extends React.Component {
         // );
       }
 
-      return (<></>);
-
+      return <></>;
     } catch (error) {
-
       LogError(`OlabMediaResourceTag render error: ${error}`);
       return (
         <>

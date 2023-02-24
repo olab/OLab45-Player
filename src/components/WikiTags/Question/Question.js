@@ -1,43 +1,38 @@
 // @flow
-import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import React from "react";
+import { withStyles } from "@material-ui/core/styles";
 
-import { getQuestion } from '../WikiTags';
-import {
-  postQuestionValue
-} from '../../../services/api'
-import styles from '../styles.module.css';
-import OlabMultilineTextQuestion from './MultilineText/MultilineText';
-import OlabSinglelineTextQuestion from './SingleLineText/SingleLineText';
-import OlabSinglePickQuestion from './SingleChoice/SingleChoice';
-import OlabMultiPickQuestion from './MultiChoice/MultiChoice';
-import OlabSliderQuestion from './Slider/Slider';
-import OlabDropDownQuestion from './DropDown/DropDown';
-import OlabDragAndDropQuestion from './DragAndDrop/DragAndDrop';
-import OlabAttendeeTag from './TurkTalk/Turkee/Turkee';
-import OlabModeratorTag from './TurkTalk/Turker/Turker';
+import { getQuestion } from "../WikiTags";
+import { postQuestionValue } from "../../../services/api";
+import styles from "../styles.module.css";
+import OlabMultilineTextQuestion from "./MultilineText/MultilineText";
+import OlabSinglelineTextQuestion from "./SingleLineText/SingleLineText";
+import OlabSinglePickQuestion from "./SingleChoice/SingleChoice";
+import OlabMultiPickQuestion from "./MultiChoice/MultiChoice";
+import OlabSliderQuestion from "./Slider/Slider";
+import OlabDropDownQuestion from "./DropDown/DropDown";
+import OlabDragAndDropQuestion from "./DragAndDrop/DragAndDrop";
+import OlabAttendeeTag from "./TurkTalk/Turkee/Turkee";
+import OlabModeratorTag from "./TurkTalk/Turker/Turker";
 
-const playerState = require('../../../utils/PlayerState').PlayerState;
-import { Log, LogInfo, LogError } from '../../../utils/Logger';
-import log from 'loglevel';
+const playerState = require("../../../utils/PlayerState").PlayerState;
+import { Log, LogInfo, LogError } from "../../../utils/Logger";
+import log from "loglevel";
 
 class OlabQuestionTag extends React.Component {
-
   constructor(props) {
-
     super(props);
 
     let question = getQuestion(this.props.name, this.props);
     const debug = playerState.GetDebug();
 
-    if ((question.questionType !== 3) && (question.questionType !== 2)) {
+    if (question.questionType !== 3 && question.questionType !== 2) {
       if (question.value === null) {
         question.value = 0;
       }
-    }
-    else {
+    } else {
       if (question.value === null) {
-        question.value = '';
+        question.value = "";
       }
     }
 
@@ -48,54 +43,55 @@ class OlabQuestionTag extends React.Component {
     this.state = {
       question,
       ...props.props,
-      debug
+      debug,
     };
 
-    // Binding this keyword  
-    this.onSubmitResponse = this.onSubmitResponse.bind(this)
+    // Binding this keyword
+    this.onSubmitResponse = this.onSubmitResponse.bind(this);
   }
 
   static getQuestionId(question) {
     if (question.name == null) {
       return "QU" + question.id;
     }
-    return ("QU-" + question.name.replace(' ', '')).toLowerCase();
+    return ("QU-" + question.name.replace(" ", "")).toLowerCase();
   }
 
   sleep = (ms) => {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
 
   onSubmitResponse = async (newState) => {
-
     // send question response to server and get the
     // new dynamic objects state
     var { data } = await postQuestionValue(newState);
 
     // bubble up the dynamic object to player since the
     // dynamic objects may be shared to other components
-    if ((data != null) && (this.props.props.onUpdateDynamicObjects)) {
+    if (data != null && this.props.props.onUpdateDynamicObjects) {
       this.props.props.onUpdateDynamicObjects(data);
     }
-  }
+  };
 
   render() {
-
     const { debug } = this.state;
     const questionDivStyle = {
-      paddingTop: '10px',
-      paddingBottom: '10px',
+      paddingTop: "10px",
+      paddingBottom: "10px",
     };
 
-    log.debug(`rendering question '${this.state.question.name}' typeid: ${this.state.question.questionType}`);
+    log.debug(
+      `rendering question '${this.state.question.name}' typeid: ${this.state.question.questionType}`
+    );
 
     if (this.state.question != null) {
-
       if (!debug.enableWikiRendering) {
         return (
           <>
-            <b>{this.state.question.wiki} type {this.state.question.questionType} "{this.state.question.stem}"</b>
+            <b>
+              {this.state.question.wiki} type {this.state.question.questionType}{" "}
+              "{this.state.question.stem}"
+            </b>
           </>
         );
       }
@@ -111,7 +107,7 @@ class OlabQuestionTag extends React.Component {
         map: this.state.map,
         node: this.state.node,
         dynamicObjects: this.state.dynamicObjects,
-        contextId: this.props.props.contextId
+        contextId: this.props.props.contextId,
       };
 
       let questionType = props.question.questionType;
@@ -173,15 +169,15 @@ class OlabQuestionTag extends React.Component {
           );
         default:
           return (
-            <div><b>Error:</b> Implemented question type '{questionType}'</div>
+            <div>
+              <b>Error:</b> Implemented question type '{questionType}'
+            </div>
           );
       }
     }
 
-    return '';
-
+    return "";
   }
-
 }
 
 export default withStyles(styles)(OlabQuestionTag);

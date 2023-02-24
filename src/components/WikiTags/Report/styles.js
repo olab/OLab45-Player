@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import { DARK_TEXT } from '../../../shared/colors';
+import styled from "styled-components";
+import { DARK_TEXT } from "../../../shared/colors";
 
 export const ReportWrapper = styled.div`
   margin-top: 15px;
