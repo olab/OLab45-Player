@@ -50,7 +50,7 @@ class TurkTalk {
 
   async disconnect() {
     await this.connection.stop();
-    console.log("disconnection");
+    log.debug("disconnection");
   }
 
   // *****

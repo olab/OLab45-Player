@@ -22,7 +22,7 @@ function App() {
   const [token, setToken] = useState(0);
   const reactVersion = process.env.REACT_APP_VERSION;
 
-  console.log(JSON.stringify(process.env));
+  log.debug(JSON.stringify(process.env));
 
   // tests if external login (direct to a map and
   // comes with it's own access token)

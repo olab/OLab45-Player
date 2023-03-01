@@ -1,5 +1,6 @@
 import { useState } from "react";
 import jwt_decode from "jwt-decode";
+import log from "loglevel";
 const playerState = require("../../utils/PlayerState").PlayerState;
 
 export default function useToken() {
@@ -35,7 +36,7 @@ export default function useToken() {
     let authInfo = loginInfo.authInfo;
 
     var decoded = jwt_decode(authInfo.token);
-    console.log(decoded);
+    log.debug(decoded);
 
     let sessionInfo = playerState.GetSessionInfo(null);
     sessionInfo = loginInfo;
