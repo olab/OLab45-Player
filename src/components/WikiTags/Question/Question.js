@@ -85,7 +85,7 @@ class OlabQuestionTag extends React.Component {
     );
 
     if (this.state.question != null) {
-      if (!debug.enableWikiRendering) {
+      if (debug.disableWikiRendering) {
         return (
           <>
             <b>

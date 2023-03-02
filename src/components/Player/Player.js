@@ -481,15 +481,7 @@ class Player extends PureComponent {
         log.debug(`Added node id ${this.state.node.id} to visitOnce list`);
       }
 
-      if (debug.enableWikiRendering) {
-        return (
-          <>
-            {header}
-            {body}
-            {footer}
-          </>
-        );
-      } else {
+      if (debug.disableWikiRendering) {
         return (
           <FormControl>
             {header}
@@ -503,6 +495,14 @@ class Player extends PureComponent {
             <h4>Footer</h4>
             <p>{theme?.footer}</p>
           </FormControl>
+        );
+      } else {
+        return (
+          <>
+            {header}
+            {body}
+            {footer}
+          </>
         );
       }
     } else {

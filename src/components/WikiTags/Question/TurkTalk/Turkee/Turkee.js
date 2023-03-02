@@ -229,7 +229,7 @@ class OlabAttendeeTag extends React.Component {
     const {
       index,
       connectionStatus,
-      enableWikiRendering,
+      disableWikiRendering,
       remoteInfo,
       localInfo,
       userName,
@@ -249,7 +249,7 @@ class OlabAttendeeTag extends React.Component {
     log.debug(`'${localInfo.connectionId}' OlabTurkeeTag render '${userName}'`);
 
     try {
-      if (!enableWikiRendering) {
+      if (!disableWikiRendering) {
         return <>[[ATTENDEE:{remoteInfo.RoomName}]]</>;
       }
 

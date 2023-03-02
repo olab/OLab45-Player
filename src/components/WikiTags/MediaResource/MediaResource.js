@@ -69,7 +69,7 @@ class OlabMediaResourceTag extends React.Component {
         sizeProps.width = item.width;
       }
 
-      if (!debug.enableWikiRendering) {
+      if (debug.disableWikiRendering) {
         return (
           <>
             <b>

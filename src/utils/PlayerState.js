@@ -22,7 +22,7 @@ class PlayerState {
   static clear(keyPrefix) {
     persistantStorage.clear(keyPrefix);
     persistantStorage.save(KeyConstants.GLOBAL, KeyConstants.DEBUG, {
-      enableWikiRendering: true,
+      disableWikiRendering: false,
       disableCache: false,
     });
   }
@@ -30,7 +30,7 @@ class PlayerState {
   // Get all settings as object
   static Get(keyPrefix = null) {
     const debug = persistantStorage.get(null, KeyConstants.DEBUG, {
-      enableWikiRendering: true,
+      disableWikiRendering: false,
       disableCache: false,
     });
 
@@ -94,7 +94,7 @@ class PlayerState {
 
   static GetDebug(
     defaultValue = {
-      enableWikiRendering: true,
+      disableWikiRendering: false,
       disableCache: false,
     }
   ) {

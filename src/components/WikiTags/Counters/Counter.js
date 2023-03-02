@@ -54,7 +54,7 @@ class OlabCountersTag extends React.Component {
         counterActions
       );
 
-      if (!debug.enableWikiRendering) {
+      if (debug.disableWikiRendering) {
         return (
           <>
             <b>[[COUNTERS]]</b>

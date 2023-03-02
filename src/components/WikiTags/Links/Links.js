@@ -48,30 +48,7 @@ class OlabLinksTag extends React.Component {
       }
     }
 
-    if (debug.enableWikiRendering) {
-      return (
-        <div className={className}>
-          <ButtonGroup
-            orientation="vertical"
-            color="primary"
-            aria-label="vertical contained primary button group"
-            variant="contained"
-          >
-            {links.map((link) => (
-              <Button
-                key={link.id}
-                style={{ textTransform: "none" }}
-                onClick={() => {
-                  this.onNavigateToNode(mapId, link.destinationId, urlParam);
-                }}
-              >
-                {link.linkText}
-              </Button>
-            ))}
-          </ButtonGroup>
-        </div>
-      );
-    } else {
+    if (debug.disableWikiRendering) {
       return (
         <div className={className}>
           <ButtonGroup
@@ -89,6 +66,29 @@ class OlabLinksTag extends React.Component {
               >
                 {link.destinationTitle} (id: {link.id} -&gt;{" "}
                 {link.destinationId})
+              </Button>
+            ))}
+          </ButtonGroup>
+        </div>
+      );
+    } else {
+      return (
+        <div className={className}>
+          <ButtonGroup
+            orientation="vertical"
+            color="primary"
+            aria-label="vertical contained primary button group"
+            variant="contained"
+          >
+            {links.map((link) => (
+              <Button
+                key={link.id}
+                style={{ textTransform: "none" }}
+                onClick={() => {
+                  this.onNavigateToNode(mapId, link.destinationId, urlParam);
+                }}
+              >
+                {link.linkText}
               </Button>
             ))}
           </ButtonGroup>

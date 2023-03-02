@@ -25,7 +25,7 @@ class OlabCounterTag extends React.Component {
       let item = getCounter(name, this.props.props.dynamicObjects);
 
       if (item != null) {
-        if (!debug.enableWikiRendering) {
+        if (debug.disableWikiRendering) {
           return (
             <>
               <b>

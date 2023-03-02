@@ -29,14 +29,14 @@ class OlabReportTag extends React.Component {
 
   render() {
     const {
-      debug: { enableWikiRendering },
+      debug: { disableWikiRendering },
       report,
     } = this.state;
 
     log.debug(`OlabReportTag render`);
 
     try {
-      if (!enableWikiRendering) {
+      if (!disableWikiRendering) {
         return (
           <>
             <b>[[REPORT]]</b>
