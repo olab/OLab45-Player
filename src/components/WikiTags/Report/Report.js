@@ -23,20 +23,22 @@ class OlabReportTag extends React.Component {
       report = await getSessionReport(this.props.props, contextId);
     }
 
+    const debug = playerState.GetDebug();
+
     // undefined will unset the state object
-    this.setState({ report: report === undefined ? null : report });
+    this.setState({
+      debug: debug,
+      report: report === undefined ? null : report,
+    });
   }
 
   render() {
-    const {
-      debug: { disableWikiRendering },
-      report,
-    } = this.state;
+    const { debug, report } = this.state;
 
     log.debug(`OlabReportTag render`);
 
     try {
-      if (!disableWikiRendering) {
+      if (debug.disableWikiRendering) {
         return (
           <>
             <b>[[REPORT]]</b>

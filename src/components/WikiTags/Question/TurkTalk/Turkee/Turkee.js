@@ -33,7 +33,7 @@ class OlabAttendeeTag extends React.Component {
     const debug = playerState.GetDebug();
 
     this.state = {
-      ...debug,
+      debug,
       connectionStatus: null,
       index: 0,
       infoOpen: null,
@@ -229,7 +229,7 @@ class OlabAttendeeTag extends React.Component {
     const {
       index,
       connectionStatus,
-      disableWikiRendering,
+      debug,
       remoteInfo,
       localInfo,
       userName,
@@ -249,15 +249,9 @@ class OlabAttendeeTag extends React.Component {
     log.debug(`'${localInfo.connectionId}' OlabTurkeeTag render '${userName}'`);
 
     try {
-      if (!disableWikiRendering) {
-        return <>[[ATTENDEE:{remoteInfo.RoomName}]]</>;
+      if (debug.disableWikiRendering) {
+        return <>[[QU:{this.props.props.question.id}]]</>;
       }
-
-      // prevent anything interesting happening
-      // until we are connected
-      // if (!connectionStatus) {
-      //   return (<></>);
-      // }
 
       return (
         <>
@@ -295,7 +289,7 @@ class OlabAttendeeTag extends React.Component {
       return (
         <>
           <b>
-            [[ATTENDEE:{id}]] "{error.message}"
+            [[QU:{this.props.props.question.id}]] "{error.message}"
           </b>
         </>
       );
