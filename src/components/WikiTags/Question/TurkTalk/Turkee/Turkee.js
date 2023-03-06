@@ -163,10 +163,7 @@ class OlabAttendeeTag extends React.Component {
     try {
       let { userName } = this.state;
 
-      // ignore any messages not to me
-      if (userName !== payload.local.userId) {
-        return false;
-      }
+      log.debug(`onRoomAssigned message for '${userName}'`);
 
       const { localInfo } = this.state;
       this.slotManager.assignLearner(localInfo, payload.remote);
