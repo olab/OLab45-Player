@@ -188,12 +188,6 @@ async function getSessionReport(props, contextId) {
   );
 }
 
-async function getSessionReportDownloadUrl(props, contextId) {
-  // @Corey, this will need backend implementation for an application/octet-stream download (excel)
-  const url = `${config.API_URL}/reports/${contextId}/excel`;
-  return url;
-}
-
 async function getMapScopedObjects(props, mapId) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/scopedObjects`;
@@ -377,7 +371,6 @@ export {
   getNodeScopedObjects,
   getServerScopedObjects,
   getSessionReport,
-  getSessionReportDownloadUrl,
   importer,
   postQuestionValue,
 };
