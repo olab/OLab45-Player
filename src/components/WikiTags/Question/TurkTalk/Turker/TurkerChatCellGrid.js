@@ -91,15 +91,13 @@ class TurkerChatCellGrid extends React.Component {
   // *****
   onCommand(payload) {
     if (payload.command === constants.SIGNALCMD_LEARNER_ASSIGNED) {
-      log.debug(`'onCommand ${this.connectionId}': ${payload.command}`);
+      log.debug(`'onCommand ${this.connectionId}': ${JSON.stringify(payload)}`);
       this.onLearnerAssigned(payload.data);
-    }
-
-    if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-      log.debug(`'onCommand ${this.connectionId}': ${payload.command}`);
+    } else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+      log.debug(`'onCommand ${this.connectionId}': ${JSON.stringify(payload)}`);
       this.onRoomAssigned(payload.data);
     } else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
-      log.debug(`'onCommand ${this.connectionId}': ${payload.command}`);
+      log.debug(`'onCommand ${this.connectionId}': ${JSON.stringify(payload)}`);
       this.onLearnerUnassigned(payload.data);
     }
   }

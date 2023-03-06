@@ -85,7 +85,9 @@ class OlabModeratorTag extends React.Component {
 
     try {
       if (payload.command === constants.SIGNALCMD_TURKER_ASSIGNED) {
-        log.debug(`'${localInfo.connectionId}' onCommand: ${payload.command}`);
+        log.debug(
+          `'${localInfo.connectionId}' onCommand: ${JSON.stringify(payload)}`
+        );
         this.onModeratorAssigned(payload.data);
       }
     } catch (error) {

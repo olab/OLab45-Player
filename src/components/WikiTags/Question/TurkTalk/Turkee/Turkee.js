@@ -137,7 +137,9 @@ class OlabAttendeeTag extends React.Component {
     try {
       let { userName } = this.state;
 
-      log.debug(`onAtriumAssigned message for '${userName}'`);
+      log.debug(
+        `onAtriumAssigned message for '${userName}' ${JSON.stringify(payload)}`
+      );
 
       payload.isModerator = false;
       payload.show = true;
@@ -163,7 +165,9 @@ class OlabAttendeeTag extends React.Component {
     try {
       let { userName } = this.state;
 
-      log.debug(`onRoomAssigned message for '${userName}'`);
+      log.debug(
+        `onRoomAssigned message for '${userName}' ${JSON.stringify(payload)}`
+      );
 
       const { localInfo } = this.state;
       this.slotManager.assignLearner(localInfo, payload.remote);
