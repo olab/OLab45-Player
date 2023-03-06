@@ -137,10 +137,7 @@ class OlabAttendeeTag extends React.Component {
     try {
       let { userName } = this.state;
 
-      // ignore any messages not to me
-      if (userName !== payload.userId) {
-        return false;
-      }
+      log.debug(`onAtriumAssigned message for '${userName}'`);
 
       payload.isModerator = false;
       payload.show = true;

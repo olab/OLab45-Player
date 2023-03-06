@@ -542,8 +542,11 @@ class Chat extends React.Component {
     } = this.state;
 
     if (!show) {
+      log.debug(`Chat[${this.props.index}] not showing render`);
       return null;
     }
+
+    log.debug(`Chat[${this.props.index}] render ${JSON.stringify(this.state)}`);
 
     const divLayout = {
       width: "100%",

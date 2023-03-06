@@ -40,47 +40,54 @@ class ChatCell extends React.Component {
   // }
 
   render() {
-    const {
-      connection,
-      senderInfo,
-      localInfo,
-      playerProps,
-      lastMessageTime,
-      session,
-    } = this.state;
+    try {
+      const {
+        connection,
+        senderInfo,
+        localInfo,
+        playerProps,
+        lastMessageTime,
+        session,
+      } = this.state;
 
-    let cellStyling = Object.assign({ padding: 7 }, this.props.style);
-    if (!localInfo.show) {
-      cellStyling = { display: "none", padding: 7 };
+      log.debug(
+        `ChatCell[${this.props.index}] render. localInfo: ${JSON.stringify(
+          localInfo
+        )}`
+      );
+
+      let cellStyling = Object.assign({ padding: 7 }, this.props.style);
+      if (!localInfo.show) {
+        cellStyling = { display: "none", padding: 7 };
+      }
+
+      return (
+        <TableCell style={cellStyling}>
+          <Chat
+            index={this.props.index}
+            mapNodes={this.props.mapNodes}
+            session={session}
+            show={localInfo.show}
+            isModerator={this.props.isModerator}
+            connection={connection}
+            localInfo={localInfo}
+            senderInfo={senderInfo}
+            playerProps={playerProps}
+          />
+          <ChatStatusBar
+            index={this.props.index}
+            show={localInfo.show}
+            isModerator={this.props.isModerator}
+            connection={connection}
+            localInfo={localInfo}
+            lastMessageTime={lastMessageTime}
+            senderInfo={senderInfo}
+          />
+        </TableCell>
+      );
+    } catch (error) {
+      return <b>TurkerStatusBar: {error.message}</b>;
     }
-
-    return (
-      <TableCell style={cellStyling}>
-        <Chat
-          index={this.props.index}
-          mapNodes={this.props.mapNodes}
-          session={session}
-          show={localInfo.show}
-          isModerator={this.props.isModerator}
-          connection={connection}
-          localInfo={localInfo}
-          senderInfo={senderInfo}
-          playerProps={playerProps}
-        />
-        <ChatStatusBar
-          index={this.props.index}
-          show={localInfo.show}
-          isModerator={this.props.isModerator}
-          connection={connection}
-          localInfo={localInfo}
-          lastMessageTime={lastMessageTime}
-          senderInfo={senderInfo}
-        />
-      </TableCell>
-    );
-  }
-  catch(error) {
-    return <b>TurkerStatusBar: {error.message}</b>;
   }
 }
 
