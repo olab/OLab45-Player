@@ -141,32 +141,13 @@ class Turkee extends TurkTalk {
         return;
       }
 
-      // if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-
-      //   if (this.component.onRoomAssigned) {
-      //     this.component.onRoomAssigned(payload.data);
-      //   }
-
-      //   return true;
-      // }
-
       if (payload.command === constants.SIGNALCMD_MODERATOR_STATUS) {
         if (this.component.onModeratorStatus) {
           this.component.onModeratorStatus(payload.data);
         }
 
         return true;
-      }
-
-      // else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
-
-      //   if (this.component.onAtriumAssigned) {
-      //     this.component.onAtriumAssigned(payload.data);
-      //   }
-
-      //   return true;
-      // }
-      else {
+      } else {
         log.debug(
           `'${this.connectionId}' onCommand unknown command: '${payload.command}'`
         );

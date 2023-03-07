@@ -91,10 +91,6 @@ class OlabAttendeeTag extends React.Component {
         log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onJumpNode(payload);
       }
-
-      // else {
-      //   log.debug(`'${this.connectionId}' onTurkeeCommandCallback unknown command: '${payload.command}'`);
-      // }
     } catch (error) {
       LogError(
         `'${this.connectionId}' onTurkeeCommandCallback exception: ${error.message}`

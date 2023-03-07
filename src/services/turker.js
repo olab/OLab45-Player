@@ -9,9 +9,14 @@ class Turker extends TurkTalk {
   constructor(component) {
     super(component);
 
-    const { onAtriumUpdate, onAddTurkee, onRemoveTurkey, onRoomAssigned } =
-      component;
-    this.onAtriumUpdate = onAtriumUpdate;
+    const {
+      // onAtriumUpdate,
+      onAddTurkee,
+      onRemoveTurkey,
+      onRoomAssigned,
+    } = component;
+
+    // this.onAtriumUpdate = onAtriumUpdate;
     this.onRoomAssigned = onRoomAssigned;
     this.onAddTurkee = onAddTurkee;
     this.onRemoveTurkey = onRemoveTurkey;
@@ -146,11 +151,13 @@ class Turker extends TurkTalk {
         return;
       } else {
         log.debug(
-          `'${this.connectionId}' onCommand unknown command: '${payload.command}'`
+          `'${this.connectionId}' turker.js onCommand unknown command: '${payload.command}'`
         );
       }
     } catch (error) {
-      LogError(`'${this.connectionId}' onCommand exception: ${error.message}`);
+      LogError(
+        `'${this.connectionId}' turker.js onCommand exception: ${error.message}`
+      );
     }
   }
 }

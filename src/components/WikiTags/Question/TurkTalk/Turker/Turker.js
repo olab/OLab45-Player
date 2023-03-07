@@ -135,56 +135,56 @@ class OlabModeratorTag extends React.Component {
   }
 
   // handle atrium contents updated
-  onAtriumUpdate(payloadArray) {
-    let { localInfo, atriumLearners } = this.state;
+  // onAtriumUpdate(payloadArray) {
+  //   let { localInfo, atriumLearners } = this.state;
 
-    try {
-      const previousAtriumCount = atriumLearners.length;
+  //   try {
+  //     const previousAtriumCount = atriumLearners.length;
 
-      atriumLearners = [];
+  //     atriumLearners = [];
 
-      // save atrium contents if array passed in
-      if (Array.isArray(payloadArray) && payloadArray.length >= 0) {
-        let key = 1;
-        for (const payloadItem of payloadArray) {
-          // make a copy of the object so it can be modified
-          var learner = Object.assign({}, payloadItem);
+  //     // save atrium contents if array passed in
+  //     if (Array.isArray(payloadArray) && payloadArray.length >= 0) {
+  //       let key = 1;
+  //       for (const payloadItem of payloadArray) {
+  //         // make a copy of the object so it can be modified
+  //         var learner = Object.assign({}, payloadItem);
 
-          // add a 'key/value' properties so atriumContents plays nicely with
-          // javascript .map()
-          learner.key = `${key++}`;
+  //         // add a 'key/value' properties so atriumContents plays nicely with
+  //         // javascript .map()
+  //         learner.key = `${key++}`;
 
-          atriumLearners.push(learner);
-        }
+  //         atriumLearners.push(learner);
+  //       }
 
-        log.debug(
-          `'${
-            localInfo.connectionId
-          }' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`
-        );
+  //       log.debug(
+  //         `'${
+  //           localInfo.connectionId
+  //         }' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`
+  //       );
 
-        if (previousAtriumCount != atriumLearners.length) {
-          this.setState({
-            atriumLearners: atriumLearners,
-            selectedLearnerUserId: "0",
-            infoOpen: true,
-            infoMessage: "Atrium Updated",
-          });
-        } else {
-          this.setState({
-            atriumLearners: atriumLearners,
-            selectedLearnerUserId: "0",
-          });
-        }
+  //       if (previousAtriumCount != atriumLearners.length) {
+  //         this.setState({
+  //           atriumLearners: atriumLearners,
+  //           selectedLearnerUserId: "0",
+  //           infoOpen: true,
+  //           infoMessage: "Atrium Updated",
+  //         });
+  //       } else {
+  //         this.setState({
+  //           atriumLearners: atriumLearners,
+  //           selectedLearnerUserId: "0",
+  //         });
+  //       }
 
-        this.updateAtriumState();
-      }
-    } catch (error) {
-      LogError(
-        `'${localInfo.connectionId}' onAtriumUpdate exception: ${error.message}`
-      );
-    }
-  }
+  //       this.updateAtriumState();
+  //     }
+  //   } catch (error) {
+  //     LogError(
+  //       `'${localInfo.connectionId}' onAtriumUpdate exception: ${error.message}`
+  //     );
+  //   }
+  // }
 
   onAtriumLearnerSelected(event) {
     let { localInfo } = this.state;

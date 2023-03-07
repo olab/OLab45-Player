@@ -115,7 +115,7 @@ class TurkerChatCellGrid extends React.Component {
       const { localInfo } = this.state;
 
       // the connected learner's command channel becomes
-      // our own locla channel
+      // our own local channel
       localInfo.commandChannel = payload.learner.commandChannel;
 
       this.slotManager.assignLearner(localInfo, payload.learner);

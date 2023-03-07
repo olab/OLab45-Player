@@ -200,10 +200,11 @@ class Chat extends React.Component {
         remoteInfo = new SlotInfo(payload.data.remote);
         // there should already be session info in the state
         session = localInfo.session;
+        localInfo.assigned = true;
       }
 
       this.setState({
-        // senderInfo: remoteInfo,
+        localInfo: localInfo,
         session: session,
       });
 
@@ -545,8 +546,6 @@ class Chat extends React.Component {
       log.debug(`Chat[${this.props.index}] not showing render`);
       return null;
     }
-
-    log.debug(`Chat[${this.props.index}] render ${JSON.stringify(this.state)}`);
 
     const divLayout = {
       width: "100%",
