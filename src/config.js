@@ -6,7 +6,7 @@ const prod = {
 
 const dev = {
   API_URL: "https://localhost:5001/olab/api/v3",
-  TTALK_HUB_URL: "https://localhost:5001/turktalk",
+  TTALK_HUB_URL: "https://localhost:5002/turktalk",
 };
 
 export const config = process.env.NODE_ENV === "development" ? dev : prod;
