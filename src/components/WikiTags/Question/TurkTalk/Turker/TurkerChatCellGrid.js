@@ -357,7 +357,7 @@ class TurkerChatCellGrid extends React.Component {
           &nbsp;
         </Grid>
         <Grid container justifyContent="flex-end" item xs={4}>
-          <Button
+          {/* <Button
             variant="contained"
             color="primary"
             size="small"
@@ -365,7 +365,7 @@ class TurkerChatCellGrid extends React.Component {
             onClick={this.onCloseClicked}
           >
             &nbsp;Close Room&nbsp;
-          </Button>
+          </Button> */}
         </Grid>
       </Grid>
     );
