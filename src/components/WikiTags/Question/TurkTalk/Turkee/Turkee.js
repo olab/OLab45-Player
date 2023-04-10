@@ -99,7 +99,7 @@ class OlabAttendeeTag extends React.Component {
   }
 
   onNavigateToNode = (mapId, nodeId, urlParam = null) => {
-    let url = `/player/player/${mapId}/${nodeId}`;
+    let url = `/player/${mapId}/${nodeId}`;
     if (urlParam) {
       url += `/${urlParam}`;
     }

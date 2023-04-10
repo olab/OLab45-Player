@@ -79,7 +79,7 @@ function App() {
           <Header version={reactVersion} authActions={authActions} />
           <Routes>
             <Route
-              path={`/player/player/:mapId/:nodeId`}
+              path={`/player/:mapId/:nodeId`}
               element={<Player authActions={authActions} />}
             />
             <Route path="*" element={<NoMatch />} />
@@ -109,7 +109,7 @@ function App() {
           element={<Home authActions={authActions} />}
         />
         <Route
-          path={`/player/player/:mapId/:nodeId`}
+          path={`/player/:mapId/:nodeId`}
           element={<Player authActions={authActions} />}
         />
         <Route path="*" element={<NoMatch />} />
