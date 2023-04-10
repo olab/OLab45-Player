@@ -16,7 +16,7 @@ class OlabLinksTag extends React.Component {
   }
 
   onNavigateToNode = (mapId, nodeId, urlParam) => {
-    let url = `/player/player/${mapId}/${nodeId}`;
+    let url = `/player/${mapId}/${nodeId}`;
     if (urlParam) {
       url += `/${urlParam}`;
     }
