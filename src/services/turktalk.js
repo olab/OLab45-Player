@@ -26,6 +26,8 @@ class TurkTalk {
     const token = `${sessionInfo?.authInfo.token}`;
     const hubUrl = `${url}?access_token=${token}&contextId=${this.contextId}&mapId=${this.component.props.props.map.id}`;
 
+    log.debug(`building connection to hub`);
+
     this.connection = new HubConnectionBuilder()
       .withUrl(hubUrl)
       // .withUrl(url, { accessTokenFactory: () => this.token })
@@ -60,7 +62,7 @@ class TurkTalk {
       .then(function () {
         if (clientObject?.onConnected) {
           // call onConnected method on 'derived' class
-          clientObject.onConnected(clientObject);
+          clientObject.onConnected();
         }
       })
       .catch(function (error) {

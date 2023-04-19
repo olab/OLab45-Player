@@ -46,16 +46,16 @@ class Turker extends TurkTalk {
   }
 
   // *****
-  onConnected(clientObject) {
+  onConnected() {
     LogInfo(
       `'${this.connection.connectionId}' onConnected: connection succeeded`
     );
 
     this.connectionId = this.connection.connectionId.slice(-3);
 
-    this.connection.onclose(clientObject.onDisconnected);
-    this.connection.onreconnecting(clientObject.onReconnecting);
-    this.connection.onreconnected(clientObject.onReconnected);
+    this.connection.onclose(this.onDisconnected);
+    this.connection.onreconnecting(this.onReconnecting);
+    this.connection.onreconnected(this.onReconnected);
 
     if (this.component.onConnectionChanged) {
       this.component.onConnectionChanged({
@@ -79,7 +79,7 @@ class Turker extends TurkTalk {
       `'${this.connectionId}' registering turker for room name: ${roomName}`
     );
 
-    clientObject.connection.send(
+    this.connection.send(
       constants.SIGNALCMD_REGISTERTURKER,
       this.component.props.props.map.id,
       this.component.props.props.node.id,

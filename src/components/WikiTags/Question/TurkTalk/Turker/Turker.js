@@ -15,6 +15,7 @@ import { Log, LogInfo, LogError } from "../../../../../utils/Logger";
 import log from "loglevel";
 import { withStyles } from "@material-ui/core/styles";
 import MuiAlert from "@material-ui/lab/Alert";
+import localCss from "./TurkerChatCellGrid.module.css";
 
 import Turker from "../../../../../services/turker";
 import styles from "../../../styles.module.css";
@@ -61,10 +62,12 @@ class OlabModeratorTag extends React.Component {
       localInfo: new SlotInfo(),
       ...atrium,
       infoOpen: null,
+      gridMessage: "Loading...",
     };
 
     this.handleInfoClose = this.handleInfoClose.bind(this);
     this.onModeratorAssigned = this.onModeratorAssigned.bind(this);
+    this.onServerError = this.onServerError.bind(this);
     this.onScreenPopup = this.onScreenPopup.bind(this);
 
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
@@ -89,12 +92,24 @@ class OlabModeratorTag extends React.Component {
           `'${localInfo.connectionId}' onCommand: ${JSON.stringify(payload)}`
         );
         this.onModeratorAssigned(payload.data);
+      } else if (payload.command === constants.SIGNALCMD_SERVER_ERROR) {
+        log.debug(
+          `'${localInfo.connectionId}' onCommand: ${JSON.stringify(payload)}`
+        );
+        this.onServerError(payload.data);
       }
     } catch (error) {
       LogError(
         `'${localInfo.connectionId}' onTurkerCommandCallback exception: ${error.message}`
       );
     }
+  }
+
+  onServerError(payload) {
+    alert(payload);
+    this.setState({
+      gridMessage: payload,
+    });
   }
 
   onModeratorAssigned(payload) {
@@ -133,58 +148,6 @@ class OlabModeratorTag extends React.Component {
       );
     }
   }
-
-  // handle atrium contents updated
-  // onAtriumUpdate(payloadArray) {
-  //   let { localInfo, atriumLearners } = this.state;
-
-  //   try {
-  //     const previousAtriumCount = atriumLearners.length;
-
-  //     atriumLearners = [];
-
-  //     // save atrium contents if array passed in
-  //     if (Array.isArray(payloadArray) && payloadArray.length >= 0) {
-  //       let key = 1;
-  //       for (const payloadItem of payloadArray) {
-  //         // make a copy of the object so it can be modified
-  //         var learner = Object.assign({}, payloadItem);
-
-  //         // add a 'key/value' properties so atriumContents plays nicely with
-  //         // javascript .map()
-  //         learner.key = `${key++}`;
-
-  //         atriumLearners.push(learner);
-  //       }
-
-  //       log.debug(
-  //         `'${
-  //           localInfo.connectionId
-  //         }' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`
-  //       );
-
-  //       if (previousAtriumCount != atriumLearners.length) {
-  //         this.setState({
-  //           atriumLearners: atriumLearners,
-  //           selectedLearnerUserId: "0",
-  //           infoOpen: true,
-  //           infoMessage: "Atrium Updated",
-  //         });
-  //       } else {
-  //         this.setState({
-  //           atriumLearners: atriumLearners,
-  //           selectedLearnerUserId: "0",
-  //         });
-  //       }
-
-  //       this.updateAtriumState();
-  //     }
-  //   } catch (error) {
-  //     LogError(
-  //       `'${localInfo.connectionId}' onAtriumUpdate exception: ${error.message}`
-  //     );
-  //   }
-  // }
 
   onAtriumLearnerSelected(event) {
     let { localInfo } = this.state;
@@ -338,6 +301,7 @@ class OlabModeratorTag extends React.Component {
       infoOpen,
       infoMessage,
       mapNodes,
+      gridMessage,
     } = this.state;
 
     log.debug(`'${localInfo.connectionId}' OlabTurkerTag render '${userName}'`);
@@ -346,13 +310,22 @@ class OlabModeratorTag extends React.Component {
       // prevent anything interesting happening
       // until we are connected
       if (!connectionStatus || !localInfo?.assigned) {
-        return <></>;
+        return (
+          <div className={localCss.emptyGridLayout}>
+            <div className={localCss.emptyGridLabel}>
+              <center>
+                <b>{gridMessage}</b>
+              </center>
+            </div>
+          </div>
+        );
       }
 
       return (
         <>
           <Grid container item xs={12}>
             <TurkerChatCellGrid
+              gridMessage={gridMessage}
               onScreenPopup={this.onScreenPopup}
               userName={userName}
               isModerator={true}

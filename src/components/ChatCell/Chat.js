@@ -340,7 +340,14 @@ class Chat extends React.Component {
 
   onClickJumpNode = (event) => {
     try {
-      let { senderInfo, session, selectedNode } = this.state;
+      let { senderInfo, session, selectedNode, selectedNodeId } = this.state;
+
+      if (selectedNodeId == "0") {
+        if (this.props.onPopupMessage) {
+          this.props.onPopupMessage("A node must be selected");
+        }
+        return;
+      }
 
       const payload = {
         envelope: {

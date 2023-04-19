@@ -69,6 +69,7 @@ class ChatCell extends React.Component {
             session={session}
             show={localInfo.show}
             isModerator={this.props.isModerator}
+            onPopupMessage={this.props.onPopupMessage}
             connection={connection}
             localInfo={localInfo}
             senderInfo={senderInfo}

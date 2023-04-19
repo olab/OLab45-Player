@@ -33,16 +33,16 @@ class Turkee extends TurkTalk {
   }
 
   // *****
-  onConnected(clientObject) {
+  onConnected() {
     LogInfo(
       `'${this.connection.connectionId}' onConnected: connection succeeded`
     );
 
     this.connectionId = this.connection.connectionId.slice(-3);
 
-    this.connection.onclose(clientObject.onDisconnected);
-    this.connection.onreconnecting(clientObject.onReconnecting);
-    this.connection.onreconnected(clientObject.onReconnected);
+    this.connection.onclose(this.onDisconnected);
+    this.connection.onreconnecting(this.onReconnecting);
+    this.connection.onreconnected(this.onReconnected);
 
     if (this.component.onConnectionChanged) {
       this.component.onConnectionChanged({
@@ -70,10 +70,7 @@ class Turkee extends TurkTalk {
       )}`
     );
 
-    clientObject.connection.send(
-      constants.SIGNALCMD_REGISTERTURKEE,
-      this.session
-    );
+    this.connection.send(constants.SIGNALCMD_REGISTERTURKEE, this.session);
   }
 
   onReconnecting(error) {

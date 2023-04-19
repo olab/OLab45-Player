@@ -55,16 +55,19 @@ class TurkerChatCellGrid extends React.Component {
     };
 
     this.connection = this.props.connection;
-    this.connectionId = this.props.connection.connectionId?.slice(-3);
 
     this.onAtriumAssignClicked = this.onAtriumAssignClicked.bind(this);
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
     this.onCloseClicked = this.onCloseClicked.bind(this);
+    this.onPopupMessage = this.onPopupMessage.bind(this);
 
     var turkerChatCellGridSelf = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
-      turkerChatCellGridSelf.onCommand(payload);
-    });
+    if (this.connection) {
+      this.connectionId = this.props.connection.connectionId?.slice(-3);
+      this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
+        turkerChatCellGridSelf.onCommand(payload);
+      });
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -281,6 +284,7 @@ class TurkerChatCellGrid extends React.Component {
               localInfo={localSlot}
               senderInfo={remoteSlot}
               playerProps={this.props.props}
+              onPopupMessage={this.onPopupMessage}
             />
           );
         }
@@ -326,6 +330,12 @@ class TurkerChatCellGrid extends React.Component {
   onAtriumUpdate(currentAtrium) {
     if (this.props.onScreenPopup) {
       this.props.onScreenPopup({ message: "Atrium Updated" });
+    }
+  }
+
+  onPopupMessage(message) {
+    if (this.props.onScreenPopup) {
+      this.props.onScreenPopup({ message: message });
     }
   }
 

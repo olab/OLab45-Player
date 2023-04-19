@@ -54,6 +54,7 @@ class OlabAttendeeTag extends React.Component {
     this.handleInfoClose = this.handleInfoClose.bind(this);
     this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
     this.onJumpNode = this.onJumpNode.bind(this);
+    this.onServerMessage = this.onServerMessage.bind(this);
 
     var turkeeSelf = this;
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
@@ -90,6 +91,9 @@ class OlabAttendeeTag extends React.Component {
       } else if (payload.command === constants.SIGNALCMD_JUMP_NODE) {
         log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onJumpNode(payload);
+      } else if (payload.command === constants.SIGNALCMD_TURKEEMESSAGE) {
+        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
+        this.onServerMessage(payload);
       }
     } catch (error) {
       LogError(
@@ -108,6 +112,20 @@ class OlabAttendeeTag extends React.Component {
 
     window.location.href = url;
   };
+
+  // system is sending a message to turkee
+  onServerMessage(payload) {
+    try {
+      this.setState({
+        infoOpen: true,
+        infoMessage: payload.data,
+      });
+    } catch (error) {
+      LogError(
+        `'${this.connectionId}' onServerMessage exception: ${error.message}`
+      );
+    }
+  }
 
   // moderator is sending the learner to a new node
   async onJumpNode(payload) {
