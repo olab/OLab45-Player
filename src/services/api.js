@@ -3,111 +3,114 @@ import log from "loglevel";
 import { config } from "../config";
 const playerState = require("../utils/PlayerState").PlayerState;
 
+async function internalFetch(method, url, payload, headerOverrides = null) {
+  let tries = 0;
+
+  let headers = {
+    "Content-Type": "application/json",
+    ...headerOverrides,
+  };
+
+  let settings = {
+    signal: AbortSignal.timeout(7500),
+    method: method,
+    headers: headers,
+  };
+
+  if (payload) {
+    settings.body = JSON.stringify(payload);
+    log.debug(`URL: ${url} payload: ${settings.body})`);
+  }
+
+  while (tries++ < 5) {
+    try {
+      const response = await fetch(url, settings);
+
+      const jsonData = await response.json();
+      return jsonData;
+    } catch (error) {
+      log.error(`URL '${url}': ${error.message}`);
+    }
+  }
+
+  log.error(`URL '${url}': max retries exceeded`);
+
+  return null;
+}
+
 async function loginUserAsync(credentials) {
   var payload = {
     UserName: credentials.username,
     Password: credentials.password,
   };
-
   let url = `${config.API_URL}/auth/login`;
 
-  log.debug(`loginUser(${credentials.username}) url: ${url})`);
-
-  return fetch(url, {
-    signal: AbortSignal.timeout(7500),
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  }).then((data) => data.json());
+  return await internalFetch("POST", url, payload);
 }
 
 async function loginExternalUserAsync(token) {
-  let url = `${config.API_URL}/auth/loginexternal`;
   let payload = { ExternalToken: token };
+  let url = `${config.API_URL}/auth/loginexternal`;
 
-  log.debug(`loginExternal(${token}) url: ${url})`);
-
-  return fetch(url, {
-    signal: AbortSignal.timeout(7500),
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  }).then(function (response) {
-    if (!response.ok) {
-      throw new Error("HTTP status " + response.status);
-    }
-    return response.json();
-  });
+  return await internalFetch("POST", url, payload);
 }
 
 async function importer(props, fileName) {
-  let token = props.authActions.getToken();
+  var payload = { fileName: fileName };
   let url = `${config.API_URL}/import/post`;
-  log.debug(`importer(${fileName}) url: ${url})`);
+  let token = props.authActions.getToken();
 
-  var body = { fileName: fileName };
-
-  return fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(body),
-  }).then((data) => {
-    if (data.status === 402) {
-      props.authActions.logout();
-    }
-    return data.json();
+  const data = await internalFetch("POST", url, payload, {
+    Authorization: `Bearer ${token}`,
   });
+
+  if (data.error_code === 200) {
+    return data;
+  }
+
+  if (data.error_code === 402) {
+    props.authActions.logout();
+  }
+
+  throw new Error(`Error ${url}`, { cause: data });
 }
 
 async function getMap(props, mapId) {
-  let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}`;
-  log.debug(`getMap(${mapId}) url: ${url})`);
+  let token = props.authActions.getToken();
 
-  return fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  }).then((data) => {
-    if (data.status === 402) {
-      props.authActions.logout();
-    }
-    return data.json();
+  const data = await internalFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
   });
+
+  if (data.error_code === 200) {
+    return data;
+  }
+
+  if (data.error_code === 402) {
+    props.authActions.logout();
+  }
+
+  throw new Error(`Error ${url}`, { cause: data });
 }
 
 async function getMaps(props) {
-  let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps`;
-  log.debug(`getMaps() url: ${url})`);
+  let token = props.authActions.getToken();
 
-  return fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((data) => {
-      if (data.status === 402) {
-        props.authActions.logout();
-      }
-      return data.json();
-    })
-    .catch(function (error) {
-      alert(`Failed to fetch maps`);
-      var data = { data: [] };
-      return data;
-    });
+  const data = await internalFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  if (data.error_code === 200) {
+    return data;
+  }
+
+  if (data.error_code === 402) {
+    props.authActions.logout();
+  }
+
+  throw new Error(`Error ${url}`, { cause: data });
 }
 
 async function getDownload(props, file) {
@@ -153,39 +156,35 @@ async function getSessionReport(props, contextId) {
 
   log.debug(`getSessionReport(${props.map?.id}) url: ${url})`);
 
-  return (
-    fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((data) => {
-        if (data.status === 402) {
-          props.authActions.logout();
-        } else if (data.status === 200) {
-          return data.json();
-        }
+  const data = await internalFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
+  });
 
-        let message = data.status;
-        if (data.status == 401) {
-          message = "Not Authorized";
-        }
+  if (data.error_code === 200) {
+    return data;
+  }
 
-        throw new Error(
-          `Error ${data.statusText} retrieving map. Reason: ${message}`,
-          { cause: data }
-        );
-      })
-      // @Corey, I've added this line to catch any misc HTTP errors meanwhile
-      .catch(
-        (error) =>
-          void log.debug(
-            `getSessionReport(${props.map?.id}) error: ${error.stack})`
-          )
-      )
+  if (data.error_code === 402) {
+    props.authActions.logout();
+  }
+
+  let message = data.error_code;
+  if (data.status == 401) {
+    message = "Not Authorized";
+  }
+
+  throw new Error(
+    `Error ${data.statusText} retrieving map. Reason: ${message}`,
+    { cause: data }
   );
+
+  // @Corey, I've added this line to catch any misc HTTP errors meanwhile
+  // .catch(
+  //   (error) =>
+  //     void log.debug(
+  //       `getSessionReport(${props.map?.id}) error: ${error.stack})`
+  //     )
+  // )
 }
 
 async function getSessionReportDownloadUrl(props, contextId) {
@@ -195,112 +194,132 @@ async function getSessionReportDownloadUrl(props, contextId) {
 }
 
 async function getMapScopedObjects(props, mapId) {
-  let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/scopedObjects`;
-  log.debug(`getMapScopedObjects(${mapId}) url: ${url})`);
+  let token = props.authActions.getToken();
 
-  return fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  }).then((data) => {
-    if (data.status === 402) {
-      props.authActions.logout();
-    }
-    return data.json();
+  const data = await internalFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
   });
+
+  if (data.error_code === 200) {
+    return data;
+  }
+
+  if (data.error_code === 402) {
+    props.authActions.logout();
+  }
+
+  throw new Error(`Error ${url}`, { cause: data });
 }
 
 async function getMapNode(props, mapId, nodeId, dynamicObjects) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/node/${nodeId}`;
-  log.debug(`getMapNode(${mapId}, ${nodeId}) url: ${url})`);
   let contextId = playerState.GetContextId(null);
 
-  return fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      OLabSessionId: contextId,
-    },
-    body: JSON.stringify(dynamicObjects),
-  }).then((data) => {
-    if (data.status === 402) {
-      props.authActions.logout();
-    } else if (data.status === 200) {
-      return data.json();
-    }
-
-    let message = data.status;
-    if (data.status == 401) {
-      message = "Not Authorized";
-    }
-
-    throw new Error(
-      `Error ${data.statusText} retrieving node. Reason: ${message}`,
-      { cause: data }
-    );
+  const data = await internalFetch("POST", url, dynamicObjects, {
+    OLabSessionId: contextId,
+    Authorization: `Bearer ${token}`,
   });
+
+  if (data.error_code === 200) {
+    return data;
+  }
+
+  if (data.error_code === 402) {
+    props.authActions.logout();
+  }
+
+  let message = data.status;
+  if (data.status == 401) {
+    message = "Not Authorized";
+  }
+
+  throw new Error(
+    `Error ${data.statusText} retrieving node. Reason: ${message}`,
+    { cause: data }
+  );
 }
 
 async function getNodeScopedObjects(props, nodeId) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/nodes/${nodeId}/scopedObjects`;
-  log.debug(`getNodeScopedObjects(${nodeId}) url: ${url})`);
 
-  return fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  }).then((data) => {
-    if (data.status === 402) {
-      props.authActions.logout();
-    }
-    return data.json();
+  const data = await internalFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
   });
+
+  if (data.error_code === 200) {
+    return data;
+  }
+
+  if (data.error_code === 402) {
+    props.authActions.logout();
+  }
+
+  let message = data.status;
+  if (data.status == 401) {
+    message = "Not Authorized";
+  }
+
+  throw new Error(
+    `Error ${data.statusText} retrieving node. Reason: ${message}`,
+    { cause: data }
+  );
 }
 
 async function getDynamicScopedObjects(props, mapId, nodeId) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/nodes/${nodeId}/dynamicobjects`;
-  log.debug(`getDynamicScopedObjects(${nodeId}) url: ${url})`);
 
-  return fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  }).then((data) => {
-    if (data.status === 402) {
-      props.authActions.logout();
-    }
-    return data.json();
+  const data = await internalFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
   });
+
+  if (data.error_code === 200) {
+    return data;
+  }
+
+  if (data.error_code === 402) {
+    props.authActions.logout();
+  }
+
+  let message = data.status;
+  if (data.status == 401) {
+    message = "Not Authorized";
+  }
+
+  throw new Error(
+    `Error ${data.statusText} retrieving node. Reason: ${message}`,
+    { cause: data }
+  );
 }
 
 async function getServerScopedObjects(props, serverId) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/servers/${serverId}/scopedObjects`;
-  log.debug(`getServerScopedObjects(${serverId}) url: ${url})`);
 
-  return fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  }).then((data) => {
-    if (data.status === 402) {
-      props.authActions.logout();
-    }
-    return data.json();
+  const data = await internalFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
   });
+
+  if (data.error_code === 200) {
+    return data;
+  }
+
+  if (data.error_code === 402) {
+    props.authActions.logout();
+  }
+
+  let message = data.status;
+  if (data.status == 401) {
+    message = "Not Authorized";
+  }
+
+  throw new Error(
+    `Error ${data.statusText} retrieving node. Reason: ${message}`,
+    { cause: data }
+  );
 }
 
 async function postQuestionValue(state) {
@@ -339,30 +358,24 @@ async function postQuestionValue(state) {
     dynamicObjects: dynamicObjects,
   };
 
-  return fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      OLabSessionId: contextId,
-    },
-    body: JSON.stringify(body),
-  }).then((data) => {
-    // signal to caller that we are done the work
-    if (!setInProgress) {
-      setInProgress(false);
-    }
-
-    if (data.status === 402) {
-      authActions.logout();
-    }
-
-    if (data.status === 200) {
-      return data.json();
-    }
-
-    return { data: null };
+  const data = await internalFetch("POST", url, body, {
+    Authorization: `Bearer ${token}`,
+    OLabSessionId: contextId,
   });
+
+  if (!setInProgress) {
+    setInProgress(false);
+  }
+
+  if (data.error_code === 402) {
+    authActions.logout();
+  }
+
+  if (data.error_code === 200) {
+    return data;
+  }
+
+  return { data: null };
 }
 
 export {

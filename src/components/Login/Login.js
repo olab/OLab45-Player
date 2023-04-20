@@ -24,30 +24,6 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-// async function loginUserAsync(credentials) {
-
-//   var creds = {
-//     "UserName": credentials.username,
-//     "Password": credentials.password
-//   };
-
-//   let url = `${config.API_URL}/auth/login`;
-
-//   log.debug(`loginUser(${credentials.username}) url: ${url})`);
-
-//   return fetch(url, {
-//     signal: AbortSignal.timeout(7500),
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify(creds)
-//   })
-//     .then(
-//       data => data.json()
-//     )
-// }
-
 const Login = ({ message, authActions, classes }) => {
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
@@ -73,6 +49,10 @@ const Login = ({ message, authActions, classes }) => {
         username,
         password,
       });
+
+      if (!response) {
+        throw new Error("unable to login");
+      }
 
       if (response.statusCode == 401) {
         setErrorMessage("Invalid username/password");
