@@ -55,6 +55,12 @@ async function loginExternalUserAsync(token) {
   return await internalFetch("POST", url, payload);
 }
 
+async function loginAnonymousUserAsync(mapId) {
+  let url = `${config.API_URL}/auth/loginanonymous/${mapId}`;
+
+  return await internalFetch("GET", url, null);
+}
+
 async function importer(props, fileName) {
   var payload = { fileName: fileName };
   let url = `${config.API_URL}/import/post`;
@@ -381,6 +387,7 @@ async function postQuestionValue(state) {
 export {
   getDownload,
   loginUserAsync,
+  loginAnonymousUserAsync,
   loginExternalUserAsync,
   getDynamicScopedObjects,
   getMap,
