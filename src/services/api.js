@@ -57,7 +57,11 @@ async function loginExternalUserAsync(token) {
 
 async function loginAnonymousUserAsync(mapId) {
   let url = `${config.API_URL}/auth/loginanonymous/${mapId}`;
+  return await internalFetch("GET", url, null);
+}
 
+async function getMapSecurityId(mapId) {
+  let url = `${config.API_URL}/maps/accesstype/${mapId}`;
   return await internalFetch("GET", url, null);
 }
 
@@ -391,6 +395,7 @@ export {
   loginExternalUserAsync,
   getDynamicScopedObjects,
   getMap,
+  getMapSecurityId,
   getMapNode,
   getMaps,
   getMapScopedObjects,

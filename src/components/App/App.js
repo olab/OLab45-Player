@@ -15,10 +15,7 @@ import log from "loglevel";
 import Player from "../Player/Player";
 import useToken from "./useToken";
 import { config } from "../../constants";
-import {
-  loginExternalUserAsync,
-  loginAnonymousUserAsync,
-} from "../../services/api";
+import { loginExternalUserAsync } from "../../services/api";
 
 function App() {
   const { authActions } = useToken();
@@ -27,36 +24,15 @@ function App() {
 
   log.debug(JSON.stringify(process.env));
 
-  const searchParams = new URLSearchParams(document.location.search);
-  const queryToken = searchParams.get("token");
-
-  let mapId = null;
-  var urlParts = window.location.pathname.split("/");
-  if (urlParts.length == 4) {
-    mapId = urlParts[2];
-    if (isNaN(mapId)) {
-      mapId = null;
-    } else {
-      mapId = Number(mapId);
-    }
-  }
   // tests if external login (direct to a map and
   // comes with it's own access token)
+  const searchParams = new URLSearchParams(document.location.search);
+  const queryToken = searchParams.get("token");
   const isExternal = queryToken != null;
   const [externalLoginStatus, setExternalLoginStatus] = useState(null);
 
   useEffect(() => {
     if (!token) {
-      const submitAnonymousUser = async (mapId) => {
-        try {
-          let data = await loginAnonymousUserAsync(mapId);
-          data.statusCode = 200;
-          return data;
-        } catch (error) {
-          return { statusCode: 500, message: error.message };
-        }
-      };
-
       const submitExternalToken = async (queryToken) => {
         try {
           let data = await loginExternalUserAsync(queryToken);
@@ -70,18 +46,6 @@ function App() {
       // try and get access token from querystring first
       if (queryToken) {
         let accessToken = submitExternalToken(queryToken).then((data) => {
-          if (data) {
-            if (data.statusCode != 200) {
-              log.error(`Error on externalLogin ${JSON.stringify(data)}`);
-              setExternalLoginStatus(false);
-            } else {
-              authActions.setToken(data, true);
-              setExternalLoginStatus(true);
-            }
-          }
-        });
-      } else {
-        let accessToken = submitAnonymousUser(mapId).then((data) => {
           if (data) {
             if (data.statusCode != 200) {
               log.error(`Error on externalLogin ${JSON.stringify(data)}`);
