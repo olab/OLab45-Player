@@ -15,11 +15,13 @@ import log from "loglevel";
 import Player from "../Player/Player";
 import useToken from "./useToken";
 import { config } from "../../constants";
-import { loginExternalUserAsync } from "../../services/api";
+import {
+  loginExternalUserAsync,
+  loginAnonymousUserAsync,
+} from "../../services/api";
 
 function App() {
   const { authActions } = useToken();
-  const [token, setToken] = useState(0);
   const reactVersion = process.env.REACT_APP_VERSION;
 
   log.debug(JSON.stringify(process.env));
@@ -28,8 +30,41 @@ function App() {
   // comes with it's own access token)
   const searchParams = new URLSearchParams(document.location.search);
   const queryToken = searchParams.get("token");
-  const isExternal = queryToken != null;
-  const [externalLoginStatus, setExternalLoginStatus] = useState(null);
+
+  function processUrl() {
+    let mapId = null;
+    let nodeId = null;
+
+    const urlParts = window.location.pathname.split("/");
+    if (urlParts.length == 4) {
+      mapId = urlParts[2];
+      if (isNaN(mapId)) {
+        mapId = null;
+      } else {
+        mapId = Number(mapId);
+      }
+
+      nodeId = urlParts[3];
+      if (isNaN(nodeId)) {
+        nodeId = null;
+      } else {
+        nodeId = Number(nodeId);
+      }
+
+      return [mapId, nodeId];
+    }
+
+    return [null, null];
+  }
+
+  const [mapId, nodeId] = processUrl();
+
+  const [state, setState] = useState({
+    token: null,
+    isExternal: queryToken != null,
+    mapId: mapId,
+    nodeId: nodeId,
+  });
 
   useEffect(() => {
     if (!token) {
@@ -65,7 +100,7 @@ function App() {
 
       log.debug(`useEffect: token: ${authActions.getToken()}`);
     }
-  }, [token, authActions]);
+  }, []);
 
   const isExpired = authActions.isExpiredSession();
   log.debug(`render: token: ${token}`);
