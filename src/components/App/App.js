@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Routes,
-  Route,
-  useParams,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import "./App.css";
 import Home from "../Home/Home";
 import Header from "../Header/Header";
