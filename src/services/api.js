@@ -60,7 +60,7 @@ async function loginAnonymousUserAsync(mapId) {
   return await internalFetch("GET", url, null);
 }
 
-async function getMapSecurityId(mapId) {
+async function isMapAnonymous(mapId) {
   let url = `${config.API_URL}/maps/accesstype/${mapId}`;
   return await internalFetch("GET", url, null);
 }
@@ -395,7 +395,7 @@ export {
   loginExternalUserAsync,
   getDynamicScopedObjects,
   getMap,
-  getMapSecurityId,
+  isMapAnonymous,
   getMapNode,
   getMaps,
   getMapScopedObjects,
