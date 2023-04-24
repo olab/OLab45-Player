@@ -27,6 +27,11 @@ async function internalFetch(method, url, payload, headerOverrides = null) {
       const response = await fetch(url, settings);
 
       const jsonData = await response.json();
+
+      if (jsonData.error_code !== 200) {
+        log.error(`URL '${url}': ${JSON.stringify(jsonData)}`);
+      }
+
       return jsonData;
     } catch (error) {
       log.error(`URL '${url}': ${error.message}`);
@@ -35,7 +40,11 @@ async function internalFetch(method, url, payload, headerOverrides = null) {
 
   log.error(`URL '${url}': max retries exceeded`);
 
-  return null;
+  return {
+    data: "max retries exceeded",
+    errorCode: 500,
+    message: `${URL}: server error`,
+  };
 }
 
 async function loginUserAsync(credentials) {
@@ -65,26 +74,6 @@ async function isMapAnonymous(mapId) {
   return await internalFetch("GET", url, null);
 }
 
-async function importer(props, fileName) {
-  var payload = { fileName: fileName };
-  let url = `${config.API_URL}/import/post`;
-  let token = props.authActions.getToken();
-
-  const data = await internalFetch("POST", url, payload, {
-    Authorization: `Bearer ${token}`,
-  });
-
-  if (data.error_code === 200) {
-    return data;
-  }
-
-  if (data.error_code === 402) {
-    props.authActions.logout();
-  }
-
-  throw new Error(`Error ${url}`, { cause: data });
-}
-
 async function getMap(props, mapId) {
   let url = `${config.API_URL}/maps/${mapId}`;
   let token = props.authActions.getToken();
@@ -93,15 +82,11 @@ async function getMap(props, mapId) {
     Authorization: `Bearer ${token}`,
   });
 
-  if (data.error_code === 200) {
-    return data;
+  if (data.error_code != 200) {
+    throw new Error(`Error retrieving map ${mapId}: ${data.message}`);
   }
 
-  if (data.error_code === 402) {
-    props.authActions.logout();
-  }
-
-  throw new Error(`Error ${url}`, { cause: data });
+  return data;
 }
 
 async function getMaps(props) {
@@ -112,114 +97,11 @@ async function getMaps(props) {
     Authorization: `Bearer ${token}`,
   });
 
-  if (data.error_code === 200) {
-    return data;
+  if (data.error_code != 200) {
+    throw new Error(`Error retrieving maps`);
   }
 
-  if (data.error_code === 402) {
-    props.authActions.logout();
-  }
-
-  throw new Error(`Error ${url}`, { cause: data });
-}
-
-async function getDownload(props, file) {
-  let token = props.authActions.getToken();
-  let url = `${config.API_URL}/filescontent/${file.id}`;
-  var anchorTagId = `file-link-${file.id}`;
-  let anchorElement = document.getElementById(anchorTagId);
-
-  log.debug(`getDownload(${file.id}) url: ${url})`);
-
-  return fetch(url, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((data) => {
-      if (data.status === 402) {
-        props.authActions.logout();
-      }
-      return data;
-    })
-    .then((response) => response.blob())
-    .then((blob) => {
-      var windowUrl = window.URL || window.webkitURL;
-      var url = windowUrl.createObjectURL(blob);
-
-      anchorElement.setAttribute("href", url);
-      anchorElement.setAttribute("download", file.path);
-      anchorElement.onclick();
-
-      windowUrl.revokeObjectURL(url);
-    })
-    .catch(function (error) {
-      alert("Fetch error: " + error.message);
-      LogError(error);
-    });
-}
-
-async function getSessionReport(props, contextId) {
-  const token = props.authActions.getToken();
-  const url = `${config.API_URL}/reports/${contextId}`;
-
-  log.debug(`getSessionReport(${props.map?.id}) url: ${url})`);
-
-  const data = await internalFetch("GET", url, null, {
-    Authorization: `Bearer ${token}`,
-  });
-
-  if (data.error_code === 200) {
-    return data;
-  }
-
-  if (data.error_code === 402) {
-    props.authActions.logout();
-  }
-
-  let message = data.error_code;
-  if (data.status == 401) {
-    message = "Not Authorized";
-  }
-
-  throw new Error(
-    `Error ${data.statusText} retrieving map. Reason: ${message}`,
-    { cause: data }
-  );
-
-  // @Corey, I've added this line to catch any misc HTTP errors meanwhile
-  // .catch(
-  //   (error) =>
-  //     void log.debug(
-  //       `getSessionReport(${props.map?.id}) error: ${error.stack})`
-  //     )
-  // )
-}
-
-async function getSessionReportDownloadUrl(props, contextId) {
-  // @Corey, this will need backend implementation for an application/octet-stream download (excel)
-  const url = `${config.API_URL}/reports/${contextId}/excel`;
-  return url;
-}
-
-async function getMapScopedObjects(props, mapId) {
-  let url = `${config.API_URL}/maps/${mapId}/scopedObjects`;
-  let token = props.authActions.getToken();
-
-  const data = await internalFetch("GET", url, null, {
-    Authorization: `Bearer ${token}`,
-  });
-
-  if (data.error_code === 200) {
-    return data;
-  }
-
-  if (data.error_code === 402) {
-    props.authActions.logout();
-  }
-
-  throw new Error(`Error ${url}`, { cause: data });
+  return data;
 }
 
 async function getMapNode(props, mapId, nodeId, dynamicObjects) {
@@ -232,23 +114,11 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
     Authorization: `Bearer ${token}`,
   });
 
-  if (data.error_code === 200) {
-    return data;
+  if (data.error_code != 200) {
+    throw new Error(`Error retrieving map node: ${mapId}/${nodeId}`);
   }
 
-  if (data.error_code === 402) {
-    props.authActions.logout();
-  }
-
-  let message = data.status;
-  if (data.status == 401) {
-    message = "Not Authorized";
-  }
-
-  throw new Error(
-    `Error ${data.statusText} retrieving node. Reason: ${message}`,
-    { cause: data }
-  );
+  return data;
 }
 
 async function getNodeScopedObjects(props, nodeId) {
@@ -259,23 +129,11 @@ async function getNodeScopedObjects(props, nodeId) {
     Authorization: `Bearer ${token}`,
   });
 
-  if (data.error_code === 200) {
-    return data;
+  if (data.error_code != 200) {
+    throw new Error(`Error retrieving map node scoped: ${nodeId}`);
   }
 
-  if (data.error_code === 402) {
-    props.authActions.logout();
-  }
-
-  let message = data.status;
-  if (data.status == 401) {
-    message = "Not Authorized";
-  }
-
-  throw new Error(
-    `Error ${data.statusText} retrieving node. Reason: ${message}`,
-    { cause: data }
-  );
+  return data;
 }
 
 async function getDynamicScopedObjects(props, mapId, nodeId) {
@@ -286,23 +144,11 @@ async function getDynamicScopedObjects(props, mapId, nodeId) {
     Authorization: `Bearer ${token}`,
   });
 
-  if (data.error_code === 200) {
-    return data;
+  if (data.error_code != 200) {
+    throw new Error(`Error retrieving dynamic scoped: ${mapId}/${nodeId}`);
   }
 
-  if (data.error_code === 402) {
-    props.authActions.logout();
-  }
-
-  let message = data.status;
-  if (data.status == 401) {
-    message = "Not Authorized";
-  }
-
-  throw new Error(
-    `Error ${data.statusText} retrieving node. Reason: ${message}`,
-    { cause: data }
-  );
+  return data;
 }
 
 async function getServerScopedObjects(props, serverId) {
@@ -313,23 +159,11 @@ async function getServerScopedObjects(props, serverId) {
     Authorization: `Bearer ${token}`,
   });
 
-  if (data.error_code === 200) {
-    return data;
+  if (data.error_code != 200) {
+    throw new Error(`Error retrieving server scoped: ${serverId}`);
   }
 
-  if (data.error_code === 402) {
-    props.authActions.logout();
-  }
-
-  let message = data.status;
-  if (data.status == 401) {
-    message = "Not Authorized";
-  }
-
-  throw new Error(
-    `Error ${data.statusText} retrieving node. Reason: ${message}`,
-    { cause: data }
-  );
+  return data;
 }
 
 async function postQuestionValue(state) {
@@ -377,15 +211,102 @@ async function postQuestionValue(state) {
     setInProgress(false);
   }
 
-  if (data.error_code === 402) {
-    authActions.logout();
-  }
+  // if (data.error_code === 401) {
+  //   authActions.logout();
+  // }
 
   if (data.error_code === 200) {
     return data;
   }
 
   return { data: null };
+}
+
+async function getDownload(props, file) {
+  let token = props.authActions.getToken();
+  let url = `${config.API_URL}/filescontent/${file.id}`;
+  var anchorTagId = `file-link-${file.id}`;
+  let anchorElement = document.getElementById(anchorTagId);
+
+  log.debug(`getDownload(${file.id}) url: ${url})`);
+
+  return fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((data) => {
+      // if (data.status === 401) {
+      //   props.authActions.logout();
+      // }
+      return data;
+    })
+    .then((response) => response.blob())
+    .then((blob) => {
+      var windowUrl = window.URL || window.webkitURL;
+      var url = windowUrl.createObjectURL(blob);
+
+      anchorElement.setAttribute("href", url);
+      anchorElement.setAttribute("download", file.path);
+      anchorElement.onclick();
+
+      windowUrl.revokeObjectURL(url);
+    })
+    .catch(function (error) {
+      alert("Fetch error: " + error.message);
+      LogError(error);
+    });
+}
+
+async function importer(props, fileName) {
+  var payload = { fileName: fileName };
+  let url = `${config.API_URL}/import/post`;
+  let token = props.authActions.getToken();
+
+  const data = await internalFetch("POST", url, payload, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  if (data.error_code === 200) {
+    return data;
+  }
+
+  // if (data.error_code === 401) {
+  //   props.authActions.logout();
+  // }
+
+  throw new Error(`Error ${url}`, { cause: data });
+}
+
+async function getSessionReport(props, contextId) {
+  const token = props.authActions.getToken();
+  const url = `${config.API_URL}/reports/${contextId}`;
+
+  log.debug(`getSessionReport(${props.map?.id}) url: ${url})`);
+
+  const data = await internalFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  return data;
+}
+
+async function getSessionReportDownloadUrl(props, contextId) {
+  // @Corey, this will need backend implementation for an application/octet-stream download (excel)
+  const url = `${config.API_URL}/reports/${contextId}/excel`;
+  return url;
+}
+
+async function getMapScopedObjects(props, mapId) {
+  let url = `${config.API_URL}/maps/${mapId}/scopedObjects`;
+  let token = props.authActions.getToken();
+
+  const data = await internalFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  return data;
 }
 
 export {
