@@ -22,7 +22,7 @@ import {
 
 function App() {
   const { authActions } = useToken();
-  const [token, setToken] = useState(0);
+  const [token, setToken] = useState(authActions.getToken());
   const reactVersion = process.env.REACT_APP_VERSION;
 
   log.debug(JSON.stringify(process.env));
@@ -33,6 +33,7 @@ function App() {
   const queryToken = searchParams.get("token");
   const isExternal = queryToken != null;
   const [externalLoginStatus, setExternalLoginStatus] = useState(null);
+  const [anonymousPlay, setAnonymousPlay] = useState(null);
 
   function processUrl() {
     let mapId = null;
@@ -91,7 +92,7 @@ function App() {
           if (data) {
             if (data.statusCode != 200) {
               log.error(`Error on submitExternalToken ${JSON.stringify(data)}`);
-              setExternalLoginStatus(false);
+              setExternalLoginStatus(null);
             } else {
               authActions.setToken(data, true);
               setExternalLoginStatus(true);
@@ -103,10 +104,10 @@ function App() {
           if (data) {
             if (data.statusCode != 200) {
               log.error(`Error on submitAnonymousPlay ${JSON.stringify(data)}`);
-              setExternalLoginStatus(false);
+              setExternalLoginStatus(null);
             } else {
               authActions.setToken(data, true);
-              setExternalLoginStatus(true);
+              setAnonymousPlay(true);
             }
           }
         });
@@ -125,9 +126,9 @@ function App() {
   log.debug(`render: token: ${token}`);
 
   // test for external login or direct anon play, which has very limited routes
-  if (isExternal || directPlay) {
+  if (directPlay && (externalLoginStatus || anonymousPlay)) {
     // need non-expired external token in order to invoke Player
-    if (token && !isExpired && externalLoginStatus) {
+    if (token && !isExpired) {
       return (
         <div className="wrapper">
           <Header version={reactVersion} authActions={authActions} />
@@ -141,7 +142,7 @@ function App() {
         </div>
       );
     } else {
-      if (externalLoginStatus == false) {
+      if (externalLoginStatus === false) {
         return <Login message="Login failed" authActions={authActions} />;
       }
 
