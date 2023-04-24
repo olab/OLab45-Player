@@ -34,6 +34,7 @@ function App() {
   const isExternal = queryToken != null;
   const [externalLoginStatus, setExternalLoginStatus] = useState(null);
   const [anonymousPlay, setAnonymousPlay] = useState(null);
+  const [loginError, setLoginError] = useState(null);
 
   function processUrl() {
     let mapId = null;
@@ -68,7 +69,7 @@ function App() {
     const submitAnonymousMapId = async (mapId) => {
       try {
         let data = await loginAnonymousUserAsync(mapId);
-        data.statusCode = 200;
+        if (!data.statusCode) data.statusCode = 200;
         return data;
       } catch (error) {
         return { statusCode: 500, message: error.message };
@@ -92,7 +93,7 @@ function App() {
           if (data) {
             if (data.statusCode != 200) {
               log.error(`Error on submitExternalToken ${JSON.stringify(data)}`);
-              setExternalLoginStatus(null);
+              setLoginError(data.message);
             } else {
               authActions.setToken(data, true);
               setExternalLoginStatus(true);
@@ -104,7 +105,7 @@ function App() {
           if (data) {
             if (data.statusCode != 200) {
               log.error(`Error on submitAnonymousPlay ${JSON.stringify(data)}`);
-              setExternalLoginStatus(null);
+              setLoginError(data.message);
             } else {
               authActions.setToken(data, true);
               setAnonymousPlay(true);
@@ -142,12 +143,12 @@ function App() {
         </div>
       );
     } else {
-      if (externalLoginStatus === false) {
-        return <Login message="Login failed" authActions={authActions} />;
-      }
-
       return <></>;
     }
+  }
+
+  if (directPlay && loginError) {
+    return <Login message={loginError} authActions={authActions} />;
   }
 
   if (!token || isExpired) {
@@ -172,69 +173,6 @@ function App() {
     </div>
   );
 }
-
-// function processCookieForTokenAsync(cookieString) {
-
-//   if (!cookieString) {
-//     log.debug(`No external cookies set`);
-//     return null;
-//   }
-
-//   var token = extractExternalToken(cookieString);
-//   if (!token) {
-//     return null;
-//   }
-
-//   let url = `${config.API_URL}/auth/loginexternal`;
-
-//   log.debug(`loginExternal(${token}) url: ${url})`);
-
-//   var body = {
-//     "ExternalToken": token
-//   };
-
-//   return fetch(url, {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify(body)
-//   })
-//     .then(
-//       data => data.json()
-//     )
-
-// }
-
-// function extractExternalToken(cookieStr) {
-
-//   try {
-
-//     log.debug(`parsing: '${cookieStr}')`);
-
-//     const parseCookie = str =>
-//       str
-//         .split(';')
-//         .map(v => v.split('='))
-//         .reduce((acc, v) => {
-//           acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
-//           return acc;
-//         }, {});
-
-//     let cookies = parseCookie(cookieStr);
-//     log.debug(`Cookie: ${JSON.stringify(cookies, null, 2)}`);
-
-//     if ('external_token' in cookies) {
-//       log.debug(`External token: ${cookies.external_token}`);
-//       return cookies.external_token;
-//     }
-
-//     return null;
-
-//   } catch (error) {
-//     LogError(error);
-//   }
-// }
 
 function NoMatch() {
   let location = useLocation();

@@ -213,6 +213,11 @@ class Player extends PureComponent {
         };
       }
 
+      // do a check if the first node played, based
+      // on if there was a previous node in local storage
+      var nodeState = playerState.GetNodeStatic(null, null);
+      dynamicObjects.newPlay = nodeState == null;
+
       const { data: nodeData } = await getMapNode(
         props,
         mapId,

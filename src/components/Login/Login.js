@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // import PropTypes from 'prop-types';
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -30,6 +30,11 @@ const Login = ({ message, authActions, classes }) => {
   const [open, setOpen] = React.useState(message != null);
   const [errorMessage, setErrorMessage] = React.useState(message);
   const [inProgress, setInProgress] = React.useState(false);
+
+  if (errorMessage != message) {
+    setOpen(true);
+    setErrorMessage(message);
+  }
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
