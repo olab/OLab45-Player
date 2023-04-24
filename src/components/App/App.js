@@ -15,7 +15,10 @@ import log from "loglevel";
 import Player from "../Player/Player";
 import useToken from "./useToken";
 import { config } from "../../constants";
-import { loginExternalUserAsync } from "../../services/api";
+import {
+  loginAnonymousUserAsync,
+  loginExternalUserAsync,
+} from "../../services/api";
 
 function App() {
   const { authActions } = useToken();
@@ -31,24 +34,75 @@ function App() {
   const isExternal = queryToken != null;
   const [externalLoginStatus, setExternalLoginStatus] = useState(null);
 
-  useEffect(() => {
-    if (!token) {
-      const submitExternalToken = async (queryToken) => {
-        try {
-          let data = await loginExternalUserAsync(queryToken);
-          data.statusCode = 200;
-          return data;
-        } catch (error) {
-          return { statusCode: 500, message: error.message };
-        }
-      };
+  function processUrl() {
+    let mapId = null;
+    let nodeId = null;
 
+    const urlParts = window.location.pathname.split("/");
+    if (urlParts.length == 4) {
+      mapId = urlParts[2];
+      if (isNaN(mapId)) {
+        mapId = null;
+      } else {
+        mapId = Number(mapId);
+      }
+
+      nodeId = urlParts[3];
+      if (isNaN(nodeId)) {
+        nodeId = null;
+      } else {
+        nodeId = Number(nodeId);
+      }
+
+      return [mapId, nodeId];
+    }
+
+    return [null, null];
+  }
+
+  const [mapId, nodeId] = processUrl();
+  const directPlay = mapId != null && nodeId != null;
+
+  useEffect(() => {
+    const submitAnonymousMapId = async (mapId) => {
+      try {
+        let data = await loginAnonymousUserAsync(mapId);
+        data.statusCode = 200;
+        return data;
+      } catch (error) {
+        return { statusCode: 500, message: error.message };
+      }
+    };
+
+    const submitExternalToken = async (queryToken) => {
+      try {
+        let data = await loginExternalUserAsync(queryToken);
+        data.statusCode = 200;
+        return data;
+      } catch (error) {
+        return { statusCode: 500, message: error.message };
+      }
+    };
+
+    if (!token) {
       // try and get access token from querystring first
       if (queryToken) {
         let accessToken = submitExternalToken(queryToken).then((data) => {
           if (data) {
             if (data.statusCode != 200) {
-              log.error(`Error on externalLogin ${JSON.stringify(data)}`);
+              log.error(`Error on submitExternalToken ${JSON.stringify(data)}`);
+              setExternalLoginStatus(false);
+            } else {
+              authActions.setToken(data, true);
+              setExternalLoginStatus(true);
+            }
+          }
+        });
+      } else if (directPlay) {
+        let accessToken = submitAnonymousMapId(mapId).then((data) => {
+          if (data) {
+            if (data.statusCode != 200) {
+              log.error(`Error on submitAnonymousPlay ${JSON.stringify(data)}`);
               setExternalLoginStatus(false);
             } else {
               authActions.setToken(data, true);
@@ -70,8 +124,8 @@ function App() {
   const isExpired = authActions.isExpiredSession();
   log.debug(`render: token: ${token}`);
 
-  // test for external login, which has very limited routes
-  if (isExternal) {
+  // test for external login or direct anon play, which has very limited routes
+  if (isExternal || directPlay) {
     // need non-expired external token in order to invoke Player
     if (token && !isExpired && externalLoginStatus) {
       return (
