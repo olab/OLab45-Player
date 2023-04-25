@@ -27,21 +27,22 @@ function Alert(props) {
 const Login = ({ message, authActions, classes }) => {
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
-  const [open, setOpen] = React.useState(message != null);
-  const [errorMessage, setErrorMessage] = React.useState(message);
+  const [error, setError] = React.useState({
+    show: message != null,
+    message: message,
+  });
   const [inProgress, setInProgress] = React.useState(false);
-
-  if (errorMessage != message) {
-    setOpen(true);
-    setErrorMessage(message);
-  }
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
 
-    setOpen(false);
+    setError({ show: false });
+  };
+
+  const showError = (message) => {
+    setError({ show: true, message: message });
   };
 
   const handleSubmit = async (e) => {
@@ -60,8 +61,7 @@ const Login = ({ message, authActions, classes }) => {
       }
 
       if (response.statusCode == 401) {
-        setErrorMessage("Invalid username/password");
-        setOpen(true);
+        showError("Invalid username/password");
       } else {
         if (response.authInfo) {
           authActions.setToken(response, false);
@@ -73,7 +73,7 @@ const Login = ({ message, authActions, classes }) => {
     } catch (error) {
       LogError(`loginUser() error: ${JSON.stringify(error, null, 2)})`);
       setErrorMessage(`Login error: server not responding.`);
-      setOpen(true);
+      setErrorFound(true);
     }
 
     setInProgress(false);
@@ -109,7 +109,8 @@ const Login = ({ message, authActions, classes }) => {
                 <InputLabel htmlFor="username">Username</InputLabel>
                 <Input
                   name="username"
-                  type="username"
+                  type="text"
+                  value={username}
                   onChange={(e) => setUserName(e.target.value)}
                 />
               </FormControl>
@@ -133,9 +134,13 @@ const Login = ({ message, authActions, classes }) => {
               </Button>
             </form>
           )}
-          <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
+          <Snackbar
+            open={error.show}
+            autoHideDuration={5000}
+            onClose={handleClose}
+          >
             <Alert onClose={handleClose} severity="error">
-              {errorMessage}
+              {error.message}
             </Alert>
           </Snackbar>
         </Paper>

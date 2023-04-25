@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { withStyles } from "@material-ui/core/styles";
-import { FormControl, Snackbar } from "@material-ui/core";
+import { FormControl } from "@material-ui/core";
 import JsxParser from "react-jsx-parser";
 import { Log, LogInfo, LogError, LogEnable } from "../../utils/Logger";
 import log from "loglevel";
@@ -51,6 +51,7 @@ class Player extends PureComponent {
     this.getServer = this.getServer.bind(this);
     this.getMap = this.getMap.bind(this);
     this.getNode = this.getNode.bind(this);
+    this.showError = this.showError.bind(this);
     this.onErrorDismissed = this.onErrorDismissed.bind(this);
 
     this.onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
@@ -84,6 +85,13 @@ class Player extends PureComponent {
     setOpen(false);
   };
 
+  showError = (message) => {
+    this.setState({
+      errorFound: true,
+      errorMessage: message,
+    });
+  };
+
   async componentDidMount() {
     this.setState({ mapId: this.props.params.mapId });
     this.setState({ nodeId: this.props.params.nodeId });
@@ -95,10 +103,7 @@ class Player extends PureComponent {
 
       this.setState({ isMounted: true });
     } catch (error) {
-      this.setState({
-        errorFound: true,
-        errorMessage: error.message,
-      });
+      this.showError(error.message);
     }
   }
 

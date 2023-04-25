@@ -86,31 +86,40 @@ function App() {
       }
     };
 
+    const externalTokenCheck = (data) => {
+      if (data) {
+        if (data.statusCode != 200) {
+          log.error(`Error on submitExternalToken ${JSON.stringify(data)}`);
+          setLoginError(data.message);
+        } else {
+          authActions.setToken(data, true);
+          setExternalLoginStatus(true);
+        }
+      }
+    };
+
+    const anonymousMapCheck = (data) => {
+      if (data) {
+        if (data.statusCode != 200) {
+          log.error(`Error on submitAnonymousPlay ${JSON.stringify(data)}`);
+          setLoginError(data.message);
+          setToken(null);
+        } else {
+          authActions.setToken(data, true);
+          setAnonymousPlay(true);
+        }
+      }
+    };
+
     if (!token) {
       // try and get access token from querystring first
       if (queryToken) {
-        let accessToken = submitExternalToken(queryToken).then((data) => {
-          if (data) {
-            if (data.statusCode != 200) {
-              log.error(`Error on submitExternalToken ${JSON.stringify(data)}`);
-              setLoginError(data.message);
-            } else {
-              authActions.setToken(data, true);
-              setExternalLoginStatus(true);
-            }
-          }
+        submitExternalToken(queryToken).then((data) => {
+          externalTokenCheck(data);
         });
       } else if (directPlay) {
-        let accessToken = submitAnonymousMapId(mapId).then((data) => {
-          if (data) {
-            if (data.statusCode != 200) {
-              log.error(`Error on submitAnonymousPlay ${JSON.stringify(data)}`);
-              setLoginError(data.message);
-            } else {
-              authActions.setToken(data, true);
-              setAnonymousPlay(true);
-            }
-          }
+        submitAnonymousMapId(mapId).then((data) => {
+          anonymousMapCheck(data);
         });
       }
 
@@ -120,6 +129,10 @@ function App() {
       }
 
       log.debug(`useEffect: token: ${authActions.getToken()}`);
+    } else if (directPlay) {
+      submitAnonymousMapId(mapId).then((data) => {
+        anonymousMapCheck(data);
+      });
     }
   }, [token, authActions]);
 
@@ -148,7 +161,13 @@ function App() {
   }
 
   if (directPlay && loginError) {
-    return <Login message={loginError} authActions={authActions} />;
+    return (
+      <div>
+        <center>
+          <p>{loginError}</p>
+        </center>
+      </div>
+    );
   }
 
   if (!token || isExpired) {
