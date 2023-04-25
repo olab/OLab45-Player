@@ -20,9 +20,9 @@ export default function useToken() {
     return userName;
   };
 
-  const isExternalToken = () => {
-    const { isExternalToken } = playerState.GetSessionInfo(null);
-    return isExternalToken;
+  const getTokenType = () => {
+    const { tokenType } = playerState.GetSessionInfo(null);
+    return tokenType;
   };
 
   const getToken = () => {
@@ -32,20 +32,22 @@ export default function useToken() {
     return token;
   };
 
-  const saveToken = (loginInfo, isExternalToken) => {
+  const saveToken = (loginInfo, tokenType) => {
     let authInfo = loginInfo.authInfo;
 
     var decoded = jwt_decode(authInfo.token);
-    log.debug(decoded);
+    log.debug(`Token decoded: ${JSON.stringify(decoded, null, 2)}`);
 
     let sessionInfo = playerState.GetSessionInfo(null);
     sessionInfo = loginInfo;
 
     const expiry = new Date(decoded.exp * 1000);
     sessionInfo.authInfo.expires = expiry;
-    sessionInfo.isExternalToken = isExternalToken;
+    sessionInfo.tokenType = tokenType;
 
     playerState.SetSessionInfo(null, sessionInfo);
+
+    log.debug(`Saving session info: ${JSON.stringify(sessionInfo, null, 2)}`);
 
     setToken(sessionInfo.authInfo);
     setUserName(decoded.sub);
@@ -87,7 +89,7 @@ export default function useToken() {
     token,
     authActions: {
       isExpiredSession: isExpiredSession,
-      isExternalToken: isExternalToken,
+      getTokenType: getTokenType,
       setToken: saveToken,
       getToken: getToken,
       getRole: getRole,

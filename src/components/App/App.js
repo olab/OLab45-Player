@@ -14,75 +14,70 @@ import { Log, LogInfo, LogError } from "../../utils/Logger";
 import log from "loglevel";
 import Player from "../Player/Player";
 import useToken from "./useToken";
-import { config } from "../../constants";
 import {
-  loginAnonymousUserAsync,
-  loginExternalUserAsync,
-} from "../../services/api";
+  processUrl,
+  submitAnonymousMapId,
+  submitExternalToken,
+} from "../../utils/AppHelpers";
+var constants = require("../../services/constants");
+const playerState = require("../../utils/PlayerState").PlayerState;
 
 function App() {
-  const { authActions } = useToken();
-  const [token, setToken] = useState(authActions.getToken());
   const reactVersion = process.env.REACT_APP_VERSION;
-
   log.debug(JSON.stringify(process.env));
 
-  // tests if external login (direct to a map and
-  // comes with it's own access token)
+  const { authActions } = useToken();
+  const [token, setToken] = useState(authActions.getToken());
+
   const searchParams = new URLSearchParams(document.location.search);
   const queryToken = searchParams.get("token");
-  const isExternal = queryToken != null;
-  const [externalLoginStatus, setExternalLoginStatus] = useState(null);
-  const [anonymousPlay, setAnonymousPlay] = useState(null);
-  const [loginError, setLoginError] = useState(null);
-
-  function processUrl() {
-    let mapId = null;
-    let nodeId = null;
-
-    const urlParts = window.location.pathname.split("/");
-    if (urlParts.length == 4) {
-      mapId = urlParts[2];
-      if (isNaN(mapId)) {
-        mapId = null;
-      } else {
-        mapId = Number(mapId);
-      }
-
-      nodeId = urlParts[3];
-      if (isNaN(nodeId)) {
-        nodeId = null;
-      } else {
-        nodeId = Number(nodeId);
-      }
-
-      return [mapId, nodeId];
-    }
-
-    return [null, null];
-  }
 
   const [mapId, nodeId] = processUrl();
   const directPlay = mapId != null && nodeId != null;
 
-  useEffect(() => {
-    const submitAnonymousMapId = async (mapId) => {
-      try {
-        let data = await loginAnonymousUserAsync(mapId);
-        if (!data.statusCode) data.statusCode = 200;
-        return data;
-      } catch (error) {
-        return { statusCode: 500, message: error.message };
-      }
-    };
+  const tokenType = authActions.getTokenType();
 
-    const submitExternalToken = async (queryToken) => {
-      try {
-        let data = await loginExternalUserAsync(queryToken);
-        data.statusCode = 200;
-        return data;
-      } catch (error) {
-        return { statusCode: 500, message: error.message };
+  // perform any left-over anon/external token cleanup
+  if (
+    (tokenType == constants.TOKEN_TYPE_ANONYMOUS ||
+      tokenType == constants.TOKEN_TYPE_EXTERNAL) &&
+    !directPlay
+  ) {
+    log.info(`logging out previous anonymous session`);
+    authActions.logout();
+  }
+
+  // catch any maps changes under previous anon/external session
+  if (
+    tokenType == constants.TOKEN_TYPE_ANONYMOUS ||
+    tokenType == constants.TOKEN_TYPE_EXTERNAL
+  ) {
+    const map = playerState.GetMap();
+    if (map && map?.id != mapId) {
+      log.info(`logging out anonymous session from different map`);
+      authActions.logout();
+    }
+  }
+
+  const [externalPlay, setExternalPlay] = useState(null);
+  const [anonymousPlay, setAnonymousPlay] = useState(
+    tokenType == constants.TOKEN_TYPE_ANONYMOUS
+  );
+  const [directPlayError, setDirectPlayError] = useState(
+    tokenType == constants.TOKEN_TYPE_EXTERNAL
+  );
+
+  useEffect(() => {
+    const anonymousMapCheck = (data) => {
+      if (data) {
+        if (data.error_code != 200) {
+          log.error(`Error on submitAnonymousPlay ${JSON.stringify(data)}`);
+          setDirectPlayError(data.data);
+          setToken(null);
+        } else {
+          authActions.setToken(data.data, constants.TOKEN_TYPE_ANONYMOUS);
+          setAnonymousPlay(true);
+        }
       }
     };
 
@@ -90,62 +85,74 @@ function App() {
       if (data) {
         if (data.statusCode != 200) {
           log.error(`Error on submitExternalToken ${JSON.stringify(data)}`);
-          setLoginError(data.message);
+          setDirectPlayError(data.message);
         } else {
-          authActions.setToken(data, true);
-          setExternalLoginStatus(true);
+          authActions.setToken(data, constants.TOKEN_TYPE_EXTERNAL);
+          setExternalPlay(true);
         }
       }
     };
 
-    const anonymousMapCheck = (data) => {
-      if (data) {
-        if (data.statusCode != 200) {
-          log.error(`Error on submitAnonymousPlay ${JSON.stringify(data)}`);
-          setLoginError(data.message);
-          setToken(null);
-        } else {
-          authActions.setToken(data, true);
-          setAnonymousPlay(true);
-        }
-      }
-    };
+    log.debug(`useEffect: token: ${token ? token.slice(-3) : "none"}`);
+    log.debug(`           directPlay: ${directPlay}`);
+    log.debug(`           externalPlay: ${externalPlay}`);
+    log.debug(`           anonymousPlay: ${anonymousPlay}`);
 
     if (!token) {
-      // try and get access token from querystring first
-      if (queryToken) {
-        submitExternalToken(queryToken).then((data) => {
-          externalTokenCheck(data);
-        });
-      } else if (directPlay) {
-        submitAnonymousMapId(mapId).then((data) => {
-          anonymousMapCheck(data);
-        });
-      }
+      if (directPlay) {
+        // process access token on querystring
+        if (queryToken) {
+          log.debug(`processing esternal token`);
+          submitExternalToken(queryToken).then((data) => {
+            externalTokenCheck(data);
+          });
 
-      const localToken = authActions.getToken();
-      if (localToken) {
-        setToken(localToken);
+          // else the play has to be anonymous
+        } else {
+          log.debug(`processing anonymous play`);
+          submitAnonymousMapId(mapId).then((data) => {
+            anonymousMapCheck(data);
+          });
+        }
       }
-
-      log.debug(`useEffect: token: ${authActions.getToken()}`);
-    } else if (directPlay) {
-      submitAnonymousMapId(mapId).then((data) => {
-        anonymousMapCheck(data);
-      });
     }
+
+    const localToken = authActions.getToken();
+    if (localToken) {
+      setToken(localToken);
+    }
+
+    log.debug(`useEffect: token: ${authActions.getToken()}`);
   }, [token, authActions]);
 
   const isExpired = authActions.isExpiredSession();
-  log.debug(`render: token: ${token}`);
+  log.debug(`render: token: ${token ? token.slice(-3) : "none"}`);
+  log.debug(`        directPlay: ${directPlay}`);
+  log.debug(`        externalPlay: ${externalPlay}`);
+  log.debug(`        anonymousPlay: ${anonymousPlay}`);
+
+  if (directPlay && directPlayError) {
+    return (
+      <div>
+        <Header version={reactVersion} />
+        <center>
+          <p>{directPlayError}</p>
+        </center>
+      </div>
+    );
+  }
+
+  if (!token || isExpired) {
+    return <Login authActions={authActions} />;
+  }
 
   // test for external login or direct anon play, which has very limited routes
-  if (directPlay && (externalLoginStatus || anonymousPlay)) {
+  if (directPlay && (externalPlay || anonymousPlay)) {
     // need non-expired external token in order to invoke Player
     if (token && !isExpired) {
       return (
         <div className="wrapper">
-          <Header version={reactVersion} authActions={authActions} />
+          <Header version={reactVersion} />
           <Routes>
             <Route
               path={`/player/:mapId/:nodeId`}
@@ -160,37 +167,30 @@ function App() {
     }
   }
 
-  if (directPlay && loginError) {
+  if (tokenType == constants.TOKEN_TYPE_NATIVE) {
     return (
-      <div>
-        <center>
-          <p>{loginError}</p>
-        </center>
+      <div className="wrapper">
+        <Header version={reactVersion} authActions={authActions} />
+        <Routes>
+          <Route
+            path={`/player`}
+            element={<Home authActions={authActions} />}
+          />
+          <Route
+            path={`/player/home`}
+            element={<Home authActions={authActions} />}
+          />
+          <Route
+            path={`/player/:mapId/:nodeId`}
+            element={<Player authActions={authActions} />}
+          />
+          <Route path="*" element={<NoMatch />} />
+        </Routes>
       </div>
     );
+  } else {
+    return <></>;
   }
-
-  if (!token || isExpired) {
-    return <Login authActions={authActions} />;
-  }
-
-  return (
-    <div className="wrapper">
-      <Header version={reactVersion} authActions={authActions} />
-      <Routes>
-        <Route path={`/player`} element={<Home authActions={authActions} />} />
-        <Route
-          path={`/player/home`}
-          element={<Home authActions={authActions} />}
-        />
-        <Route
-          path={`/player/:mapId/:nodeId`}
-          element={<Player authActions={authActions} />}
-        />
-        <Route path="*" element={<NoMatch />} />
-      </Routes>
-    </div>
-  );
 }
 
 function NoMatch() {

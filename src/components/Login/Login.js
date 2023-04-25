@@ -19,14 +19,15 @@ import styles from "./styles";
 import { config } from "../../config";
 import { ReactComponent as LogoIcon } from "../../shared/assets/icons/olab4_logo.svg";
 import { loginUserAsync } from "../../services/api";
+var constants = require("../../services/constants");
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 const Login = ({ message, authActions, classes }) => {
-  const [username, setUserName] = useState();
-  const [password, setPassword] = useState();
+  const [username, setUserName] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = React.useState({
     show: message != null,
     message: message,
@@ -51,29 +52,28 @@ const Login = ({ message, authActions, classes }) => {
     setInProgress(true);
 
     try {
-      const response = await loginUserAsync({
+      const data = await loginUserAsync({
         username,
         password,
       });
 
-      if (!response) {
-        throw new Error("unable to login");
+      if (!data) {
+        throw new Error("Unable to Login");
       }
 
-      if (response.statusCode == 401) {
-        showError("Invalid username/password");
+      if (data.error_code == 401) {
+        showError(data.data);
       } else {
-        if (response.authInfo) {
-          authActions.setToken(response, false);
+        if (data.data.authInfo) {
+          authActions.setToken(data.data, constants.TOKEN_TYPE_NATIVE);
           authActions.setUserName(username);
         } else {
-          throw JSON.stringify(response, null, 2);
+          throw JSON.stringify(data, null, 2);
         }
       }
     } catch (error) {
       LogError(`loginUser() error: ${JSON.stringify(error, null, 2)})`);
-      setErrorMessage(`Login error: server not responding.`);
-      setErrorFound(true);
+      showError(error.message);
     }
 
     setInProgress(false);

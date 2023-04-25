@@ -56,4 +56,8 @@ module.exports = Object.freeze({
   STATUS_TEXT_CLASS: "status-text",
   PARTNER_ID_CLASS: "partner-name",
   BUTTON_BOX_CLASS: "button-box",
+
+  TOKEN_TYPE_EXTERNAL: "external",
+  TOKEN_TYPE_ANONYMOUS: "anonymous",
+  TOKEN_TYPE_NATIVE: "native",
 });
