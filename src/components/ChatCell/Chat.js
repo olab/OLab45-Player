@@ -246,12 +246,6 @@ class Chat extends React.Component {
         )})`
       );
 
-      // ensure the message was for this chat box
-      // if (payload.data.participant.commandChannel !== localInfo.commandChannel) {
-      //   LogInfo(`'${localInfo.connectionId}' onParticipantUnassigned message not for '${localInfo.commandChannel}'`);
-      //   return;
-      // }
-
       localInfo.assigned = false;
 
       this.setState({ localInfo: localInfo });

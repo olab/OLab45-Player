@@ -21,8 +21,15 @@ import {
 
 import CircularSpinnerWithText from "../CircularSpinnerWithText/CircularSpinnerWithText";
 import removeHTMLTags from "../../helpers/removeHTMLTags";
+import styled from "styled-components";
 
 import styles, { SearchWrapper, ListItemContentWrapper } from "./styles";
+
+const MapListWrapper = styled.div`
+  max-height: 75vh;
+  overflow: auto;
+  padding-right: 5px;
+`;
 
 class ListWithSearch extends PureComponent {
   static defaultProps = {
@@ -115,42 +122,44 @@ class ListWithSearch extends PureComponent {
           </SearchWrapper>
         )}
 
-        <List classes={{ root: listClassNames }} disablePadding>
-          {list.map((listItem) => (
-            <ListItem
-              key={listItem.id}
-              classes={{ root: classes.listItem }}
-              disabled={isItemsDisabled}
-            >
-              <ListItemContentWrapper>
-                <div disabled={isItemsDisabled}>
-                  <Grid container spacing={0}>
-                    <Grid item xs={3} style={{ minWidth: "125px" }}>
-                      {getIcon(showIcons, listItem)}
+        <MapListWrapper>
+          <List classes={{ root: listClassNames }} disablePadding>
+            {list.map((listItem) => (
+              <ListItem
+                key={listItem.id}
+                classes={{ root: classes.listItem }}
+                disabled={isItemsDisabled}
+              >
+                <ListItemContentWrapper>
+                  <div disabled={isItemsDisabled}>
+                    <Grid container spacing={0}>
+                      <Grid item xs={3} style={{ minWidth: "125px" }}>
+                        {getIcon(showIcons, listItem)}
+                      </Grid>
+                      <Grid item xs={9}>
+                        <ListItemText
+                          primary={primarytext(listItem)}
+                          secondary={removeHTMLTags(
+                            secondarytext(listItem) || ""
+                          )}
+                          classes={{ secondary: classes.secondaryText }}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={9}>
-                      <ListItemText
-                        primary={primarytext(listItem)}
-                        secondary={removeHTMLTags(
-                          secondarytext(listItem) || ""
-                        )}
-                        classes={{ secondary: classes.secondaryText }}
-                      />
-                    </Grid>
-                  </Grid>
-                </div>
-              </ListItemContentWrapper>
-            </ListItem>
-          ))}
+                  </div>
+                </ListItemContentWrapper>
+              </ListItem>
+            ))}
 
-          {!list.length && (
-            <ListItem classes={{ root: classes.listItem }}>
-              <Typography component="span" align="right" variant="caption">
-                Empty list...
-              </Typography>
-            </ListItem>
-          )}
-        </List>
+            {!list.length && (
+              <ListItem classes={{ root: classes.listItem }}>
+                <Typography component="span" align="right" variant="caption">
+                  Empty list...
+                </Typography>
+              </ListItem>
+            )}
+          </List>
+        </MapListWrapper>
 
         {isShowSpinner && (
           <CircularSpinnerWithText
