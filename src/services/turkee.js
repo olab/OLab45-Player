@@ -11,6 +11,8 @@ class Turkee extends TurkTalk {
     super(component);
 
     this.session = component.state.session;
+    this.session.referringNode = component.props.props.node.title;
+
     this.bindConnectionMessage(this.connection);
     this.onDisconnected = this.onDisconnected.bind(this);
     this.playerState = component.props.props;
@@ -55,6 +57,7 @@ class Turkee extends TurkTalk {
     // get room name from persistant storage in case
     // user refreshes the window
     this.session.roomName = this.penName;
+
     let learner = playerState.GetConnectionInfo(null);
     if (learner != null) {
       if (learner.roomName) {

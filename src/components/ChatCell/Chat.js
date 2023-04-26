@@ -211,7 +211,7 @@ class Chat extends React.Component {
       this.onSystemMessage({
         commandChannel: payload.data.local.commandChannel,
         data: isModerator
-          ? `'${payload.data.local.nickName}' connected`
+          ? `'${payload.data.local.nickName}' connected from node '${payload.data.local.referringNodeName}'`
           : `Connected. You are talking to '${payload.data.remote.nickName}'`,
       });
     } catch (error) {
