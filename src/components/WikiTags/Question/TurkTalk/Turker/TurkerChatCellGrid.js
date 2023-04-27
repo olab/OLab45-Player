@@ -15,7 +15,6 @@ import TurkerChatStatusBar from "./TurkerChatStatusBar";
 import Atrium from "../Atrium/Atrium";
 
 import SlotManager from "../SlotManager";
-// import ChatCellManager from "../ChatCellManager";
 import ChatCell from "../../../../ChatCell/ChatCell";
 const persistantStorage =
   require("../../../../../utils/PersistantStorage").PersistantStorage;
@@ -33,22 +32,11 @@ class TurkerChatCellGrid extends React.Component {
     this.numColumns = this.MAX_TURKEES / this.NUM_ROWS;
 
     this.slotManager = this.buildSlotManager();
-
-    // this.chatCellManager = new ChatCellManager({
-    //   totalCount: this.MAX_TURKEES,
-    //   numRows: this.NUM_ROWS,
-    //   jumpMapNodes: this.props.mapNodes,
-    //   moderator: true,
-    //   connection: this.props.connection,
-    //   localInfo: this.props.localInfo,
-    // });
-
     this.roomName = this.props.roomName;
 
     this.state = {
       localSlots: this.slotManager.LocalSlots(),
       remoteSlots: this.slotManager.RemoteSlots(),
-      jumpNodes: this.slotManager.JumpNodes(),
       localInfo: this.props.localInfo,
       showChatGrid: false,
       sessionId: null,
@@ -127,13 +115,11 @@ class TurkerChatCellGrid extends React.Component {
         payload.learner,
         payload.jumpNodes
       );
-      // this.chatCellManager.assignChatParticipant(payload.learner);
 
       this.setState({
         showChatGrid: true,
         remoteSlots: this.slotManager.RemoteSlots(),
         localSlots: this.slotManager.LocalSlots(),
-        jumpNodes: this.slotManager.JumpNodes(),
       });
 
       // update the slot state in storage
@@ -264,7 +250,6 @@ class TurkerChatCellGrid extends React.Component {
           // individual state for each chat grid item)
           const remoteSlot = remoteSlots[index];
           const localSlot = localSlots[index];
-          const jumpNode = jumpNodes[index];
 
           if (localSlot.show) {
             foundConnectedChat = true;
@@ -281,7 +266,6 @@ class TurkerChatCellGrid extends React.Component {
           columns.push(
             <ChatCell
               name="chatcell"
-              mapNodes={jumpNode}
               session={session}
               key={index}
               index={index}

@@ -37,7 +37,6 @@ class Chat extends React.Component {
       conversation: [],
       message: "",
       inMacroMode: false,
-      mapNodes: props.mapNodes,
       inJumpNodeMode: false,
       selectedNode: {},
       selectedNodeId: "0",
@@ -382,14 +381,14 @@ class Chat extends React.Component {
 
   onSelectNode(event) {
     try {
-      let { selectedNodeId, selectedNode, mapNodes } = this.state;
+      let { selectedNodeId, selectedNode, senderInfo } = this.state;
 
       // test for valid turkee selected from available list
       if (event.target.value !== "0") {
         LogInfo(`'onSelectNode[${this.props.index}] (${event.target.value})`);
 
         // find learner in atrium list
-        for (let item of mapNodes) {
+        for (let item of senderInfo.jumpNodes) {
           if (item.id === event.target.value) {
             selectedNode = item;
             selectedNodeId = `${item.id}`;
@@ -534,7 +533,6 @@ class Chat extends React.Component {
       inJumpNodeMode,
       isModerator,
       localInfo,
-      mapNodes,
       maxHeight,
       message,
       selectedNodeId,
@@ -689,7 +687,7 @@ class Chat extends React.Component {
                           <MenuItem key="0" value="0">
                             <em>--Select--</em>
                           </MenuItem>
-                          {mapNodes.map((item) => (
+                          {senderInfo.jumpNodes.map((item) => (
                             <MenuItem key={item.id} value={item.id}>
                               {item.name}
                             </MenuItem>
@@ -768,7 +766,10 @@ class Chat extends React.Component {
         </div>
       );
     } catch (error) {
-      LogException(`render[${this.props.index}]`, error);
+      LogException(
+        `render[${this.props.index}]`,
+        JSON.stringify(error, null, 2)
+      );
       return (
         <>
           <b>"{error.message}"</b>
