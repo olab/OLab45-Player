@@ -12,6 +12,8 @@ class Turkee extends TurkTalk {
 
     this.session = component.state.session;
     this.session.referringNode = component.props.props.node.title;
+    this.session.nodeId = component.props.props.node.id;
+    this.session.mapId = component.props.props.map.id;
 
     this.bindConnectionMessage(this.connection);
     this.onDisconnected = this.onDisconnected.bind(this);
@@ -66,7 +68,7 @@ class Turkee extends TurkTalk {
     }
 
     log.debug(
-      `'${this.connectionId}' registering turker for session: ${JSON.stringify(
+      `'${this.connectionId}' registering turkee for session: ${JSON.stringify(
         this.session,
         null,
         1
