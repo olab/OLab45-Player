@@ -37,7 +37,7 @@ class Chat extends React.Component {
       conversation: [],
       message: "",
       inMacroMode: false,
-      mapNodes: [],
+      mapNodes: props.mapNodes,
       inJumpNodeMode: false,
       selectedNode: {},
       selectedNodeId: "0",
