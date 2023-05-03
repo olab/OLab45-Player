@@ -207,7 +207,7 @@ class Atrium extends React.Component {
 
     return (
       <Grid container>
-        <Grid container item xs={3}>
+        <Grid item xs={3}>
           <FormLabel>Atrium ({atriumLearners.length} waiting)</FormLabel>
           <Select
             value={selectedLearnerUserId}

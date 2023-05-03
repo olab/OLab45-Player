@@ -30,10 +30,14 @@ class TurkTalk {
 
     this.connection = new HubConnectionBuilder()
       .withUrl(hubUrl)
-      // .withUrl(url, { accessTokenFactory: () => this.token })
       // .withAutomaticReconnect()
       .configureLogging(LogLevel.Error)
       .build();
+
+    this.connection.serverTimeoutInMilliseconds = 60000;
+    if (config?.API_URL) {
+      this.connection.serverTimeoutInMilliseconds = config?.API_URL;
+    }
 
     this.connections = [];
   }

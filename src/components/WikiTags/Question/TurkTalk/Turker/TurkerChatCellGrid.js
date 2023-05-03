@@ -13,6 +13,7 @@ import styles from "../../../styles.module.css";
 import localCss from "./TurkerChatCellGrid.module.css";
 import TurkerChatStatusBar from "./TurkerChatStatusBar";
 import Atrium from "../Atrium/Atrium";
+import RememberedLearners from "../RememberedLearners/RememberedLearners";
 
 import SlotManager from "../SlotManager";
 import ChatCell from "../../../../ChatCell/ChatCell";
@@ -346,7 +347,7 @@ class TurkerChatCellGrid extends React.Component {
 
     let common = (
       <Grid container>
-        <Grid container item xs={6}>
+        <Grid item xs={6}>
           <Atrium
             userName={userName}
             connection={this.connection}
@@ -354,19 +355,14 @@ class TurkerChatCellGrid extends React.Component {
             onAtriumUpdate={this.onAtriumUpdate}
           />
         </Grid>
-        <Grid container item xs={2}>
+        <Grid item xs={2}>
           &nbsp;
         </Grid>
-        <Grid container justifyContent="flex-end" item xs={4}>
-          {/* <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            className={localCss.closeButton}
-            onClick={this.onCloseClicked}
-          >
-            &nbsp;Close Room&nbsp;
-          </Button> */}
+        <Grid item xs={4}>
+          <RememberedLearners
+            userName={userName}
+            connection={this.connection}
+          />
         </Grid>
       </Grid>
     );
