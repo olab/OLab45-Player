@@ -39,9 +39,9 @@ async function internalFetch(method, url, payload, headerOverrides = null) {
             jsonData
           )}. try ${tries} of ${retryCount}`
         );
+      } else {
+        return jsonData;
       }
-
-      return jsonData;
     } catch (error) {
       log.error(
         `URL '${url}': ${error.message}. try ${tries} of ${retryCount}`
