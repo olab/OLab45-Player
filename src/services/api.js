@@ -3,6 +3,11 @@ import log from "loglevel";
 import { config } from "../config";
 const playerState = require("../utils/PlayerState").PlayerState;
 
+let retryCount = 10;
+if (config?.API_RETRY_COUNT) {
+  retryCount = Number(config.API_RETRY_COUNT);
+}
+
 async function internalFetch(method, url, payload, headerOverrides = null) {
   let tries = 0;
 
@@ -22,23 +27,29 @@ async function internalFetch(method, url, payload, headerOverrides = null) {
     log.debug(`URL: ${url} payload: ${settings.body})`);
   }
 
-  while (tries++ < 5) {
+  while (tries++ < retryCount) {
     try {
       const response = await fetch(url, settings);
 
       const jsonData = await response.json();
 
       if (jsonData.error_code !== 200) {
-        log.error(`URL '${url}': ${JSON.stringify(jsonData)}`);
+        log.error(
+          `URL '${url}': ${JSON.stringify(
+            jsonData
+          )}. try ${tries} of ${retryCount}`
+        );
       }
 
       return jsonData;
     } catch (error) {
-      log.error(`URL '${url}': ${error.message}`);
+      log.error(
+        `URL '${url}': ${error.message}. try ${tries} of ${retryCount}`
+      );
     }
   }
 
-  log.error(`URL '${url}': max retries exceeded`);
+  log.error(`URL '${url}': max retries ${retryCount} exceeded`);
 
   return {
     data: "max retries exceeded",
