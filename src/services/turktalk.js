@@ -35,8 +35,8 @@ class TurkTalk {
       .build();
 
     this.connection.serverTimeoutInMilliseconds = 60000;
-    if (config?.API_URL) {
-      this.connection.serverTimeoutInMilliseconds = config?.API_URL;
+    if (config?.SIGNALR_TIMEOUT_MS) {
+      this.connection.serverTimeoutInMilliseconds = config?.SIGNALR_TIMEOUT_MS;
     }
 
     this.connections = [];
