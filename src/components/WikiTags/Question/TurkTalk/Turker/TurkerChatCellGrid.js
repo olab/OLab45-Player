@@ -42,6 +42,8 @@ class TurkerChatCellGrid extends React.Component {
       showChatGrid: false,
       sessionId: null,
       userName: this.props.userName,
+      watchedLearners: [],
+      autoAssign: false,
     };
 
     this.connection = this.props.connection;
@@ -105,7 +107,7 @@ class TurkerChatCellGrid extends React.Component {
   // learner has been assigned to the room
   onLearnerAssigned(payload) {
     try {
-      const { localInfo } = this.state;
+      let { localInfo, watchedLearners } = this.state;
 
       // the connected learner's command channel becomes
       // our own local channel
@@ -117,7 +119,11 @@ class TurkerChatCellGrid extends React.Component {
         payload.jumpNodes
       );
 
+      watchedLearners.push(payload.learner);
+      watchedLearners = [...new Set(watchedLearners)];
+
       this.setState({
+        watchedLearners: watchedLearners,
         showChatGrid: true,
         remoteSlots: this.slotManager.RemoteSlots(),
         localSlots: this.slotManager.LocalSlots(),
@@ -342,8 +348,25 @@ class TurkerChatCellGrid extends React.Component {
     this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
   }
 
+  onUpdateWatchedLearners(watchedLearners) {
+    this.setState({
+      watchedLearners: watchedLearners,
+    });
+  }
+
+  onAutoAssign(value) {
+    this.setState({ autoAssign: value });
+  }
+
   render() {
-    const { showChatGrid, localInfo, sessionId, userName } = this.state;
+    const {
+      autoAssign,
+      showChatGrid,
+      localInfo,
+      sessionId,
+      userName,
+      watchedLearners,
+    } = this.state;
 
     let common = (
       <Grid container>
@@ -353,6 +376,8 @@ class TurkerChatCellGrid extends React.Component {
             connection={this.connection}
             onAtriumAssignClicked={this.onAtriumAssignClicked}
             onAtriumUpdate={this.onAtriumUpdate}
+            autoAssign={autoAssign}
+            watchedLearners={watchedLearners}
           />
         </Grid>
         <Grid item xs={2}>
@@ -362,6 +387,8 @@ class TurkerChatCellGrid extends React.Component {
           <RememberedLearners
             userName={userName}
             connection={this.connection}
+            watchedLearners={watchedLearners}
+            onUpdateWatchedLearners={this.onUpdateWatchedLearners}
           />
         </Grid>
       </Grid>

@@ -4,12 +4,10 @@ import {
   Button,
   Grid,
   FormLabel,
-  Table,
-  TableBody,
   MenuItem,
   Select,
-  TableRow,
-  Snackbar,
+  Checkbox,
+  FormControlLabel,
 } from "@material-ui/core";
 import { Log, LogInfo, LogError } from "../../../../../utils/Logger";
 import log from "loglevel";
@@ -24,24 +22,46 @@ class RememberedLearners extends React.Component {
     super(props);
 
     this.state = {
-      learners: [],
+      watchedLearners: this.props.watchedLearners,
       selectedLearnerUserId: "0",
+      autoAssign: false,
     };
+
+    this.onUnrememberClicked = this.onUnrememberClicked.bind(this);
+    this.onAutoRememberClicked = this.onAutoRememberClicked.bind(this);
+    this.onLearnerSelected = this.onLearnerSelected.bind(this);
+  }
+
+  onLearnerSelected(event) {
+    let { selectedLearnerUserId, watchedLearners, localInfo } = this.state;
+
+    // test for valid turkee selected from available list
+    if (event.target.value !== "0") {
+      log.debug(`onLearnerSelected: ${event.target.value}`);
+
+      // find learner in atrium list
+      for (let item of watchedLearners) {
+        if (item.userId === event.target.value) {
+          selectedLearnerUserId = item.userId;
+        }
+      }
+
+      this.setState({ selectedLearnerUserId: selectedLearnerUserId });
+    }
   }
 
   onUnrememberClicked(event) {
-    let { localInfo } = this.state;
-
     try {
-      const { selectedLearnerUserId } = this.state;
-      let selectedLearner = null;
+      const { watchedLearners, selectedLearnerUserId } = this.state;
 
+      // don't do anything if nothing selected
       if (selectedLearnerUserId == undefined || selectedLearnerUserId == "0") {
         return;
       }
 
       // get unassigned atrium learner from list
-      for (let item of this.state.learners) {
+      let selectedLearner = null;
+      for (let item of watchedLearners) {
         if (item.userId === selectedLearnerUserId) {
           selectedLearner = item;
         }
@@ -53,22 +73,35 @@ class RememberedLearners extends React.Component {
         );
       }
 
-      // save remembered state to local storage
-      this.updateRememberedLearnerState();
+      // signal watched learners change to parent
+      if (this.props.onUpdateWatchedLearners) {
+        log.debug(
+          `new watched learners ${JSON.stringify(watchedLearners, null, 2)}`
+        );
+        this.props.onUpdateWatchedLearners(watchedLearners);
+      } else {
+        throw new Error("onUpdateWatchedLearners callback not set");
+      }
     } catch (error) {
-      LogError(
-        `'${this.connectionId}' onUnrememberClicked exception: ${error.message}`
-      );
+      log.error(`'onUnrememberClicked exception: ${error.message}`);
     }
   }
 
+  onAutoRememberClicked(event) {
+    log.debug(`'onAutoRememberClicked clicked`);
+    const { autoAssign } = this.state;
+    this.setState({
+      autoAssign: !autoAssign,
+    });
+  }
+
   render() {
-    const { learners, selectedLearnerUserId } = this.state;
+    const { watchedLearners, selectedLearnerUserId, autoAssign } = this.state;
 
     return (
-      <Grid container direction="row">
-        <Grid item xs={4}>
-          <FormLabel>{learners.length} remembered learners</FormLabel>
+      <Grid container direction="row" justifyContent="flex-end">
+        <Grid item xs={7}>
+          <FormLabel>{watchedLearners.length} remembered learners</FormLabel>
           <Select
             value={selectedLearnerUserId}
             onChange={this.onLearnerSelected}
@@ -77,14 +110,15 @@ class RememberedLearners extends React.Component {
             <MenuItem key="0" value="0">
               <em>--Select--</em>
             </MenuItem>
-            {learners.map((item) => (
+            {watchedLearners.map((item) => (
               <MenuItem key={item.userId} value={item.userId}>
                 {item.nickName}
               </MenuItem>
             ))}
           </Select>
         </Grid>
-        <Grid container item xs={1}>
+
+        <Grid container item xs={2}>
           <Button
             variant="contained"
             color="primary"
@@ -92,8 +126,23 @@ class RememberedLearners extends React.Component {
             className={localCss.assignButton}
             onClick={this.onUnrememberClicked}
           >
-            &nbsp;Assign&nbsp;
+            &nbsp;Forget&nbsp;
           </Button>
+        </Grid>
+
+        <Grid item xs={3}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={autoAssign}
+                onChange={this.onAutoRememberClicked}
+                name="checkedF"
+                color="primary"
+              />
+            }
+            labelPlacement="top"
+            label="Auto-assign"
+          />
         </Grid>
       </Grid>
     );

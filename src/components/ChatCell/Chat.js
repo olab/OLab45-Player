@@ -161,9 +161,7 @@ class Chat extends React.Component {
         });
       }
     } catch (error) {
-      LogError(
-        `onAtriumAssigned[${this.props.index}] exception: ${error.message}`
-      );
+      log.error(`onAtriumAssigned[${this.props.index}]`, error.message);
     }
   }
 
@@ -216,9 +214,7 @@ class Chat extends React.Component {
           : `Connected. You are talking to '${payload.data.remote.nickName}'`,
       });
     } catch (error) {
-      LogError(
-        `onParticipantAssigned[${this.props.index}] exception: ${error.message}`
-      );
+      log.error(`onParticipantAssigned[${this.props.index}]`, error.message);
     }
   }
 
@@ -263,7 +259,7 @@ class Chat extends React.Component {
         data: `'${payload.data.participant.nickName}' was disconnected`,
       });
     } catch (error) {
-      LogException(`onLearnerUnassigned[${this.props.index}]`, error);
+      log.error(`onLearnerUnassigned[${this.props.index}]`, error.message);
     }
   }
 
@@ -283,7 +279,7 @@ class Chat extends React.Component {
       payload.isSystemMessage = true;
       this.onMessage(payload);
     } catch (error) {
-      LogException(`onSystemMessage[${this.props.index}]`, error);
+      log.error(`onSystemMessage[${this.props.index}]`, error.message);
     }
   }
 
@@ -326,7 +322,7 @@ class Chat extends React.Component {
       this.setState({ conversation: conversation });
       this.scrollToBottom();
     } catch (error) {
-      LogException(`onMessage[${this.props.index}]`, error);
+      log.error(`onMessage[${this.props.index}]`, error.message);
     }
   }
 
@@ -366,7 +362,7 @@ class Chat extends React.Component {
 
       this.setState({ inJumpNodeMode: false });
     } catch (error) {
-      LogException(`onClickJumpNode[${this.props.index}]`, error);
+      log.error(`onClickJumpNode[${this.props.index}]`, error.message);
     }
   };
 
