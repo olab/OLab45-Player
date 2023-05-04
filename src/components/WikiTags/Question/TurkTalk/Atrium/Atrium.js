@@ -91,11 +91,22 @@ class Atrium extends React.Component {
           )}'`
         );
 
-        if (previousAtriumCount != atriumLearners.length) {
-          if (this.props.onAtriumUpdate) {
-            this.props.onAtriumUpdate(atriumLearners);
-          }
+        if (this.props.onAtriumUpdate) {
+          this.props.onAtriumUpdate(atriumLearners);
+        }
 
+        let selectedLearner = null;
+        // get unassigned atrium learner from list
+        for (let item of this.state.atriumLearners) {
+          if (item.userId === selectedLearnerUserId) {
+            selectedLearner = item;
+          }
+        }
+
+        // try and do some smart prevention of
+        // losing a currently selected learner
+        // based on if one was previously selected.
+        if (selectedLearner == null) {
           this.setState({
             atriumLearners: atriumLearners,
             selectedLearnerUserId: "0",
@@ -103,7 +114,6 @@ class Atrium extends React.Component {
         } else {
           this.setState({
             atriumLearners: atriumLearners,
-            selectedLearnerUserId: "0",
           });
         }
 
@@ -144,6 +154,11 @@ class Atrium extends React.Component {
       if (this.props.onAtriumAssignClicked) {
         this.props.onAtriumAssignClicked(selectedLearner);
       }
+
+      // reset the selected learner to empty
+      this.setState({
+        selectedLearnerUserId: "0",
+      });
 
       // save atrium state to local storage
       this.updateAtriumState();
