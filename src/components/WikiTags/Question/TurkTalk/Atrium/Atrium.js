@@ -1,22 +1,7 @@
 // @flow
 import * as React from "react";
-import {
-  Button,
-  Grid,
-  FormLabel,
-  Table,
-  TableBody,
-  MenuItem,
-  Select,
-  TableRow,
-  Snackbar,
-} from "@material-ui/core";
-import { Log, LogInfo, LogError } from "../../../../../utils/Logger";
+import { LogError } from "../../../../../utils/Logger";
 import log from "loglevel";
-import { withStyles } from "@material-ui/core/styles";
-import localCss from "./Atrium.module.css";
-import styles from "../../../styles.module.css";
-import Participant from "../../../../../helpers/participant";
 import SlotInfo from "../../../../../helpers/SlotInfo";
 import AssigneeSearchableList from "./AssigneeSearchableList/AssigneeSearchableList";
 const playerState = require("../../../../../utils/PlayerState").PlayerState;
@@ -37,10 +22,7 @@ class Atrium extends React.Component {
       localInfo: new SlotInfo(),
     };
 
-    this.onAssignClicked = this.onAssignClicked.bind(this);
-    this.onAtriumLearnerSelected = this.onAtriumLearnerSelected.bind(this);
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
-    this.onTurkeeSelected = this.onAtriumLearnerSelected.bind(this);
 
     var atriumSelf = this;
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
@@ -49,8 +31,6 @@ class Atrium extends React.Component {
   }
 
   onCommand(payload) {
-    let { localInfo } = this.state;
-
     try {
       if (payload.command === constants.SIGNALCMD_ATRIUMUPDATE) {
         log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
@@ -125,75 +105,31 @@ class Atrium extends React.Component {
     }
   }
 
-  onAssignClicked(event) {
-    try {
-      const { atriumLearners, selectedLearnerUserId } = this.state;
-      let selectedLearner = null;
+  assignAtriumLearner({ id: userId }) {
+    log.debug(
+      `assignAtriumLearner '${this.connectionId}': ${userId}`
+    );
 
-      if (selectedLearnerUserId == undefined || selectedLearnerUserId == "0") {
-        return;
-      }
+    const { atriumLearners } = this.state;
+    const selectedLearner = atriumLearners.find(learner => learner.userId == userId);
 
-      // get unassigned atrium learner from list
-      for (let item of atriumLearners) {
-        if (item.userId === selectedLearnerUserId) {
-          selectedLearner = item;
-        }
-      }
-
-      if (!selectedLearner) {
-        throw new Error(
-          `Unable to find unassigned learner ${selectedLearnerUserId}`
-        );
-      }
-
-      // signal the parent component of a learner assignment
-      if (this.props.onAtriumAssignClicked) {
-        this.props.onAtriumAssignClicked(selectedLearner);
-      }
-
-      // reset the selected learner to empty
-      this.setState({
-        selectedLearnerUserId: "0",
-      });
-
-      // save atrium state to local storage
-      this.updateAtriumState();
-    } catch (error) {
-      LogError(
-        `'${this.connectionId}' onAssignClicked exception: ${error.message}`
-      );
+    if ( ! selectedLearner ) {
+      LogError('Could not find learner to assign', userId);
+      return;
     }
-  }
 
-  onAtriumLearnerSelected(event) {
-    let { localInfo } = this.state;
-
-    try {
-      let { selectedLearnerUserId, atriumLearners, localInfo } = this.state;
-
-      // test for valid turkee selected from available list
-      if (event.target.value !== "0") {
-        log.debug(
-          `onAtriumLearnerSelected '${this.connectionId}': ${event.target.value}`
-        );
-
-        // find learner in atrium list
-        for (let item of this.state.atriumLearners) {
-          if (item.userId === event.target.value) {
-            selectedLearnerUserId = item.userId;
-          }
-        }
-
-        this.setState({ selectedLearnerUserId: selectedLearnerUserId });
-
-        this.updateAtriumState();
-      }
-    } catch (error) {
-      LogError(
-        `'${this.connectionId}' onAtriumLearnerSelected exception: ${error.message}`
-      );
+    // signal the parent component of a learner assignment
+    if (this.props.onAtriumAssignClicked) {
+      this.props.onAtriumAssignClicked(selectedLearner);
     }
+
+    // reset the selected learner to empty
+    this.setState({
+      selectedLearnerUserId: "0",
+    });
+
+    // save atrium state to local storage
+    this.updateAtriumState();
   }
 
   updateAtriumState() {
@@ -215,55 +151,19 @@ class Atrium extends React.Component {
   }
 
   render() {
-    const { atriumLearners, selectedLearnerUserId } = this.state;
+    const { atriumLearners } = this.state;
+    const learnersList = atriumLearners.map(learner => ({
+      id: learner.userId,
+      text: learner.nickName
+    }))
 
     return (
-      <>
-        <FormLabel>Atrium ({atriumLearners.length} waiting)</FormLabel>
+      <div>
+        <small>Atrium ({atriumLearners.length} waiting)</small>
         <AssigneeSearchableList
-          list={atriumLearners.map(learner => ({
-            id: learner.userId,
-            text: learner.nickName
-          }))}
-          selectItem={({ id }) =>
-          {
-            // select a learner by id from the atrium list
-            const learner = atriumLearners.find(learner => learner.userId == id)
-            log.debug('atrium learner selected', learner)
-          }}
-          />
-
-        <Grid container>
-          <Grid item xs={3}>
-            <FormLabel>Atrium ({atriumLearners.length} waiting)</FormLabel>
-            <Select
-              value={selectedLearnerUserId}
-              onChange={this.onAtriumLearnerSelected}
-              style={{ width: "100%" }}
-            >
-              <MenuItem key="0" value="0">
-                <em>--Select--</em>
-              </MenuItem>
-              {atriumLearners.map((item) => (
-                <MenuItem key={item.userId} value={item.userId}>
-                  {item.nickName}
-                </MenuItem>
-              ))}
-            </Select>
-          </Grid>
-          <Grid container item xs={1}>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              className={localCss.assignButton}
-              onClick={this.onAssignClicked}
-            >
-              &nbsp;Assign&nbsp;
-            </Button>
-          </Grid>
-        </Grid>
-      </>
+          list={learnersList}
+          selectItem={this.assignAtriumLearner.bind(this)} />
+      </div>
     );
   }
 }
