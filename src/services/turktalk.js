@@ -30,8 +30,8 @@ class TurkTalk {
 
     this.connection = new HubConnectionBuilder()
       .withUrl(hubUrl)
-      // .withAutomaticReconnect()
-      .configureLogging(LogLevel.Error)
+      .withAutomaticReconnect()
+      .configureLogging(LogLevel.Information)
       .build();
 
     this.connection.serverTimeoutInMilliseconds = 60000;

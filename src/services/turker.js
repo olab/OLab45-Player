@@ -91,7 +91,7 @@ class Turker extends TurkTalk {
   // *****
   onDisconnected() {
     try {
-      log.debug(`'${this.connectionId}' onDisconnected`);
+      log.warn(`'${this.connectionId}' onDisconnected`);
       if (this.component.onConnectionChanged) {
         if (this.component.onConnectionChanged) {
           this.component.onConnectionChanged({
@@ -109,7 +109,7 @@ class Turker extends TurkTalk {
 
   onReconnecting(error) {
     try {
-      log.debug(`'${this.connectionId}' onReconnecting: ${error}`);
+      log.warn(`'${this.connectionId}' onReconnecting: ${error}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -126,7 +126,7 @@ class Turker extends TurkTalk {
 
   onReconnected(connectionId) {
     try {
-      log.debug(`'${this.connectionId}' onReconnected: ${connectionId}`);
+      log.warn(`'${this.connectionId}' onReconnected: ${connectionId}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
