@@ -50,11 +50,11 @@ class ChatCell extends React.Component {
         session,
       } = this.state;
 
-      log.debug(
-        `ChatCell[${this.props.index}] render. localInfo: ${JSON.stringify(
-          localInfo
-        )}`
-      );
+      // log.debug(
+      //   `ChatCell[${this.props.index}] render. localInfo: ${JSON.stringify(
+      //     localInfo
+      //   )}`
+      // );
 
       let cellStyling = Object.assign({ padding: 7 }, this.props.style);
       if (!localInfo.show) {

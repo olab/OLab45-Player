@@ -34,7 +34,7 @@ class TurkTalk {
       .configureLogging(LogLevel.Information)
       .build();
 
-    this.connection.serverTimeoutInMilliseconds = 60000;
+    this.connection.serverTimeoutInMilliseconds = 120000;
 
     if (config?.SIGNALR_TIMEOUT_MS) {
       this.connection.serverTimeoutInMilliseconds = Number(

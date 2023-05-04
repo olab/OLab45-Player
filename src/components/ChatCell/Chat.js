@@ -97,9 +97,6 @@ class Chat extends React.Component {
       let { isModerator, localInfo, senderInfo } = this.state;
 
       if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
-        log.debug(
-          `'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`
-        );
         this.onAtriumAssigned(payload);
       }
 
@@ -109,9 +106,6 @@ class Chat extends React.Component {
         );
         this.onModeratorAssigned(payload.data);
       } else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-        log.debug(
-          `'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`
-        );
         this.onParticipantAssigned(payload);
       } else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
         log.debug(
@@ -145,7 +139,11 @@ class Chat extends React.Component {
   // so paint a message to the chat window
   onAtriumAssigned(payload) {
     try {
-      let { localInfo, isModerator } = this.state;
+      let { localInfo, isModerator, index } = this.state;
+
+      if (isModerator && payload.data.slotIndex != index) {
+        return;
+      }
 
       LogInfo(
         `'onAtriumAssigned[${this.props.index}] (${JSON.stringify(
@@ -177,8 +175,12 @@ class Chat extends React.Component {
       let remoteInfo = {};
       let session = {};
 
-      // test if assignment is for this cell (moderators only,
+      // test if assignment is for this room (moderators only,
       // since routing to a specific chat is required)
+      if (isModerator && payload.data.local.roomName != localInfo.roomName) {
+        return;
+      }
+
       if (isModerator && payload.data.slotIndex != index) {
         return;
       }
@@ -225,6 +227,13 @@ class Chat extends React.Component {
   onParticipantUnassigned(payload) {
     try {
       let { isModerator, localInfo, senderInfo, index } = this.state;
+
+      if (
+        isModerator &&
+        payload.data.participant.roomName != localInfo.roomName
+      ) {
+        return;
+      }
 
       // test if assignment is for this cell (moderators only,
       // since routing to a specific chat is required)
@@ -283,20 +292,13 @@ class Chat extends React.Component {
     try {
       const { conversation, localInfo, senderInfo } = this.state;
 
-      LogInfo(
-        `'onMessage[${this.props.index}] (${JSON.stringify(payload, null, 1)})`
-      );
-
       // ensure the message was for this chat box
       if (payload.commandChannel !== localInfo.commandChannel) {
-        LogInfo(
-          `'${localInfo.connectionId}' onMessage message not for '${localInfo.commandChannel}'`
-        );
         return;
       }
 
       LogInfo(
-        `'${localInfo.connectionId}' onMessage message for '${localInfo.commandChannel}'`
+        `'${localInfo.connectionId}' onMessage message for '${localInfo.commandChannel}' ${payload.data}`
       );
 
       // tri-ary flag:
@@ -308,9 +310,6 @@ class Chat extends React.Component {
       // if not system message, determine locality
       // of message
       if (!payload.isSystemMessage) {
-        LogInfo(
-          `'${localInfo.connectionId}' system message.  testing message direction: ('${senderInfo.userId}' == '${payload.from}'?)`
-        );
         isLocal = localInfo.userId == payload.from;
       } else {
         // 'normal' message, so we can signal
@@ -541,8 +540,9 @@ class Chat extends React.Component {
       width,
     } = this.state;
 
-    if (!show) {
-      log.debug(`Chat[${this.props.index}] not showing render`);
+    if (show) {
+      log.debug(`Chat[${this.props.index}] showing render`);
+    } else {
       return null;
     }
 

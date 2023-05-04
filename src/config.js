@@ -7,8 +7,8 @@ const prod = {
 };
 
 const dev = {
-  API_URL: "https://localhost:5001/olab/api/v3",
-  TTALK_HUB_URL: "https://localhost:5002/turktalk",
+  API_URL: "https://everest.cardinalcreek.ca/olab/api/v3",
+  TTALK_HUB_URL: "https://everest.cardinalcreek.ca/turktalk",
   SIGNALR_TIMEOUT_MS: 180000,
   API_RETRY_COUNT: 10,
 };
