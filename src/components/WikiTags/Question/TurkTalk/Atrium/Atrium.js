@@ -18,6 +18,7 @@ import localCss from "./Atrium.module.css";
 import styles from "../../../styles.module.css";
 import Participant from "../../../../../helpers/participant";
 import SlotInfo from "../../../../../helpers/SlotInfo";
+import AssigneeSearchableList from "./AssigneeSearchableList/AssigneeSearchableList";
 const playerState = require("../../../../../utils/PlayerState").PlayerState;
 var constants = require("../../../../../services/constants");
 
@@ -217,36 +218,52 @@ class Atrium extends React.Component {
     const { atriumLearners, selectedLearnerUserId } = this.state;
 
     return (
-      <Grid container>
-        <Grid item xs={3}>
-          <FormLabel>Atrium ({atriumLearners.length} waiting)</FormLabel>
-          <Select
-            value={selectedLearnerUserId}
-            onChange={this.onAtriumLearnerSelected}
-            style={{ width: "100%" }}
-          >
-            <MenuItem key="0" value="0">
-              <em>--Select--</em>
-            </MenuItem>
-            {atriumLearners.map((item) => (
-              <MenuItem key={item.userId} value={item.userId}>
-                {item.nickName}
+      <>
+        <FormLabel>Atrium ({atriumLearners.length} waiting)</FormLabel>
+        <AssigneeSearchableList
+          list={atriumLearners.map(learner => ({
+            id: learner.userId,
+            text: learner.nickName
+          }))}
+          selectItem={({ id }) =>
+          {
+            // select a learner by id from the atrium list
+            const learner = atriumLearners.find(learner => learner.userId == id)
+            log.debug('atrium learner selected', learner)
+          }}
+          />
+
+        <Grid container>
+          <Grid item xs={3}>
+            <FormLabel>Atrium ({atriumLearners.length} waiting)</FormLabel>
+            <Select
+              value={selectedLearnerUserId}
+              onChange={this.onAtriumLearnerSelected}
+              style={{ width: "100%" }}
+            >
+              <MenuItem key="0" value="0">
+                <em>--Select--</em>
               </MenuItem>
-            ))}
-          </Select>
+              {atriumLearners.map((item) => (
+                <MenuItem key={item.userId} value={item.userId}>
+                  {item.nickName}
+                </MenuItem>
+              ))}
+            </Select>
+          </Grid>
+          <Grid container item xs={1}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              className={localCss.assignButton}
+              onClick={this.onAssignClicked}
+            >
+              &nbsp;Assign&nbsp;
+            </Button>
+          </Grid>
         </Grid>
-        <Grid container item xs={1}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            className={localCss.assignButton}
-            onClick={this.onAssignClicked}
-          >
-            &nbsp;Assign&nbsp;
-          </Button>
-        </Grid>
-      </Grid>
+      </>
     );
   }
 }
