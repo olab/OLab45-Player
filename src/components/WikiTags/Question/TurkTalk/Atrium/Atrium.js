@@ -64,11 +64,9 @@ class Atrium extends React.Component {
 
   // handle atrium contents updated
   onAtriumUpdate(payloadArray) {
-    let { localInfo, atriumLearners } = this.state;
+    let { atriumLearners, selectedLearnerUserId } = this.state;
 
     try {
-      const previousAtriumCount = atriumLearners.length;
-
       atriumLearners = [];
 
       // save atrium contents if array passed in
@@ -97,7 +95,7 @@ class Atrium extends React.Component {
 
         let selectedLearner = null;
         // get unassigned atrium learner from list
-        for (let item of this.state.atriumLearners) {
+        for (let item of atriumLearners) {
           if (item.userId === selectedLearnerUserId) {
             selectedLearner = item;
           }
@@ -127,10 +125,8 @@ class Atrium extends React.Component {
   }
 
   onAssignClicked(event) {
-    let { localInfo } = this.state;
-
     try {
-      const { selectedLearnerUserId } = this.state;
+      const { atriumLearners, selectedLearnerUserId } = this.state;
       let selectedLearner = null;
 
       if (selectedLearnerUserId == undefined || selectedLearnerUserId == "0") {
@@ -138,7 +134,7 @@ class Atrium extends React.Component {
       }
 
       // get unassigned atrium learner from list
-      for (let item of this.state.atriumLearners) {
+      for (let item of atriumLearners) {
         if (item.userId === selectedLearnerUserId) {
           selectedLearner = item;
         }
