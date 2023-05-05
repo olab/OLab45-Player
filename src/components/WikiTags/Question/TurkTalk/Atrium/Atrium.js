@@ -11,7 +11,6 @@ class Atrium extends React.Component {
   constructor(props) {
     super(props);
 
-    let atrium = playerState.GetAtrium();
     this.connection = this.props.connection;
     this.connectionId = this.props.connection.connectionId?.slice(-3);
 
@@ -20,9 +19,11 @@ class Atrium extends React.Component {
       selectedLearnerUserId: "0",
       userName: this.props.userName,
       localInfo: new SlotInfo(),
+      watchProfile: this.props.watchProfile,
     };
 
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
+    this.onAtriumAssignClicked = this.onAtriumAssignClicked.bind(this);
 
     var atriumSelf = this;
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
@@ -45,7 +46,7 @@ class Atrium extends React.Component {
 
   // handle atrium contents updated
   onAtriumUpdate(payloadArray) {
-    let { atriumLearners, selectedLearnerUserId } = this.state;
+    let { atriumLearners, selectedLearnerUserId, autoAssign } = this.state;
 
     try {
       atriumLearners = [];
@@ -105,46 +106,60 @@ class Atrium extends React.Component {
     }
   }
 
-  assignAtriumLearner({ id: userId }) {
-    log.debug(
-      `assignAtriumLearner '${this.connectionId}': ${userId}`
-    );
+  onAtriumAssignClicked({ id: userId }) {
+    try {
+      log.debug(`assignAtriumLearner '${this.connectionId}': ${userId}`);
 
-    const { atriumLearners } = this.state;
-    const selectedLearner = atriumLearners.find(learner => learner.userId == userId);
+      let { atriumLearners, watchedLearners } = this.state;
+      const selectedLearner = atriumLearners.find(
+        (learner) => learner.userId == userId
+      );
 
-    if ( ! selectedLearner ) {
-      LogError('Could not find learner to assign', userId);
-      return;
+      if (!selectedLearner) {
+        LogError("Could not find learner to assign", userId);
+        return;
+      }
+
+      // signal the parent component of a learner assignment
+      if (this.props.onAtriumAssignClicked) {
+        this.props.onAtriumAssignClicked(selectedLearner);
+      }
+
+      // reset the selected learner to empty
+      this.setState({
+        selectedLearnerUserId: "0",
+      });
+
+      // save atrium state to local storage
+      this.updateAtriumState();
+    } catch (error) {
+      log.error(
+        `'${this.connectionId}' onAtriumAssignClicked exception: ${error.message}`
+      );
     }
-
-    // signal the parent component of a learner assignment
-    if (this.props.onAtriumAssignClicked) {
-      this.props.onAtriumAssignClicked(selectedLearner);
-    }
-
-    // reset the selected learner to empty
-    this.setState({
-      selectedLearnerUserId: "0",
-    });
-
-    // save atrium state to local storage
-    this.updateAtriumState();
   }
 
   updateAtriumState() {
-    let { selectedLearnerUserId, atriumLearners, localInfo } = this.state;
+    let {
+      selectedLearnerUserId,
+      atriumLearners,
+      localInfo,
+      watchedLearners,
+      autoAssign,
+    } = this.state;
 
     try {
       const state = {
         roomName: localInfo.roomName,
         selectedLearnerUserId,
         atriumLearners,
+        watchedLearners,
+        autoAssign,
       };
 
       playerState.SetAtrium(state);
     } catch (error) {
-      LogError(
+      log.error(
         `'${this.connectionId}' updateAtriumState exception: ${error.message}`
       );
     }
@@ -152,17 +167,17 @@ class Atrium extends React.Component {
 
   render() {
     const { atriumLearners } = this.state;
-    const learnersList = atriumLearners.map(learner => ({
+    const learnersList = atriumLearners.map((learner) => ({
       id: learner.userId,
-      text: learner.nickName
-    }))
+      text: learner.nickName,
+    }));
 
     return (
       <div>
-        <small>Atrium ({atriumLearners.length} waiting)</small>
         <AssigneeSearchableList
           list={learnersList}
-          selectItem={this.assignAtriumLearner.bind(this)} />
+          onAtriumAssignClicked={this.onAtriumAssignClicked}
+        />
       </div>
     );
   }

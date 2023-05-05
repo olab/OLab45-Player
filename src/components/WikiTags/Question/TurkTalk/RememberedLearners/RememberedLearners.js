@@ -8,13 +8,10 @@ import {
   Select,
   Checkbox,
   FormControlLabel,
+  Tooltip,
 } from "@material-ui/core";
-import { Log, LogInfo, LogError } from "../../../../../utils/Logger";
 import log from "loglevel";
-import { withStyles } from "@material-ui/core/styles";
-import styles from "../../../styles.module.css";
 import localCss from "./RememberedLearners.module.css";
-const playerState = require("../../../../../utils/PlayerState").PlayerState;
 var constants = require("../../../../../services/constants");
 
 class RememberedLearners extends React.Component {
@@ -22,13 +19,12 @@ class RememberedLearners extends React.Component {
     super(props);
 
     this.state = {
-      watchedLearners: this.props.watchedLearners,
       selectedLearnerUserId: "0",
-      autoAssign: false,
+      watchProfile: this.props.watchProfile,
     };
 
     this.onUnrememberClicked = this.onUnrememberClicked.bind(this);
-    this.onAutoRememberClicked = this.onAutoRememberClicked.bind(this);
+    this.onClickAutoAssign = this.onClickAutoAssign.bind(this);
     this.onLearnerSelected = this.onLearnerSelected.bind(this);
   }
 
@@ -75,9 +71,6 @@ class RememberedLearners extends React.Component {
 
       // signal watched learners change to parent
       if (this.props.onUpdateWatchedLearners) {
-        log.debug(
-          `new watched learners ${JSON.stringify(watchedLearners, null, 2)}`
-        );
         this.props.onUpdateWatchedLearners(watchedLearners);
       } else {
         throw new Error("onUpdateWatchedLearners callback not set");
@@ -87,21 +80,24 @@ class RememberedLearners extends React.Component {
     }
   }
 
-  onAutoRememberClicked(event) {
-    log.debug(`'onAutoRememberClicked clicked`);
-    const { autoAssign } = this.state;
-    this.setState({
-      autoAssign: !autoAssign,
-    });
+  onClickAutoAssign(event) {
+    // signal watched learners change to parent
+    if (this.props.onClickAutoAssign) {
+      this.props.onClickAutoAssign(event.target.checked);
+    } else {
+      throw new Error("onClickAutoAssign callback not set");
+    }
   }
 
   render() {
-    const { watchedLearners, selectedLearnerUserId, autoAssign } = this.state;
+    const { watchProfile, selectedLearnerUserId } = this.state;
 
     return (
       <Grid container direction="row" justifyContent="flex-end">
         <Grid item xs={7}>
-          <FormLabel>{watchedLearners.length} remembered learners</FormLabel>
+          <FormLabel>
+            {watchProfile.watchedLearners.length} remembered learners
+          </FormLabel>
           <Select
             value={selectedLearnerUserId}
             onChange={this.onLearnerSelected}
@@ -110,7 +106,7 @@ class RememberedLearners extends React.Component {
             <MenuItem key="0" value="0">
               <em>--Select--</em>
             </MenuItem>
-            {watchedLearners.map((item) => (
+            {watchProfile.watchedLearners.map((item) => (
               <MenuItem key={item.userId} value={item.userId}>
                 {item.nickName}
               </MenuItem>
@@ -119,26 +115,34 @@ class RememberedLearners extends React.Component {
         </Grid>
 
         <Grid container item xs={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            className={localCss.assignButton}
-            onClick={this.onUnrememberClicked}
+          <Tooltip
+            title="Remove learner from watch list"
+            aria-label="add"
+            placement="top"
           >
-            &nbsp;Forget&nbsp;
-          </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              className={localCss.assignButton}
+              onClick={this.onUnrememberClicked}
+            >
+              &nbsp;Forget&nbsp;
+            </Button>
+          </Tooltip>
         </Grid>
 
         <Grid item xs={3}>
           <FormControlLabel
             control={
-              <Checkbox
-                checked={autoAssign}
-                onChange={this.onAutoRememberClicked}
-                name="checkedF"
-                color="primary"
-              />
+              <Tooltip title="Auto assign when learner arrives" placement="top">
+                <Checkbox
+                  checked={watchProfile.autoAssign}
+                  onChange={this.onClickAutoAssign}
+                  name="checkedF"
+                  color="primary"
+                />
+              </Tooltip>
             }
             labelPlacement="top"
             label="Auto-assign"

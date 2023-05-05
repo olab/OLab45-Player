@@ -72,8 +72,6 @@ class Chat extends React.Component {
       chatSelf.onSystemMessage(payload);
     });
 
-    log.debug(`Chat[${this.props.index}] ctor`);
-
     this.messageRef = React.createRef();
   }
 
@@ -549,7 +547,7 @@ class Chat extends React.Component {
     };
     const systemMessageStyle = {
       border: "none",
-      backgroundColor: "grey",
+      backgroundColor: "green",
       color: "white",
       borderRadius: "25px",
       fontSize: "14px",
@@ -724,7 +722,7 @@ class Chat extends React.Component {
                     {!inJumpNodeMode && isModerator && (
                       <>
                         <Tooltip
-                          title="Enter Node Selection Mode"
+                          title="Enter node selection mode"
                           placement="top"
                         >
                           <span>
