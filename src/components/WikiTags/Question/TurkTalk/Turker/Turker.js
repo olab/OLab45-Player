@@ -325,6 +325,7 @@ class OlabModeratorTag extends React.Component {
         <>
           <Grid container item xs={12}>
             <TurkerChatCellGrid
+              props={this.props}
               gridMessage={gridMessage}
               onScreenPopup={this.onScreenPopup}
               userName={userName}

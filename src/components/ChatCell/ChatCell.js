@@ -24,8 +24,6 @@ class ChatCell extends React.Component {
 
     // var self = this;
     // this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
-
-    log.debug(`ChatCell[${this.props.index}] ctor`);
   }
 
   componentDidUpdate(prevProps) {

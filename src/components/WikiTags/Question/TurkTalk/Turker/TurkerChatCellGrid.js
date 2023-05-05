@@ -2,21 +2,16 @@
 import * as React from "react";
 import { Button, Table, TableBody, TableRow, Grid } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-import {
-  Log,
-  LogInfo,
-  LogError,
-  LogException,
-} from "../../../../../utils/Logger";
+import { LogException } from "../../../../../utils/Logger";
 import log from "loglevel";
 import styles from "../../../styles.module.css";
 import localCss from "./TurkerChatCellGrid.module.css";
 import TurkerChatStatusBar from "./TurkerChatStatusBar";
 import Atrium from "../Atrium/Atrium";
 import RememberedLearners from "../RememberedLearners/RememberedLearners";
-
 import SlotManager from "../SlotManager";
 import ChatCell from "../../../../ChatCell/ChatCell";
+import WatchedLearners from "./WatchedLearners";
 const persistantStorage =
   require("../../../../../utils/PersistantStorage").PersistantStorage;
 
@@ -35,6 +30,11 @@ class TurkerChatCellGrid extends React.Component {
     this.slotManager = this.buildSlotManager();
     this.roomName = this.props.roomName;
 
+    this.watchLearnerHelper = new WatchedLearners(
+      this.props.props.props.map.id,
+      this.props.props.props.question
+    );
+
     this.state = {
       localSlots: this.slotManager.LocalSlots(),
       remoteSlots: this.slotManager.RemoteSlots(),
@@ -42,6 +42,7 @@ class TurkerChatCellGrid extends React.Component {
       showChatGrid: false,
       sessionId: null,
       userName: this.props.userName,
+      watchProfile: this.watchLearnerHelper.watchProfile,
     };
 
     this.connection = this.props.connection;
@@ -50,6 +51,8 @@ class TurkerChatCellGrid extends React.Component {
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
     this.onCloseClicked = this.onCloseClicked.bind(this);
     this.onPopupMessage = this.onPopupMessage.bind(this);
+    this.onUpdateWatchedLearners = this.onUpdateWatchedLearners.bind(this);
+    this.onClickAutoAssign = this.onClickAutoAssign.bind(this);
 
     var turkerChatCellGridSelf = this;
     if (this.connection) {
@@ -105,7 +108,7 @@ class TurkerChatCellGrid extends React.Component {
   // learner has been assigned to the room
   onLearnerAssigned(payload) {
     try {
-      const { localInfo } = this.state;
+      let { localInfo, watchedLearners } = this.state;
 
       // the connected learner's command channel becomes
       // our own local channel
@@ -294,40 +297,80 @@ class TurkerChatCellGrid extends React.Component {
     }
   }
 
-  onAtriumAssignClicked(selectedLearner) {
-    let { localInfo } = this.state;
-    log.debug(
-      `onAtriumAssignClicked '${
-        this.connectionId
-      }': learner = '${JSON.stringify(selectedLearner, null, 2)}' `
-    );
+  onAtriumUpdate(atriumLearners) {
+    const { watchProfile } = this.state;
 
-    // re-assign a slot to put the participant in
-    // and send that to the server
-    const slotIndex = this.slotManager.getSlotIndex(selectedLearner);
-    selectedLearner.slotIndex = slotIndex;
-
-    log.debug(
-      `onAtriumAssignClicked '${this.connectionId}': assigned to slot '${slotIndex}' `
-    );
-
-    // signal server with assignment of turkee to this room
-    this.connection.send(
-      constants.SIGNALCMD_ASSIGNTURKEE,
-      selectedLearner,
-      localInfo.roomName
-    );
-  }
-
-  onAtriumUpdate(currentAtrium) {
     if (this.props.onScreenPopup) {
       this.props.onScreenPopup({ message: "Atrium Updated" });
     }
+
+    // if no auto assign, then we are done
+    if (!watchProfile.autoAssign) {
+      return;
+    }
+
+    // look into atrium learners for watched learners
+    // and auto assign
+    let learnersToAssign = [];
+    atriumLearners.forEach((atriumLearner) => {
+      var index = watchProfile.watchedLearners.findIndex(
+        (item) => item.userId === atriumLearner.userId
+      );
+      if (index != -1) {
+        learnersToAssign.push(atriumLearner);
+      }
+    });
+
+    learnersToAssign.forEach((learnerToAssign) => {
+      this.onAtriumAssignClicked(learnerToAssign);
+    });
   }
 
   onPopupMessage(message) {
     if (this.props.onScreenPopup) {
       this.props.onScreenPopup({ message: message });
+    }
+  }
+
+  onAtriumAssignClicked(selectedLearner) {
+    try {
+      let { localInfo, watchProfile } = this.state;
+
+      log.debug(
+        `onAtriumAssignClicked '${
+          this.connectionId
+        }': learner = '${JSON.stringify(selectedLearner, null, 2)}' `
+      );
+
+      // re-assign a slot to put the participant in
+      // and send that to the server
+      const slotIndex = this.slotManager.getSlotIndex(selectedLearner);
+      selectedLearner.slotIndex = slotIndex;
+
+      // add if not in list of watched learners
+      var index = watchProfile.watchedLearners.findIndex(
+        (item) => item.userId === selectedLearner.userId
+      );
+      if (index === -1) {
+        watchProfile.watchedLearners.push(selectedLearner);
+      }
+
+      this.onUpdateWatchedLearners(watchProfile.watchedLearners);
+
+      log.debug(
+        `onAtriumAssignClicked '${this.connectionId}': assigned to slot '${slotIndex}' `
+      );
+
+      // signal server with assignment of turkee to this room
+      this.connection.send(
+        constants.SIGNALCMD_ASSIGNTURKEE,
+        selectedLearner,
+        localInfo.roomName
+      );
+    } catch (error) {
+      log.error(
+        `'${this.connectionId}' onAtriumAssignClicked exception: ${error.message}`
+      );
     }
   }
 
@@ -342,26 +385,46 @@ class TurkerChatCellGrid extends React.Component {
     this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
   }
 
+  onUpdateWatchedLearners(watchedLearners) {
+    this.watchLearnerHelper.SetWatchedLearners(watchedLearners);
+    this.setState({
+      watchProfile: this.watchLearnerHelper.watchProfile,
+    });
+  }
+
+  onClickAutoAssign(value) {
+    this.watchLearnerHelper.SetAutoAssign(value);
+    this.setState({
+      watchProfile: this.watchLearnerHelper.watchProfile,
+    });
+  }
+
   render() {
-    const { showChatGrid, localInfo, sessionId, userName } = this.state;
+    const { showChatGrid, localInfo, sessionId, userName, watchProfile } =
+      this.state;
 
     let common = (
-      <Grid container>
-        <Grid item xs={6}>
+      <Grid container id="common_grid">
+        <Grid item xs={3} id="atrium">
           <Atrium
             userName={userName}
             connection={this.connection}
             onAtriumAssignClicked={this.onAtriumAssignClicked}
             onAtriumUpdate={this.onAtriumUpdate}
+            watchProfile={watchProfile}
           />
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={5}>
           &nbsp;
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={4} id="rememberedlearners_grid">
           <RememberedLearners
             userName={userName}
             connection={this.connection}
+            watchProfile={watchProfile}
+            onUpdateWatchedLearners={this.onUpdateWatchedLearners}
+            onClickAutoAssign={this.onClickAutoAssign}
+            watchedLearnerHelper={this.watchLearnerHelper}
           />
         </Grid>
       </Grid>
@@ -387,7 +450,6 @@ class TurkerChatCellGrid extends React.Component {
               <br />
             </div>
           </Grid>
-
           {common}
         </Grid>
       );
@@ -409,7 +471,6 @@ class TurkerChatCellGrid extends React.Component {
             <br />
           </div>
         </Grid>
-
         {common}
       </Grid>
     );
