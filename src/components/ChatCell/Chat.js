@@ -254,7 +254,7 @@ class Chat extends React.Component {
 
       this.onSystemMessage({
         commandChannel: localInfo?.commandChannel,
-        data: `'${payload.data.participant.nickName}' was disconnected`,
+        data: `'${payload.data.participant.nickName}' disconnected or left`,
       });
     } catch (error) {
       log.error(`onLearnerUnassigned[${this.props.index}]`, error.message);

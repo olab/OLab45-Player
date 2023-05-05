@@ -386,25 +386,17 @@ class TurkerChatCellGrid extends React.Component {
   }
 
   onUpdateWatchedLearners(watchedLearners) {
-    let { watchProfile } = this.state;
-    watchProfile.watchedLearners = watchedLearners;
-
-    this.setState({
-      watchProfile: watchProfile,
-    });
-
     this.watchLearnerHelper.SetWatchedLearners(watchedLearners);
+    this.setState({
+      watchProfile: this.watchLearnerHelper.watchProfile,
+    });
   }
 
   onClickAutoAssign(value) {
-    let { watchProfile } = this.state;
-    watchProfile.autoAssign = value;
-
-    this.setState({
-      watchProfile: watchProfile,
-    });
-
     this.watchLearnerHelper.SetAutoAssign(value);
+    this.setState({
+      watchProfile: this.watchLearnerHelper.watchProfile,
+    });
   }
 
   render() {
@@ -432,6 +424,7 @@ class TurkerChatCellGrid extends React.Component {
             watchProfile={watchProfile}
             onUpdateWatchedLearners={this.onUpdateWatchedLearners}
             onClickAutoAssign={this.onClickAutoAssign}
+            watchedLearnerHelper={this.watchLearnerHelper}
           />
         </Grid>
       </Grid>

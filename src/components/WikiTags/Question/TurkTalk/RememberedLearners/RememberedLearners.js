@@ -18,9 +18,11 @@ class RememberedLearners extends React.Component {
   constructor(props) {
     super(props);
 
+    this.watchedLearnerHelper = this.props.watchedLearnerHelper;
+
     this.state = {
       selectedLearnerUserId: "0",
-      watchProfile: this.props.watchProfile,
+      watchProfile: this.watchedLearnerHelper.watchProfile,
     };
 
     this.onUnrememberClicked = this.onUnrememberClicked.bind(this);
@@ -36,10 +38,12 @@ class RememberedLearners extends React.Component {
       log.debug(`onLearnerSelected: ${event.target.value}`);
 
       // find learner in atrium list
-      for (let item of watchedLearners) {
-        if (item.userId === event.target.value) {
-          selectedLearnerUserId = item.userId;
-        }
+      const watchedLearner = this.watchedLearnerHelper.FindWatchedLearner(
+        event.target.value
+      );
+
+      if (watchedLearner) {
+        selectedLearnerUserId = watchedLearner.userId;
       }
 
       this.setState({ selectedLearnerUserId: selectedLearnerUserId });
@@ -48,33 +52,25 @@ class RememberedLearners extends React.Component {
 
   onUnrememberClicked(event) {
     try {
-      const { watchedLearners, selectedLearnerUserId } = this.state;
+      const { selectedLearnerUserId } = this.state;
 
       // don't do anything if nothing selected
       if (selectedLearnerUserId == undefined || selectedLearnerUserId == "0") {
         return;
       }
 
-      // get unassigned atrium learner from list
-      let selectedLearner = null;
-      for (let item of watchedLearners) {
-        if (item.userId === selectedLearnerUserId) {
-          selectedLearner = item;
-        }
-      }
-
-      if (!selectedLearner) {
-        throw new Error(
-          `Unable to find selected learner ${selectedLearnerUserId}`
-        );
-      }
+      this.watchedLearnerHelper.RemoveWatchedLearner(selectedLearnerUserId);
 
       // signal watched learners change to parent
       if (this.props.onUpdateWatchedLearners) {
-        this.props.onUpdateWatchedLearners(watchedLearners);
+        this.props.onUpdateWatchedLearners(
+          this.watchedLearnerHelper.watchProfile.watchedLearners
+        );
       } else {
         throw new Error("onUpdateWatchedLearners callback not set");
       }
+
+      this.setState({ selectedLearnerUserId: "0" });
     } catch (error) {
       log.error(`'onUnrememberClicked exception: ${error.message}`);
     }
