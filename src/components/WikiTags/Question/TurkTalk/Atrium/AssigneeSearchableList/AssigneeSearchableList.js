@@ -19,14 +19,29 @@ import styles, {
 
 class AssigneeSearchableList extends PureComponent {
   isMatchingQuery(item) {
-    const { query = "" } = this.state || {};
+    const { query = "" } = this.state || "";
     // basic case-insensitive string search
     const cleanup = (str) => str.toLowerCase().replace(/\s/g, "").trim();
 
     // empty query, return all
     if (0 == query.trim().length) return true;
 
-    return -1 != cleanup(item.text).indexOf(cleanup(query));
+    // separate query into sub queries
+    const queryParts = query.split(" ");
+
+    // test if any query sub part matches
+    let result = false;
+    queryParts.forEach((queryPart) => {
+      if (queryPart.length > 0) {
+        let partResult = -1 != cleanup(item.text).indexOf(cleanup(queryPart));
+        if (partResult) {
+          result = true;
+          return;
+        }
+      }
+    });
+
+    return result;
   }
 
   render() {
@@ -40,7 +55,7 @@ class AssigneeSearchableList extends PureComponent {
         <TextField
           type="search"
           name="query"
-          label={"Search by name"}
+          label={"Search by name(s) (separate with spaces)"}
           className={classes.searchField}
           value={query}
           onChange={(e) => this.setState({ query: e.target.value })}
