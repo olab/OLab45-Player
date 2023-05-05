@@ -549,9 +549,10 @@ class Chat extends React.Component {
       border: "none",
       backgroundColor: "green",
       color: "white",
-      borderRadius: "25px",
-      fontSize: "14px",
+      borderRadius: "16px",
+      fontSize: "16px",
       padding: "10px",
+      lineHeight: "1.8",
     };
     const localMessageStyle = {
       border: "none",
