@@ -25,7 +25,7 @@ class RememberedLearners extends React.Component {
       watchProfile: this.watchedLearnerHelper.watchProfile,
     };
 
-    this.onUnrememberClicked = this.onUnrememberClicked.bind(this);
+    this.onUnrememberClicked = this.onForgetClicked.bind(this);
     this.onClickAutoAssign = this.onClickAutoAssign.bind(this);
     this.onLearnerSelected = this.onLearnerSelected.bind(this);
   }
@@ -50,7 +50,7 @@ class RememberedLearners extends React.Component {
     }
   }
 
-  onUnrememberClicked(event) {
+  onForgetClicked(event) {
     try {
       const { selectedLearnerUserId } = this.state;
 
@@ -121,7 +121,7 @@ class RememberedLearners extends React.Component {
               color="primary"
               size="small"
               className={localCss.assignButton}
-              onClick={this.onUnrememberClicked}
+              onClick={this.onForgetClicked}
             >
               &nbsp;Forget&nbsp;
             </Button>

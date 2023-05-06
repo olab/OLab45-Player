@@ -53,6 +53,7 @@ class OlabModeratorTag extends React.Component {
       ...atrium,
       infoOpen: null,
       gridMessage: "Loading...",
+      popup: { open: null, message: null, level: null },
     };
 
     this.handleInfoClose = this.handleInfoClose.bind(this);
@@ -269,6 +270,10 @@ class OlabModeratorTag extends React.Component {
   }
 
   onScreenPopup(props) {
+    let { popup } = this.state;
+
+    popup = { ...popup, ...props };
+
     this.setState({
       infoOpen: true,
       infoMessage: props.message,

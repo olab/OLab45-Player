@@ -3,15 +3,19 @@ import log from "loglevel";
 
 class WatchedLearners {
   constructor(mapId, question) {
-    let questionSettings = JSON.parse(question.settings);
-    let { roomName: roomId } = questionSettings;
+    try {
+      let questionSettings = JSON.parse(question.settings);
+      let { roomName: roomId } = questionSettings;
 
-    this.watchProfileKey = `${mapId}/${roomId}`;
-    this.watchProfile = playerState.GetWatchProfile(this.watchProfileKey);
+      this.watchProfileKey = `${mapId}/${roomId}`;
+      this.watchProfile = playerState.GetWatchProfile(this.watchProfileKey);
 
-    log.debug(
-      `current watchProfile: ${JSON.stringify(this.watchProfile, null, 2)}`
-    );
+      log.debug(
+        `current watchProfile: ${JSON.stringify(this.watchProfile, null, 2)}`
+      );
+    } catch (error) {
+      log.error(`WatchedLearners ctor exception: ${error.message}`);
+    }
   }
 
   FindWatchedLearner(userId) {
@@ -27,26 +31,34 @@ class WatchedLearners {
   }
 
   RemoveWatchedLearner(userId) {
-    let newArray = [];
-    this.watchProfile.watchedLearners.forEach((watchedLearner) => {
-      if (watchedLearner.userId != userId) {
-        newArray = watchedLearner;
-      }
-    });
+    try {
+      let newArray = [];
+      this.watchProfile.watchedLearners.forEach((watchedLearner) => {
+        if (watchedLearner.userId != userId) {
+          newArray = watchedLearner;
+        }
+      });
 
-    this.SetWatchedLearners(newArray);
+      this.SetWatchedLearners(newArray);
+    } catch (error) {
+      log.error(`RemoveWatchedLearner exception: ${error.message}`);
+    }
   }
 
   SetWatchedLearners(watchedLearners) {
-    this.watchProfile.watchedLearners = watchedLearners;
-    playerState.SetWatchProfile(this.watchProfileKey, this.watchProfile);
-    log.debug(
-      `new watchedLearners: ${JSON.stringify(
-        this.watchProfile.watchedLearners,
-        null,
-        2
-      )}`
-    );
+    try {
+      this.watchProfile.watchedLearners = watchedLearners;
+      playerState.SetWatchProfile(this.watchProfileKey, this.watchProfile);
+      log.debug(
+        `new watchedLearners: ${JSON.stringify(
+          this.watchProfile.watchedLearners,
+          null,
+          2
+        )}`
+      );
+    } catch (error) {
+      log.error(`SetWatchedLearners exception: ${error.message}`);
+    }
   }
 
   SetAutoAssign(value) {

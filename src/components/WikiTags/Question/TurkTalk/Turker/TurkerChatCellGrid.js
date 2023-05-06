@@ -488,7 +488,7 @@ class TurkerChatCellGrid extends React.Component {
     );
   }
   catch(error) {
-    LogException("render", error);
+    log.error(`render exception: ${error.message}`);
     return <b>TurkerStatusBar: {error.message}</b>;
   }
 }
