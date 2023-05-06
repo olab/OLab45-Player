@@ -174,6 +174,7 @@ class Atrium extends React.Component {
 
     return (
       <div>
+        Atrium Size: {learnersList.length}
         <AssigneeSearchableList
           list={learnersList}
           onAtriumAssignClicked={this.onAtriumAssignClicked}
