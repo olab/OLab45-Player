@@ -345,6 +345,18 @@ class TurkerChatCellGrid extends React.Component {
       // re-assign a slot to put the participant in
       // and send that to the server
       const slotIndex = this.slotManager.getSlotIndex(selectedLearner);
+
+      // catch if we have no slot available
+      if (slotIndex === null) {
+        if (this.props.onScreenPopup) {
+          this.props.onScreenPopup({
+            message: "Room is full.  Unable to assign.",
+          });
+        }
+
+        return;
+      }
+
       selectedLearner.slotIndex = slotIndex;
 
       // add if not in list of watched learners

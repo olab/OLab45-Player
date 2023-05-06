@@ -122,16 +122,16 @@ class Atrium extends React.Component {
 
       // signal the parent component of a learner assignment
       if (this.props.onAtriumAssignClicked) {
-        this.props.onAtriumAssignClicked(selectedLearner);
+        if (this.props.onAtriumAssignClicked(selectedLearner)) {
+          // reset the selected learner to empty
+          this.setState({
+            selectedLearnerUserId: "0",
+          });
+
+          // save atrium state to local storage
+          this.updateAtriumState();
+        }
       }
-
-      // reset the selected learner to empty
-      this.setState({
-        selectedLearnerUserId: "0",
-      });
-
-      // save atrium state to local storage
-      this.updateAtriumState();
     } catch (error) {
       log.error(
         `'${this.connectionId}' onAtriumAssignClicked exception: ${error.message}`
