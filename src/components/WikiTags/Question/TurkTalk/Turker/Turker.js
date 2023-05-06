@@ -1,16 +1,6 @@
 // @flow
 import * as React from "react";
-import {
-  Button,
-  Grid,
-  FormLabel,
-  Table,
-  TableBody,
-  MenuItem,
-  Select,
-  TableRow,
-  Snackbar,
-} from "@material-ui/core";
+import { Grid, Snackbar } from "@material-ui/core";
 import { Log, LogInfo, LogError } from "../../../../../utils/Logger";
 import log from "loglevel";
 import { withStyles } from "@material-ui/core/styles";

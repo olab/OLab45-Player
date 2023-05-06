@@ -8,7 +8,7 @@ import styles from "../../../styles.module.css";
 import localCss from "./TurkerChatCellGrid.module.css";
 import TurkerChatStatusBar from "./TurkerChatStatusBar";
 import Atrium from "../Atrium/Atrium";
-import RememberedLearners from "../RememberedLearners/RememberedLearners";
+import RememberedLearners from "./RememberedLearners/RememberedLearners";
 import SlotManager from "../SlotManager";
 import ChatCell from "../../../../ChatCell/ChatCell";
 import WatchedLearners from "./WatchedLearners";
