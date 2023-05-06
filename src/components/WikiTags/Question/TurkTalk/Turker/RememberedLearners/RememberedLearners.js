@@ -25,9 +25,9 @@ class RememberedLearners extends React.Component {
       watchProfile: this.watchedLearnerHelper.watchProfile,
     };
 
-    this.onUnrememberClicked = this.onForgetClicked.bind(this);
     this.onClickAutoAssign = this.onClickAutoAssign.bind(this);
     this.onLearnerSelected = this.onLearnerSelected.bind(this);
+    this.onForgetClicked = this.onForgetClicked.bind(this);
   }
 
   onLearnerSelected(event) {
@@ -67,12 +67,12 @@ class RememberedLearners extends React.Component {
           this.watchedLearnerHelper.watchProfile.watchedLearners
         );
       } else {
-        throw new Error("onUpdateWatchedLearners callback not set");
+        throw new Error("onForgetClicked callback not set");
       }
 
       this.setState({ selectedLearnerUserId: "0" });
     } catch (error) {
-      log.error(`'onUnrememberClicked exception: ${error.message}`);
+      log.error(`'onForgetClicked exception: ${error.message}`);
     }
   }
 
