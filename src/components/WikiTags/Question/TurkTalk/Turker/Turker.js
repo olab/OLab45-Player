@@ -97,7 +97,6 @@ class OlabModeratorTag extends React.Component {
   }
 
   onServerError(payload) {
-    alert(payload);
     this.setState({
       gridMessage: payload,
     });
