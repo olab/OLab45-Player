@@ -91,7 +91,7 @@ class OlabAttendeeTag extends React.Component {
       } else if (payload.command === constants.SIGNALCMD_JUMP_NODE) {
         log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onJumpNode(payload);
-      } else if (payload.command === constants.SIGNALCMD_TURKEEMESSAGE) {
+      } else if (payload.command === constants.SIGNALCMD_SERVER_ERROR) {
         log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
         this.onServerMessage(payload);
       }
@@ -240,7 +240,6 @@ class OlabAttendeeTag extends React.Component {
   render() {
     const {
       index,
-      connectionStatus,
       debug,
       remoteInfo,
       localInfo,
