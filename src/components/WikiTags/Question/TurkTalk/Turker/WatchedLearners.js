@@ -35,7 +35,7 @@ class WatchedLearners {
       let newArray = [];
       this.watchProfile.watchedLearners.forEach((watchedLearner) => {
         if (watchedLearner.userId != userId) {
-          newArray = watchedLearner;
+          newArray.push(watchedLearner);
         }
       });
 
