@@ -20,6 +20,7 @@ class OlabMultilineTextQuestion extends React.Component {
 
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);
+    this.onFocusLost = this.onFocusLost.bind(this);
     this.setValue = this.setValue.bind(this);
   }
 
@@ -63,6 +64,19 @@ class OlabMultilineTextQuestion extends React.Component {
       onSubmitResponse(responseState);
     }
   }
+
+  onFocusLost = (event) => {
+    const value = event.target.value;
+    const question = this.state.question;
+
+    // set the question value in trackable state
+    this.setState((state) => {
+      question.value = value;
+      return { question };
+    });
+
+    this.transmitResponse();
+  };
 
   handleChange = (event) => {
     const value = event.target.value;
@@ -116,16 +130,17 @@ class OlabMultilineTextQuestion extends React.Component {
               value={question.value}
               disabled={disabled}
               onChange={this.handleChange}
+              onBlur={this.onFocusLost}
             ></textarea>
           </div>
           <div>
-            <button
+            {/* <button
               id={`${id}-submit`}
               disabled={disabled}
               onClick={(event) => this.setValue(event)}
             >
               Submit
-            </button>
+            </button> */}
             {progressButtonHtml}
           </div>
         </div>
