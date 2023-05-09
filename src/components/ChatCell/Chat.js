@@ -348,15 +348,8 @@ class Chat extends React.Component {
         },
       };
 
-      LogInfo(
-        `'onClickJumpNode[${this.props.index}] (${JSON.stringify(
-          payload,
-          null,
-          1
-        )})`
-      );
-
-      this.connection.send(constants.SIGNALCMD_JUMP_NODE, payload);
+      LogInfo(`'onClickJumpNode[${this.props.index}].`);
+      this.props.signalr.send(constants.SIGNALCMD_JUMP_NODE, payload);
 
       this.setState({ inJumpNodeMode: false });
     } catch (error) {
@@ -421,21 +414,15 @@ class Chat extends React.Component {
           Data: message,
         };
 
-        LogInfo(
-          `'onSendClicked[${this.props.index}] (${JSON.stringify(
-            messagePayload,
-            null,
-            1
-          )})`
-        );
+        LogInfo(`'onSendClicked[${this.props.index}]`);
 
-        this.connection.send(constants.SIGNALMETHOD_MESSAGE, messagePayload);
+        this.props.signalr.send(constants.SIGNALMETHOD_MESSAGE, messagePayload);
       }
 
       // clear out sent messages
       this.setState({ message: "" });
     } catch (error) {
-      LogException(`onSendClicked[${this.props.index}]`, error);
+      log.error(`onSendClicked[${this.props.index}] ${error.message}`);
     }
   };
 
@@ -526,12 +513,10 @@ class Chat extends React.Component {
       inJumpNodeMode,
       isModerator,
       localInfo,
-      maxHeight,
       message,
       selectedNodeId,
       senderInfo,
       show,
-      width,
     } = this.state;
 
     if (show) {

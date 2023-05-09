@@ -19,11 +19,7 @@ class ChatCell extends React.Component {
       lastMessageTime: null,
     };
 
-    // this.onCommand = this.onCommand.bind(this);
     this.connectionId = this.state.connection.connectionId?.slice(-3);
-
-    // var self = this;
-    // this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
   }
 
   componentDidUpdate(prevProps) {
@@ -31,11 +27,6 @@ class ChatCell extends React.Component {
       this.setState({ localInfo: this.props.localInfo });
     }
   }
-
-  // command method listener
-  // onCommand(payload) {
-  // log.debug(`'${this.state.connection.connectionId?.slice(-3)}' onChatCellCommandCallback: ${payload.command}`);
-  // }
 
   render() {
     try {
@@ -68,19 +59,21 @@ class ChatCell extends React.Component {
             show={localInfo.show}
             isModerator={this.props.isModerator}
             onPopupMessage={this.props.onPopupMessage}
-            connection={connection}
             localInfo={localInfo}
             senderInfo={senderInfo}
             playerProps={playerProps}
+            connection={connection}
+            signalr={this.props.signalr}
           />
           <ChatStatusBar
             index={this.props.index}
             show={localInfo.show}
             isModerator={this.props.isModerator}
-            connection={connection}
             localInfo={localInfo}
             lastMessageTime={lastMessageTime}
             senderInfo={senderInfo}
+            connection={connection}
+            signalr={this.props.signalr}
           />
         </TableCell>
       );

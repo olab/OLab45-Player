@@ -65,6 +65,8 @@ class OlabModeratorTag extends React.Component {
 
     this.turker = new Turker(this);
     this.turker.connect(this.state.userName);
+    this.signalr = this.turker.signalr;
+
     this.connection = this.turker.connection;
     this.connectionId = "";
 
@@ -177,7 +179,7 @@ class OlabModeratorTag extends React.Component {
     );
 
     // signal server to close out this room
-    this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
+    this.signalr.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
   }
 
   onAssignClicked(event) {
@@ -217,7 +219,7 @@ class OlabModeratorTag extends React.Component {
       );
 
       // signal server with assignment of turkee to this room
-      this.connection.send(
+      this.signalr.send(
         constants.SIGNALCMD_ASSIGNTURKEE,
         selectedLearner,
         localInfo.roomName,
@@ -324,10 +326,11 @@ class OlabModeratorTag extends React.Component {
               onScreenPopup={this.onScreenPopup}
               userName={userName}
               isModerator={true}
-              connection={this.connection}
               roomName={localInfo.roomName}
               localInfo={localInfo}
               mapNodes={mapNodes}
+              connection={this.connection}
+              signalr={this.signalr}
             />
           </Grid>
 

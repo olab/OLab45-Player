@@ -47,6 +47,8 @@ class OlabAttendeeTag extends React.Component {
     };
 
     this.turkee = new Turkee(this);
+    this.signalr = this.turkee.signalr;
+
     this.turkee.connect(this.state.userName);
     this.connection = this.turkee.connection;
     this.connectionId = "";
@@ -274,11 +276,12 @@ class OlabAttendeeTag extends React.Component {
                   index={index}
                   isModerator={localInfo.isModerator}
                   style={chatCellStyle}
-                  connection={this.connection}
                   localInfo={localInfo}
                   senderInfo={remoteInfo}
                   session={session}
                   playerProps={this.props.props}
+                  connection={this.connection}
+                  signalr={this.signalr}
                 />
               </TableRow>
             </TableBody>

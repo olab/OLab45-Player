@@ -2,6 +2,7 @@ import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import { Log, LogInfo, LogError } from "../utils/Logger";
 import log from "loglevel";
 import { config } from "../config";
+import SignalRWrapper from "./signalRWrapper";
 
 var constants = require("./constants");
 const playerState = require("../utils/PlayerState").PlayerState;
@@ -41,6 +42,8 @@ class TurkTalk {
         config?.SIGNALR_TIMEOUT_MS
       );
     }
+
+    this.signalr = new SignalRWrapper({ connection: this.connection });
 
     this.connections = [];
   }

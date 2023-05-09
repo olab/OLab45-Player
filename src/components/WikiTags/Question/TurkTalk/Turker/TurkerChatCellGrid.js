@@ -46,6 +46,7 @@ class TurkerChatCellGrid extends React.Component {
     };
 
     this.connection = this.props.connection;
+    this.signalr = this.props.signalr;
 
     this.onAtriumAssignClicked = this.onAtriumAssignClicked.bind(this);
     this.onAtriumUpdate = this.onAtriumUpdate.bind(this);
@@ -275,11 +276,12 @@ class TurkerChatCellGrid extends React.Component {
               index={index}
               style={chatCellWidthStyle}
               isModerator={this.props.isModerator}
-              connection={this.connection}
               localInfo={localSlot}
               senderInfo={remoteSlot}
               playerProps={this.props.props}
               onPopupMessage={this.onPopupMessage}
+              connection={this.connection}
+              signalr={this.signalr}
             />
           );
         }
@@ -374,7 +376,7 @@ class TurkerChatCellGrid extends React.Component {
       );
 
       // signal server with assignment of turkee to this room
-      this.connection.send(
+      this.signalr.send(
         constants.SIGNALCMD_ASSIGNTURKEE,
         selectedLearner,
         localInfo.roomName
@@ -394,7 +396,7 @@ class TurkerChatCellGrid extends React.Component {
     );
 
     // signal server to close out this room
-    this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
+    this.signalr.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
   }
 
   onUpdateWatchedLearners(watchedLearners) {
@@ -420,10 +422,11 @@ class TurkerChatCellGrid extends React.Component {
         <Grid item xs={3} id="atrium">
           <Atrium
             userName={userName}
-            connection={this.connection}
             onAtriumAssignClicked={this.onAtriumAssignClicked}
             onAtriumUpdate={this.onAtriumUpdate}
             watchProfile={watchProfile}
+            connection={this.connection}
+            signalr={this.signalr}
           />
         </Grid>
         <Grid item xs={5}>
@@ -432,11 +435,12 @@ class TurkerChatCellGrid extends React.Component {
         <Grid item xs={4} id="rememberedlearners_grid">
           <RememberedLearners
             userName={userName}
-            connection={this.connection}
             watchProfile={watchProfile}
             onUpdateWatchedLearners={this.onUpdateWatchedLearners}
             onClickAutoAssign={this.onClickAutoAssign}
             watchedLearnerHelper={this.watchLearnerHelper}
+            connection={this.connection}
+            signalr={this.signalr}
           />
         </Grid>
       </Grid>

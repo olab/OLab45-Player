@@ -79,7 +79,7 @@ class Turker extends TurkTalk {
       `'${this.connectionId}' registering turker for room name: ${roomName}`
     );
 
-    this.connection.send(
+    this.signalr.send(
       constants.SIGNALCMD_REGISTERTURKER,
       this.component.props.props.map.id,
       this.component.props.props.node.id,

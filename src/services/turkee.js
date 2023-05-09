@@ -75,7 +75,7 @@ class Turkee extends TurkTalk {
       )}`
     );
 
-    this.connection.send(constants.SIGNALCMD_REGISTERTURKEE, this.session);
+    this.signalr.send(constants.SIGNALCMD_REGISTERTURKEE, this.session);
   }
 
   onReconnecting(error) {
@@ -106,7 +106,7 @@ class Turkee extends TurkTalk {
         });
       }
     } catch (error) {
-      LogError(`'${connectionId}' onReconnected exception: ${error.message}`);
+      log.error(`'${connectionId}' onReconnected exception: ${error.message}`);
     }
   }
 
