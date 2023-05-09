@@ -87,7 +87,7 @@ function App() {
           log.error(`Error on submitExternalToken ${JSON.stringify(data)}`);
           setDirectPlayError(data.message);
         } else {
-          authActions.setToken(data, constants.TOKEN_TYPE_EXTERNAL);
+          authActions.setToken(data.data, constants.TOKEN_TYPE_EXTERNAL);
           setExternalPlay(true);
         }
       }
