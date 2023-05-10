@@ -1,10 +1,6 @@
 import { PureComponent } from "react";
 import React from "react";
-import {
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import "./App.css";
 import Home from "../Home/Home";
 import Header from "../Header/Header";
@@ -26,9 +22,6 @@ class App extends PureComponent {
 
     this.reactVersion = process.env.REACT_APP_VERSION;
     log.debug(JSON.stringify(process.env));
-
-    const searchParams = new URLSearchParams(document.location.search);
-    const queryToken = searchParams.get("token");
 
     const [mapId, nodeId] = processUrl();
     const directPlay = mapId != null && nodeId != null;
@@ -73,6 +66,7 @@ class App extends PureComponent {
   }
 
   anonymousMapCheck = (data) => {
+    const { authActions } = this.state;
     if (data) {
       if (data.error_code != 200) {
         log.error(`Error on anonymousMapCheck ${JSON.stringify(data)}`);
@@ -85,6 +79,7 @@ class App extends PureComponent {
   };
 
   externalTokenCheck = (data) => {
+    const { authActions } = this.state;
     if (data) {
       if (data.statusCode != 200) {
         log.error(`Error on externalTokenCheck ${JSON.stringify(data)}`);
@@ -115,6 +110,8 @@ class App extends PureComponent {
 
     if (!token) {
       if (directPlay) {
+        const searchParams = new URLSearchParams(document.location.search);
+        const queryToken = searchParams.get("token");
         // process access token on querystring (external play)
         if (queryToken) {
           log.debug(`processing external token`);
@@ -125,6 +122,7 @@ class App extends PureComponent {
           // else the play has to be anonymous
         } else {
           log.debug(`processing anonymous play`);
+          const [mapId] = processUrl();
           submitAnonymousMapId(mapId).then((data) => {
             this.anonymousMapCheck(data);
           });
@@ -159,7 +157,7 @@ class App extends PureComponent {
     if (directPlay && directPlayError) {
       return (
         <div>
-          <Header version={this.reactVersion} />
+          <Header version={this.reactVersion} authActions={authActions} />
           <center>
             <p>{directPlayError}</p>
           </center>
@@ -173,7 +171,7 @@ class App extends PureComponent {
       if (token && !isExpired) {
         return (
           <div className="wrapper">
-            <Header version={this.reactVersion} />
+            <Header version={this.reactVersion} authActions={authActions} />
             <Routes>
               <Route
                 path={`/player/:mapId/:nodeId`}
