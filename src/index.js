@@ -19,5 +19,11 @@ reportWebVitals();
 
 // safari polyfill
 if ("AbortSignal" in window) {
-  AbortSignal.timeout = AbortSignal.timeout || (() => null);
+  AbortSignal.timeout =
+    AbortSignal.timeout ||
+    ((duration) => {
+      const controller = new AbortController();
+      setTimeout(() => controller.abort(), duration);
+      return controller.signal;
+    });
 }
