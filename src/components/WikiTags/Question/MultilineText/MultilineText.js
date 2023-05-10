@@ -44,6 +44,7 @@ class OlabMultilineTextQuestion extends React.Component {
     }
 
     this.transmitResponse();
+
     this.setState({ contentsChanged: false });
   };
 
