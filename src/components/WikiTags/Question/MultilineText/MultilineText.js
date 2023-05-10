@@ -1,7 +1,7 @@
 // @flow
+import { Button } from "@material-ui/core";
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
 
 import styles from "../../styles.module.css";
@@ -15,13 +15,13 @@ class OlabMultilineTextQuestion extends React.Component {
       onSubmitResponse: props.props.onSubmitResponse,
       showProgressSpinner: false,
       disabled: false,
+      contentsChanged: false,
       ...props.props,
     };
 
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);
-    this.onBlur = this.onBlur.bind(this);
-    this.setValue = this.setValue.bind(this);
+    this.onSubmitClicked = this.onSubmitClicked.bind(this);
   }
 
   setInProgress(inProgress) {
@@ -29,7 +29,7 @@ class OlabMultilineTextQuestion extends React.Component {
     log.debug(`set progress spinner: ${inProgress}`);
   }
 
-  setValue = (event) => {
+  onSubmitClicked = (event) => {
     const question = this.state.question;
     const value = question.value;
     let disabled = this.state.disabled;
@@ -44,6 +44,7 @@ class OlabMultilineTextQuestion extends React.Component {
     }
 
     this.transmitResponse();
+    this.setState({ contentsChanged: false });
   };
 
   transmitResponse() {
@@ -66,46 +67,24 @@ class OlabMultilineTextQuestion extends React.Component {
   }
 
   onFocus = (event) => {
-    const value = event.target.value;
-    const question = this.state.question;
     log.debug(`onFocus ${event.target.id}`);
   };
 
-  onBlur = (event) => {
+  onTextChanged = (event) => {
     const value = event.target.value;
     const question = this.state.question;
 
-    log.debug(`onBlur ${event.target.id}`);
+    question.value = value;
 
     // set the question value in trackable state
-    this.setState((state) => {
-      question.value = value;
-      return { question };
-    });
-
-    this.transmitResponse();
-
-    if (event.relatedTarget) {
-      setTimeout(function () {
-        log.debug(`focus ${event.relatedTarget.id}`);
-        event.relatedTarget.focus();
-      }, 500);
-    }
-  };
-
-  handleChange = (event) => {
-    const value = event.target.value;
-    const question = this.state.question;
-
-    // set the question value in trackable state
-    this.setState((state) => {
-      question.value = value;
-      return { question };
+    this.setState({
+      question: question,
+      contentsChanged: true,
     });
   };
 
   render() {
-    const { id, name, question, disabled } = this.state;
+    const { id, name, question, contentsChanged, disabled } = this.state;
 
     log.debug(`OlabMultilineTextQuestion render '${name}'`);
 
@@ -144,19 +123,20 @@ class OlabMultilineTextQuestion extends React.Component {
               id={`${id}-value`}
               value={question.value}
               disabled={disabled}
-              onChange={this.handleChange}
-              onBlur={this.onBlur}
+              onChange={this.onTextChanged}
               onFocus={this.onFocus}
             ></textarea>
           </div>
           <div>
-            {/* <button
-              id={`${id}-submit`}
-              disabled={disabled}
-              onClick={(event) => this.setValue(event)}
-            >
-              Submit
-            </button> */}
+            {contentsChanged && (
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={(event) => this.onSubmitClicked(event)}
+              >
+                Submit
+              </Button>
+            )}
             {progressButtonHtml}
           </div>
         </div>
