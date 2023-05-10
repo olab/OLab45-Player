@@ -86,8 +86,10 @@ class OlabMultilineTextQuestion extends React.Component {
     this.transmitResponse();
 
     if (event.relatedTarget) {
-      log.debug(`focus ${event.relatedTarget.id}`);
-      event.relatedTarget.focus();
+      setTimeout(function () {
+        log.debug(`focus ${event.relatedTarget.id}`);
+        event.relatedTarget.focus();
+      }, 500);
     }
   };
 
