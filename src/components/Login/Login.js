@@ -25,7 +25,7 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const Login = ({ message, authActions, classes }) => {
+const Login = ({ setCredentials, message, authActions, classes }) => {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = React.useState({
@@ -65,8 +65,7 @@ const Login = ({ message, authActions, classes }) => {
         showError(data.data);
       } else {
         if (data.data.authInfo) {
-          authActions.setToken(data.data, constants.TOKEN_TYPE_NATIVE);
-          authActions.setUserName(username);
+          setCredentials(data.data, username, constants.TOKEN_TYPE_NATIVE);
         } else {
           throw JSON.stringify(data, null, 2);
         }

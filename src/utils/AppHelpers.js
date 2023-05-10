@@ -43,7 +43,7 @@ const submitAnonymousMapId = async (mapId) => {
 const submitExternalToken = async (queryToken) => {
   try {
     let data = await loginExternalUserAsync(queryToken);
-    data.statusCode = 200;
+    data.statusCode = data.error_code;
     return data;
   } catch (error) {
     return { statusCode: 500, message: error.message };

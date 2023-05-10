@@ -41,13 +41,13 @@ const Header = ({ version, authActions, isScreenBusy }) => (
           </Button>
         </>
       )}
-      {!authActions && (
+      {/* {!authActions && (
         <VersionWrapper>
           User: anonymous
           <br />
           Version: {version}
         </VersionWrapper>
-      )}
+      )} */}
     </div>
     {isScreenBusy ? <LinearProgress /> : <FakeProgress />}
   </HeaderWrapper>

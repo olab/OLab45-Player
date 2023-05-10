@@ -17,7 +17,6 @@ async function internalFetch(method, url, payload, headerOverrides = null) {
   };
 
   let settings = {
-    signal: AbortSignal.timeout(7500),
     method: method,
     headers: headers,
   };
@@ -29,6 +28,7 @@ async function internalFetch(method, url, payload, headerOverrides = null) {
 
   while (tries++ < retryCount) {
     try {
+      settings.signal = AbortSignal.timeout(7500);
       const response = await fetch(url, settings);
 
       const jsonData = await response.json();
