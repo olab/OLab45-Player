@@ -25,14 +25,28 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
+let MOUNTED = false;
+
+const useStateWrapper = (...args) =>
+{
+  const [val, setter] = useState(...args);
+  return [val, (...args) => MOUNTED && setter(...args)];
+};
+
 const Login = ({ setCredentials, message, authActions, classes }) => {
-  const [username, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = React.useState({
+  useEffect(() =>
+  {
+    MOUNTED = true;
+    return () => MOUNTED = false;
+  }, []);
+
+  const [username, setUserName] = useStateWrapper("");
+  const [password, setPassword] = useStateWrapper("");
+  const [error, setError] = useStateWrapper({
     show: message != null,
     message: message,
   });
-  const [inProgress, setInProgress] = React.useState(false);
+  const [inProgress, setInProgress] = useStateWrapper(false);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
