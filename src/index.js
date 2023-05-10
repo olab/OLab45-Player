@@ -16,3 +16,14 @@ ReactDOM.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+// safari polyfill
+if ("AbortSignal" in window) {
+  AbortSignal.timeout =
+    AbortSignal.timeout ||
+    ((duration) => {
+      const controller = new AbortController();
+      setTimeout(() => controller.abort(), duration);
+      return controller.signal;
+    });
+}

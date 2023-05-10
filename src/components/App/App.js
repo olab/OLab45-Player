@@ -1,10 +1,8 @@
 import { PureComponent } from "react";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Routes,
   Route,
-  useParams,
-  useNavigate,
   useLocation,
 } from "react-router-dom";
 import "./App.css";
@@ -216,6 +214,18 @@ class App extends PureComponent {
       return <></>;
     }
   }
+}
+
+function NoMatch() {
+  let location = useLocation();
+
+  return (
+    <div>
+      <h4>
+        Page not found <code>{location.pathname}</code>
+      </h4>
+    </div>
+  );
 }
 
 // import { useState } from "react";
