@@ -37,6 +37,7 @@ class OlabAttendeeTag extends React.Component {
       connectionStatus: null,
       index: 0,
       infoOpen: null,
+      infoMessage: null,
       localInfo: new SlotInfo({ connectionId: "???" }),
       maxHeight: 200,
       remoteInfo: new SlotInfo(),
@@ -44,6 +45,8 @@ class OlabAttendeeTag extends React.Component {
       slotInfos: this.slotManager.RemoteSlots(),
       userName: props.props.authActions.getUserName(),
       width: "100%",
+      inAtrium: false,
+      inRoom: false,
     };
 
     this.turkee = new Turkee(this);
@@ -117,11 +120,19 @@ class OlabAttendeeTag extends React.Component {
 
   // system is sending a message to turkee
   onServerMessage(payload) {
+    const { inAtrium, inRoom } = this.state;
+
     try {
-      this.setState({
-        infoOpen: true,
-        infoMessage: payload.data,
-      });
+      if (inRoom) {
+        this.setState({
+          infoOpen: true,
+          infoMessage: payload.data,
+        });
+      } else if (!inAtrium) {
+        this.setState({
+          infoMessage: payload.data,
+        });
+      }
     } catch (error) {
       LogError(
         `'${this.connectionId}' onServerMessage exception: ${error.message}`
@@ -167,6 +178,7 @@ class OlabAttendeeTag extends React.Component {
       this.setState({
         localInfo: localInfo,
         remoteInfo: null,
+        inAtrium: true,
       });
 
       this.dumpConnectionState();
@@ -192,6 +204,7 @@ class OlabAttendeeTag extends React.Component {
         showChatGrid: true,
         localInfo: this.slotManager.LocalSlots()[0],
         remoteInfo: this.slotManager.remoteSlots[0],
+        inRoom: true,
       });
 
       this.dumpConnectionState();
@@ -249,6 +262,8 @@ class OlabAttendeeTag extends React.Component {
       session,
       infoOpen,
       infoMessage,
+      inAtrium,
+      inRoom,
     } = this.state;
 
     const tableStyle = {
@@ -272,17 +287,26 @@ class OlabAttendeeTag extends React.Component {
           <Table style={tableStyle}>
             <TableBody>
               <TableRow>
-                <ChatCell
-                  index={index}
-                  isModerator={localInfo.isModerator}
-                  style={chatCellStyle}
-                  localInfo={localInfo}
-                  senderInfo={remoteInfo}
-                  session={session}
-                  playerProps={this.props.props}
-                  connection={this.connection}
-                  signalr={this.signalr}
-                />
+                {!inAtrium && infoMessage && (
+                  <div style={{ textAlign: "center" }}>
+                    <p>
+                      <b>{infoMessage}</b>
+                    </p>
+                  </div>
+                )}
+                {(inAtrium || inRoom) && (
+                  <ChatCell
+                    index={index}
+                    isModerator={localInfo.isModerator}
+                    style={chatCellStyle}
+                    localInfo={localInfo}
+                    senderInfo={remoteInfo}
+                    session={session}
+                    playerProps={this.props.props}
+                    connection={this.connection}
+                    signalr={this.signalr}
+                  />
+                )}
               </TableRow>
             </TableBody>
           </Table>
