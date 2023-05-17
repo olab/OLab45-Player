@@ -11,6 +11,10 @@ class Turkee extends TurkTalk {
     super(component);
 
     this.session = component.state.session;
+    this.session.referringNode = component.props.props.node.title;
+    this.session.nodeId = component.props.props.node.id;
+    this.session.mapId = component.props.props.map.id;
+
     this.bindConnectionMessage(this.connection);
     this.onDisconnected = this.onDisconnected.bind(this);
     this.playerState = component.props.props;
@@ -33,16 +37,16 @@ class Turkee extends TurkTalk {
   }
 
   // *****
-  onConnected(clientObject) {
+  onConnected() {
     LogInfo(
       `'${this.connection.connectionId}' onConnected: connection succeeded`
     );
 
     this.connectionId = this.connection.connectionId.slice(-3);
 
-    this.connection.onclose(clientObject.onDisconnected);
-    this.connection.onreconnecting(clientObject.onReconnecting);
-    this.connection.onreconnected(clientObject.onReconnected);
+    this.connection.onclose(this.onDisconnected);
+    this.connection.onreconnecting(this.onReconnecting);
+    this.connection.onreconnected(this.onReconnected);
 
     if (this.component.onConnectionChanged) {
       this.component.onConnectionChanged({
@@ -55,6 +59,7 @@ class Turkee extends TurkTalk {
     // get room name from persistant storage in case
     // user refreshes the window
     this.session.roomName = this.penName;
+
     let learner = playerState.GetConnectionInfo(null);
     if (learner != null) {
       if (learner.roomName) {
@@ -63,17 +68,14 @@ class Turkee extends TurkTalk {
     }
 
     log.debug(
-      `'${this.connectionId}' registering turker for session: ${JSON.stringify(
+      `'${this.connectionId}' registering turkee for session: ${JSON.stringify(
         this.session,
         null,
         1
       )}`
     );
 
-    clientObject.connection.send(
-      constants.SIGNALCMD_REGISTERTURKEE,
-      this.session
-    );
+    this.signalr.send(constants.SIGNALCMD_REGISTERTURKEE, this.session);
   }
 
   onReconnecting(error) {
@@ -104,7 +106,7 @@ class Turkee extends TurkTalk {
         });
       }
     } catch (error) {
-      LogError(`'${connectionId}' onReconnected exception: ${error.message}`);
+      log.error(`'${connectionId}' onReconnected exception: ${error.message}`);
     }
   }
 

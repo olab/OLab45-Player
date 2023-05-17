@@ -26,12 +26,6 @@ const HomeWrapper = styled.div`
   width: 80%;
 `;
 
-const MapListWrapper = styled.div`
-  max-height: 75vh;
-  overflow: auto;
-  padding-right: 5px;
-`;
-
 class Home extends PureComponent {
   constructor(props) {
     super(props);
@@ -213,20 +207,18 @@ class Home extends PureComponent {
         <HomeWrapper>
           <Grid container spacing={2}>
             <Grid item xs={10}>
-              <MapListWrapper>
-                <ListWithSearch
-                  getIcon={this.getIcon}
-                  innerRef={this.setListWithSearchRef}
-                  isItemsDisabled={isButtonsDisabled}
-                  isItemsFetching={isMapsFetching}
-                  label="Search for map by keyword or index"
-                  list={mapsFiltered}
-                  onClear={this.clearSearchInput}
-                  onItemClick={this.handleMapItemClick}
-                  onSearch={this.handleItemsSearch}
-                  isWithSpinner={this.isMapsFetching}
-                />
-              </MapListWrapper>
+              <ListWithSearch
+                getIcon={this.getIcon}
+                innerRef={this.setListWithSearchRef}
+                isItemsDisabled={isButtonsDisabled}
+                isItemsFetching={isMapsFetching}
+                label="Search for map by keyword or index"
+                list={mapsFiltered}
+                onClear={this.clearSearchInput}
+                onItemClick={this.handleMapItemClick}
+                onSearch={this.handleItemsSearch}
+                isWithSpinner={this.isMapsFetching}
+              />
               <br />
               Showing&nbsp;
               {mapsFiltered.length}

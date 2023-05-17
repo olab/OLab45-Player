@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // import PropTypes from 'prop-types';
 import { withStyles } from "@material-ui/core/styles";
 import {
@@ -19,48 +19,43 @@ import styles from "./styles";
 import { config } from "../../config";
 import { ReactComponent as LogoIcon } from "../../shared/assets/icons/olab4_logo.svg";
 import { loginUserAsync } from "../../services/api";
+var constants = require("../../services/constants");
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-// async function loginUserAsync(credentials) {
+let MOUNTED = false;
 
-//   var creds = {
-//     "UserName": credentials.username,
-//     "Password": credentials.password
-//   };
+const useStateWrapper = (...args) => {
+  const [val, setter] = useState(...args);
+  return [val, (...args) => MOUNTED && setter(...args)];
+};
 
-//   let url = `${config.API_URL}/auth/login`;
+const Login = ({ setCredentials, message, authActions, classes }) => {
+  useEffect(() => {
+    MOUNTED = true;
+    return () => (MOUNTED = false);
+  }, []);
 
-//   log.debug(`loginUser(${credentials.username}) url: ${url})`);
-
-//   return fetch(url, {
-//     signal: AbortSignal.timeout(7500),
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify(creds)
-//   })
-//     .then(
-//       data => data.json()
-//     )
-// }
-
-const Login = ({ message, authActions, classes }) => {
-  const [username, setUserName] = useState();
-  const [password, setPassword] = useState();
-  const [open, setOpen] = React.useState(message != null);
-  const [errorMessage, setErrorMessage] = React.useState(message);
-  const [inProgress, setInProgress] = React.useState(false);
+  const [username, setUserName] = useStateWrapper("");
+  const [password, setPassword] = useStateWrapper("");
+  const [error, setError] = useStateWrapper({
+    show: message != null,
+    message: message,
+  });
+  const [inProgress, setInProgress] = useStateWrapper(false);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
 
-    setOpen(false);
+    setError({ show: false });
+  };
+
+  const showError = (message) => {
+    setError({ show: true, message: message });
   };
 
   const handleSubmit = async (e) => {
@@ -69,26 +64,27 @@ const Login = ({ message, authActions, classes }) => {
     setInProgress(true);
 
     try {
-      const response = await loginUserAsync({
+      const data = await loginUserAsync({
         username,
         password,
       });
 
-      if (response.statusCode == 401) {
-        setErrorMessage("Invalid username/password");
-        setOpen(true);
+      if (!data) {
+        throw new Error("Unable to Login");
+      }
+
+      if (data.error_code == 401) {
+        showError(data.data);
       } else {
-        if (response.authInfo) {
-          authActions.setToken(response, false);
-          authActions.setUserName(username);
+        if (data.data.authInfo) {
+          setCredentials(data.data, username, constants.TOKEN_TYPE_NATIVE);
         } else {
-          throw JSON.stringify(response, null, 2);
+          throw JSON.stringify(data, null, 2);
         }
       }
     } catch (error) {
       LogError(`loginUser() error: ${JSON.stringify(error, null, 2)})`);
-      setErrorMessage(`Login error: server not responding.`);
-      setOpen(true);
+      showError(error.message);
     }
 
     setInProgress(false);
@@ -124,7 +120,8 @@ const Login = ({ message, authActions, classes }) => {
                 <InputLabel htmlFor="username">Username</InputLabel>
                 <Input
                   name="username"
-                  type="username"
+                  type="text"
+                  value={username}
                   onChange={(e) => setUserName(e.target.value)}
                 />
               </FormControl>
@@ -148,9 +145,13 @@ const Login = ({ message, authActions, classes }) => {
               </Button>
             </form>
           )}
-          <Snackbar open={open} autoHideDuration={5000} onClose={handleClose}>
+          <Snackbar
+            open={error.show}
+            autoHideDuration={5000}
+            onClose={handleClose}
+          >
             <Alert onClose={handleClose} severity="error">
-              {errorMessage}
+              {error.message}
             </Alert>
           </Snackbar>
         </Paper>

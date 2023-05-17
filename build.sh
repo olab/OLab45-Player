@@ -5,4 +5,4 @@ npm run-script build
 pushd build/static
 ln -s /var/www/vhosts/olab46/files files
 popd
-service apache2 restart
+service nginx restart

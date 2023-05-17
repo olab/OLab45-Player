@@ -2,6 +2,7 @@ import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import { Log, LogInfo, LogError } from "../utils/Logger";
 import log from "loglevel";
 import { config } from "../config";
+import SignalRWrapper from "./signalRWrapper";
 
 var constants = require("./constants");
 const playerState = require("../utils/PlayerState").PlayerState;
@@ -26,12 +27,23 @@ class TurkTalk {
     const token = `${sessionInfo?.authInfo.token}`;
     const hubUrl = `${url}?access_token=${token}&contextId=${this.contextId}&mapId=${this.component.props.props.map.id}`;
 
+    log.debug(`building connection to hub`);
+
     this.connection = new HubConnectionBuilder()
       .withUrl(hubUrl)
-      // .withUrl(url, { accessTokenFactory: () => this.token })
-      // .withAutomaticReconnect()
-      .configureLogging(LogLevel.Error)
+      .withAutomaticReconnect()
+      .configureLogging(LogLevel.Information)
       .build();
+
+    this.connection.serverTimeoutInMilliseconds = 120000;
+
+    if (config?.SIGNALR_TIMEOUT_MS) {
+      this.connection.serverTimeoutInMilliseconds = Number(
+        config?.SIGNALR_TIMEOUT_MS
+      );
+    }
+
+    this.signalr = new SignalRWrapper({ connection: this.connection });
 
     this.connections = [];
   }
@@ -60,7 +72,7 @@ class TurkTalk {
       .then(function () {
         if (clientObject?.onConnected) {
           // call onConnected method on 'derived' class
-          clientObject.onConnected(clientObject);
+          clientObject.onConnected();
         }
       })
       .catch(function (error) {
