@@ -16,6 +16,7 @@ const KeyConstants = {
   SERVER: "server",
   SESSION_INFO: "session-info",
   VISIT_ONCE_NODE_LIST: "visit-once-node-list",
+  WATCH_PROFILE: "watchProfile",
 };
 
 class PlayerState {
@@ -105,7 +106,22 @@ class PlayerState {
     );
   }
 
-  static GetAtrium(defaultValue = []) {
+  static GetWatchProfile(
+    key,
+    defaultValue = { autoAssign: false, watchedLearners: [] }
+  ) {
+    return persistantStorage.get(
+      null,
+      `${key}_${KeyConstants.WATCH_PROFILE}`,
+      defaultValue
+    );
+  }
+
+  static SetWatchProfile(key, obj) {
+    persistantStorage.save(null, `${key}_${KeyConstants.WATCH_PROFILE}`, obj);
+  }
+
+  static GetAtrium(defaultValue = {}) {
     return persistantStorage.get(null, KeyConstants.ATRIUM, defaultValue);
   }
 

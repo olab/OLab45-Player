@@ -1,20 +1,11 @@
 // @flow
 import * as React from "react";
-import {
-  Button,
-  Grid,
-  FormLabel,
-  Table,
-  TableBody,
-  MenuItem,
-  Select,
-  TableRow,
-  Snackbar,
-} from "@material-ui/core";
+import { Grid, Snackbar } from "@material-ui/core";
 import { Log, LogInfo, LogError } from "../../../../../utils/Logger";
 import log from "loglevel";
 import { withStyles } from "@material-ui/core/styles";
 import MuiAlert from "@material-ui/lab/Alert";
+import localCss from "./TurkerChatCellGrid.module.css";
 
 import Turker from "../../../../../services/turker";
 import styles from "../../../styles.module.css";
@@ -61,16 +52,21 @@ class OlabModeratorTag extends React.Component {
       localInfo: new SlotInfo(),
       ...atrium,
       infoOpen: null,
+      gridMessage: "Loading...",
+      popup: { open: null, message: null, level: null },
     };
 
     this.handleInfoClose = this.handleInfoClose.bind(this);
     this.onModeratorAssigned = this.onModeratorAssigned.bind(this);
+    this.onServerError = this.onServerError.bind(this);
     this.onScreenPopup = this.onScreenPopup.bind(this);
 
     this.onConnectionChanged = this.onConnectionChanged.bind(this);
 
     this.turker = new Turker(this);
     this.turker.connect(this.state.userName);
+    this.signalr = this.turker.signalr;
+
     this.connection = this.turker.connection;
     this.connectionId = "";
 
@@ -89,12 +85,23 @@ class OlabModeratorTag extends React.Component {
           `'${localInfo.connectionId}' onCommand: ${JSON.stringify(payload)}`
         );
         this.onModeratorAssigned(payload.data);
+      } else if (payload.command === constants.SIGNALCMD_SERVER_ERROR) {
+        log.debug(
+          `'${localInfo.connectionId}' onCommand: ${JSON.stringify(payload)}`
+        );
+        this.onServerError(payload.data);
       }
     } catch (error) {
       LogError(
         `'${localInfo.connectionId}' onTurkerCommandCallback exception: ${error.message}`
       );
     }
+  }
+
+  onServerError(payload) {
+    this.setState({
+      gridMessage: payload,
+    });
   }
 
   onModeratorAssigned(payload) {
@@ -134,58 +141,6 @@ class OlabModeratorTag extends React.Component {
     }
   }
 
-  // handle atrium contents updated
-  // onAtriumUpdate(payloadArray) {
-  //   let { localInfo, atriumLearners } = this.state;
-
-  //   try {
-  //     const previousAtriumCount = atriumLearners.length;
-
-  //     atriumLearners = [];
-
-  //     // save atrium contents if array passed in
-  //     if (Array.isArray(payloadArray) && payloadArray.length >= 0) {
-  //       let key = 1;
-  //       for (const payloadItem of payloadArray) {
-  //         // make a copy of the object so it can be modified
-  //         var learner = Object.assign({}, payloadItem);
-
-  //         // add a 'key/value' properties so atriumContents plays nicely with
-  //         // javascript .map()
-  //         learner.key = `${key++}`;
-
-  //         atriumLearners.push(learner);
-  //       }
-
-  //       log.debug(
-  //         `'${
-  //           localInfo.connectionId
-  //         }' onAtriumUpdate: refreshing: '${JSON.stringify(atriumLearners)}'`
-  //       );
-
-  //       if (previousAtriumCount != atriumLearners.length) {
-  //         this.setState({
-  //           atriumLearners: atriumLearners,
-  //           selectedLearnerUserId: "0",
-  //           infoOpen: true,
-  //           infoMessage: "Atrium Updated",
-  //         });
-  //       } else {
-  //         this.setState({
-  //           atriumLearners: atriumLearners,
-  //           selectedLearnerUserId: "0",
-  //         });
-  //       }
-
-  //       this.updateAtriumState();
-  //     }
-  //   } catch (error) {
-  //     LogError(
-  //       `'${localInfo.connectionId}' onAtriumUpdate exception: ${error.message}`
-  //     );
-  //   }
-  // }
-
   onAtriumLearnerSelected(event) {
     let { localInfo } = this.state;
 
@@ -224,7 +179,7 @@ class OlabModeratorTag extends React.Component {
     );
 
     // signal server to close out this room
-    this.connection.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
+    this.signalr.send(constants.SIGNALCMD_ROOMCLOSE, localInfo.roomName);
   }
 
   onAssignClicked(event) {
@@ -264,7 +219,7 @@ class OlabModeratorTag extends React.Component {
       );
 
       // signal server with assignment of turkee to this room
-      this.connection.send(
+      this.signalr.send(
         constants.SIGNALCMD_ASSIGNTURKEE,
         selectedLearner,
         localInfo.roomName,
@@ -316,6 +271,10 @@ class OlabModeratorTag extends React.Component {
   }
 
   onScreenPopup(props) {
+    let { popup } = this.state;
+
+    popup = { ...popup, ...props };
+
     this.setState({
       infoOpen: true,
       infoMessage: props.message,
@@ -338,6 +297,7 @@ class OlabModeratorTag extends React.Component {
       infoOpen,
       infoMessage,
       mapNodes,
+      gridMessage,
     } = this.state;
 
     log.debug(`'${localInfo.connectionId}' OlabTurkerTag render '${userName}'`);
@@ -346,20 +306,31 @@ class OlabModeratorTag extends React.Component {
       // prevent anything interesting happening
       // until we are connected
       if (!connectionStatus || !localInfo?.assigned) {
-        return <></>;
+        return (
+          <div className={localCss.emptyGridLayout}>
+            <div className={localCss.emptyGridLabel}>
+              <center>
+                <b>{gridMessage}</b>
+              </center>
+            </div>
+          </div>
+        );
       }
 
       return (
         <>
           <Grid container item xs={12}>
             <TurkerChatCellGrid
+              props={this.props}
+              gridMessage={gridMessage}
               onScreenPopup={this.onScreenPopup}
               userName={userName}
               isModerator={true}
-              connection={this.connection}
               roomName={localInfo.roomName}
               localInfo={localInfo}
               mapNodes={mapNodes}
+              connection={this.connection}
+              signalr={this.signalr}
             />
           </Grid>
 
