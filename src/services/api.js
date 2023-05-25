@@ -33,6 +33,11 @@ async function internalFetch(method, url, payload, headerOverrides = null) {
 
       const jsonData = await response.json();
 
+      if (jsonData.error_code === 401) {
+        log.error(`URL '${url}': access denied ${JSON.stringify(jsonData)}`);
+        return jsonData;
+      }
+
       if (jsonData.error_code !== 200) {
         log.error(
           `URL '${url}': ${JSON.stringify(

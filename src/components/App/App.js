@@ -23,20 +23,18 @@ class App extends PureComponent {
     this.reactVersion = process.env.REACT_APP_VERSION;
     log.debug(JSON.stringify(process.env));
 
-    const [mapId, nodeId] = processUrl();
+    const [mapId, nodeId, accessToken] = processUrl();
     const directPlay = mapId != null && nodeId != null;
 
     const { authActions } = new useToken();
     const tokenType = authActions.getTokenType();
 
+    log.info(`current token type: ${tokenType}`);
+
     // perform any left-over anon/external token cleanup
-    if (
-      (tokenType == constants.TOKEN_TYPE_ANONYMOUS ||
-        tokenType == constants.TOKEN_TYPE_EXTERNAL) &&
-      !directPlay
-    ) {
-      log.info(`logging out previous anonymous session`);
-      authActions.logout();
+    if (accessToken) {
+      log.info(`logging out previous session`);
+      authActions.clearState();
     }
 
     // catch any maps changes under previous anon/external session
@@ -46,7 +44,7 @@ class App extends PureComponent {
     ) {
       let map;
 
-      const checkMap = (retry=true) => {
+      const checkMap = (retry = true) => {
         map = playerState.GetMap();
 
         if (map && map?.id != mapId) {
@@ -54,7 +52,7 @@ class App extends PureComponent {
           authActions.logout(!retry);
           retry && checkMap(false);
         }
-      }
+      };
 
       checkMap();
     }

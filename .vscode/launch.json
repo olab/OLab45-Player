@@ -25,7 +25,7 @@
       "name": "External",
       "request": "launch",
       "type": "chrome",
-      "url": "http://logan.cardinalcreek.ca/player/1649/0?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Im9sYWI0cyIsInJvbGUiOiJvbGFic3VwZXJ1c2VyIiwibmFtZSI6Ik9sYWIgSiBVc2VyIiwic3ViIjoib2xhYjRzIiwiaWQiOiIxMSIsIm5iZiI6MTY3NjM5NjExMywiZXhwIjoxNjc3MDAwOTEzLCJpYXQiOjE2NzYzOTYxMTMsImlzcyI6Im9sYWIiLCJhdWQiOiJodHRwczovL3d3dy5vbGFiLmNhIn0.hgRzfhusaPx7E6kq32s9M9QgrIp1ddDYbCVUKwJmAec",
+      "url": "http://localhost:3000/player/1696/0?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1bmlxdWVfbmFtZSI6Im1vZGVyYXRvcjAwMSIsImlkIjoiNjE1IiwiZW1haWwiOiJ0ZXN0X21vZGVyYXRvcl8xQHRlc3QuY29tIiwicm9sZSI6Im9sYWJtb2QiLCJpYXQiOjE2ODQ5NzQ5NDUsImV4cCI6MTY4NTgzODk0NSwiaXNzIjoibW9vZGxlIiwiYXVkIjoiaHR0cHM6XC9cL3d3dy5vbGFiLmNhIiwiY291cnNlIjowfQ.KHQEsW9ud3mHWNj2yFzmz87QC7AdvGnqKBmavS-xcQ0",
       "webRoot": "${workspaceFolder}"
     }
   ]
