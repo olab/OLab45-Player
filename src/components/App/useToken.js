@@ -72,11 +72,13 @@ class useToken {
     return authInfoObject;
   };
 
-  logout = () => {
+  logout = (redirect=true) => {
     this.#initializeState(true);
 
-    let url = `${process.env.PUBLIC_URL}/`;
-    window.location.href = url;
+    if ( redirect ) {
+      let url = `${process.env.PUBLIC_URL}/`;
+      window.location.href = url;
+    }
   };
 
   isExpiredSession = () => {

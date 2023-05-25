@@ -44,11 +44,19 @@ class App extends PureComponent {
       tokenType == constants.TOKEN_TYPE_ANONYMOUS ||
       tokenType == constants.TOKEN_TYPE_EXTERNAL
     ) {
-      const map = playerState.GetMap();
-      if (map && map?.id != mapId) {
-        log.info(`logging out anonymous session from different map`);
-        authActions.logout();
+      let map;
+
+      const checkMap = (retry=true) => {
+        map = playerState.GetMap();
+
+        if (map && map?.id != mapId) {
+          log.info(`logging out anonymous session from different map`);
+          authActions.logout(!retry);
+          retry && checkMap(false);
+        }
       }
+
+      checkMap();
     }
 
     this.state = {
