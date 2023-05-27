@@ -38,6 +38,11 @@ async function internalFetch(method, url, payload, headerOverrides = null) {
         return jsonData;
       }
 
+      if (jsonData.error_code === 500) {
+        log.error(`URL '${url}': server error ${JSON.stringify(jsonData)}`);
+        return jsonData;
+      }
+
       if (jsonData.error_code !== 200) {
         log.error(
           `URL '${url}': ${JSON.stringify(
@@ -99,7 +104,7 @@ async function getMap(props, mapId) {
   });
 
   if (data.error_code != 200) {
-    throw new Error(`Error retrieving map ${mapId}: ${data.message}`);
+    throw new Error(`Error retrieving map ${mapId}: ${data.data}`);
   }
 
   return data;
