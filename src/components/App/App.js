@@ -33,28 +33,21 @@ class App extends PureComponent {
 
     // perform any left-over anon/external token cleanup
     if (accessToken) {
-      log.info(`logging out previous session`);
+      log.info(`external token found. logging out previous session`);
       authActions.clearState();
     }
 
-    // catch any maps changes under previous anon/external session
+    // catch any map changes under previous anon/external session
     if (
       tokenType == constants.TOKEN_TYPE_ANONYMOUS ||
       tokenType == constants.TOKEN_TYPE_EXTERNAL
     ) {
-      let map;
+      let map = playerState.GetMap();
 
-      const checkMap = (retry = true) => {
-        map = playerState.GetMap();
-
-        if (map && map?.id != mapId) {
-          log.info(`logging out anonymous session from different map`);
-          authActions.logout(!retry);
-          retry && checkMap(false);
-        }
-      };
-
-      checkMap();
+      if (map && map?.id != mapId) {
+        log.info(`map changed. logging out previous session`);
+        authActions.clearState();
+      }
     }
 
     this.state = {

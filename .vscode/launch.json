@@ -25,7 +25,7 @@
       "name": "External",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:3000/player/1696/0?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1bmlxdWVfbmFtZSI6Im1vZGVyYXRvcjAwMSIsImlkIjoiNjE1IiwiZW1haWwiOiJ0ZXN0X21vZGVyYXRvcl8xQHRlc3QuY29tIiwicm9sZSI6Im9sYWJtb2QiLCJpYXQiOjE2ODQ5NzQ5NDUsImV4cCI6MTY4NTgzODk0NSwiaXNzIjoibW9vZGxlIiwiYXVkIjoiaHR0cHM6XC9cL3d3dy5vbGFiLmNhIiwiY291cnNlIjowfQ.KHQEsW9ud3mHWNj2yFzmz87QC7AdvGnqKBmavS-xcQ0",
+      "url": "http://localhost:3000/player/1703/0?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1bmlxdWVfbmFtZSI6Im9sc3R1ZGVudCIsImlkIjoiOSIsImVtYWlsIjoiZGEudmlkLnRvcHBzQGdtYWlsLmNvbSIsInJvbGUiOiJzdHVkZW50LG9sYWJsZWFybmVyIiwiaWF0IjoxNjg1MDU5NjgzLCJleHAiOjE2ODU5MjM2ODMsImlzcyI6Im1vb2RsZSIsImF1ZCI6Imh0dHBzOlwvXC93d3cub2xhYi5jYSIsImNvdXJzZSI6MH0.dI18kmpf8kmnzcPoOIYN-Tnz0lNNss061y_GGro_25E",
       "webRoot": "${workspaceFolder}"
     }
   ]
