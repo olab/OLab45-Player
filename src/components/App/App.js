@@ -13,6 +13,8 @@ import {
   submitAnonymousMapId,
   submitExternalToken,
 } from "../../utils/AppHelpers";
+import Logout from "./../Logout/";
+
 var constants = require("../../services/constants");
 const playerState = require("../../utils/PlayerState").PlayerState;
 
@@ -176,6 +178,10 @@ class App extends PureComponent {
                 path={`/player/:mapId/:nodeId`}
                 element={<Player authActions={authActions} />}
               />
+              <Route
+                path={`/player/logout`}
+                element={<Logout authActions={authActions} />}
+              />
               <Route path="*" element={<NoMatch />} />
             </Routes>
           </div>
@@ -203,6 +209,10 @@ class App extends PureComponent {
               path={`/player/:mapId/:nodeId`}
               element={<Player authActions={authActions} />}
             />
+            <Route
+                path={`/player/logout`}
+                element={<Logout authActions={authActions} />}
+              />
             <Route path="*" element={<NoMatch />} />
           </Routes>
         </div>
