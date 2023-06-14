@@ -9,9 +9,14 @@ class Turker extends TurkTalk {
   constructor(component) {
     super(component);
 
-    const { onAtriumUpdate, onAddTurkee, onRemoveTurkey, onRoomAssigned } =
-      component;
-    this.onAtriumUpdate = onAtriumUpdate;
+    const {
+      // onAtriumUpdate,
+      onAddTurkee,
+      onRemoveTurkey,
+      onRoomAssigned,
+    } = component;
+
+    // this.onAtriumUpdate = onAtriumUpdate;
     this.onRoomAssigned = onRoomAssigned;
     this.onAddTurkee = onAddTurkee;
     this.onRemoveTurkey = onRemoveTurkey;
@@ -41,16 +46,16 @@ class Turker extends TurkTalk {
   }
 
   // *****
-  onConnected(clientObject) {
+  onConnected() {
     LogInfo(
       `'${this.connection.connectionId}' onConnected: connection succeeded`
     );
 
     this.connectionId = this.connection.connectionId.slice(-3);
 
-    this.connection.onclose(clientObject.onDisconnected);
-    this.connection.onreconnecting(clientObject.onReconnecting);
-    this.connection.onreconnected(clientObject.onReconnected);
+    this.connection.onclose(this.onDisconnected);
+    this.connection.onreconnecting(this.onReconnecting);
+    this.connection.onreconnected(this.onReconnected);
 
     if (this.component.onConnectionChanged) {
       this.component.onConnectionChanged({
@@ -74,7 +79,7 @@ class Turker extends TurkTalk {
       `'${this.connectionId}' registering turker for room name: ${roomName}`
     );
 
-    clientObject.connection.send(
+    this.signalr.send(
       constants.SIGNALCMD_REGISTERTURKER,
       this.component.props.props.map.id,
       this.component.props.props.node.id,
@@ -86,7 +91,7 @@ class Turker extends TurkTalk {
   // *****
   onDisconnected() {
     try {
-      log.debug(`'${this.connectionId}' onDisconnected`);
+      log.warn(`'${this.connectionId}' onDisconnected`);
       if (this.component.onConnectionChanged) {
         if (this.component.onConnectionChanged) {
           this.component.onConnectionChanged({
@@ -104,7 +109,7 @@ class Turker extends TurkTalk {
 
   onReconnecting(error) {
     try {
-      log.debug(`'${this.connectionId}' onReconnecting: ${error}`);
+      log.warn(`'${this.connectionId}' onReconnecting: ${error}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -121,7 +126,7 @@ class Turker extends TurkTalk {
 
   onReconnected(connectionId) {
     try {
-      log.debug(`'${this.connectionId}' onReconnected: ${connectionId}`);
+      log.warn(`'${this.connectionId}' onReconnected: ${connectionId}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -146,11 +151,13 @@ class Turker extends TurkTalk {
         return;
       } else {
         log.debug(
-          `'${this.connectionId}' onCommand unknown command: '${payload.command}'`
+          `'${this.connectionId}' turker.js onCommand unknown command: '${payload.command}'`
         );
       }
     } catch (error) {
-      LogError(`'${this.connectionId}' onCommand exception: ${error.message}`);
+      LogError(
+        `'${this.connectionId}' turker.js onCommand exception: ${error.message}`
+      );
     }
   }
 }

@@ -19,13 +19,7 @@ class ChatCell extends React.Component {
       lastMessageTime: null,
     };
 
-    // this.onCommand = this.onCommand.bind(this);
     this.connectionId = this.state.connection.connectionId?.slice(-3);
-
-    // var self = this;
-    // this.state.connection.on(constants.SIGNALCMD_COMMAND, (payload) => { self.onCommand(payload) });
-
-    log.debug(`ChatCell[${this.props.index}] ctor`);
   }
 
   componentDidUpdate(prevProps) {
@@ -33,11 +27,6 @@ class ChatCell extends React.Component {
       this.setState({ localInfo: this.props.localInfo });
     }
   }
-
-  // command method listener
-  // onCommand(payload) {
-  // log.debug(`'${this.state.connection.connectionId?.slice(-3)}' onChatCellCommandCallback: ${payload.command}`);
-  // }
 
   render() {
     try {
@@ -50,11 +39,11 @@ class ChatCell extends React.Component {
         session,
       } = this.state;
 
-      log.debug(
-        `ChatCell[${this.props.index}] render. localInfo: ${JSON.stringify(
-          localInfo
-        )}`
-      );
+      // log.debug(
+      //   `ChatCell[${this.props.index}] render. localInfo: ${JSON.stringify(
+      //     localInfo
+      //   )}`
+      // );
 
       let cellStyling = Object.assign({ padding: 7 }, this.props.style);
       if (!localInfo.show) {
@@ -69,19 +58,22 @@ class ChatCell extends React.Component {
             session={session}
             show={localInfo.show}
             isModerator={this.props.isModerator}
-            connection={connection}
+            onPopupMessage={this.props.onPopupMessage}
             localInfo={localInfo}
             senderInfo={senderInfo}
             playerProps={playerProps}
+            connection={connection}
+            signalr={this.props.signalr}
           />
           <ChatStatusBar
             index={this.props.index}
             show={localInfo.show}
             isModerator={this.props.isModerator}
-            connection={connection}
             localInfo={localInfo}
             lastMessageTime={lastMessageTime}
             senderInfo={senderInfo}
+            connection={connection}
+            signalr={this.props.signalr}
           />
         </TableCell>
       );

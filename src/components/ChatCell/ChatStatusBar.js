@@ -25,6 +25,7 @@ class ChatStatusBar extends React.Component {
     };
 
     this.messageTimer = null;
+    this.signalr = this.props?.signalr;
     this.connectionId = this.props.connection.connectionId?.slice(-3);
 
     this.onMessageTimer = this.onMessageTimer.bind(this);

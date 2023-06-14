@@ -13,6 +13,7 @@ class SlotManager {
     this.haveLocalAssigned = false;
     this.remoteSlots = [];
     this.localSlots = [];
+    // this.jumpNodes = [];
 
     // if have no saved slots, initialize a
     // new list of slots
@@ -64,6 +65,10 @@ class SlotManager {
   LocalSlots() {
     return this.localSlots;
   }
+
+  // JumpNodes() {
+  //   return this.jumpNodes;
+  // }
 
   assignLocalInfo(localInfo) {
     // make copy of localInfo so it can be modified per slot
@@ -165,7 +170,7 @@ class SlotManager {
   }
 
   // *****
-  assignLearner(localInfo, remoteInfo) {
+  assignLearner(localInfo, remoteInfo, jumpNodes) {
     let index = this.getSlotIndex(remoteInfo);
     if (index == null) {
       throw new Error(
@@ -180,6 +185,7 @@ class SlotManager {
     participant.show = true;
     participant.assigned = true;
     participant.slotIndex = index;
+    participant.jumpNodes = jumpNodes;
     remoteSlot.SetParticipant(participant);
 
     this.haveAssigned = true;
@@ -193,14 +199,9 @@ class SlotManager {
     participant.assigned = true;
 
     this.LocalSlots()[index] = participant;
+    // this.JumpNodes()[index] = jumpNodes;
 
     log.debug(`assignLearner: ${JSON.stringify(participant)}`);
-
-    // return {
-    //   remoteSlot: remoteSlot,
-    //   localSlot: participant,
-    //   slotIndex: index
-    // }
   }
 }
 

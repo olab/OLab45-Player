@@ -99,6 +99,13 @@ class OlabMultiPickQuestion extends React.Component {
       },
       () => this.transmitResponse()
     );
+
+    if (event.relatedTarget) {
+      setTimeout(function () {
+        log.debug(`focus ${event.relatedTarget.id}`);
+        event.relatedTarget.focus();
+      }, 500);
+    }
   };
 
   transmitResponse() {

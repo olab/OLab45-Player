@@ -11,21 +11,21 @@
       "name": "Moderator",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:3000/player/player/1649/0",
+      "url": "http://localhost:3000/player/1649/0",
       "webRoot": "${workspaceFolder}"
     },
     {
       "name": "Learner",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:3000/player/player/1649/0",
+      "url": "http://localhost:3000/player/1649/0",
       "webRoot": "${workspaceFolder}"
     },
     {
       "name": "External",
       "request": "launch",
       "type": "chrome",
-      "url": "http://logan.cardinalcreek.ca/player/player/1649/0?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Im9sYWI0cyIsInJvbGUiOiJvbGFic3VwZXJ1c2VyIiwibmFtZSI6Ik9sYWIgSiBVc2VyIiwic3ViIjoib2xhYjRzIiwiaWQiOiIxMSIsIm5iZiI6MTY3NjM5NjExMywiZXhwIjoxNjc3MDAwOTEzLCJpYXQiOjE2NzYzOTYxMTMsImlzcyI6Im9sYWIiLCJhdWQiOiJodHRwczovL3d3dy5vbGFiLmNhIn0.hgRzfhusaPx7E6kq32s9M9QgrIp1ddDYbCVUKwJmAec",
+      "url": "http://localhost:3000/player/1731/0?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1bmlxdWVfbmFtZSI6Im1ob3NzZWluaSIsImlkIjoiMTMiLCJlbWFpbCI6InNleWVkbWFoZGkuaG9zc2VpbmlAdWNhbGdhcnkuY2EiLCJyb2xlIjoibWFuYWdlcixvbGFic3VwZXJ1c2VyIiwiaWF0IjoxNjg1MTQ4MTY5LCJleHAiOjE2ODYwMTIxNjksImlzcyI6Im1vb2RsZSIsImF1ZCI6Imh0dHBzOlwvXC93d3cub2xhYi5jYSIsImNvdXJzZSI6MH0.mvNARWVUXRbOkVekFZgBPFe6yAZus_GUEEm-ZtqfnqM",
       "webRoot": "${workspaceFolder}"
     }
   ]

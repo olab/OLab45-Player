@@ -84,10 +84,13 @@ class OlabSliderQuestion extends React.Component {
     try {
       // eslint-disable-next-line
       const settings = JSON.parse(question.settings);
+      question.width = 200; // use fixed width - @see https://olabrats.atlassian.net/browse/OD-28
 
       return (
         <div className={`${styles["quslider"]} ${siteStyles[id]}`} id={`${id}`}>
-          <Box width={question.width}>
+          <Box
+            width={question.width}
+            className={'hor' != settings.orientation ? styles["quslider_box_vertical"] : ''}>
             <Typography id={`${id}-stem`} component="div" gutterBottom>
               {question.stem}
             </Typography>
@@ -101,6 +104,7 @@ class OlabSliderQuestion extends React.Component {
               defaultValue={question.value}
               onChangeCommitted={(event, value) => this.setValue(event, value)}
               step={Number(settings.stepValue)}
+              orientation={'hor' != settings.orientation ? 'vertical' : 'horizontal'}
               marks
               name={`${id}-slider`}
               min={Number(settings.minValue)}

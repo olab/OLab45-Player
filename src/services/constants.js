@@ -22,6 +22,7 @@ module.exports = Object.freeze({
   SIGNALCMD_LEARNER_LIST: "learnerlist",
   SIGNALCMD_LEARNER_ASSIGNED: "learnerassignment",
   SIGNALCMD_TURKER_ASSIGNED: "moderatorassignment",
+  SIGNALCMD_SERVER_ERROR: "servererror",
   SIGNALCMD_JUMP_NODE: "jumpnode",
 
   SIGNALCMD_TURKERCONNECT: "TURKERCONNECT",
@@ -31,6 +32,7 @@ module.exports = Object.freeze({
   SIGNALCMD_TURKEELIST: "TURKEELIST",
   SIGNALCMD_TURKEELOAD: "TURKEELOAD",
   SIGNALCMD_TURKEEUNLOAD: "TURKEEUNLOAD",
+  SIGNALCMD_TURKEEMESSAGE: "TURKEEMESSAGE",
 
   SIGNALCMD_SYSTEM_BROADCAST: "systemBroadcastMessage",
   SIGNALCMD_COHORT_BROADCAST: "cohortBroadcastMessage",
@@ -54,4 +56,8 @@ module.exports = Object.freeze({
   STATUS_TEXT_CLASS: "status-text",
   PARTNER_ID_CLASS: "partner-name",
   BUTTON_BOX_CLASS: "button-box",
+
+  TOKEN_TYPE_EXTERNAL: "external",
+  TOKEN_TYPE_ANONYMOUS: "anonymous",
+  TOKEN_TYPE_NATIVE: "native",
 });
