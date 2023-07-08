@@ -40,9 +40,9 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-  { id: 'timestamp', numeric: false, disablePadding: false, label: 'Timestamp' },
-  { id: 'user', numeric: false, disablePadding: false, label: 'User' },
-  { id: 'nodesVisited', numeric: true, disablePadding: false, label: 'Nodes Visited' },
+  { id: 'timestamp', numeric: false, disablePadding: false, label: 'Date' },
+  { id: 'user', numeric: false, disablePadding: false, label: 'Username' },
+  { id: 'nodesVisited', numeric: true, disablePadding: false, label: 'Nodes visited' },
 ];
 
 function EnhancedTableHead(props) {
@@ -89,7 +89,7 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(2),
   },
   table: {
-    minWidth: 750,
+    minWidth: 600,
   },
   visuallyHidden: {
     border: 0,
@@ -166,17 +166,19 @@ export default (props) => {
             />
             <TableBody>
               { (undefined === sessions || !sessions) &&
-                <TableCell colSpan={3} align='center'>
-                  <p><small><em>{
-                    undefined === sessions
-                      ? 'Loading sessions...'
-                      : (
-                        ! Array.isArray(sessions)
-                          ? 'Error occurred while loading sessions.'
-                          : 'No sessions found.'
-                      )
-                  }</em></small></p>
-                </TableCell> }
+                <TableRow>
+                  <TableCell scope="row" colSpan={3} align="center">
+                    <p><small><em>{
+                      undefined === sessions
+                        ? 'Loading sessions...'
+                        : (
+                          ! Array.isArray(sessions)
+                            ? 'Error occurred while loading sessions.'
+                            : 'No sessions found.'
+                        )
+                    }</em></small></p>
+                  </TableCell>
+                </TableRow> }
 
               {stableSort(sessions ?? [], getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -186,7 +188,6 @@ export default (props) => {
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.name)}
                       role="checkbox"
                       tabIndex={-1}
                       key={row.name}
