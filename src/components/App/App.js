@@ -158,7 +158,7 @@ class App extends PureComponent {
     if (directPlay && directPlayError) {
       return (
         <div>
-          <Header version={this.reactVersion} authActions={authActions} />
+          <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
           <center>
             <p>{directPlayError}</p>
           </center>
@@ -172,7 +172,7 @@ class App extends PureComponent {
       if (token && !isExpired) {
         return (
           <div className="wrapper">
-            <Header version={this.reactVersion} authActions={authActions} />
+            <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
             <Routes>
               <Route
                 path={`/player/:mapId/:nodeId`}
@@ -195,7 +195,7 @@ class App extends PureComponent {
     if (tokenType == constants.TOKEN_TYPE_NATIVE) {
       return (
         <div className="wrapper">
-          <Header version={this.reactVersion} authActions={authActions} />
+          <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
           <Routes>
             <Route
               path={`/player`}
