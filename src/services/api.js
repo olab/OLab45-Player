@@ -324,6 +324,21 @@ async function getMapScopedObjects(props, mapId) {
   return data;
 }
 
+async function getMapSessions(props, mapId) {
+  let url = `${config.API_URL}/maps/${mapId}/sessions`;
+  let token = props.authActions.getToken();
+
+  const data = await internalFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  if (data.error_code != 200) {
+    throw new Error(`Error retrieving map sessions ${mapId}: ${data.data}`);
+  }
+
+  return data;
+}
+
 export {
   getDownload,
   loginUserAsync,
@@ -340,4 +355,5 @@ export {
   getSessionReport,
   importer,
   postQuestionValue,
+  getMapSessions,
 };

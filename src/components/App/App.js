@@ -14,6 +14,7 @@ import {
   submitExternalToken,
 } from "../../utils/AppHelpers";
 import Logout from "./../Logout/";
+import MapSessions from "../Sessions/Sessions";
 
 var constants = require("../../services/constants");
 const playerState = require("../../utils/PlayerState").PlayerState;
@@ -175,6 +176,10 @@ class App extends PureComponent {
             <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
             <Routes>
               <Route
+                path={`/player/:mapId/sessions`}
+                element={<MapSessions authActions={authActions} />}
+              />
+              <Route
                 path={`/player/:mapId/:nodeId`}
                 element={<Player authActions={authActions} />}
               />
@@ -204,6 +209,10 @@ class App extends PureComponent {
             <Route
               path={`/player/home`}
               element={<Home authActions={authActions} />}
+            />
+            <Route
+              path={`/player/:mapId/sessions`}
+              element={<MapSessions authActions={authActions} />}
             />
             <Route
               path={`/player/:mapId/:nodeId`}
