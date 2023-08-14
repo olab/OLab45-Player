@@ -19,7 +19,7 @@ jobs:
         with:
           submodules: true        
       - run: npm cache clean --force
-      - run: npm run build:prod
+      - run: npm run build:dev
       - run: npm cache verify
       - run: npm install npm@latest -g           
       - name: Build And Deploy
