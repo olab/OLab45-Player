@@ -1,7 +1,7 @@
 {
   "name": "olab46player",
   "homepage": "/player",
-  "version": "23.8.14-0",
+  "version": "23.5.3-6",
   "private": true,
   "dependencies": {
     "@material-ui/core": "latest",
@@ -42,7 +42,8 @@
     "start": "react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "build": "dotenv -e .env.azure react-scripts build && echo '' > build/index.html",
+    "build": "dotenv -e .env.production react-scripts build",
+    "build:azure": "dotenv -e .env.azure react-scripts build && echo '' > build/index.html",
     "build:dev": "npm --no-git-tag-version version prerelease",
     "build:prod": "npm --no-git-tag-version version `date +%y.%m.%d-0`",
     "prepare": "husky install"
