@@ -313,12 +313,6 @@ async function getSessionReport(props, contextId) {
   return data;
 }
 
-async function getSessionReportDownloadUrl(props, contextId) {
-  // @Corey, this will need backend implementation for an application/octet-stream download (excel)
-  const url = `${config.API_URL}/reports/${contextId}/excel`;
-  return url;
-}
-
 async function getMapScopedObjects(props, mapId) {
   let url = `${config.API_URL}/maps/${mapId}/scopedObjects`;
   let token = props.authActions.getToken();
@@ -326,6 +320,21 @@ async function getMapScopedObjects(props, mapId) {
   const data = await internalFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
   });
+
+  return data;
+}
+
+async function getMapSessions(props, mapId) {
+  let url = `${config.API_URL}/maps/${mapId}/sessions`;
+  let token = props.authActions.getToken();
+
+  const data = await internalFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  if (data.error_code != 200) {
+    throw new Error(`Error retrieving map sessions ${mapId}: ${data.data}`);
+  }
 
   return data;
 }
@@ -344,7 +353,7 @@ export {
   getNodeScopedObjects,
   getServerScopedObjects,
   getSessionReport,
-  getSessionReportDownloadUrl,
   importer,
   postQuestionValue,
+  getMapSessions,
 };

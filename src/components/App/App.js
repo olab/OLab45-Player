@@ -13,6 +13,9 @@ import {
   submitAnonymousMapId,
   submitExternalToken,
 } from "../../utils/AppHelpers";
+import Logout from "./../Logout/";
+import MapSessions from "../Sessions/Sessions";
+
 var constants = require("../../services/constants");
 const playerState = require("../../utils/PlayerState").PlayerState;
 
@@ -156,7 +159,7 @@ class App extends PureComponent {
     if (directPlay && directPlayError) {
       return (
         <div>
-          <Header version={this.reactVersion} authActions={authActions} />
+          <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
           <center>
             <p>{directPlayError}</p>
           </center>
@@ -170,11 +173,19 @@ class App extends PureComponent {
       if (token && !isExpired) {
         return (
           <div className="wrapper">
-            <Header version={this.reactVersion} authActions={authActions} />
+            <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
             <Routes>
+              <Route
+                path={`/player/:mapId/sessions`}
+                element={<MapSessions authActions={authActions} />}
+              />
               <Route
                 path={`/player/:mapId/:nodeId`}
                 element={<Player authActions={authActions} />}
+              />
+              <Route
+                path={`/player/logout`}
+                element={<Logout authActions={authActions} />}
               />
               <Route path="*" element={<NoMatch />} />
             </Routes>
@@ -189,7 +200,7 @@ class App extends PureComponent {
     if (tokenType == constants.TOKEN_TYPE_NATIVE) {
       return (
         <div className="wrapper">
-          <Header version={this.reactVersion} authActions={authActions} />
+          <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
           <Routes>
             <Route
               path={`/player`}
@@ -200,9 +211,17 @@ class App extends PureComponent {
               element={<Home authActions={authActions} />}
             />
             <Route
+              path={`/player/:mapId/sessions`}
+              element={<MapSessions authActions={authActions} />}
+            />
+            <Route
               path={`/player/:mapId/:nodeId`}
               element={<Player authActions={authActions} />}
             />
+            <Route
+                path={`/player/logout`}
+                element={<Logout authActions={authActions} />}
+              />
             <Route path="*" element={<NoMatch />} />
           </Routes>
         </div>
