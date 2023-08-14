@@ -184,7 +184,7 @@ class OlabMultiPickQuestion extends React.Component {
         }
 
         // test for 'incorrect' answer
-        if (response.isCorrect == 0 && question.showAnswerIndicators) {
+        if (response.isCorrect == -1 && question.showAnswerIndicators) {
           correctnessIndicator = (
             <>
               {response.response}
