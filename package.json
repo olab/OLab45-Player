@@ -42,7 +42,7 @@
     "start": "react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "build": "BUILD_PATH='build/player' react-scripts build && echo '' > build/index.html",
+    "build": "react-scripts build && echo '' > build/index.html",
     "build:dev": "npm --no-git-tag-version version prerelease",
     "build:prod": "npm --no-git-tag-version version `date +%y.%m.%d-0`",
     "prepare": "husky install"
