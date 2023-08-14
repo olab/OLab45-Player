@@ -1,0 +1,15 @@
+{
+  "routes": [
+    {
+      "route": "/index.html",
+      "redirect": "/player"
+    },
+    {
+      "route": "/",
+      "redirect": "/player"
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "/player/index.html"
+  }
+}
