@@ -218,7 +218,7 @@ async function postQuestionValue(state) {
     questionId: question.id,
     responseId: question.responseId,
     previousResponseId: question.previousResponseId,
-    value: question.value,
+    value: question.valueOverride ?? question.value,
     previousValue: question.previousValue,
     dynamicObjects: dynamicObjects,
   };

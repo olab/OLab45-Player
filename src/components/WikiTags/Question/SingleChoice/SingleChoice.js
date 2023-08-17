@@ -57,6 +57,7 @@ class OlabSinglePickQuestion extends React.Component {
 
     question.responseId = response.id;
     question.value = question.responseId;
+    question.valueOverride = response.response;
 
     log.debug(
       `OlabSinglePickQuestion set question '${question.id}' value = '${value}'`
