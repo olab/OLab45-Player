@@ -3,11 +3,11 @@ name: Azure Static Web Apps CI/CD
 on:
   push:
     branches:
-      - coreywirun/azureintegation
+      - coreywirun/azureintegration
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
-      - coreywirun/azureintegation
+      - coreywirun/azureintegration
 
 jobs:
   build_and_deploy_job:
