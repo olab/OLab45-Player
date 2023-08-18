@@ -60,11 +60,13 @@ class OlabMultiPickQuestion extends React.Component {
     }
 
     let value = null;
+    let valueOverride;
     const checked = event.target.checked;
     const alreadyContains = choiceArray.includes(choiceId);
 
     if (checked && choiceArray.length === 0) {
       value = choiceId;
+      valueOverride = question.responses.find(res => res.id == choiceId)?.response;
     } else {
       if (!checked && alreadyContains) {
         const index = choiceArray.indexOf(choiceId);
@@ -76,6 +78,11 @@ class OlabMultiPickQuestion extends React.Component {
       }
 
       value = this.createValueFromArray(choiceArray);
+      valueOverride = this.createValueFromArray(
+        question.responses
+          .filter(res => choiceArray.map(n => +n).includes(res.id))
+          .map(res => res.response)
+      );
     }
 
     log.debug(
@@ -95,6 +102,7 @@ class OlabMultiPickQuestion extends React.Component {
       (state) => {
         question.previousValue = question.value;
         question.value = value;
+        question.valueOverride = valueOverride;
         return { question };
       },
       () => this.transmitResponse()
