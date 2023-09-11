@@ -13,6 +13,9 @@ import {
   submitAnonymousMapId,
   submitExternalToken,
 } from "../../utils/AppHelpers";
+import Logout from "./../Logout/";
+import MapSessions from "../Sessions/Sessions";
+
 var constants = require("../../services/constants");
 const playerState = require("../../utils/PlayerState").PlayerState;
 
@@ -23,31 +26,30 @@ class App extends PureComponent {
     this.reactVersion = process.env.REACT_APP_VERSION;
     log.debug(JSON.stringify(process.env));
 
-    const [mapId, nodeId] = processUrl();
+    const [mapId, nodeId, accessToken] = processUrl();
     const directPlay = mapId != null && nodeId != null;
 
     const { authActions } = new useToken();
     const tokenType = authActions.getTokenType();
 
+    log.info(`current token type: ${tokenType}`);
+
     // perform any left-over anon/external token cleanup
-    if (
-      (tokenType == constants.TOKEN_TYPE_ANONYMOUS ||
-        tokenType == constants.TOKEN_TYPE_EXTERNAL) &&
-      !directPlay
-    ) {
-      log.info(`logging out previous anonymous session`);
-      authActions.logout();
+    if (accessToken) {
+      log.info(`external token found. logging out previous session`);
+      authActions.clearState();
     }
 
-    // catch any maps changes under previous anon/external session
+    // catch any map changes under previous anon/external session
     if (
       tokenType == constants.TOKEN_TYPE_ANONYMOUS ||
       tokenType == constants.TOKEN_TYPE_EXTERNAL
     ) {
-      const map = playerState.GetMap();
+      let map = playerState.GetMap();
+
       if (map && map?.id != mapId) {
-        log.info(`logging out anonymous session from different map`);
-        authActions.logout();
+        log.info(`map changed. logging out previous session`);
+        authActions.clearState();
       }
     }
 
@@ -157,7 +159,7 @@ class App extends PureComponent {
     if (directPlay && directPlayError) {
       return (
         <div>
-          <Header version={this.reactVersion} authActions={authActions} />
+          <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
           <center>
             <p>{directPlayError}</p>
           </center>
@@ -171,11 +173,19 @@ class App extends PureComponent {
       if (token && !isExpired) {
         return (
           <div className="wrapper">
-            <Header version={this.reactVersion} authActions={authActions} />
+            <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
             <Routes>
+              <Route
+                path={`/player/:mapId/sessions`}
+                element={<MapSessions authActions={authActions} />}
+              />
               <Route
                 path={`/player/:mapId/:nodeId`}
                 element={<Player authActions={authActions} />}
+              />
+              <Route
+                path={`/player/logout`}
+                element={<Logout authActions={authActions} />}
               />
               <Route path="*" element={<NoMatch />} />
             </Routes>
@@ -190,7 +200,7 @@ class App extends PureComponent {
     if (tokenType == constants.TOKEN_TYPE_NATIVE) {
       return (
         <div className="wrapper">
-          <Header version={this.reactVersion} authActions={authActions} />
+          <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
           <Routes>
             <Route
               path={`/player`}
@@ -201,9 +211,17 @@ class App extends PureComponent {
               element={<Home authActions={authActions} />}
             />
             <Route
+              path={`/player/:mapId/sessions`}
+              element={<MapSessions authActions={authActions} />}
+            />
+            <Route
               path={`/player/:mapId/:nodeId`}
               element={<Player authActions={authActions} />}
             />
+            <Route
+                path={`/player/logout`}
+                element={<Logout authActions={authActions} />}
+              />
             <Route path="*" element={<NoMatch />} />
           </Routes>
         </div>

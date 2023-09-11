@@ -150,7 +150,7 @@ class PlayerState {
 
   static GetSessionInfo(
     keyPrefix,
-    defaultValue = { authInfo: { expires: 0, token: null } }
+    defaultValue = { tokenType: null, authInfo: { expires: 0, token: null } }
   ) {
     return persistantStorage.get(
       keyPrefix,
