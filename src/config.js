@@ -1,13 +1,13 @@
 // Constants.js
 const prod = {
-  API_URL: "https://logan.cardinalcreek.ca/olab/api/v3",
-  TTALK_HUB_URL: "https://logan.cardinalcreek.ca/turktalk",
-  SIGNALR_TIMEOUT_MS: 180000,
-  API_RETRY_COUNT: 10,
+  API_URL: process.env.API_URL,
+  TTALK_HUB_URL: process.env.TTALK_HUB_URL,
+  SIGNALR_TIMEOUT_MS: process.env.SIGNALR_TIMEOUT_MS,
+  API_RETRY_COUNT: process.env.API_RETRY_COUNT,
 };
 
 const dev = {
-  API_URL: "https://localhost:5001/olab/api/v3",
+  API_URL: "https://olabdevapi.azurewebsites.net/olab/api/v3",
   TTALK_HUB_URL: "https://localhost:5002/turktalk",
   SIGNALR_TIMEOUT_MS: 180000,
   API_RETRY_COUNT: 10,

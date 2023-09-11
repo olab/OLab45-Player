@@ -1,7 +1,7 @@
 {
   "name": "olab46player",
   "homepage": "/player",
-  "version": "23.5.3-6",
+  "version": "23.9.7-1",
   "private": true,
   "dependencies": {
     "@material-ui/core": "latest",
@@ -38,12 +38,13 @@
   },
   "scripts": {
     "clean": "rm -Rf build/*",
-    "start": "react-scripts start",
+    "start": "dotenv -e .env.azure react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "build": "dotenv -e .env.production react-scripts build",
-    "build:dev": "npm --no-git-tag-version version prerelease",
-    "build:prod": "npm --no-git-tag-version version `date +%y.%m.%d-0`",
+    "build:azure": "dotenv -e .env.azure react-scripts build",
+    "version:minor": "npm --no-git-tag-version version prerelease",
+    "version:major": "npm --no-git-tag-version version `date +%y.%m.%d-0`",
     "prepare": "husky install"
   },
   "eslintConfig": {
