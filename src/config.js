@@ -1,6 +1,6 @@
 // Constants.js
 const prod = {
-  API_URL: "https://https://olabdevapi.azurewebsites.net/api/v3",
+  API_URL: "https://olabdevapi.azurewebsites.net/api/v3",
   TTALK_HUB_URL: "https://olabdevapi.azurewebsites.net/turktalk",
   SIGNALR_TIMEOUT_MS: 180000,
   API_RETRY_COUNT: 10,
