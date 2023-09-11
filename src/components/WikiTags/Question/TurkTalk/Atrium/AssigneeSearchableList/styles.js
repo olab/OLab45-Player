@@ -71,13 +71,13 @@ const styles = () => ({
   emptyListItem: {
     padding: 0,
     margin: 2,
-    backgroundColor: 'transparent!important',
+    backgroundColor: "transparent!important",
   },
   searchField: {
     marginBottom: 5,
   },
-  '@global': {
-    'li:nth-of-type(odd)': {
+  "@global": {
+    "li:nth-of-type(odd)": {
       backgroundColor: GREY,
     },
   },

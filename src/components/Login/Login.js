@@ -27,17 +27,15 @@ function Alert(props) {
 
 let MOUNTED = false;
 
-const useStateWrapper = (...args) =>
-{
+const useStateWrapper = (...args) => {
   const [val, setter] = useState(...args);
   return [val, (...args) => MOUNTED && setter(...args)];
 };
 
 const Login = ({ setCredentials, message, authActions, classes }) => {
-  useEffect(() =>
-  {
+  useEffect(() => {
     MOUNTED = true;
-    return () => MOUNTED = false;
+    return () => (MOUNTED = false);
   }, []);
 
   const [username, setUserName] = useStateWrapper("");
