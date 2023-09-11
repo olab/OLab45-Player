@@ -57,6 +57,7 @@ class OlabSinglePickQuestion extends React.Component {
 
     question.responseId = response.id;
     question.value = question.responseId;
+    question.valueOverride = response.response;
 
     log.debug(
       `OlabSinglePickQuestion set question '${question.id}' value = '${value}'`
@@ -147,7 +148,7 @@ class OlabSinglePickQuestion extends React.Component {
       // is_correct and feedback.
       if (selectedIndex == response.id) {
         // test for 'correct' answer
-        if (response.isCorrect > 0 && question.showAnswerIndicators) {
+        if (response.isCorrect == 1 && question.showAnswerIndicators) {
           correctnessIndicator = (
             <>
               <CheckIcon style={{ color: "green" }} />
@@ -157,7 +158,7 @@ class OlabSinglePickQuestion extends React.Component {
         }
 
         // test for 'incorrect' answer
-        if (response.isCorrect == 0 && question.showAnswerIndicators) {
+        if (response.isCorrect == -1 && question.showAnswerIndicators) {
           correctnessIndicator = (
             <>
               <CloseIcon style={{ color: "red" }} />

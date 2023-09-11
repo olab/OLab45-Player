@@ -7,6 +7,7 @@ import {
 function processUrl() {
   let mapId = null;
   let nodeId = null;
+  let accessToken = null;
 
   const urlParts = window.location.pathname.split("/");
   if (urlParts.length == 4) {
@@ -24,10 +25,11 @@ function processUrl() {
       nodeId = Number(nodeId);
     }
 
-    return [mapId, nodeId];
+    const urlParams = new URLSearchParams(window.location.search);
+    accessToken = urlParams.get("token");
   }
 
-  return [null, null];
+  return [mapId, nodeId, accessToken];
 }
 
 const submitAnonymousMapId = async (mapId) => {

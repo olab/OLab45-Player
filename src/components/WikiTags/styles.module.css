@@ -33,6 +33,13 @@
   padding: 10px;
 }
 
+.quslider_box_vertical {
+  height: 200px;
+  width: auto !important;
+  display: flex;
+  align-items: flex-start;
+}
+
 .qumultichoice {
   background-color: rgb(240, 240, 240);
   color: black;
@@ -92,6 +99,10 @@
   width: 25px;
   padding: 5px;
   height: 20px;
+}
+
+.quslider_box_vertical .quslider-value {
+  margin-left: 10px;
 }
 
 .MuiTableCell-root {
