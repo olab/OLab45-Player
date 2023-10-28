@@ -15,6 +15,7 @@ import {
 } from "../../utils/AppHelpers";
 import Logout from "./../Logout/";
 import MapSessions from "../Sessions/Sessions";
+import { config } from "../../config";
 
 var constants = require("../../services/constants");
 const playerState = require("../../utils/PlayerState").PlayerState;
@@ -184,15 +185,15 @@ class App extends PureComponent {
             />
             <Routes>
               <Route
-                path={`/player/:mapId/sessions`}
+                path={`/${config.APP_BASEPATH}/:mapId/sessions`}
                 element={<MapSessions authActions={authActions} />}
               />
               <Route
-                path={`/player/:mapId/:nodeId`}
+                path={`/${config.APP_BASEPATH}/:mapId/:nodeId`}
                 element={<Player authActions={authActions} />}
               />
               <Route
-                path={`/player/logout`}
+                path={`/${config.APP_BASEPATH}/logout`}
                 element={<Logout authActions={authActions} />}
               />
               <Route path="*" element={<NoMatch />} />
@@ -215,23 +216,23 @@ class App extends PureComponent {
           />
           <Routes>
             <Route
-              path={`/player`}
+              path={`/${config.APP_BASEPATH}`}
               element={<Home authActions={authActions} />}
             />
             <Route
-              path={`/player/home`}
+              path={`/${config.APP_BASEPATH}/home`}
               element={<Home authActions={authActions} />}
             />
             <Route
-              path={`/player/:mapId/sessions`}
+              path={`/${config.APP_BASEPATH}/:mapId/sessions`}
               element={<MapSessions authActions={authActions} />}
             />
             <Route
-              path={`/player/:mapId/:nodeId`}
+              path={`/${config.APP_BASEPATH}/:mapId/:nodeId`}
               element={<Player authActions={authActions} />}
             />
             <Route
-              path={`/player/logout`}
+              path={`/${config.APP_BASEPATH}/logout`}
               element={<Logout authActions={authActions} />}
             />
             <Route path="*" element={<NoMatch />} />
