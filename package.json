@@ -43,8 +43,10 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "build": "react-scripts build && echo '' > build/index.html",
-    "build:dev": "npm --no-git-tag-version version prerelease",
-    "build:prod": "npm --no-git-tag-version version `date +%y.%m.%d-0`",
+    "version:inc": "npm --no-git-tag-version version prerelease",
+    "version:full": "npm --no-git-tag-version version `date +%y.%m.%d-0`",
+    "build:dev": "env-cmd -f .env.debug npm run-script build",
+    "build:prod": "env-cmd -f .env.production npm run-script build",
     "build:azure": "env-cmd -f .env.azure npm run-script build",
     "prepare": "husky install"
   },
