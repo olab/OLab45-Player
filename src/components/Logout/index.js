@@ -9,6 +9,7 @@ export default (props) => {
       log.error("logout authActions.clearState() error", err.stack);
     }
 
+    log.debug(`logging out to URL ${process.env.PUBLIC_URL}`);
     location.assign(process.env.PUBLIC_URL + "/");
   }, []);
 
