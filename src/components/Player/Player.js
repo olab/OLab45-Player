@@ -17,6 +17,7 @@ import OlabQuestionTag from "../WikiTags/Question/Question";
 import OlabAttendeeTag from "../WikiTags/Question/TurkTalk/Turkee/Turkee";
 import OlabModeratorTag from "../WikiTags/Question/TurkTalk/Turker/Turker";
 import { withParams } from "../ComponentWrapper";
+import { config } from "../../config";
 
 import styles from "./styles";
 import {
@@ -311,7 +312,7 @@ class Player extends PureComponent {
   };
 
   onNavigateToNode = (mapId, nodeId, urlParam) => {
-    let url = `/player/${mapId}/${nodeId}`;
+    let url = `${config.APP_BASEPATH}/${mapId}/${nodeId}`;
     if (urlParam) {
       url += `/${urlParam}`;
     }

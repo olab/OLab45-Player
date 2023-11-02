@@ -15,6 +15,7 @@ import Session from "../../../../../services/session";
 
 var constants = require("../../../../../services/constants");
 const playerState = require("../../../../../utils/PlayerState").PlayerState;
+import { config } from "../../../../../config";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -108,7 +109,7 @@ class OlabAttendeeTag extends React.Component {
   }
 
   onNavigateToNode = (mapId, nodeId, urlParam = null) => {
-    let url = `/player/${mapId}/${nodeId}`;
+    let url = `${config.APP_BASEPATH}/${mapId}/${nodeId}`;
     if (urlParam) {
       url += `/${urlParam}`;
     }

@@ -12,6 +12,7 @@ import TableRow from "@material-ui/core/TableRow";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import Paper from "@material-ui/core/Paper";
 import { Link } from "react-router-dom";
+import { config } from "../../config";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) return -1;
@@ -199,7 +200,9 @@ export default (props) => {
                       key={row.name}
                     >
                       <TableCell component="th" id={labelId} scope="row">
-                        <Link to={`/player/${mapId}/sessions/${row.uuid}`}>
+                        <Link
+                          to={`${config.APP_BASEPATH}/${mapId}/sessions/${row.uuid}`}
+                        >
                           {String(row.timestamp).replace("T", " ")}
                         </Link>
                       </TableCell>
