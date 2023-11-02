@@ -18,7 +18,7 @@ import filterByIndex from "../../helpers/filterByIndex";
 import { getMap } from "../../services/api";
 import Import from "../Import/Import";
 import { getMaps } from "../../services/api";
-import { config } from "../config";
+import { config } from "../../config";
 
 const playerState = require("../../utils/PlayerState").PlayerState;
 
