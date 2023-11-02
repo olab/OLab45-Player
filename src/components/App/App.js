@@ -151,8 +151,6 @@ class App extends PureComponent {
     } = this.state;
     const isExpired = authActions.isExpiredSession();
 
-    alert(JSON.stringify(config));
-
     if (!token || isExpired) {
       return (
         <Login setCredentials={this.setCredentials} authActions={authActions} />
