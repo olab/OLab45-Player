@@ -54,6 +54,8 @@ class Home extends PureComponent {
       this.state.maps = playerState.GetMaps();
       this.state.mapsFiltered = this.state.maps;
     }
+
+    console.log(JSON.stringify(config));
   }
 
   setPageTitle = () => {
