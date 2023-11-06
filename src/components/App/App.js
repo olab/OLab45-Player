@@ -185,15 +185,15 @@ class App extends PureComponent {
             />
             <Routes>
               <Route
-                path={`/${config.APP_BASEPATH}/:mapId/sessions`}
+                path={`${config.APP_BASEPATH}/:mapId/sessions`}
                 element={<MapSessions authActions={authActions} />}
               />
               <Route
-                path={`/${config.APP_BASEPATH}/:mapId/:nodeId`}
+                path={`${config.APP_BASEPATH}/:mapId/:nodeId`}
                 element={<Player authActions={authActions} />}
               />
               <Route
-                path={`/${config.APP_BASEPATH}/logout`}
+                path={`${config.APP_BASEPATH}/logout`}
                 element={<Logout authActions={authActions} />}
               />
               <Route path="*" element={<NoMatch />} />
@@ -216,23 +216,23 @@ class App extends PureComponent {
           />
           <Routes>
             <Route
-              path={`/${config.APP_BASEPATH}`}
+              path={`${config.APP_BASEPATH}`}
               element={<Home authActions={authActions} />}
             />
             <Route
-              path={`/${config.APP_BASEPATH}/home`}
+              path={`${config.APP_BASEPATH}/home`}
               element={<Home authActions={authActions} />}
             />
             <Route
-              path={`/${config.APP_BASEPATH}/:mapId/sessions`}
+              path={`${config.APP_BASEPATH}/:mapId/sessions`}
               element={<MapSessions authActions={authActions} />}
             />
             <Route
-              path={`/${config.APP_BASEPATH}/:mapId/:nodeId`}
+              path={`${config.APP_BASEPATH}/:mapId/:nodeId`}
               element={<Player authActions={authActions} />}
             />
             <Route
-              path={`/${config.APP_BASEPATH}/logout`}
+              path={`${config.APP_BASEPATH}/logout`}
               element={<Logout authActions={authActions} />}
             />
             <Route path="*" element={<NoMatch />} />
