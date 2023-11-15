@@ -8,7 +8,13 @@ if (config?.API_RETRY_COUNT) {
   retryCount = Number(config.API_RETRY_COUNT);
 }
 
-async function internalFetch(method, url, payload, headerOverrides = null) {
+async function internetJsonFetch(
+  method,
+  url,
+  payload,
+  headerOverrides = null,
+  settingsOverrides = null
+) {
   let tries = 0;
 
   let headers = {
@@ -19,6 +25,7 @@ async function internalFetch(method, url, payload, headerOverrides = null) {
   let settings = {
     method: method,
     headers: headers,
+    ...settingsOverrides,
   };
 
   if (payload) {
@@ -31,26 +38,31 @@ async function internalFetch(method, url, payload, headerOverrides = null) {
       settings.signal = AbortSignal.timeout(7500);
       const response = await fetch(url, settings);
 
-      const jsonData = await response.json();
+      let data = {};
 
-      if (jsonData.error_code === 401) {
-        log.error(`URL '${url}': access denied ${JSON.stringify(jsonData)}`);
-        return jsonData;
+      if (settings.responseType == "blob") {
+        data.body = response.body;
+        data.error_code = 200;
+      } else {
+        data = await response.json();
       }
 
-      if (jsonData.error_code === 500) {
-        log.error(`URL '${url}': server error ${JSON.stringify(jsonData)}`);
-        return jsonData;
+      if (data.error_code === 401) {
+        log.error(`URL '${url}': access denied ${JSON.stringify(data)}`);
+        return data;
       }
 
-      if (jsonData.error_code !== 200) {
+      if (data.error_code === 500) {
+        log.error(`URL '${url}': server error ${JSON.stringify(data)}`);
+        return data;
+      }
+
+      if (data.error_code !== 200) {
         log.error(
-          `URL '${url}': ${JSON.stringify(
-            jsonData
-          )}. try ${tries} of ${retryCount}`
+          `URL '${url}': ${JSON.stringify(data)}. try ${tries} of ${retryCount}`
         );
       } else {
-        return jsonData;
+        return data;
       }
     } catch (error) {
       log.error(
@@ -75,31 +87,31 @@ async function loginUserAsync(credentials) {
   };
   let url = `${config.API_URL}/auth/login`;
 
-  return await internalFetch("POST", url, payload);
+  return await internetJsonFetch("POST", url, payload);
 }
 
 async function loginExternalUserAsync(token) {
   let payload = { ExternalToken: token };
   let url = `${config.API_URL}/auth/loginexternal`;
 
-  return await internalFetch("POST", url, payload);
+  return await internetJsonFetch("POST", url, payload);
 }
 
 async function loginAnonymousUserAsync(mapId) {
   let url = `${config.API_URL}/auth/loginanonymous/${mapId}`;
-  return await internalFetch("GET", url, null);
+  return await internetJsonFetch("GET", url, null);
 }
 
 async function isMapAnonymous(mapId) {
   let url = `${config.API_URL}/maps/accesstype/${mapId}`;
-  return await internalFetch("GET", url, null);
+  return await internetJsonFetch("GET", url, null);
 }
 
 async function getMap(props, mapId) {
   let url = `${config.API_URL}/maps/${mapId}`;
   let token = props.authActions.getToken();
 
-  const data = await internalFetch("GET", url, null, {
+  const data = await internetJsonFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
   });
 
@@ -114,7 +126,7 @@ async function getMaps(props) {
   let url = `${config.API_URL}/maps`;
   let token = props.authActions.getToken();
 
-  const data = await internalFetch("GET", url, null, {
+  const data = await internetJsonFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
   });
 
@@ -130,7 +142,7 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
   let url = `${config.API_URL}/maps/${mapId}/node/${nodeId}`;
   let contextId = playerState.GetContextId(null);
 
-  const data = await internalFetch("POST", url, dynamicObjects, {
+  const data = await internetJsonFetch("POST", url, dynamicObjects, {
     OLabSessionId: contextId,
     Authorization: `Bearer ${token}`,
   });
@@ -146,7 +158,7 @@ async function getNodeScopedObjects(props, nodeId) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/nodes/${nodeId}/scopedObjects`;
 
-  const data = await internalFetch("GET", url, null, {
+  const data = await internetJsonFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
   });
 
@@ -161,7 +173,7 @@ async function getDynamicScopedObjects(props, mapId, nodeId) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/nodes/${nodeId}/dynamicobjects`;
 
-  const data = await internalFetch("GET", url, null, {
+  const data = await internetJsonFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
   });
 
@@ -176,7 +188,7 @@ async function getServerScopedObjects(props, serverId) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/servers/${serverId}/scopedObjects`;
 
-  const data = await internalFetch("GET", url, null, {
+  const data = await internetJsonFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
   });
 
@@ -223,7 +235,7 @@ async function postQuestionValue(state) {
     dynamicObjects: dynamicObjects,
   };
 
-  const data = await internalFetch("POST", url, body, {
+  const data = await internetJsonFetch("POST", url, body, {
     Authorization: `Bearer ${token}`,
     OLabSessionId: contextId,
   });
@@ -285,7 +297,7 @@ async function importer(props, fileName) {
   let url = `${config.API_URL}/import/post`;
   let token = props.authActions.getToken();
 
-  const data = await internalFetch("POST", url, payload, {
+  const data = await internetJsonFetch("POST", url, payload, {
     Authorization: `Bearer ${token}`,
   });
 
@@ -306,7 +318,7 @@ async function getSessionReport(props, contextId) {
 
   log.debug(`getSessionReport(${props.map?.id}) url: ${url})`);
 
-  const data = await internalFetch("GET", url, null, {
+  const data = await internetJsonFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
   });
 
@@ -317,7 +329,7 @@ async function getMapScopedObjects(props, mapId) {
   let url = `${config.API_URL}/maps/${mapId}/scopedObjects`;
   let token = props.authActions.getToken();
 
-  const data = await internalFetch("GET", url, null, {
+  const data = await internetJsonFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
   });
 
@@ -328,7 +340,7 @@ async function getMapSessions(props, mapId) {
   let url = `${config.API_URL}/maps/${mapId}/sessions`;
   let token = props.authActions.getToken();
 
-  const data = await internalFetch("GET", url, null, {
+  const data = await internetJsonFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
   });
 
@@ -339,8 +351,24 @@ async function getMapSessions(props, mapId) {
   return data;
 }
 
+async function getUserSession(props, payload) {
+  let url = `${config.API_URL}/sessions`;
+  let token = props.authActions.getToken();
+
+  const data = await internetJsonFetch(
+    "POST",
+    url,
+    payload,
+    { Authorization: `Bearer ${token}` },
+    { responseType: "blob" }
+  );
+
+  return data;
+}
+
 export {
   getDownload,
+  getUserSession,
   loginUserAsync,
   loginAnonymousUserAsync,
   loginExternalUserAsync,

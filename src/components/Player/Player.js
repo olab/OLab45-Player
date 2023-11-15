@@ -10,6 +10,7 @@ import ErrorPopup from "../ErrorPopup/ErrorPopup";
 import OlabConstantTag from "../WikiTags/Constant/Constant";
 import OlabCountersTag from "../WikiTags/Counters/Counter";
 import OlabCounterTag from "../WikiTags/Counter/Counter";
+import OlabSessionTag from "../WikiTags/Session/Session";
 import OlabLinksTag from "../WikiTags/Links/Links";
 import OlabReportTag from "../WikiTags/Report/Report";
 import OlabMediaResourceTag from "../WikiTags/MediaResource/MediaResource";
@@ -400,6 +401,7 @@ class Player extends PureComponent {
                 OlabConstantTag,
                 OlabCountersTag,
                 OlabCounterTag,
+                OlabSessionTag,
                 OlabLinksTag,
                 OlabMediaResourceTag,
                 OlabModeratorTag,
@@ -437,6 +439,7 @@ class Player extends PureComponent {
                 OlabConstantTag,
                 OlabCountersTag,
                 OlabCounterTag,
+                OlabSessionTag,
                 OlabLinksTag,
                 OlabMediaResourceTag,
                 OlabModeratorTag,
@@ -475,6 +478,7 @@ class Player extends PureComponent {
               OlabConstantTag,
               OlabCountersTag,
               OlabCounterTag,
+              OlabSessionTag,
               OlabLinksTag,
               OlabMediaResourceTag,
               OlabModeratorTag,
