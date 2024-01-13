@@ -35,7 +35,7 @@ class OlabAttendeeTag extends React.Component {
     this.state = {
       debug,
       connectionStatus: null,
-      index: 0,
+      seatNumber: 0,
       infoOpen: null,
       infoMessage: null,
       localInfo: new SlotInfo({ connectionId: "???" }),
@@ -50,21 +50,20 @@ class OlabAttendeeTag extends React.Component {
     };
 
     this.turkee = new Turkee(this);
-    this.signalr = this.turkee.signalr;
+    this.turkee.connect();
 
-    this.turkee.connect(this.state.userName);
-    this.connection = this.turkee.connection;
-    this.connectionId = "";
+    // this.connection = this.turkee.connection;
+    // this.connectionId = "";
 
-    this.handleInfoClose = this.handleInfoClose.bind(this);
-    this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
-    this.onJumpNode = this.onJumpNode.bind(this);
-    this.onServerMessage = this.onServerMessage.bind(this);
+    // this.handleInfoClose = this.handleInfoClose.bind(this);
+    // this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
+    // this.onJumpNode = this.onJumpNode.bind(this);
+    // this.onServerMessage = this.onServerMessage.bind(this);
 
-    var turkeeSelf = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
-      turkeeSelf.onCommand(payload);
-    });
+    // var turkeeSelf = this;
+    // this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
+    //   turkeeSelf.onCommand(payload);
+    // });
   }
 
   dumpConnectionState() {
@@ -254,7 +253,7 @@ class OlabAttendeeTag extends React.Component {
 
   render() {
     const {
-      index,
+      seatNumber,
       debug,
       remoteInfo,
       localInfo,
@@ -296,15 +295,10 @@ class OlabAttendeeTag extends React.Component {
                 )}
                 {(inAtrium || inRoom) && (
                   <ChatCell
-                    index={index}
-                    isModerator={localInfo.isModerator}
+                    seatNumber={seatNumber}
                     style={chatCellStyle}
                     localInfo={localInfo}
-                    senderInfo={remoteInfo}
-                    session={session}
-                    playerProps={this.props.props}
                     connection={this.connection}
-                    signalr={this.signalr}
                   />
                 )}
               </TableRow>
