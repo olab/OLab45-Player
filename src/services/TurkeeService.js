@@ -1,50 +1,82 @@
 import { Log, LogInfo, LogError } from "../utils/Logger";
 import log from "loglevel";
-import SignalRWrapper from "../services/signalRWrapper";
+import SignalRWrapper from "./signalRWrapper";
 var constants = require("./constants");
 
-class Turkee {
+class TurkeeService {
   // *****
   constructor(component) {
     this.session = component.state.session;
+    this.questionId = this.extractQuestionId(component.props.props.id);
     this.session.referringNode = component.props.props.node.title;
     this.session.nodeId = component.props.props.node.id;
     this.session.mapId = component.props.props.map.id;
 
     // this.bindConnectionMessage(this.connection);
-    // this.onDisconnected = this.onDisconnected.bind(this);
+
+    this.onDisconnected = this.onDisconnected.bind(this);
+    this.onConnected = this.onConnected.bind(this);
+    this.onReconnecting = this.onReconnecting.bind(this);
+    this.onReconnected = this.onReconnected.bind(this);
+
     this.playerState = component.props.props;
 
     this.accessToken = component.props.props.authActions.getToken();
     this.contextId = component.props.props.contextId;
 
-    this.signalr = new SignalRWrapper();
+    this.signalrWrapper = new SignalRWrapper();
+  }
+
+  extractQuestionId(prop) {
+    let questionIdStr = prop.replace("QU-", "");
+    return Number(questionIdStr);
   }
 
   // *****
   async connect() {
-    await this.signalr.connect(this);
+    this.connection = await this.signalrWrapper.connect(this);
 
-    LogInfo(
-      `'${this.connection.connectionId}' onConnected: connection succeeded`
-    );
+    if (this.connection != null) {
+      LogInfo(
+        `'${this.connection.connectionId}' onConnected: connection succeeded`
+      );
 
-    log.debug(
-      `'${this.connectionId}' registering turkee for session: ${JSON.stringify(
-        this.session,
-        null,
-        1
-      )}`
-    );
-
-    this.signalr.send(constants.SIGNALCMD_REGISTERTURKEE, this.session);
+      LogInfo(
+        `'${
+          this.connectionId
+        }' registering turkee for session: ${JSON.stringify(
+          this.session,
+          null,
+          1
+        )}`
+      );
+    } else {
+      LogError("unable to connect");
+    }
   }
 
-  disconnect() {}
+  onConnected() {
+    this.signalrWrapper.sendMessage(constants.SIGNALCMD_REGISTERLEARNER, {
+      contextId: this.contextId,
+      mapId: this.session.mapId,
+      nodeId: this.session.nodeId,
+      questionId: this.questionId,
+      userKey: this.signalrWrapper.userKey,
+    });
+
+    if (this.onConnectionChanged) {
+      this.onConnectionChanged({
+        connectionStatus: this.signalrWrapper.connection._connectionState,
+        connectionId: this.signalrWrapper.connection.connectionId,
+      });
+    }
+  }
+
+  onDisconnecting() {}
 
   onReconnecting(error) {
     try {
-      log.debug(`'${this.connectionId}' onReconnecting: ${error}`);
+      LogInfo(`'${this.connectionId}' onReconnecting: ${error}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -61,7 +93,7 @@ class Turkee {
 
   onReconnected(connectionId) {
     try {
-      log.debug(`'${connectionId}' onReconnected`);
+      LogInfo(`'${connectionId}' onReconnected`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -81,7 +113,7 @@ class Turkee {
         return;
       }
 
-      log.debug(`'${this.connectionId}' onDisconnected`);
+      LogInfo(`'${this.connectionId}' onDisconnected`);
 
       if (this?.component?.onConnectionChanged) {
         this.component.onConnectionChanged({
@@ -96,32 +128,6 @@ class Turkee {
       );
     }
   }
-
-  // *****
-  onCommand(payload) {
-    try {
-      log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
-
-      // test if command NOT handled in base class
-      if (super.onCommand(payload)) {
-        return;
-      }
-
-      if (payload.command === constants.SIGNALCMD_MODERATOR_STATUS) {
-        if (this.component.onModeratorStatus) {
-          this.component.onModeratorStatus(payload.data);
-        }
-
-        return true;
-      } else {
-        log.debug(
-          `'${this.connectionId}' onCommand unknown command: '${payload.command}'`
-        );
-      }
-    } catch (error) {
-      LogError(`'${this.connectionId}' onCommand exception: ${error.message}`);
-    }
-  }
 }
 
-export default Turkee;
+export default TurkeeService;

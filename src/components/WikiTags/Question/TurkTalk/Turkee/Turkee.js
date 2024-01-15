@@ -6,7 +6,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { Table, TableBody, TableRow, Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 
-import Turkee from "../../../../../services/turkee";
+import TurkeeService from "../../../../../services/TurkeeService";
 import styles from "../../../styles.module.css";
 import ChatCell from "../../../../ChatCell/ChatCell";
 import SlotInfo from "../../../../../helpers/SlotInfo";
@@ -44,13 +44,14 @@ class OlabAttendeeTag extends React.Component {
       session: session,
       slotInfos: this.slotManager.RemoteSlots(),
       userName: props.props.authActions.getUserName(),
+      questionId: null,
       width: "100%",
       inAtrium: false,
       inRoom: false,
     };
 
-    this.turkee = new Turkee(this);
-    this.turkee.connect();
+    this.turkeeService = new TurkeeService(this);
+    this.turkeeService.connect();
 
     // this.connection = this.turkee.connection;
     // this.connectionId = "";
@@ -223,9 +224,9 @@ class OlabAttendeeTag extends React.Component {
 
     this.componentMounted = false;
 
-    if (this.turkee) {
-      await this.turkee.disconnect();
-      this.turkee = null;
+    if (this.turkeeService) {
+      await this.turkeeService.onDisconnecting();
+      this.turkeeService = null;
     }
   }
 
