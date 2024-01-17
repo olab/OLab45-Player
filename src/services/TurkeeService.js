@@ -26,6 +26,7 @@ class TurkeeService {
     this.contextId = component.props.props.contextId;
 
     this.signalrWrapper = new SignalRWrapper();
+    this.component = component;
   }
 
   extractQuestionId(prop) {
@@ -53,6 +54,10 @@ class TurkeeService {
         userKey: this.userKey,
       };
 
+      if (this.component.onConnected) {
+        this.component.onConnected(connection);
+      }
+
       await this.signalrWrapper.sendMessageAsync(
         constants.SIGNALCMD_REGISTERLEARNER,
         registerPayload
@@ -70,7 +75,9 @@ class TurkeeService {
   }
 
   onAtriumAccepted(payload) {
-    Log(`onAtriumAccepted payload: ${JSON.stringify(payload)})`);
+    if (this.component.onAtriumAccepted) {
+      this.component.onAtriumAccepted(payload);
+    }
   }
 
   onDisconnecting() {}

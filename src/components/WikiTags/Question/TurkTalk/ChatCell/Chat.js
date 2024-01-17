@@ -8,10 +8,15 @@ import {
   TableContainer,
   TableRow,
 } from "@material-ui/core";
-import { Log, LogInfo, LogError, LogException } from "../../utils/Logger";
+import {
+  Log,
+  LogInfo,
+  LogError,
+  LogException,
+} from "../../../../../utils/Logger";
 import log from "loglevel";
 import { withStyles } from "@material-ui/core/styles";
-import styles from "../WikiTags/styles.module.css";
+import styles from "../../../styles.module.css";
 
 var constants = require("../../../../../services/constants");
 

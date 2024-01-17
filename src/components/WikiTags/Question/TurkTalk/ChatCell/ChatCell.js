@@ -2,7 +2,7 @@
 import * as React from "react";
 import { TableCell } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-import styles from "../WikiTags/styles.module.css";
+import styles from "../../../styles.module.css";
 
 import Chat from "./Chat";
 import ChatStatusBarLearner from "./ChatStatusBarLearner";
@@ -42,7 +42,6 @@ class ChatCell extends React.Component {
           />
           {isModerator && (
             <ChatStatusBarModerator
-              seatNumber={this.props.seatNumber}
               localInfo={localInfo}
               lastMessageTime={lastMessageTime}
               connection={connection}
@@ -52,7 +51,6 @@ class ChatCell extends React.Component {
             <ChatStatusBarLearner
               seatNumber={this.props.seatNumber}
               localInfo={localInfo}
-              lastMessageTime={lastMessageTime}
               connection={connection}
             />
           )}

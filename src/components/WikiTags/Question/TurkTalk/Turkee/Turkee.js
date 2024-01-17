@@ -8,7 +8,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 
 import TurkeeService from "../../../../../services/TurkeeService";
 import styles from "../../../styles.module.css";
-import ChatCell from "../../../../ChatCell/ChatCell";
+import ChatCell from "../ChatCell/ChatCell";
 import SlotInfo from "../../../../../helpers/SlotInfo";
 import SlotManager from "../SlotManager";
 import Session from "../../../../../services/session";
@@ -50,6 +50,8 @@ class OlabAttendeeTag extends React.Component {
       inRoom: false,
     };
 
+    this.onConnected = this.onConnected.bind(this);
+
     this.turkeeService = new TurkeeService(this);
     this.turkeeService.connect();
 
@@ -83,6 +85,11 @@ class OlabAttendeeTag extends React.Component {
       return;
     }
     this.setState({ infoOpen: false });
+  }
+
+  onConnected(connection, userKey) {
+    this.connection = connection;
+    this.userKey = userKey;
   }
 
   onCommand(payload) {
@@ -160,7 +167,7 @@ class OlabAttendeeTag extends React.Component {
   }
 
   // learner has been assigned to an atrium
-  onAtriumAssigned(payload) {
+  onAtriumAccepted(payload) {
     try {
       let { userName } = this.state;
 
@@ -168,15 +175,15 @@ class OlabAttendeeTag extends React.Component {
         `onAtriumAssigned message for '${userName}' ${JSON.stringify(payload)}`
       );
 
-      payload.isModerator = false;
-      payload.show = true;
-      payload.connectionId = payload.connectionId.slice(-3);
+      // payload.isModerator = false;
+      // payload.show = true;
+      // payload.connectionId = payload.connectionId.slice(-3);
 
-      this.slotManager.assignLocalInfo(payload);
-      var localInfo = this.slotManager.LocalSlots()[0];
+      // this.slotManager.assignLocalInfo(payload);
+      // var localInfo = this.slotManager.LocalSlots()[0];
 
       this.setState({
-        localInfo: localInfo,
+        // localInfo: null,
         remoteInfo: null,
         inAtrium: true,
       });
@@ -300,6 +307,7 @@ class OlabAttendeeTag extends React.Component {
                     style={chatCellStyle}
                     localInfo={localInfo}
                     connection={this.connection}
+                    userKey={this.userKey}
                   />
                 )}
               </TableRow>
