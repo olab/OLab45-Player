@@ -18,6 +18,7 @@ class TurkeeService {
     this.onConnected = this.onConnected.bind(this);
     this.onReconnecting = this.onReconnecting.bind(this);
     this.onReconnected = this.onReconnected.bind(this);
+    this.onAtriumAccepted = this.onAtriumAccepted.bind(this);
 
     this.playerState = component.props.props;
 
@@ -34,42 +35,42 @@ class TurkeeService {
 
   // *****
   async connect() {
-    this.connection = await this.signalrWrapper.connect(this);
+    await this.signalrWrapper.connect(this);
+  }
+
+  async onConnected(connection, userKey) {
+    this.connection = connection;
+    this.userKey = userKey;
 
     if (this.connection != null) {
-      LogInfo(
-        `'${this.connection.connectionId}' onConnected: connection succeeded`
+      this.connection.on("atriumaccepted", this.onAtriumAccepted);
+
+      let registerPayload = {
+        contextId: this.contextId,
+        mapId: this.session.mapId,
+        nodeId: this.session.nodeId,
+        questionId: this.questionId,
+        userKey: this.userKey,
+      };
+
+      await this.signalrWrapper.sendMessageAsync(
+        constants.SIGNALCMD_REGISTERLEARNER,
+        registerPayload
       );
 
-      LogInfo(
-        `'${
-          this.connectionId
-        }' registering turkee for session: ${JSON.stringify(
-          this.session,
-          null,
-          1
-        )}`
-      );
+      if (this.onConnectionChanged) {
+        this.onConnectionChanged({
+          connectionStatus: this.signalrWrapper.connection._connectionState,
+          connectionId: this.signalrWrapper.connection.connectionId,
+        });
+      }
     } else {
       LogError("unable to connect");
     }
   }
 
-  onConnected() {
-    this.signalrWrapper.sendMessage(constants.SIGNALCMD_REGISTERLEARNER, {
-      contextId: this.contextId,
-      mapId: this.session.mapId,
-      nodeId: this.session.nodeId,
-      questionId: this.questionId,
-      userKey: this.signalrWrapper.userKey,
-    });
-
-    if (this.onConnectionChanged) {
-      this.onConnectionChanged({
-        connectionStatus: this.signalrWrapper.connection._connectionState,
-        connectionId: this.signalrWrapper.connection.connectionId,
-      });
-    }
+  onAtriumAccepted(payload) {
+    Log(`onAtriumAccepted payload: ${JSON.stringify(payload)})`);
   }
 
   onDisconnecting() {}

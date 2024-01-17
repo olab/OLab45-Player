@@ -51,8 +51,6 @@ class SignalRWrapper {
 
     Log("connecting...");
 
-    this.connection.on("newConnection", this.onNewConnection);
-
     this.connection
       .start()
       .then(() => {
@@ -67,7 +65,7 @@ class SignalRWrapper {
     this.userKey = message.UserKey;
 
     if (this.service?.onConnected) {
-      this.service.onConnected(this.connection);
+      this.service.onConnected(this.connection, this.userKey);
     }
   }
 
@@ -76,6 +74,8 @@ class SignalRWrapper {
       this.connectionId = this.connection.connectionId;
 
       Log(`'${this.connectionId}' onConnected`);
+
+      this.connection.on("newConnection", this.onNewConnection);
 
       if (this.service?.onDisconnected) {
         this.connection.onclose(this.service.onDisconnected);
@@ -95,7 +95,7 @@ class SignalRWrapper {
     }
   }
 
-  sendMessage(methodName, payload) {
+  async sendMessageAsync(methodName, payload) {
     let tries = 5;
 
     do {
@@ -108,10 +108,7 @@ class SignalRWrapper {
           )})`
         );
 
-        this.connection.invoke(methodName, payload);
-
-        Log(` send message ${methodName} result ${JSON.stringify(result)}`);
-
+        await this.connection.invoke(methodName, payload);
         return;
       } catch (error) {
         LogInfo(
