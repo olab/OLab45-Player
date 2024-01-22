@@ -15,8 +15,8 @@ class SignalRWrapper {
     this.connection = null;
     this.connectionId = null;
     this.userKey = null;
-    this.onConnected = this.onConnected.bind(this);
-    this.onNewConnection = this.onNewConnection.bind(this);
+    this.onConnected = this.onConnectionActive.bind(this);
+    this.onNewConnection = this.onAuthenticated.bind(this);
   }
 
   async connect(service) {
@@ -33,12 +33,12 @@ class SignalRWrapper {
     const response = await fetch(url, settings);
     let info = await response.json();
 
-    Log(`negotiate payload: ${JSON.stringify(info)})`);
-
     // make compatible with old and new SignalRConnectionInfo
     info.accessToken = info.AccessToken || info.accessKey; // pay attention to the case
     info.url = info.Url || info.endpoint; // pay attention to the case
-    info.url = `${info.url}&olab_access_token=${this.service.accessToken}`;
+    info.url = `${info.url}&olab_access_token=${this.service.accessToken}&sessionId=${this.service.contextId}`;
+
+    Log(`negotiate payload: ${JSON.stringify(info)})`);
 
     const options = {
       accessTokenFactory: () => info.accessToken,
@@ -54,28 +54,20 @@ class SignalRWrapper {
     this.connection
       .start()
       .then(() => {
-        this.onConnected();
+        this.onConnectionActive();
       })
       .catch(function (error) {
         LogError(error.message);
       });
   }
 
-  onNewConnection(message) {
-    this.userKey = message.UserKey;
-
-    if (this.service?.onConnected) {
-      this.service.onConnected(this.connection, this.userKey);
-    }
-  }
-
-  onConnected() {
+  onConnectionActive() {
     try {
       this.connectionId = this.connection.connectionId;
 
       Log(`'${this.connectionId}' onConnected`);
 
-      this.connection.on("newConnection", this.onNewConnection);
+      this.connection.on("onauthenticated", this.onAuthenticated);
 
       if (this.service?.onDisconnected) {
         this.connection.onclose(this.service.onDisconnected);
@@ -92,6 +84,15 @@ class SignalRWrapper {
       LogError(
         `'${this.connectionId}' onConnected exception: ${error.message}`
       );
+    }
+  }
+
+  // turktalk connected method
+  onAuthenticated(message) {
+    this.userKey = message.UserKey;
+
+    if (this.service?.onConnected) {
+      this.service.onConnected(this.connection, this.userKey);
     }
   }
 

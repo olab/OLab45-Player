@@ -90,6 +90,9 @@ class OlabAttendeeTag extends React.Component {
   onConnected(connection, userKey) {
     this.connection = connection;
     this.userKey = userKey;
+    this.setState({
+      infoMessage: "Connected, waiting for room.",
+    });
   }
 
   onCommand(payload) {
@@ -294,7 +297,7 @@ class OlabAttendeeTag extends React.Component {
           <Table style={tableStyle}>
             <TableBody>
               <TableRow>
-                {!inAtrium && infoMessage && (
+                {!inAtrium && !inRoom && infoMessage && (
                   <div style={{ textAlign: "center" }}>
                     <p>
                       <b>{infoMessage}</b>

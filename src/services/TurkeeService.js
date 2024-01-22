@@ -54,6 +54,7 @@ class TurkeeService {
         userKey: this.userKey,
       };
 
+      // signal component of connection status
       if (this.component.onConnected) {
         this.component.onConnected(connection);
       }
