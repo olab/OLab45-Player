@@ -16,49 +16,67 @@ class SignalRWrapper {
     this.connectionId = null;
     this.userKey = null;
     this.onConnected = this.onConnectionActive.bind(this);
-    this.onNewConnection = this.onAuthenticated.bind(this);
+    this.onAuthenticated = this.onAuthenticated.bind(this);
+    this.sendMessageAsync = this.sendMessageAsync.bind(this);
+    this.onError = this.onError.bind(this);
+  }
+
+  onError(message) {
+    if (this.service.onError != null) {
+      this.service.onError(message);
+    }
   }
 
   async connect(service) {
     this.service = service;
+    let info = {};
 
-    var url = `${config.TTALK_HUB_URL}/negotiate?userid=${this.service.username}&accessToken=${this.service.accessToken}`;
-    Log(`connect url: ${url}`);
+    try {
+      var url = `${config.TTALK_HUB_URL}/negotiate?accessToken=${this.service.accessToken}`;
+      Log(`connect url: ${url}`);
 
-    let settings = {
-      method: "POST",
-    };
+      try {
+        let settings = {
+          method: "POST",
+        };
 
-    settings.signal = AbortSignal.timeout(10000);
-    const response = await fetch(url, settings);
-    let info = await response.json();
+        // settings.signal = AbortSignal.timeout(10000);
+        let response = await fetch(url, settings);
+        info = await response.json();
+      } catch (error) {
+        LogError(error);
+        throw new Error(`Connection error: cannot connect`);
+      }
 
-    // make compatible with old and new SignalRConnectionInfo
-    info.accessToken = info.AccessToken || info.accessKey; // pay attention to the case
-    info.url = info.Url || info.endpoint; // pay attention to the case
-    info.url = `${info.url}&olab_access_token=${this.service.accessToken}&sessionId=${this.service.contextId}`;
+      // make compatible with old and new SignalRConnectionInfo
+      info.accessToken = info.AccessToken || info.accessKey; // pay attention to the case
+      info.url = info.Url || info.endpoint; // pay attention to the case
+      info.url = `${info.url}&olab_access_token=${this.service.accessToken}&sessionId=${this.service.contextId}`;
 
-    Log(`negotiate payload: ${JSON.stringify(info)})`);
+      Log(`negotiate payload: ${JSON.stringify(info)})`);
 
-    const options = {
-      accessTokenFactory: () => info.accessToken,
-    };
+      const options = {
+        accessTokenFactory: () => info.accessToken,
+      };
 
-    this.connection = new HubConnectionBuilder()
-      .withUrl(info.url, options)
-      .configureLogging(LogLevel.Information)
-      .build();
+      this.connection = new HubConnectionBuilder()
+        .withUrl(info.url, options)
+        .configureLogging(LogLevel.Information)
+        .build();
 
-    Log("connecting...");
+      Log("connecting...");
 
-    this.connection
-      .start()
-      .then(() => {
-        this.onConnectionActive();
-      })
-      .catch(function (error) {
-        LogError(error.message);
-      });
+      this.connection
+        .start()
+        .then(() => {
+          this.onConnectionActive();
+        })
+        .catch(function (error) {
+          throw new Error(`Connection error: cannot start connection`);
+        });
+    } catch (error) {
+      this.onError(error.message);
+    }
   }
 
   onConnectionActive() {
@@ -89,10 +107,10 @@ class SignalRWrapper {
 
   // turktalk connected method
   onAuthenticated(message) {
-    this.userKey = message.UserKey;
+    Log(`onAuthenticated payload: ${JSON.stringify(message, null, 1)})`);
 
     if (this.service?.onConnected) {
-      this.service.onConnected(this.connection, this.userKey);
+      this.service.onConnected(this.connection, message);
     }
   }
 

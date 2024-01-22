@@ -24,49 +24,34 @@ class OlabAttendeeTag extends React.Component {
   constructor(props) {
     super(props);
 
-    this.slotManager = new SlotManager(1);
-    // this makes the chat and status bar
-    // components visible
-    this.slotManager.RemoteSlots()[0].show = true;
-
-    let session = new Session(props.props);
     const debug = playerState.GetDebug();
 
     this.state = {
-      debug,
+      connection: null,
       connectionStatus: null,
-      seatNumber: 0,
-      infoOpen: null,
-      infoMessage: null,
-      localInfo: new SlotInfo({ connectionId: "???" }),
-      maxHeight: 200,
-      remoteInfo: new SlotInfo(),
-      session: session,
-      slotInfos: this.slotManager.RemoteSlots(),
-      userName: props.props.authActions.getUserName(),
-      questionId: null,
-      width: "100%",
+      debug,
       inAtrium: false,
+      infoMessage: "Loading...",
+      infoOpen: null,
+      infoSeverity: "info",
       inRoom: false,
+      localInfo: null,
+      maxHeight: 200,
+      remoteInfo: null,
+      seatNumber: 0,
+      userName: null,
+      width: "100%",
     };
 
     this.onConnected = this.onConnected.bind(this);
+    this.onNavigateToNode = this.onNavigateToNode.bind(this);
+    this.onAtriumAccepted = this.onAtriumAccepted.bind(this);
+    this.onJumpNode = this.onJumpNode.bind(this);
+    this.onServerMessage = this.onServerMessage.bind(this);
+    this.handleInfoClose = this.handleInfoClose.bind(this);
+    this.onError = this.onError.bind(this);
 
     this.turkeeService = new TurkeeService(this);
-    this.turkeeService.connect();
-
-    // this.connection = this.turkee.connection;
-    // this.connectionId = "";
-
-    // this.handleInfoClose = this.handleInfoClose.bind(this);
-    // this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
-    // this.onJumpNode = this.onJumpNode.bind(this);
-    // this.onServerMessage = this.onServerMessage.bind(this);
-
-    // var turkeeSelf = this;
-    // this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
-    //   turkeeSelf.onCommand(payload);
-    // });
   }
 
   dumpConnectionState() {
@@ -87,34 +72,21 @@ class OlabAttendeeTag extends React.Component {
     this.setState({ infoOpen: false });
   }
 
-  onConnected(connection, userKey) {
-    this.connection = connection;
-    this.userKey = userKey;
+  onError(message) {
     this.setState({
-      infoMessage: "Connected, waiting for room.",
+      infoOpen: true,
+      infoMessage: message,
+      infoSeverity: "error",
     });
   }
 
-  onCommand(payload) {
-    try {
-      if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
-        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
-        this.onRoomAssigned(payload.data);
-      } else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
-        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
-        this.onAtriumAssigned(payload.data);
-      } else if (payload.command === constants.SIGNALCMD_JUMP_NODE) {
-        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
-        this.onJumpNode(payload);
-      } else if (payload.command === constants.SIGNALCMD_SERVER_ERROR) {
-        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
-        this.onServerMessage(payload);
-      }
-    } catch (error) {
-      LogError(
-        `'${this.connectionId}' onTurkeeCommandCallback exception: ${error.message}`
-      );
-    }
+  onConnected() {
+    this.setState({
+      connection: this.turkeeService.connection,
+      connectionStatus: this.turkeeService.connection._connectionState,
+      infoMessage: `${this.turkeeService.connection._connectionState}, waiting for assignment.`,
+      localInfo: this.turkeeService.localInfo,
+    });
   }
 
   onNavigateToNode = (mapId, nodeId, urlParam = null) => {
@@ -207,9 +179,6 @@ class OlabAttendeeTag extends React.Component {
         `onRoomAssigned message for '${userName}' ${JSON.stringify(payload)}`
       );
 
-      const { localInfo } = this.state;
-      this.slotManager.assignLearner(localInfo, payload.remote);
-
       this.setState({
         showChatGrid: true,
         localInfo: this.slotManager.LocalSlots()[0],
@@ -227,6 +196,7 @@ class OlabAttendeeTag extends React.Component {
 
   componentDidMount() {
     this.componentMounted = true;
+    this.turkeeService.connect();
   }
 
   async componentWillUnmount() {
@@ -238,15 +208,6 @@ class OlabAttendeeTag extends React.Component {
       await this.turkeeService.onDisconnecting();
       this.turkeeService = null;
     }
-  }
-
-  // the contextId has changed
-  oncontextIdChanged(Id) {
-    let { chatInfo } = this.state;
-
-    chatInfo.Id = Id;
-
-    this.setState({ chatInfo });
   }
 
   // applies changes to connection status
@@ -264,16 +225,17 @@ class OlabAttendeeTag extends React.Component {
 
   render() {
     const {
-      seatNumber,
+      connection,
       debug,
-      remoteInfo,
-      localInfo,
-      userName,
-      session,
-      infoOpen,
-      infoMessage,
       inAtrium,
+      infoMessage,
+      infoOpen,
+      infoSeverity,
       inRoom,
+      localInfo,
+      remoteInfo,
+      seatNumber,
+      session,
     } = this.state;
 
     const tableStyle = {
@@ -283,8 +245,6 @@ class OlabAttendeeTag extends React.Component {
     };
     const chatCellStyle = { width: "100%" };
     const stemStyle = { paddingBottom: "5px" };
-
-    log.debug(`'${localInfo.connectionId}' OlabTurkeeTag render '${userName}'`);
 
     try {
       if (debug.disableWikiRendering) {
@@ -297,32 +257,33 @@ class OlabAttendeeTag extends React.Component {
           <Table style={tableStyle}>
             <TableBody>
               <TableRow>
-                {!inAtrium && !inRoom && infoMessage && (
+                {!connection && infoMessage && (
                   <div style={{ textAlign: "center" }}>
                     <p>
                       <b>{infoMessage}</b>
                     </p>
                   </div>
                 )}
+
                 {(inAtrium || inRoom) && (
                   <ChatCell
                     seatNumber={seatNumber}
                     style={chatCellStyle}
                     localInfo={localInfo}
-                    connection={this.connection}
-                    userKey={this.userKey}
+                    connection={connection}
                   />
                 )}
               </TableRow>
             </TableBody>
           </Table>
+
           {infoOpen === true && (
             <Snackbar
               open={infoOpen}
               autoHideDuration={3000}
               onClose={this.handleInfoClose}
             >
-              <Alert onClose={this.handleInfoClose} severity="info">
+              <Alert onClose={this.handleInfoClose} severity={infoSeverity}>
                 {infoMessage}
               </Alert>
             </Snackbar>

@@ -6,21 +6,13 @@ var constants = require("./constants");
 class TurkeeService {
   // *****
   constructor(component) {
-    this.session = component.state.session;
     this.questionId = this.extractQuestionId(component.props.props.id);
-    this.session.referringNode = component.props.props.node.title;
-    this.session.nodeId = component.props.props.node.id;
-    this.session.mapId = component.props.props.map.id;
-
-    // this.bindConnectionMessage(this.connection);
 
     this.onDisconnected = this.onDisconnected.bind(this);
     this.onConnected = this.onConnected.bind(this);
     this.onReconnecting = this.onReconnecting.bind(this);
     this.onReconnected = this.onReconnected.bind(this);
     this.onAtriumAccepted = this.onAtriumAccepted.bind(this);
-
-    this.playerState = component.props.props;
 
     this.accessToken = component.props.props.authActions.getToken();
     this.contextId = component.props.props.contextId;
@@ -39,12 +31,24 @@ class TurkeeService {
     await this.signalrWrapper.connect(this);
   }
 
-  async onConnected(connection, userKey) {
+  onError(message) {
+    if (this.component.onError) {
+      this.component.onError(message);
+    }
+  }
+
+  async onConnected(connection, payload) {
     this.connection = connection;
-    this.userKey = userKey;
+    this.userKey = payload.UserKey;
+    this.localInfo = payload.Participant;
 
     if (this.connection != null) {
       this.connection.on("atriumaccepted", this.onAtriumAccepted);
+
+      // signal component of connection status
+      if (this.component.onConnected) {
+        this.component.onConnected();
+      }
 
       let registerPayload = {
         contextId: this.contextId,
@@ -53,11 +57,6 @@ class TurkeeService {
         questionId: this.questionId,
         userKey: this.userKey,
       };
-
-      // signal component of connection status
-      if (this.component.onConnected) {
-        this.component.onConnected(connection);
-      }
 
       await this.signalrWrapper.sendMessageAsync(
         constants.SIGNALCMD_REGISTERLEARNER,
