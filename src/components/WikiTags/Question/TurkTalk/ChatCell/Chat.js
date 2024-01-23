@@ -25,8 +25,8 @@ class Chat extends React.Component {
     super(props);
 
     this.state = {
-      conversation: [],
       ...this.props,
+      conversation: [],
     };
 
     var chatSelf = this;
@@ -91,12 +91,20 @@ class Chat extends React.Component {
   }
 
   render() {
-    let { localInfo, conversation } = this.state;
+    let { localInfo, conversation, progressMessage } = this.state;
+
+    const divProgressLayout = {
+      width: "100%",
+      border: "2px solid black",
+      backgroundColor: "#FFFF",
+      padding: "10px",
+      fontWeight: "bold",
+    };
 
     const divLayout = {
       width: "100%",
       border: "2px solid black",
-      backgroundColor: "#3333",
+      backgroundColor: "#FFFF",
     };
 
     const systemMessageStyle = {
@@ -127,10 +135,17 @@ class Chat extends React.Component {
     };
 
     const tableContainerStyle = { maxHeight: 300 };
-    let disabled = true;
+
+    if (progressMessage != null) {
+      return (
+        <div name="chat" style={divProgressLayout}>
+          <center>{progressMessage}</center>
+        </div>
+      );
+    }
 
     // disable entry if no seat number assigned
-    disabled = localInfo.SeatNumber == null;
+    let disabled = localInfo.SeatNumber == null;
 
     try {
       return (
@@ -209,7 +224,7 @@ class Chat extends React.Component {
         </div>
       );
     } catch (error) {
-      LogException(`render[${this.props.seatNumber}]`, error);
+      LogException(`render[${localInfo.seatNumber}]`, error);
       return (
         <>
           <b>"{error.message}"</b>

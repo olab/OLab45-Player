@@ -14,7 +14,6 @@ class ChatStatusBarLearner extends React.Component {
     super(props);
 
     this.state = {
-      show: this.props.show,
       lastUpdate: null,
       localInfo: this.props.localInfo,
       connection: this.props.connection,
@@ -24,14 +23,14 @@ class ChatStatusBarLearner extends React.Component {
     this.connectionId = this.props.connection.connectionId?.slice(-3);
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.show !== this.props.show) {
-      this.setState({ show: this.props.show });
-    }
-    if (prevProps.localInfo !== this.props.localInfo) {
-      this.setState({ localInfo: this.props.localInfo });
-    }
-  }
+  // componentDidUpdate(prevProps) {
+  //   if (prevProps.show !== this.props.show) {
+  //     this.setState({ show: this.props.show });
+  //   }
+  //   if (prevProps.localInfo !== this.props.localInfo) {
+  //     this.setState({ localInfo: this.props.localInfo });
+  //   }
+  // }
 
   generateLeftStatusString() {
     let { connection } = this.state;
@@ -49,17 +48,12 @@ class ChatStatusBarLearner extends React.Component {
   }
 
   generateRightStatusString() {
-    return null;
+    let { localInfo } = this.state;
+    return `Session Id: ${localInfo.SessionId.slice(-3)}`;
   }
 
   render() {
     try {
-      let { show } = this.state;
-
-      if (!show) {
-        return null;
-      }
-
       const statusLeftString = this.generateLeftStatusString();
       const statusCenterString = this.generateCenterStatusString();
       const statusRightString = this.generateRightStatusString();

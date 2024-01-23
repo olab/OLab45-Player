@@ -46,18 +46,19 @@ class OlabAttendeeTag extends React.Component {
     this.handleInfoClose = this.handlePopupClose.bind(this);
     this.displayErrorPopup = this.displayErrorPopup.bind(this);
     this.displayInfoPopup = this.displayInfoPopup.bind(this);
+    this.dumpConnectionState = this.dumpConnectionState.bind(this);
 
     this.turkeeService = new TurkeeService(this);
   }
 
   dumpConnectionState() {
+    let { connection } = this.state;
+
     var infoState = { localInfo: this.state.localInfo, remoteInfo: null };
     log.debug(
-      `'${this.connectionId}' dumpConnectionState localInfo = ${JSON.stringify(
-        infoState,
-        null,
-        2
-      )}]`
+      `'${
+        connection.connectionId
+      }' dumpConnectionState localInfo = ${JSON.stringify(infoState, null, 2)}]`
     );
   }
 
@@ -137,20 +138,26 @@ class OlabAttendeeTag extends React.Component {
   onAtriumAccepted(payload) {
     try {
       let { localInfo } = this.state;
+
       log.debug(
         `onAtriumAccepted user '${localInfo.userId}' ${JSON.stringify(payload)}`
       );
 
+      let progressMessage = `Waiting for moderator...`;
+      if (payload.ModeratorPresent) {
+        progressMessage = `Waiting to be accepted into room...`;
+      }
+
       this.setState({
         inAtrium: true,
         inRoom: false,
-        progressMessage: `Waiting for moderator...`,
+        progressMessage: progressMessage,
       });
 
       this.dumpConnectionState();
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onAtriumAccepted exception: ${error.message}`
+        `'${connection.connectionId}' onAtriumAccepted exception: ${error.message}`
       );
     }
   }
@@ -177,7 +184,7 @@ class OlabAttendeeTag extends React.Component {
       this.dumpConnectionState();
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onRoomAccepted exception: ${error.message}`
+        `'${this.connection.connectionId}' onRoomAccepted exception: ${error.message}`
       );
     }
   }
@@ -226,11 +233,6 @@ class OlabAttendeeTag extends React.Component {
       seatNumber,
     } = this.state;
 
-    const tableStyle = {
-      border: "2px solid black",
-      backgroundColor: "#3333",
-      width: "100%",
-    };
     const chatCellStyle = { width: "100%" };
     const stemStyle = { paddingBottom: "5px" };
 
@@ -239,49 +241,42 @@ class OlabAttendeeTag extends React.Component {
         return <>[[QU:{this.props.props.question.id}]]</>;
       }
 
+      const divLayout = {
+        width: "100%",
+        border: "2px solid black",
+        backgroundColor: "#3333",
+      };
+
       return (
         <>
           <div style={stemStyle}>{this.props.props.question.stem}</div>
-          <Table style={tableStyle}>
-            <TableBody>
-              <TableRow>
-                {progressMessage && (
-                  <div style={{ textAlign: "center" }}>
-                    <p>
-                      <b>{progressMessage}</b>
-                    </p>
-                  </div>
-                )}
 
-                {(inAtrium || inRoom) && (
-                  <ChatCell
-                    seatNumber={seatNumber}
-                    style={chatCellStyle}
-                    localInfo={localInfo}
-                    remoteInfo={remoteInfo}
-                    connection={connection}
-                  />
-                )}
-              </TableRow>
-            </TableBody>
-          </Table>
+          {!inAtrium && !inRoom && (
+            <div name="chat" style={divLayout}>
+              <center>
+                <p>
+                  <b>Loading...</b>
+                </p>
+              </center>
+            </div>
+          )}
+
+          {(inAtrium || inRoom) && (
+            <ChatCell
+              seatNumber={seatNumber}
+              style={chatCellStyle}
+              localInfo={localInfo}
+              remoteInfo={remoteInfo}
+              connection={connection}
+              progressMessage={progressMessage}
+            />
+          )}
 
           <Popup
             open={popupShow}
             message={popupMessage}
             level={popupSeverity}
           />
-
-          {/* {popupShow === true && (
-            <Snackbar
-              open={popupShow}
-              autoHideDuration={3000}
-              onClose={this.handlePopupClose}>
-              <Alert onClose={this.handlePopupClose} severity={popupSeverity}>
-                {popupMessage}
-              </Alert>
-            </Snackbar>
-          )} */}
         </>
       );
     } catch (error) {

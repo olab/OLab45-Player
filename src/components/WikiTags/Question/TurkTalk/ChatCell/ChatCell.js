@@ -1,6 +1,6 @@
 // @flow
 import * as React from "react";
-import { TableCell } from "@material-ui/core";
+import { Table, TableBody, TableCell, TableRow } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import styles from "../../../styles.module.css";
 
@@ -25,36 +25,53 @@ class ChatCell extends React.Component {
 
   render() {
     try {
-      const { connection, localInfo, isModerator, lastMessageTime } =
+      const { connection, localInfo, lastMessageTime, progressMessage } =
         this.state;
 
-      let cellStyling = Object.assign({ padding: 7 }, this.props.style);
-      if (!localInfo.show) {
-        cellStyling = { display: "none", padding: 7 };
-      }
+      const tableStyle = {
+        border: "2px solid black",
+        backgroundColor: "#3333",
+        width: "100%",
+      };
+
+      let cellStyling = Object.assign(
+        { padding: 0, width: "100%" },
+        this.props.style
+      );
 
       return (
-        <TableCell style={cellStyling}>
-          <Chat
-            seatNumber={this.props.seatNumber}
-            localInfo={localInfo}
-            connection={connection}
-          />
-          {isModerator && (
-            <ChatStatusBarModerator
-              localInfo={localInfo}
-              lastMessageTime={lastMessageTime}
-              connection={connection}
-            />
-          )}
-          {!isModerator && (
-            <ChatStatusBarLearner
-              seatNumber={this.props.seatNumber}
-              localInfo={localInfo}
-              connection={connection}
-            />
-          )}
-        </TableCell>
+        <Table style={tableStyle}>
+          <TableBody>
+            <TableRow>
+              <TableCell style={cellStyling}>
+                <Chat
+                  localInfo={localInfo}
+                  connection={connection}
+                  progressMessage={progressMessage}
+                />
+              </TableCell>
+            </TableRow>
+
+            <TableRow>
+              <TableCell style={cellStyling}>
+                {localInfo.isModerator && (
+                  <ChatStatusBarModerator
+                    localInfo={localInfo}
+                    lastMessageTime={lastMessageTime}
+                    connection={connection}
+                  />
+                )}
+                {!localInfo.isModerator && (
+                  <ChatStatusBarLearner
+                    seatNumber={this.props.seatNumber}
+                    localInfo={localInfo}
+                    connection={connection}
+                  />
+                )}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       );
     } catch (error) {
       return <b>TurkerStatusBar: {error.message}</b>;
