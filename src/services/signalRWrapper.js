@@ -83,7 +83,7 @@ class SignalRWrapper {
     try {
       this.connectionId = this.connection.connectionId;
 
-      Log(`'${this.connectionId}' onConnected`);
+      Log(`'${this.connectionId}' onConnectionActive`);
 
       this.connection.on("onauthenticated", this.onAuthenticated);
 
@@ -105,12 +105,12 @@ class SignalRWrapper {
     }
   }
 
-  // turktalk connected method
-  onAuthenticated(message) {
-    Log(`onAuthenticated payload: ${JSON.stringify(message, null, 1)})`);
+  // turktalk authenticated method
+  onAuthenticated(payload) {
+    Log(`onAuthenticated payload: ${JSON.stringify(payload, null, 1)})`);
 
-    if (this.service?.onConnected) {
-      this.service.onConnected(this.connection, message);
+    if (this.service?.onAuthenticated) {
+      this.service.onAuthenticated(this.connection, payload);
     }
   }
 

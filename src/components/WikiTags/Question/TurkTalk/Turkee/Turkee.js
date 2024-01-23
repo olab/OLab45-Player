@@ -9,16 +9,9 @@ import MuiAlert from "@material-ui/lab/Alert";
 import TurkeeService from "../../../../../services/TurkeeService";
 import styles from "../../../styles.module.css";
 import ChatCell from "../ChatCell/ChatCell";
-import SlotInfo from "../../../../../helpers/SlotInfo";
-import SlotManager from "../SlotManager";
-import Session from "../../../../../services/session";
-
+import Popup from "../Popup/Popup";
 var constants = require("../../../../../services/constants");
 const playerState = require("../../../../../utils/PlayerState").PlayerState;
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 class OlabAttendeeTag extends React.Component {
   constructor(props) {
@@ -31,9 +24,10 @@ class OlabAttendeeTag extends React.Component {
       connectionStatus: null,
       debug,
       inAtrium: false,
-      infoMessage: "Loading...",
-      infoOpen: null,
-      infoSeverity: "info",
+      progressMessage: "Loading...",
+      popupMessage: null,
+      popupShow: null,
+      popupSeverity: "info",
       inRoom: false,
       localInfo: null,
       maxHeight: 200,
@@ -43,13 +37,15 @@ class OlabAttendeeTag extends React.Component {
       width: "100%",
     };
 
-    this.onConnected = this.onConnected.bind(this);
+    this.onAuthenticated = this.onAuthenticated.bind(this);
     this.onNavigateToNode = this.onNavigateToNode.bind(this);
     this.onAtriumAccepted = this.onAtriumAccepted.bind(this);
     this.onJumpNode = this.onJumpNode.bind(this);
     this.onServerMessage = this.onServerMessage.bind(this);
-    this.handleInfoClose = this.handleInfoClose.bind(this);
-    this.onError = this.onError.bind(this);
+    this.onRoomAccepted = this.onRoomAccepted.bind(this);
+    this.handleInfoClose = this.handlePopupClose.bind(this);
+    this.displayErrorPopup = this.displayErrorPopup.bind(this);
+    this.displayInfoPopup = this.displayInfoPopup.bind(this);
 
     this.turkeeService = new TurkeeService(this);
   }
@@ -65,30 +61,46 @@ class OlabAttendeeTag extends React.Component {
     );
   }
 
-  handleInfoClose(event, reason) {
+  handlePopupClose(event, reason) {
     if (reason === "clickaway") {
       return;
     }
-    this.setState({ infoOpen: false });
+    this.setState({ popupShow: false });
   }
 
-  onError(message) {
+  // display info message in popup
+  displayInfoPopup(message) {
     this.setState({
-      infoOpen: true,
-      infoMessage: message,
-      infoSeverity: "error",
+      popupShow: true,
+      popupMessage: message,
+      popupSeverity: "info",
     });
   }
 
-  onConnected() {
+  // display error message in popup
+  displayErrorPopup(message) {
+    this.setState({
+      popupShow: true,
+      popupMessage: message,
+      popupSeverity: "error",
+    });
+  }
+
+  // handle learner authorized event
+  onAuthenticated() {
+    // initialize learner-specific flags
+    this.turkeeService.localInfo.isModerator = false;
+    this.turkeeService.localInfo.SeatNumber = null;
+
     this.setState({
       connection: this.turkeeService.connection,
       connectionStatus: this.turkeeService.connection._connectionState,
-      infoMessage: `${this.turkeeService.connection._connectionState}, waiting for assignment.`,
+      progressMessage: `${this.turkeeService.connection._connectionState}, waiting for assignment.`,
       localInfo: this.turkeeService.localInfo,
     });
   }
 
+  // jump to new url
   onNavigateToNode = (mapId, nodeId, urlParam = null) => {
     let url = `/player/${mapId}/${nodeId}`;
     if (urlParam) {
@@ -102,24 +114,7 @@ class OlabAttendeeTag extends React.Component {
 
   // system is sending a message to turkee
   onServerMessage(payload) {
-    const { inAtrium, inRoom } = this.state;
-
-    try {
-      if (inRoom) {
-        this.setState({
-          infoOpen: true,
-          infoMessage: payload.data,
-        });
-      } else if (!inAtrium) {
-        this.setState({
-          infoMessage: payload.data,
-        });
-      }
-    } catch (error) {
-      LogError(
-        `'${this.connectionId}' onServerMessage exception: ${error.message}`
-      );
-    }
+    this.displayInfoPopup(payload.data);
   }
 
   // moderator is sending the learner to a new node
@@ -127,10 +122,7 @@ class OlabAttendeeTag extends React.Component {
     try {
       let { mapId, nodeId, nodeName } = payload.data;
 
-      this.setState({
-        infoOpen: true,
-        infoMessage: `Moderator is sending you to '${nodeName}'`,
-      });
+      this.displayInfoPopup(`Moderator is sending you to '${nodeName}'`);
 
       // pause for 5 seconds
       await new Promise((r) => setTimeout(r, 4000));
@@ -144,52 +136,48 @@ class OlabAttendeeTag extends React.Component {
   // learner has been assigned to an atrium
   onAtriumAccepted(payload) {
     try {
-      let { userName } = this.state;
-
+      let { localInfo } = this.state;
       log.debug(
-        `onAtriumAssigned message for '${userName}' ${JSON.stringify(payload)}`
+        `onAtriumAccepted user '${localInfo.userId}' ${JSON.stringify(payload)}`
       );
 
-      // payload.isModerator = false;
-      // payload.show = true;
-      // payload.connectionId = payload.connectionId.slice(-3);
-
-      // this.slotManager.assignLocalInfo(payload);
-      // var localInfo = this.slotManager.LocalSlots()[0];
-
       this.setState({
-        // localInfo: null,
-        remoteInfo: null,
         inAtrium: true,
+        inRoom: false,
+        progressMessage: `Waiting for moderator...`,
       });
 
       this.dumpConnectionState();
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onAtriumAssigned exception: ${error.message}`
+        `'${this.connectionId}' onAtriumAccepted exception: ${error.message}`
       );
     }
   }
 
-  onRoomAssigned(payload) {
+  // learner has been assigned to a room
+  onRoomAccepted(payload) {
     try {
-      let { userName } = this.state;
+      let { localInfo } = this.state;
 
       log.debug(
-        `onRoomAssigned message for '${userName}' ${JSON.stringify(payload)}`
+        `onRoomAccepted user '${localInfo.userId}' ${JSON.stringify(payload)}`
       );
 
+      // update seat number from server
+      localInfo.SeatNumber = payload.SeatNumber;
+
       this.setState({
-        showChatGrid: true,
-        localInfo: this.slotManager.LocalSlots()[0],
-        remoteInfo: this.slotManager.remoteSlots[0],
         inRoom: true,
+        inAtrium: false,
+        remoteInfo: payload.Moderator,
+        localInfo,
       });
 
       this.dumpConnectionState();
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onRoomAssigned exception: ${error.message}`
+        `'${this.connectionId}' onRoomAccepted exception: ${error.message}`
       );
     }
   }
@@ -228,14 +216,14 @@ class OlabAttendeeTag extends React.Component {
       connection,
       debug,
       inAtrium,
-      infoMessage,
-      infoOpen,
-      infoSeverity,
+      popupMessage,
+      progressMessage,
+      popupShow,
+      popupSeverity,
       inRoom,
       localInfo,
       remoteInfo,
       seatNumber,
-      session,
     } = this.state;
 
     const tableStyle = {
@@ -257,10 +245,10 @@ class OlabAttendeeTag extends React.Component {
           <Table style={tableStyle}>
             <TableBody>
               <TableRow>
-                {!connection && infoMessage && (
+                {progressMessage && (
                   <div style={{ textAlign: "center" }}>
                     <p>
-                      <b>{infoMessage}</b>
+                      <b>{progressMessage}</b>
                     </p>
                   </div>
                 )}
@@ -270,6 +258,7 @@ class OlabAttendeeTag extends React.Component {
                     seatNumber={seatNumber}
                     style={chatCellStyle}
                     localInfo={localInfo}
+                    remoteInfo={remoteInfo}
                     connection={connection}
                   />
                 )}
@@ -277,17 +266,22 @@ class OlabAttendeeTag extends React.Component {
             </TableBody>
           </Table>
 
-          {infoOpen === true && (
+          <Popup
+            open={popupShow}
+            message={popupMessage}
+            level={popupSeverity}
+          />
+
+          {/* {popupShow === true && (
             <Snackbar
-              open={infoOpen}
+              open={popupShow}
               autoHideDuration={3000}
-              onClose={this.handleInfoClose}
-            >
-              <Alert onClose={this.handleInfoClose} severity={infoSeverity}>
-                {infoMessage}
+              onClose={this.handlePopupClose}>
+              <Alert onClose={this.handlePopupClose} severity={popupSeverity}>
+                {popupMessage}
               </Alert>
             </Snackbar>
-          )}
+          )} */}
         </>
       );
     } catch (error) {

@@ -7,9 +7,11 @@ class TurkeeService {
   // *****
   constructor(component) {
     this.questionId = this.extractQuestionId(component.props.props.id);
+    this.nodeId = component.props.props.node.id;
+    this.mapId = component.props.props.map.id;
 
     this.onDisconnected = this.onDisconnected.bind(this);
-    this.onConnected = this.onConnected.bind(this);
+    this.onAuthenticated = this.onAuthenticated.bind(this);
     this.onReconnecting = this.onReconnecting.bind(this);
     this.onReconnected = this.onReconnected.bind(this);
     this.onAtriumAccepted = this.onAtriumAccepted.bind(this);
@@ -37,23 +39,24 @@ class TurkeeService {
     }
   }
 
-  async onConnected(connection, payload) {
+  async onAuthenticated(connection, payload) {
     this.connection = connection;
     this.userKey = payload.UserKey;
     this.localInfo = payload.Participant;
 
     if (this.connection != null) {
       this.connection.on("atriumaccepted", this.onAtriumAccepted);
+      this.connection.on("roomaccepted", this.onRoomAccepted);
 
       // signal component of connection status
-      if (this.component.onConnected) {
-        this.component.onConnected();
+      if (this.component.onAuthenticated) {
+        this.component.onAuthenticated();
       }
 
       let registerPayload = {
         contextId: this.contextId,
-        mapId: this.session.mapId,
-        nodeId: this.session.nodeId,
+        mapId: this.mapId,
+        nodeId: this.nodeId,
         questionId: this.questionId,
         userKey: this.userKey,
       };
@@ -71,6 +74,12 @@ class TurkeeService {
       }
     } else {
       LogError("unable to connect");
+    }
+  }
+
+  onRoomAccepted(payload) {
+    if (this.component.onRoomAccepted) {
+      this.component.onRoomAccepted(payload);
     }
   }
 

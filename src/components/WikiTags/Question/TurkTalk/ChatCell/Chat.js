@@ -91,7 +91,7 @@ class Chat extends React.Component {
   }
 
   render() {
-    let { conversation } = this.state;
+    let { localInfo, conversation } = this.state;
 
     const divLayout = {
       width: "100%",
@@ -129,10 +129,8 @@ class Chat extends React.Component {
     const tableContainerStyle = { maxHeight: 300 };
     let disabled = true;
 
-    // disable entry if:
-    //  1) not assigned in room
-    //  2) not connected to hub
-    disabled = !localInfo.assigned || !this.props.connection.connectionId;
+    // disable entry if no seat number assigned
+    disabled = localInfo.SeatNumber == null;
 
     try {
       return (
