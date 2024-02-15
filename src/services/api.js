@@ -35,7 +35,7 @@ async function internetJsonFetch(
 
   while (tries++ < retryCount) {
     try {
-      settings.signal = AbortSignal.timeout(7500);
+      settings.signal = AbortSignal.timeout(30000);
       const response = await fetch(url, settings);
 
       let data = {};

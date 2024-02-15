@@ -51,10 +51,7 @@ class OlabQuestionTag extends React.Component {
   }
 
   static getQuestionId(question) {
-    if (question.name == null) {
-      return "QU" + question.id;
-    }
-    return ("QU-" + question.name.replace(" ", "")).toLowerCase();
+    return "QU-" + question.id;
   }
 
   sleep = (ms) => {

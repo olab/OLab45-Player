@@ -396,14 +396,12 @@ class Player extends PureComponent {
                 },
               }}
               components={{
-                OlabAttendeeTag,
                 OlabConstantTag,
                 OlabCountersTag,
                 OlabCounterTag,
                 OlabSessionTag,
                 OlabLinksTag,
                 OlabMediaResourceTag,
-                OlabModeratorTag,
                 OlabReportTag,
                 OlabQuestionTag,
               }}
@@ -434,14 +432,12 @@ class Player extends PureComponent {
                 },
               }}
               components={{
-                OlabAttendeeTag,
                 OlabConstantTag,
                 OlabCountersTag,
                 OlabCounterTag,
                 OlabSessionTag,
                 OlabLinksTag,
                 OlabMediaResourceTag,
-                OlabModeratorTag,
                 OlabReportTag,
                 OlabQuestionTag,
               }}
