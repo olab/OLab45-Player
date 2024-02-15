@@ -45,6 +45,7 @@
     "build": "dotenv -e .env.production react-scripts build",
     "build:dev": "npm --no-git-tag-version version prerelease",
     "build:prod": "npm --no-git-tag-version version `date +%y.%m.%d-0`",
+    "build:azure": "npm --no-git-tag-version version `date +%y.%m.%d-0`",  
     "prepare": "husky install"
   },
   "eslintConfig": {
