@@ -167,7 +167,7 @@ class OlabQuestionTag extends React.Component {
         default:
           return (
             <div>
-              <b>Error:</b> Implemented question type '{questionType}'
+              <b>Error:</b> Unimplemented question type '{questionType}'
             </div>
           );
       }
