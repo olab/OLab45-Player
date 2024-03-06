@@ -28,6 +28,34 @@ class PlayerState {
     });
   }
 
+  static ClearMap(keyPrefix) {
+    const contextId = persistantStorage.get(
+      keyPrefix,
+      KeyConstants.CONTEXT_ID,
+      null
+    );
+    const sessionInfo = persistantStorage.get(
+      keyPrefix,
+      KeyConstants.SESSION_INFO,
+      null
+    );
+    const visitOnceNodeList = persistantStorage.get(
+      keyPrefix,
+      KeyConstants.VISIT_ONCE_NODE_LIST,
+      null
+    );
+
+    persistantStorage.clear(keyPrefix);
+
+    persistantStorage.save(keyPrefix, KeyConstants.CONTEXT_ID, contextId);
+    persistantStorage.save(keyPrefix, KeyConstants.SESSION_INFO, sessionInfo);
+    persistantStorage.save(
+      keyPrefix,
+      KeyConstants.VISIT_ONCE_NODE_LIST,
+      visitOnceNodeList
+    );
+  }
+
   // Get all settings as object
   static Get(keyPrefix = null) {
     const debug = persistantStorage.get(null, KeyConstants.DEBUG, {

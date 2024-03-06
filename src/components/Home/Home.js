@@ -144,6 +144,7 @@ class Home extends PureComponent {
     });
 
     playerState.SetMaps(this.state.maps);
+    playerState.ClearMap(null);
   }
 
   getIcon = (showIcons, scopedObject) => {
