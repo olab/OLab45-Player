@@ -19,7 +19,7 @@ import {
 } from "@material-ui/core";
 import PrintIcon from "@material-ui/icons/Print";
 import DownloadIcon from "@material-ui/icons/GetApp";
-import { json2csvAsync } from 'json-2-csv';
+import { json2csvAsync } from "json-2-csv";
 
 const reportTableRef = React.createRef();
 const reportHeaderRef = React.createRef();
@@ -31,65 +31,66 @@ export default class OlabReportContents extends React.Component {
   }
 
   async exportCsvData(rows, documentName) {
-    if ( 0 == rows.length )
-      return;
+    if (0 == rows.length) return;
 
-    const csvdata = await json2csvAsync(rows)
-      .catch(error => void log.error('json2csvAsync error', error) || '');
+    const csvdata = await json2csvAsync(rows).catch(
+      (error) => void log.error("json2csvAsync error", error) || ""
+    );
 
-    if ( 0 == String(csvdata).trim().length )
-      return;
+    if (0 == String(csvdata).trim().length) return;
 
-    var a = document.createElement('a');
+    var a = document.createElement("a");
     a.download = documentName;
-    a.href = 'data:text/csv;charset=UTF-8,' + encodeURIComponent(csvdata);
-    a.dispatchEvent(new MouseEvent('click'));
+    a.href = "data:text/csv;charset=UTF-8," + encodeURIComponent(csvdata);
+    a.dispatchEvent(new MouseEvent("click"));
   }
 
   async exportReportMetadaToCsv(e) {
     e.preventDefault();
 
-    if ( ! reportHeaderRef?.current )
-      return;
+    if (!reportHeaderRef?.current) return;
 
     const rows = [];
 
-    reportHeaderRef.current.querySelectorAll('div > p > strong').forEach(elem =>
-    {
-      const text = [...elem.parentElement.childNodes].filter(n => 3 === n.nodeType)
-        .map(n => n.textContent)
-        .join('')
-        .trim();
+    reportHeaderRef.current
+      .querySelectorAll("div > p > strong")
+      .forEach((elem) => {
+        const text = [...elem.parentElement.childNodes]
+          .filter((n) => 3 === n.nodeType)
+          .map((n) => n.textContent)
+          .join("")
+          .trim();
 
-      const title = elem.innerText.trim().replace(/\s{0,}\:$/g, '');
+        const title = elem.innerText.trim().replace(/\s{0,}\:$/g, "");
 
-      rows.push({ [title]: text });
-    })
+        rows.push({ [title]: text });
+      });
 
-    return this.exportCsvData([Object.assign({}, ...rows)], 'Learner Report.csv');
+    return this.exportCsvData(
+      [Object.assign({}, ...rows)],
+      "Learner Report.csv"
+    );
   }
 
   async exportQuestionsTableToCsv(e) {
     e.preventDefault();
 
-    if ( ! reportTableRef?.current )
-      return;
+    if (!reportTableRef?.current) return;
 
     const rows = [];
-    const headers = reportTableRef.current.querySelectorAll('thead > tr > th');
+    const headers = reportTableRef.current.querySelectorAll("thead > tr > th");
 
-    reportTableRef.current.querySelectorAll('tbody > tr').forEach((tr) =>
-    {
+    reportTableRef.current.querySelectorAll("tbody > tr").forEach((tr) => {
       const row = {};
 
-      for ( let i=0; i<tr.children.length; i++ ) {
+      for (let i = 0; i < tr.children.length; i++) {
         row[headers[i].innerText] = tr.children[i].innerText;
       }
 
       rows.push(row);
     });
 
-    return this.exportCsvData(rows, 'Report Questions.csv');
+    return this.exportCsvData(rows, "Report Questions.csv");
   }
 
   render() {
@@ -206,7 +207,13 @@ export default class OlabReportContents extends React.Component {
           </ReportTopSection>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <h3>Questions</h3>
           <Button
             size="small"

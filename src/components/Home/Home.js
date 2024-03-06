@@ -18,6 +18,7 @@ import filterByIndex from "../../helpers/filterByIndex";
 import { getMap } from "../../services/api";
 import Import from "../Import/Import";
 import { getMaps } from "../../services/api";
+import { config } from "../../config";
 
 const playerState = require("../../utils/PlayerState").PlayerState;
 
@@ -53,6 +54,8 @@ class Home extends PureComponent {
       this.state.maps = playerState.GetMaps();
       this.state.mapsFiltered = this.state.maps;
     }
+
+    console.log(JSON.stringify(config));
   }
 
   setPageTitle = () => {
@@ -69,7 +72,10 @@ class Home extends PureComponent {
 
   handleMapPlayClick = (map, nodeId) => {
     this.setState({ mapId: map.id, nodeId: nodeId });
-    const url = `/player/${map.id}/${nodeId}`;
+
+    const url = `${config.APP_BASEPATH}/${map.id}/${nodeId}`;
+    log.debug(`map clicked. url ${url}`);
+
     window.location.href = url;
   };
 

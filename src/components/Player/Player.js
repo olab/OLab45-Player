@@ -10,6 +10,7 @@ import ErrorPopup from "../ErrorPopup/ErrorPopup";
 import OlabConstantTag from "../WikiTags/Constant/Constant";
 import OlabCountersTag from "../WikiTags/Counters/Counter";
 import OlabCounterTag from "../WikiTags/Counter/Counter";
+import OlabSessionTag from "../WikiTags/Session/Session";
 import OlabLinksTag from "../WikiTags/Links/Links";
 import OlabReportTag from "../WikiTags/Report/Report";
 import OlabMediaResourceTag from "../WikiTags/MediaResource/MediaResource";
@@ -17,6 +18,7 @@ import OlabQuestionTag from "../WikiTags/Question/Question";
 import OlabAttendeeTag from "../WikiTags/Question/TurkTalk/Turkee/Turkee";
 import OlabModeratorTag from "../WikiTags/Question/TurkTalk/Turker/Turker";
 import { withParams } from "../ComponentWrapper";
+import { config } from "../../config";
 
 import styles from "./styles";
 import {
@@ -310,7 +312,7 @@ class Player extends PureComponent {
   };
 
   onNavigateToNode = (mapId, nodeId, urlParam) => {
-    let url = `/player/${mapId}/${nodeId}`;
+    let url = `${config.APP_BASEPATH}/${mapId}/${nodeId}`;
     if (urlParam) {
       url += `/${urlParam}`;
     }
@@ -394,13 +396,12 @@ class Player extends PureComponent {
                 },
               }}
               components={{
-                OlabAttendeeTag,
                 OlabConstantTag,
                 OlabCountersTag,
                 OlabCounterTag,
+                OlabSessionTag,
                 OlabLinksTag,
                 OlabMediaResourceTag,
-                OlabModeratorTag,
                 OlabReportTag,
                 OlabQuestionTag,
               }}
@@ -431,13 +432,12 @@ class Player extends PureComponent {
                 },
               }}
               components={{
-                OlabAttendeeTag,
                 OlabConstantTag,
                 OlabCountersTag,
                 OlabCounterTag,
+                OlabSessionTag,
                 OlabLinksTag,
                 OlabMediaResourceTag,
-                OlabModeratorTag,
                 OlabReportTag,
                 OlabQuestionTag,
               }}
@@ -473,6 +473,7 @@ class Player extends PureComponent {
               OlabConstantTag,
               OlabCountersTag,
               OlabCounterTag,
+              OlabSessionTag,
               OlabLinksTag,
               OlabMediaResourceTag,
               OlabModeratorTag,

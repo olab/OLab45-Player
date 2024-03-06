@@ -90,7 +90,12 @@ class OlabSliderQuestion extends React.Component {
         <div className={`${styles["quslider"]} ${siteStyles[id]}`} id={`${id}`}>
           <Box
             width={question.width}
-            className={'hor' != settings.orientation ? styles["quslider_box_vertical"] : ''}>
+            className={
+              "hor" != settings.orientation
+                ? styles["quslider_box_vertical"]
+                : ""
+            }
+          >
             <Typography id={`${id}-stem`} component="div" gutterBottom>
               {question.stem}
             </Typography>
@@ -104,7 +109,9 @@ class OlabSliderQuestion extends React.Component {
               defaultValue={question.value}
               onChangeCommitted={(event, value) => this.setValue(event, value)}
               step={Number(settings.stepValue)}
-              orientation={'hor' != settings.orientation ? 'vertical' : 'horizontal'}
+              orientation={
+                "hor" != settings.orientation ? "vertical" : "horizontal"
+              }
               marks
               name={`${id}-slider`}
               min={Number(settings.minValue)}

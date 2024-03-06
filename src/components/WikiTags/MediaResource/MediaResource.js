@@ -142,7 +142,7 @@ class OlabMediaResourceTag extends React.Component {
             <div>
               <a
                 id={`file-link-${item.id}`}
-                download={item.originUrl}
+                download={item.fileName}
                 href={item.originUrl}
               >
                 {item.fileName}

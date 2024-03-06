@@ -51,10 +51,7 @@ class OlabQuestionTag extends React.Component {
   }
 
   static getQuestionId(question) {
-    if (question.name == null) {
-      return "QU" + question.id;
-    }
-    return ("QU-" + question.name.replace(" ", "")).toLowerCase();
+    return "QU-" + question.id;
   }
 
   sleep = (ms) => {
@@ -170,7 +167,7 @@ class OlabQuestionTag extends React.Component {
         default:
           return (
             <div>
-              <b>Error:</b> Implemented question type '{questionType}'
+              <b>Error:</b> Unimplemented question type '{questionType}'
             </div>
           );
       }
