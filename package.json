@@ -1,6 +1,6 @@
 {
   "name": "olab46player",
-  "version": "24.2.15-0",
+  "version": "24.3.5-0",
   "private": true,
   "dependencies": {
     "@material-ui/core": "latest",
