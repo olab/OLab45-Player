@@ -254,6 +254,9 @@ class Home extends PureComponent {
                       <b>Links:&nbsp;</b>
                       {mapDetails.nodeLinkCount}
                       <br />
+                      <b>Created:&nbsp;</b>
+                      {mapDetails.createdAt}
+                      <br />                      
                     </p>
                     <p>
                       <b>
