@@ -242,8 +242,8 @@ class Home extends PureComponent {
                       <b>Id:&nbsp;</b>
                       {mapDetails.id}
                       <br />
-                      <b>Title:&nbsp;</b>
-                      {mapDetails.title}
+                      <b>Name:&nbsp;</b>
+                      {mapDetails.name}
                       <br />
                       <b>Authors:&nbsp;</b>
                       {mapDetails.author}
@@ -252,10 +252,7 @@ class Home extends PureComponent {
                       {mapDetails.nodeCount}
                       <br />
                       <b>Links:&nbsp;</b>
-                      {mapDetails.linkCount}
-                      <br />
-                      <b>Questions:&nbsp;</b>
-                      {mapDetails.questionCount}
+                      {mapDetails.nodeLinkCount}
                       <br />
                     </p>
                     <p>

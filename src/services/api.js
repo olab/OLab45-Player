@@ -108,7 +108,7 @@ async function isMapAnonymous(mapId) {
 }
 
 async function getMap(props, mapId) {
-  let url = `${config.API_URL}/maps/${mapId}`;
+  let url = `${config.API_URL}/maps/${mapId}/shortstatus`;
   let token = props.authActions.getToken();
 
   const data = await internetJsonFetch("GET", url, null, {
