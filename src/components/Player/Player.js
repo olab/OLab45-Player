@@ -80,12 +80,12 @@ class Player extends PureComponent {
     });
   }
 
-  handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpen(false);
-  };
+  // handleClose = (event, reason) => {
+  //   if (reason === "clickaway") {
+  //     return;
+  //   }
+  //   setOpen(false);
+  // };
 
   showError = (message) => {
     this.setState({

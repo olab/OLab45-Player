@@ -1,4 +1,5 @@
 import React, { PureComponent } from "react";
+import ReactDOM from "react-dom";
 import { withStyles } from "@material-ui/core/styles";
 import {
   Info as MapInfoIcon,
@@ -11,6 +12,7 @@ import log from "loglevel";
 
 import styles from "./styles";
 import ListWithSearch from "../ListWithSearch/ListWithSearch";
+import MapDetail from "./MapDetail/MapDetail";
 import styled from "styled-components";
 import { PAGE_TITLES } from "../config";
 import filterByName from "../../helpers/filterByName";
@@ -24,7 +26,7 @@ const playerState = require("../../utils/PlayerState").PlayerState;
 
 const HomeWrapper = styled.div`
   padding: 1rem;
-  width: 80%;
+  width: 100%;
 `;
 
 class Home extends PureComponent {
@@ -82,9 +84,17 @@ class Home extends PureComponent {
   handleMapInfoClick = async (map) => {
     this.setState({ isMapInfoFetched: false });
     const { data } = await getMap(this.props, map.id);
+
     this.setState({
+      mapInfoOpen: true,
       isMapInfoFetched: true,
       mapDetails: data,
+    });
+  };
+
+  mapInfoHandleClose = () => {
+    this.setState({
+      mapInfoOpen: false,
     });
   };
 
@@ -204,6 +214,7 @@ class Home extends PureComponent {
       isButtonsDisabled,
       mapDetails,
       isMapInfoFetched,
+      mapInfoOpen,
     } = this.state;
 
     var role = this.props.authActions.getRole();
@@ -213,7 +224,7 @@ class Home extends PureComponent {
         <h2>Home</h2>
         <HomeWrapper>
           <Grid container spacing={2}>
-            <Grid item xs={10}>
+            <Grid item xs={12}>
               <ListWithSearch
                 getIcon={this.getIcon}
                 innerRef={this.setListWithSearchRef}
@@ -233,44 +244,16 @@ class Home extends PureComponent {
               {maps.length}
               &nbsp;maps.
             </Grid>
-            <Grid item xs={2}>
-              {isMapInfoFetched && mapDetails && mapDetails.id !== null && (
-                <>
-                  <h4>Map Details</h4>
-                  <small>
-                    <p>
-                      <b>Id:&nbsp;</b>
-                      {mapDetails.id}
-                      <br />
-                      <b>Name:&nbsp;</b>
-                      {mapDetails.name}
-                      <br />
-                      <b>Authors:&nbsp;</b>
-                      {mapDetails.author}
-                      <br />
-                      <b>Nodes:&nbsp;</b>
-                      {mapDetails.nodeCount}
-                      <br />
-                      <b>Links:&nbsp;</b>
-                      {mapDetails.nodeLinkCount}
-                      <br />
-                      <b>Created:&nbsp;</b>
-                      {mapDetails.createdAt}
-                      <br />                      
-                    </p>
-                    <p>
-                      <b>
-                        Checkpoint:
-                        <br />
-                      </b>
-                      {mapDetails.resumeInfo}
-                    </p>
-                  </small>
-                </>
-              )}
-            </Grid>
           </Grid>
           {role === "olab:superuser" && <Import props={this.props} />}
+          {isMapInfoFetched && mapDetails && mapDetails.id !== null && (
+            <MapDetail
+              open={mapInfoOpen}
+              onClose={this.mapInfoHandleClose}
+              data={mapDetails}
+            />
+          )}
+          ;
         </HomeWrapper>
       </>
     );
