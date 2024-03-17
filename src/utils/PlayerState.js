@@ -44,7 +44,11 @@ class PlayerState {
       KeyConstants.VISIT_ONCE_NODE_LIST,
       null
     );
-
+    const debugInfo = persistantStorage.get(
+      keyPrefix,
+      KeyConstants.DEBUG,
+      null
+    );
     persistantStorage.clear(keyPrefix);
 
     persistantStorage.save(keyPrefix, KeyConstants.CONTEXT_ID, contextId);
@@ -54,6 +58,7 @@ class PlayerState {
       KeyConstants.VISIT_ONCE_NODE_LIST,
       visitOnceNodeList
     );
+    persistantStorage.save(keyPrefix, KeyConstants.DEBUG, debugInfo);
   }
 
   // Get all settings as object
