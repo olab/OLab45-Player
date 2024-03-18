@@ -33,7 +33,7 @@ class Home extends PureComponent {
   constructor(props) {
     super(props);
 
-    const debug = playerState.GetDebug();
+    const debug = playerState.GetDebug(config.APPLICATION_ID);
 
     this.state = {
       error: null,
@@ -53,7 +53,7 @@ class Home extends PureComponent {
     this.setPageTitle();
 
     if (!this.state.disableCache) {
-      this.state.maps = playerState.GetMaps();
+      this.state.maps = playerState.GetMaps(config.APPLICATION_ID);
       this.state.mapsFiltered = this.state.maps;
     }
 
@@ -159,8 +159,8 @@ class Home extends PureComponent {
       mapsFiltered: objData,
     });
 
-    playerState.SetMaps(this.state.maps);
-    playerState.ClearMap(null);
+    playerState.SetMaps(config.APPLICATION_ID, this.state.maps);
+    playerState.ClearMap(config.APPLICATION_ID);
   }
 
   getIcon = (showIcons, scopedObject) => {

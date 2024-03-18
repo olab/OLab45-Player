@@ -6,6 +6,7 @@ const cfg = {
   APP_BASEPATH: process.env.REACT_APP_BASEPATH,
   SIGNALR_TIMEOUT_MS: process.env.REACT_APP_SIGNALR_TIMEOUT_MS,
   TTALK_HUB_URL: process.env.REACT_APP_TTALK_HUB_URL,
+  APPLICATION_ID: "PLAYER",
 };
 
 // export const config = process.env.NODE_ENV === "development" ? dev : prod;
