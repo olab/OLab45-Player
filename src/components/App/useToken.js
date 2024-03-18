@@ -28,7 +28,7 @@ class useToken {
   setUserName = (userName) => {
     const sessionInfo = playerState.GetSessionInfo(config.APPLICATION_ID);
     sessionInfo.userName = userName;
-    playerState.SetSessionInfo(null, sessionInfo);
+    playerState.SetSessionInfo(config.APPLICATION_ID, sessionInfo);
   };
 
   getUserName = () => {

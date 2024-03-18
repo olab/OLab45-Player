@@ -144,12 +144,12 @@ class Home extends PureComponent {
 
   async componentDidMount() {
     // test if already have node loaded (and it's the same one)
-    var { maps } = this.state;
-    if (maps.length > 0) {
-      this.setState({ isMapsFetching: false });
-      log.debug("using cached maps data");
-      return;
-    }
+    // var { maps } = this.state;
+    // if (maps.length > 0) {
+    //   this.setState({ isMapsFetching: false });
+    //   log.debug("using cached maps data");
+    //   return;
+    // }
 
     const { data: objData } = await getMaps(this.props);
 
@@ -159,8 +159,7 @@ class Home extends PureComponent {
       mapsFiltered: objData,
     });
 
-    // playerState.ClearMap(config.APPLICATION_ID);
-    playerState.SetMaps(config.APPLICATION_ID, this.state.maps);
+    playerState.ClearMap(config.APPLICATION_ID);
   }
 
   getIcon = (showIcons, scopedObject) => {

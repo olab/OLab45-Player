@@ -4,7 +4,6 @@ import { FormControl } from "@material-ui/core";
 import JsxParser from "react-jsx-parser";
 import { Log, LogInfo, LogError, LogEnable } from "../../utils/Logger";
 import log from "loglevel";
-import MuiAlert from "@material-ui/lab/Alert";
 
 import ErrorPopup from "../ErrorPopup/ErrorPopup";
 import OlabConstantTag from "../WikiTags/Constant/Constant";
@@ -56,7 +55,7 @@ class Player extends PureComponent {
 
     if (this.state.disableCache) {
       LogInfo(`disabled cache`);
-      playerState.clear(null);
+      playerState.clear(config.APPLICATION_ID);
     } else {
       const persistedState = playerState.Get(config.APPLICATION_ID);
 

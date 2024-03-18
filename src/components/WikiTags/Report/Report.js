@@ -16,7 +16,7 @@ class OlabReportTag extends React.Component {
   }
 
   async componentDidMount() {
-    const contextId = playerState.GetContextId(null);
+    const contextId = playerState.GetContextId(config.APPLICATION_ID);
 
     let report;
 
