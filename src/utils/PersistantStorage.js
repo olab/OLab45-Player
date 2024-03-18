@@ -1,19 +1,30 @@
 import { Apps } from "@material-ui/icons";
 
 class PersistantStorage {
-  static clear(prefix = null) {
-    localStorage.clear();
+  static clear(keyPrefix = null) {
+    if (keyPrefix == null) {
+      localStorage.clear();
+    } else {
+      localStorage.removeItem(keyPrefix);
+    }
   }
 
-  static getAppSettings(appPrefix = null) {
-    if (appPrefix == null) return null;
+  static getAppSettings(keyPrefix = null) {
+    if (keyPrefix == null) {
+      throw new Error("missing keyPrefix");
+    }
 
-    const appRoot = localStorage.getItem(appPrefix);
+    const appRoot = localStorage.getItem(keyPrefix);
 
     // save fresh object if doesn't exist yet
     if (appRoot == null) {
-      this.saveObject(appPrefix, {});
-      return {};
+      this.saveObject(keyPrefix, {
+        debug: {
+          disableWikiRendering: false,
+          disableCache: false,
+        },
+      });
+      return this.getAppSettings(keyPrefix);
     }
 
     let appSettings = null;
@@ -22,7 +33,7 @@ class PersistantStorage {
       appSettings = JSON.parse(appRoot);
     } catch (error) {
       throw new Error(
-        `could not parse ${appPrefix} settings. ${JSON.stringify(error)}`
+        `could not parse ${keyPrefix} settings. ${JSON.stringify(error)}`
       );
     }
 

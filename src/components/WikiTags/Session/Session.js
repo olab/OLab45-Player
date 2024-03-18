@@ -14,7 +14,7 @@ class OlabSessionTag extends React.Component {
   constructor(props) {
     super(props);
 
-    const debug = playerState.GetDebug();
+    const debug = playerState.GetDebug(config.APPLICATION_ID);
 
     this.state = {
       debug,

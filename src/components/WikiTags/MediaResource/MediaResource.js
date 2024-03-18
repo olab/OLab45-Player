@@ -10,12 +10,13 @@ import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 import BrokenImageIcon from "@material-ui/icons/BrokenImage";
 import { Tooltip } from "@material-ui/core";
+import { config } from "../../../config";
 
 class OlabMediaResourceTag extends React.Component {
   constructor(props) {
     super(props);
 
-    const debug = playerState.GetDebug();
+    const debug = playerState.GetDebug(config.APPLICATION_ID);
     this.state = { debug };
   }
 

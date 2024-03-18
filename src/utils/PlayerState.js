@@ -22,10 +22,6 @@ const KeyConstants = {
 class PlayerState {
   static clear(appId) {
     persistantStorage.clear(appId);
-    persistantStorage.save(appId, KeyConstants.DEBUG, {
-      disableWikiRendering: false,
-      disableCache: false,
-    });
   }
 
   static ClearMap(appId) {

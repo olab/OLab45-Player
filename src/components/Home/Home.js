@@ -159,8 +159,8 @@ class Home extends PureComponent {
       mapsFiltered: objData,
     });
 
+    // playerState.ClearMap(config.APPLICATION_ID);
     playerState.SetMaps(config.APPLICATION_ID, this.state.maps);
-    playerState.ClearMap(config.APPLICATION_ID);
   }
 
   getIcon = (showIcons, scopedObject) => {

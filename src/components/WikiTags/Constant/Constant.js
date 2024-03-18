@@ -5,12 +5,13 @@ import { getConstant } from "../WikiTags";
 const playerState = require("../../../utils/PlayerState").PlayerState;
 import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
+import { config } from "../../../config";
 
 class OlabConstantTag extends React.Component {
   constructor(props) {
     super(props);
 
-    const debug = playerState.GetDebug();
+    const debug = playerState.GetDebug(config.APPLICATION_ID);
     this.state = { debug };
   }
 

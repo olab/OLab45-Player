@@ -2,7 +2,6 @@
 import React from "react";
 // import { withStyles } from '@material-ui/core/styles';
 import { Button, ButtonGroup } from "@material-ui/core";
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 const playerState = require("../../../utils/PlayerState").PlayerState;
 import { config } from "../../../config";
@@ -11,7 +10,7 @@ class OlabLinksTag extends React.Component {
   constructor(props) {
     super(props);
 
-    const debug = playerState.GetDebug();
+    const debug = playerState.GetDebug(config.APPLICATION_ID);
 
     this.state = { debug };
   }

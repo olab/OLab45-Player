@@ -4,13 +4,14 @@ import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 import { getSessionReport } from "../../../services/api";
 import OlabReportContents from "./Contents";
+import { config } from "../../../config";
 
 const playerState = require("../../../utils/PlayerState").PlayerState;
 
 class OlabReportTag extends React.Component {
   constructor(props) {
     super(props);
-    const debug = playerState.GetDebug();
+    const debug = playerState.GetDebug(config.APPLICATION_ID);
     this.state = { debug };
   }
 
@@ -23,7 +24,7 @@ class OlabReportTag extends React.Component {
       report = await getSessionReport(this.props.props, contextId);
     }
 
-    const debug = playerState.GetDebug();
+    const debug = playerState.GetDebug(config.APPLICATION_ID);
 
     // undefined will unset the state object
     this.setState({

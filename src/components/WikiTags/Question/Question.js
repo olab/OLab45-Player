@@ -14,6 +14,7 @@ import OlabDropDownQuestion from "./DropDown/DropDown";
 import OlabDragAndDropQuestion from "./DragAndDrop/DragAndDrop";
 import OlabAttendeeTag from "./TurkTalk/Turkee/Turkee";
 import OlabModeratorTag from "./TurkTalk/Turker/Turker";
+import { config } from "../../../config";
 
 const playerState = require("../../../utils/PlayerState").PlayerState;
 import { Log, LogInfo, LogError } from "../../../utils/Logger";
@@ -24,7 +25,7 @@ class OlabQuestionTag extends React.Component {
     super(props);
 
     let question = getQuestion(this.props.name, this.props);
-    const debug = playerState.GetDebug();
+    const debug = playerState.GetDebug(config.APPLICATION_ID);
 
     if (question.questionType !== 3 && question.questionType !== 2) {
       if (question.value === null) {

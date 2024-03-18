@@ -32,10 +32,6 @@ import {
 
 const playerState = require("../../utils/PlayerState").PlayerState;
 
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
 class Player extends PureComponent {
   constructor(props) {
     super(props);
@@ -62,7 +58,7 @@ class Player extends PureComponent {
       LogInfo(`disabled cache`);
       playerState.clear(null);
     } else {
-      const persistedState = playerState.Get();
+      const persistedState = playerState.Get(config.APPLICATION_ID);
 
       this.state = {
         ...this.state,
@@ -162,7 +158,10 @@ class Player extends PureComponent {
     });
 
     if (!this.state.disableCache) {
-      playerState.SetServerStatic(null, this.state.scopedObjects.server);
+      playerState.SetServerStatic(
+        config.APPLICATION_ID,
+        this.state.scopedObjects.server
+      );
     }
 
     log.debug("read server data");
@@ -195,8 +194,11 @@ class Player extends PureComponent {
     });
 
     if (!this.state.disableCache) {
-      playerState.SetMapStatic(null, this.state.scopedObjects.map);
-      playerState.SetMap(null, this.state.map);
+      playerState.SetMapStatic(
+        config.APPLICATION_ID,
+        this.state.scopedObjects.map
+      );
+      playerState.SetMap(config.APPLICATION_ID, this.state.map);
     }
 
     log.debug("read map data");
@@ -208,7 +210,7 @@ class Player extends PureComponent {
     // reset nodes visited if entering map via 'root node'
     if (nodeId == 0) {
       this.setState({ nodesVisited: [] });
-      playerState.SetNodesVisited(null, []);
+      playerState.SetNodesVisited(config.APPLICATION_ID, []);
     }
 
     // test if already have node loaded (and it's the same one)
@@ -255,9 +257,9 @@ class Player extends PureComponent {
     // if new play, should be new contextId from server,
     // otherwise get it out of local state
     if (newPlay) {
-      playerState.SetContextId(null, nodeData.contextId);
+      playerState.SetContextId(config.APPLICATION_ID, nodeData.contextId);
     } else {
-      nodeData.contextId = playerState.GetContextId(null);
+      nodeData.contextId = playerState.GetContextId(config.APPLICATION_ID);
     }
 
     LogInfo(`contextId: ${nodeData.contextId}`);
@@ -274,9 +276,15 @@ class Player extends PureComponent {
     });
 
     if (!this.state.disableCache) {
-      playerState.SetNode(null, this.state.node);
-      playerState.SetDynamicObjects(null, this.state.dynamicObjects);
-      playerState.SetNodeStatic(null, this.state.scopedObjects.node);
+      playerState.SetNode(config.APPLICATION_ID, this.state.node);
+      playerState.SetDynamicObjects(
+        config.APPLICATION_ID,
+        this.state.dynamicObjects
+      );
+      playerState.SetNodeStatic(
+        config.APPLICATION_ID,
+        this.state.scopedObjects.node
+      );
     }
 
     log.debug("read node data");
@@ -299,7 +307,10 @@ class Player extends PureComponent {
         dynamicObjects: scopedObjectsData,
       });
 
-      playerState.SetDynamicObjects(null, this.state.dynamicObjects);
+      playerState.SetDynamicObjects(
+        config.APPLICATION_ID,
+        this.state.dynamicObjects
+      );
 
       log.debug("read dynamic data");
     } catch (error) {
@@ -323,7 +334,10 @@ class Player extends PureComponent {
 
   onUpdateDynamicObjects = (dynamicObjects) => {
     this.setState({ dynamicObjects: dynamicObjects });
-    playerState.SetDynamicObjects(null, this.state.dynamicObjects);
+    playerState.SetDynamicObjects(
+      config.APPLICATION_ID,
+      this.state.dynamicObjects
+    );
   };
 
   onJsxParseError(arg) {
@@ -495,7 +509,7 @@ class Player extends PureComponent {
         this.setState({ nodesVisited: newNodesVisited });
 
         log.debug(`saving visited node id: ${this.state.node.id}`);
-        playerState.SetNodesVisited(null, newNodesVisited);
+        playerState.SetNodesVisited(config.APPLICATION_ID, newNodesVisited);
 
         log.debug(`Added node id ${this.state.node.id} to visitOnce list`);
       }
