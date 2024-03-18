@@ -28,14 +28,14 @@ class PlayerState {
     const contextId = this.GetContextId(appId);
     const sessionInfo = this.GetSessionInfo(appId);
     const debugInfo = this.GetDebug(appId);
-    const visitOnceNodeList = this.GetNodesVisited(appId);
+    // const visitOnceNodeList = this.GetNodesVisited(appId);
 
     persistantStorage.clear(appId);
 
     this.SetContextId(appId, contextId);
     this.SetSessionInfo(appId, sessionInfo);
-    this.SetNodesVisited(appId, visitOnceNodeList);
     this.SetDebug(appId, debugInfo);
+    // this.SetNodesVisited(appId, visitOnceNodeList);
   }
 
   // Get all settings as object
