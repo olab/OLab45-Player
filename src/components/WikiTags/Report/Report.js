@@ -11,12 +11,12 @@ const playerState = require("../../../utils/PlayerState").PlayerState;
 class OlabReportTag extends React.Component {
   constructor(props) {
     super(props);
-    const debug = playerState.GetDebug(config.APPLICATION_ID);
+    const debug = playerState.GetDebug();
     this.state = { debug };
   }
 
   async componentDidMount() {
-    const contextId = playerState.GetContextId(config.APPLICATION_ID);
+    const contextId = playerState.GetContextId();
 
     let report;
 
@@ -24,7 +24,7 @@ class OlabReportTag extends React.Component {
       report = await getSessionReport(this.props.props, contextId);
     }
 
-    const debug = playerState.GetDebug(config.APPLICATION_ID);
+    const debug = playerState.GetDebug();
 
     // undefined will unset the state object
     this.setState({
