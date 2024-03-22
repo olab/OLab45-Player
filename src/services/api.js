@@ -140,7 +140,7 @@ async function getMaps(props) {
 async function getMapNode(props, mapId, nodeId, dynamicObjects) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/maps/${mapId}/node/${nodeId}`;
-  let contextId = playerState.GetContextId(config.APPLICATION_ID);
+  let contextId = playerState.GetContextId();
 
   const data = await internetJsonFetch("POST", url, dynamicObjects, {
     OLabSessionId: contextId,

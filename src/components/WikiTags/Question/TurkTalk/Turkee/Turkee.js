@@ -18,7 +18,7 @@ class OlabAttendeeTag extends React.Component {
   constructor(props) {
     super(props);
 
-    const debug = playerState.GetDebug(config.APPLICATION_ID);
+    const debug = playerState.GetDebug();
 
     this.state = {
       connection: null,

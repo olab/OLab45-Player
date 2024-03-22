@@ -46,7 +46,7 @@ class App extends PureComponent {
       tokenType == constants.TOKEN_TYPE_ANONYMOUS ||
       tokenType == constants.TOKEN_TYPE_EXTERNAL
     ) {
-      let map = playerState.GetMap(config.APPLICATION_ID);
+      let map = playerState.GetMap();
 
       if (map && map?.id != mapId) {
         log.info(`map changed. logging out previous session`);

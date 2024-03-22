@@ -33,7 +33,7 @@ class Home extends PureComponent {
   constructor(props) {
     super(props);
 
-    const debug = playerState.GetDebug(config.APPLICATION_ID);
+    const debug = playerState.GetDebug();
 
     this.state = {
       error: null,
@@ -53,7 +53,7 @@ class Home extends PureComponent {
     this.setPageTitle();
 
     if (!this.state.disableCache) {
-      this.state.maps = playerState.GetMaps(config.APPLICATION_ID);
+      this.state.maps = playerState.GetMaps();
       this.state.mapsFiltered = this.state.maps;
     }
 
@@ -143,14 +143,6 @@ class Home extends PureComponent {
   }
 
   async componentDidMount() {
-    // test if already have node loaded (and it's the same one)
-    // var { maps } = this.state;
-    // if (maps.length > 0) {
-    //   this.setState({ isMapsFetching: false });
-    //   log.debug("using cached maps data");
-    //   return;
-    // }
-
     const { data: objData } = await getMaps(this.props);
 
     this.setState({
@@ -159,7 +151,7 @@ class Home extends PureComponent {
       mapsFiltered: objData,
     });
 
-    playerState.ClearMap(config.APPLICATION_ID);
+    playerState.ClearMap();
   }
 
   getIcon = (showIcons, scopedObject) => {

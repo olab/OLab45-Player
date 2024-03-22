@@ -25,7 +25,7 @@ class OlabQuestionTag extends React.Component {
     super(props);
 
     let question = getQuestion(this.props.name, this.props);
-    const debug = playerState.GetDebug(config.APPLICATION_ID);
+    const debug = playerState.GetDebug();
 
     if (question.questionType !== 3 && question.questionType !== 2) {
       if (question.value === null) {
