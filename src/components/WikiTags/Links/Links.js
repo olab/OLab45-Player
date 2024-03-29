@@ -2,9 +2,9 @@
 import React from "react";
 // import { withStyles } from '@material-ui/core/styles';
 import { Button, ButtonGroup } from "@material-ui/core";
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 const playerState = require("../../../utils/PlayerState").PlayerState;
+import { config } from "../../../config";
 
 class OlabLinksTag extends React.Component {
   constructor(props) {
@@ -16,7 +16,7 @@ class OlabLinksTag extends React.Component {
   }
 
   onNavigateToNode = (mapId, nodeId, urlParam) => {
-    let url = `/player/${mapId}/${nodeId}`;
+    let url = `${config.APP_BASEPATH}/${mapId}/${nodeId}`;
     if (urlParam) {
       url += `/${urlParam}`;
     }

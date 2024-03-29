@@ -1,30 +1,29 @@
-import React from 'react';
-import { getMap, getMapSessions } from '../../services/api';
-import { processUrl } from '../../utils/AppHelpers';
-import { makeStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Paper from '@material-ui/core/Paper';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { getMap, getMapSessions } from "../../services/api";
+import { processUrl } from "../../utils/AppHelpers";
+import { makeStyles } from "@material-ui/core/styles";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TablePagination from "@material-ui/core/TablePagination";
+import TableRow from "@material-ui/core/TableRow";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
+import Paper from "@material-ui/core/Paper";
+import { Link } from "react-router-dom";
+import { config } from "../../config";
 
 function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy])
-    return -1;
+  if (b[orderBy] < a[orderBy]) return -1;
 
-  if (b[orderBy] > a[orderBy])
-    return 1;
+  if (b[orderBy] > a[orderBy]) return 1;
 
   return 0;
 }
 
 function getComparator(order, orderBy) {
-  return order === 'desc'
+  return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
@@ -40,9 +39,14 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-  { id: 'timestamp', numeric: false, disablePadding: false, label: 'Date' },
-  { id: 'user', numeric: false, disablePadding: false, label: 'Username' },
-  { id: 'nodesVisited', numeric: true, disablePadding: false, label: 'Nodes visited' },
+  { id: "timestamp", numeric: false, disablePadding: false, label: "Date" },
+  { id: "user", numeric: false, disablePadding: false, label: "Username" },
+  {
+    id: "nodesVisited",
+    numeric: true,
+    disablePadding: false,
+    label: "Nodes visited",
+  },
 ];
 
 function EnhancedTableHead(props) {
@@ -57,19 +61,19 @@ function EnhancedTableHead(props) {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
+            align={"left"}
+            padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
               active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
+              direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
             >
               <strong>{headCell.label}</strong>
               {orderBy === headCell.id ? (
                 <span className={classes.visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                  {order === "desc" ? "sorted descending" : "sorted ascending"}
                 </span>
               ) : null}
             </TableSortLabel>
@@ -82,10 +86,10 @@ function EnhancedTableHead(props) {
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: '100%',
+    width: "100%",
   },
   paper: {
-    width: '100%',
+    width: "100%",
     marginBottom: theme.spacing(2),
   },
   table: {
@@ -93,46 +97,44 @@ const useStyles = makeStyles((theme) => ({
   },
   visuallyHidden: {
     border: 0,
-    clip: 'rect(0 0 0 0)',
+    clip: "rect(0 0 0 0)",
     height: 1,
     margin: -1,
-    overflow: 'hidden',
+    overflow: "hidden",
     padding: 0,
-    position: 'absolute',
+    position: "absolute",
     top: 20,
     width: 1,
   },
 }));
 
 export default (props) => {
-  const [ mapId ] = processUrl();
+  const [mapId] = processUrl();
 
-  if ( ! (+mapId > 0) )
-    return <NoMatch />
+  if (!(+mapId > 0)) return <NoMatch />;
 
   const [map, setMap] = React.useState(undefined);
   const [sessions, setSessions] = React.useState(undefined);
 
-  React.useEffect(() =>
-  {
+  React.useEffect(() => {
     getMapSessions(props, mapId)
-      .then(data => setSessions(data.data))
+      .then((data) => setSessions(data.data))
       .catch(() => setSessions(null));
 
     getMap(props, mapId)
-      .then(data => setMap(data.data))
+      .then((data) => setMap(data.data))
       .catch(() => setMap(null));
   }, []);
 
   const classes = useStyles();
-  const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('');
+  const [order, setOrder] = React.useState("asc");
+  const [orderBy, setOrderBy] = React.useState("");
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
@@ -147,7 +149,9 @@ export default (props) => {
 
   return (
     <div className={classes.root}>
-      <h2>{ map?.id ? `Labyrinth Report for "${map.name}"` : `Labyrinth Report` }</h2>
+      <h2>
+        {map?.id ? `Labyrinth Report for "${map.name}"` : `Labyrinth Report`}
+      </h2>
 
       <Paper className={classes.paper}>
         <TableContainer>
@@ -165,20 +169,23 @@ export default (props) => {
               rowCount={sessions?.length ?? 0}
             />
             <TableBody>
-              { (undefined === sessions || !sessions) &&
+              {(undefined === sessions || !sessions) && (
                 <TableRow>
                   <TableCell scope="row" colSpan={3} align="center">
-                    <p><small><em>{
-                      undefined === sessions
-                        ? 'Loading sessions...'
-                        : (
-                          ! Array.isArray(sessions)
-                            ? 'Error occurred while loading sessions.'
-                            : 'No sessions found.'
-                        )
-                    }</em></small></p>
+                    <p>
+                      <small>
+                        <em>
+                          {undefined === sessions
+                            ? "Loading sessions..."
+                            : !Array.isArray(sessions)
+                            ? "Error occurred while loading sessions."
+                            : "No sessions found."}
+                        </em>
+                      </small>
+                    </p>
                   </TableCell>
-                </TableRow> }
+                </TableRow>
+              )}
 
               {stableSort(sessions ?? [], getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -193,8 +200,10 @@ export default (props) => {
                       key={row.name}
                     >
                       <TableCell component="th" id={labelId} scope="row">
-                        <Link to={`/player/${mapId}/sessions/${row.uuid}`}>
-                          {String(row.timestamp).replace('T', ' ')}
+                        <Link
+                          to={`${config.APP_BASEPATH}/${mapId}/sessions/${row.uuid}`}
+                        >
+                          {String(row.timestamp).replace("T", " ")}
                         </Link>
                       </TableCell>
                       <TableCell>{row.user}</TableCell>
@@ -217,4 +226,4 @@ export default (props) => {
       </Paper>
     </div>
   );
-}
+};

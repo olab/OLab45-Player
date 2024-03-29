@@ -2,6 +2,7 @@ import { useState } from "react";
 import jwt_decode from "jwt-decode";
 import log from "loglevel";
 const playerState = require("../../utils/PlayerState").PlayerState;
+import { config } from "../../config";
 
 class useToken {
   constructor() {
@@ -20,23 +21,23 @@ class useToken {
   }
 
   getRole = () => {
-    const { role } = playerState.GetSessionInfo(null);
+    const { role } = playerState.GetSessionInfo();
     return role;
   };
 
   setUserName = (userName) => {
-    const sessionInfo = playerState.GetSessionInfo(null);
+    const sessionInfo = playerState.GetSessionInfo();
     sessionInfo.userName = userName;
-    playerState.SetSessionInfo(null, sessionInfo);
+    playerState.SetSessionInfo(sessionInfo);
   };
 
   getUserName = () => {
-    const { userName } = playerState.GetSessionInfo(null);
+    const { userName } = playerState.GetSessionInfo();
     return userName;
   };
 
   getTokenType = () => {
-    const sessionInfo = playerState.GetSessionInfo(null);
+    const sessionInfo = playerState.GetSessionInfo();
     const { tokenType } = sessionInfo;
     return tokenType;
   };
@@ -44,7 +45,7 @@ class useToken {
   getToken = () => {
     const {
       authInfo: { token },
-    } = playerState.GetSessionInfo(null);
+    } = playerState.GetSessionInfo();
     return token;
   };
 
@@ -54,14 +55,14 @@ class useToken {
     var decoded = jwt_decode(authInfo.token);
     log.debug(`Token decoded: ${JSON.stringify(decoded, null, 2)}`);
 
-    let sessionInfo = playerState.GetSessionInfo(null);
+    let sessionInfo = playerState.GetSessionInfo();
     sessionInfo = loginInfo;
 
     const expiry = new Date(decoded.exp * 1000);
     sessionInfo.authInfo.expires = expiry;
     sessionInfo.tokenType = tokenType;
 
-    playerState.SetSessionInfo(null, sessionInfo);
+    playerState.SetSessionInfo(sessionInfo);
 
     log.debug(`Saving session info: ${JSON.stringify(sessionInfo, null, 2)}`);
 
@@ -70,7 +71,7 @@ class useToken {
   };
 
   session = () => {
-    const authInfoObject = playerState.GetSessionInfo(null);
+    const authInfoObject = playerState.GetSessionInfo();
     return authInfoObject;
   };
 
@@ -86,7 +87,7 @@ class useToken {
   isExpiredSession = () => {
     const {
       authInfo: { expires },
-    } = playerState.GetSessionInfo(null);
+    } = playerState.GetSessionInfo();
     const expiryDate = new Date(expires);
     const now = new Date();
     return expiryDate < now;

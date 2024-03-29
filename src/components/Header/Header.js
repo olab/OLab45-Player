@@ -10,14 +10,17 @@ import {
   CenterPlaceholder,
   VersionWrapper,
 } from "./styles";
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 
 const Header = ({ version, authActions, isScreenBusy, externalPlay }) => {
-  const [logoutDialogOpen, toggleLogoutDialogOpen] = React.useReducer((state) => !state, false);
+  const [logoutDialogOpen, toggleLogoutDialogOpen] = React.useReducer(
+    (state) => !state,
+    false
+  );
 
   return (
     <>
@@ -42,9 +45,10 @@ const Header = ({ version, authActions, isScreenBusy, externalPlay }) => {
                 color="primary"
                 size="large"
                 aria-label="Return to Home"
-                onClick={() => externalPlay
-                  ? toggleLogoutDialogOpen()
-                  : authActions.logout() }>
+                onClick={() =>
+                  externalPlay ? toggleLogoutDialogOpen() : authActions.logout()
+                }
+              >
                 &nbsp;Logout&nbsp;
               </Button>
             </>
@@ -65,26 +69,32 @@ const Header = ({ version, authActions, isScreenBusy, externalPlay }) => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">Are you sure you want to sign out?</DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          Are you sure you want to sign out?
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Any progress you have made may be discarded.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => toggleLogoutDialogOpen()} color="primary" autoFocus>
+          <Button
+            onClick={() => toggleLogoutDialogOpen()}
+            color="primary"
+            autoFocus
+          >
             Cancel
           </Button>
-          <Button onClick={() => (
-            toggleLogoutDialogOpen(),
-            authActions.logout()
-          )} color="secondary">
+          <Button
+            onClick={() => (toggleLogoutDialogOpen(), authActions.logout())}
+            color="secondary"
+          >
             Confirm
           </Button>
         </DialogActions>
       </Dialog>
     </>
   );
-}
+};
 
 export default Header;

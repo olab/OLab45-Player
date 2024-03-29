@@ -40,8 +40,8 @@ class OlabModeratorTag extends React.Component {
 
     if (newRoomName != previousRoomName) {
       atrium = {};
-      playerState.SetAtrium(null);
-      playerState.SetConnectionInfo(null, null);
+      playerState.SetAtrium();
+      playerState.SetConnectionInfo(null);
     }
 
     this.state = {

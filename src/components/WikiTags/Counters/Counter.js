@@ -16,8 +16,7 @@ import {
 import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 import { getCounters } from "../WikiTags";
-import styles from "../styles.module.css";
-import siteStyles from "../site.module.css";
+import { config } from "../../../config";
 
 const playerState = require("../../../utils/PlayerState").PlayerState;
 

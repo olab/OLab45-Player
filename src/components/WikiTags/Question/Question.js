@@ -14,6 +14,7 @@ import OlabDropDownQuestion from "./DropDown/DropDown";
 import OlabDragAndDropQuestion from "./DragAndDrop/DragAndDrop";
 import OlabAttendeeTag from "./TurkTalk/Turkee/Turkee";
 import OlabModeratorTag from "./TurkTalk/Turker/Turker";
+import { config } from "../../../config";
 
 const playerState = require("../../../utils/PlayerState").PlayerState;
 import { Log, LogInfo, LogError } from "../../../utils/Logger";
@@ -51,10 +52,7 @@ class OlabQuestionTag extends React.Component {
   }
 
   static getQuestionId(question) {
-    if (question.name == null) {
-      return "QU" + question.id;
-    }
-    return ("QU-" + question.name.replace(" ", "")).toLowerCase();
+    return "QU-" + question.id;
   }
 
   sleep = (ms) => {
@@ -170,7 +168,7 @@ class OlabQuestionTag extends React.Component {
         default:
           return (
             <div>
-              <b>Error:</b> Implemented question type '{questionType}'
+              <b>Error:</b> Unimplemented question type '{questionType}'
             </div>
           );
       }

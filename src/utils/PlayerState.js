@@ -1,3 +1,5 @@
+import { config } from "../config";
+
 const persistantStorage = require("./PersistantStorage").PersistantStorage;
 
 const KeyConstants = {
@@ -20,59 +22,47 @@ const KeyConstants = {
 };
 
 class PlayerState {
-  static clear(keyPrefix) {
-    persistantStorage.clear(keyPrefix);
-    persistantStorage.save(KeyConstants.GLOBAL, KeyConstants.DEBUG, {
-      disableWikiRendering: false,
-      disableCache: false,
-    });
+  static appId = config.APPLICATION_ID;
+  static userId = "";
+  static storageKey = this.appId;
+
+  static SetUser(userId) {
+    if (userId == null) {
+      return;
+    }
+    this.userId = userId;
+    this.storageKey = `${this.appId}.${this.userId}.`;
+  }
+
+  static clear() {
+    persistantStorage.clear(this.storageKey);
+  }
+
+  static ClearMap() {
+    const contextId = this.GetContextId();
+    const sessionInfo = this.GetSessionInfo();
+    const debugInfo = this.GetDebug();
+
+    persistantStorage.clear(this.storageKey);
+
+    this.SetContextId(contextId);
+    this.SetSessionInfo(sessionInfo);
+    this.SetDebug(debugInfo);
   }
 
   // Get all settings as object
-  static Get(keyPrefix = null) {
-    const debug = persistantStorage.get(null, KeyConstants.DEBUG, {
-      disableWikiRendering: false,
-      disableCache: false,
-    });
-
-    const contextId = persistantStorage.get(
-      keyPrefix,
-      KeyConstants.CONTEXT_ID,
-      null
-    );
-    const dynamicObjects = persistantStorage.get(
-      keyPrefix,
-      KeyConstants.DYNAMIC_OBJECTS,
-      null
-    );
-    const map = persistantStorage.get(keyPrefix, KeyConstants.MAP, null);
-    const mapStatic = persistantStorage.get(
-      keyPrefix,
-      KeyConstants.MAP_STATIC,
-      null
-    );
-    const node = persistantStorage.get(keyPrefix, KeyConstants.NODE, null);
-    const nodeStatic = persistantStorage.get(
-      keyPrefix,
-      KeyConstants.NODE_STATIC,
-      null
-    );
-    const server = persistantStorage.get(keyPrefix, KeyConstants.SERVER, null);
-    const serverStatic = persistantStorage.get(
-      keyPrefix,
-      KeyConstants.SERVER_STATIC,
-      null
-    );
-    const sessionInfo = persistantStorage.get(
-      keyPrefix,
-      KeyConstants.SESSION_INFO,
-      { authInfo: { expires: 0 } }
-    );
-    const visitOnceList = persistantStorage.get(
-      keyPrefix,
-      KeyConstants.VISIT_ONCE_NODE_LIST,
-      []
-    );
+  static Get() {
+    const debug = this.GetDebug();
+    const contextId = this.GetContextId();
+    const dynamicObjects = this.GetDynamicObjects();
+    const map = this.GetMap();
+    const mapStatic = this.GetMapStatic();
+    const node = this.GetNode();
+    const nodeStatic = this.GetNodeStatic();
+    const server = persistantStorage.get(KeyConstants.SERVER);
+    const serverStatic = this.GetServerStatic();
+    const sessionInfo = this.GetSessionInfo();
+    const visitOnceList = this.GetNodesVisited();
 
     return {
       debug: debug,
@@ -93,163 +83,180 @@ class PlayerState {
     };
   }
 
+  static SetDebug(obj) {
+    persistantStorage.save(this.storageKey, KeyConstants.DEBUG, obj);
+  }
+
   static GetDebug(
-    defaultValue = {
-      disableWikiRendering: false,
-      disableCache: false,
-    }
+    userId = null,
+    defaultValue = { disableWikiRendering: false, disableCache: false }
   ) {
     return persistantStorage.get(
-      KeyConstants.GLOBAL,
+      this.storageKey,
       KeyConstants.DEBUG,
       defaultValue
     );
   }
 
   static GetWatchProfile(
-    key,
     defaultValue = { autoAssign: false, watchedLearners: [] }
   ) {
     return persistantStorage.get(
-      null,
-      `${key}_${KeyConstants.WATCH_PROFILE}`,
+      this.storageKey,
+      KeyConstants.WATCH_PROFILE,
       defaultValue
     );
   }
 
-  static SetWatchProfile(key, obj) {
-    persistantStorage.save(null, `${key}_${KeyConstants.WATCH_PROFILE}`, obj);
+  static SetWatchProfile(obj) {
+    persistantStorage.save(this.storageKey, KeyConstants.WATCH_PROFILE, obj);
   }
 
   static GetAtrium(defaultValue = {}) {
-    return persistantStorage.get(null, KeyConstants.ATRIUM, defaultValue);
+    return persistantStorage.get(
+      this.storageKey,
+      KeyConstants.ATRIUM,
+      defaultValue
+    );
   }
 
   static SetAtrium(obj) {
-    persistantStorage.save(null, KeyConstants.ATRIUM, obj);
+    persistantStorage.save(this.storageKey, KeyConstants.ATRIUM, obj);
   }
 
-  static SetConnectionInfo(keyPrefix, obj) {
-    persistantStorage.save(keyPrefix, KeyConstants.CONNECTION_INFO, obj);
+  static SetConnectionInfo(obj) {
+    persistantStorage.save(this.storageKey, KeyConstants.CONNECTION_INFO, obj);
   }
 
   static GetConnectionInfo(
-    keyPrefix,
     defaultValue = { authInfo: { expires: 0, token: null } }
   ) {
     return persistantStorage.get(
-      keyPrefix,
+      this.storageKey,
       KeyConstants.CONNECTION_INFO,
       defaultValue
     );
   }
 
-  static SetSessionInfo(keyPrefix, obj) {
-    persistantStorage.save(keyPrefix, KeyConstants.SESSION_INFO, obj);
+  static SetSessionInfo(obj) {
+    persistantStorage.save(this.storageKey, KeyConstants.SESSION_INFO, obj);
   }
 
-  static GetSessionInfo(
-    keyPrefix,
-    defaultValue = { tokenType: null, authInfo: { expires: 0, token: null } }
-  ) {
+  static GetSessionInfo(defaultValue = { authInfo: { expires: 0 } }) {
     return persistantStorage.get(
-      keyPrefix,
+      this.storageKey,
       KeyConstants.SESSION_INFO,
       defaultValue
     );
   }
 
-  static SetContextId(keyPrefix, obj) {
-    persistantStorage.save(keyPrefix, KeyConstants.CONTEXT_ID, obj);
+  static SetContextId(obj) {
+    persistantStorage.save(this.storageKey, KeyConstants.CONTEXT_ID, obj);
   }
 
-  static GetContextId(keyPrefix, defaultValue = null) {
+  static GetContextId(defaultValue = null) {
     return persistantStorage.get(
-      keyPrefix,
+      this.storageKey,
       KeyConstants.CONTEXT_ID,
       defaultValue
     );
   }
 
   static SetMaps(obj) {
-    persistantStorage.save(null, KeyConstants.MAPS, obj);
+    persistantStorage.save(this.storageKey, KeyConstants.MAPS, obj);
   }
 
   static GetMaps(defaultValue = []) {
-    return persistantStorage.get(null, KeyConstants.MAPS, defaultValue);
-  }
-
-  static SetMap(keyPrefix, obj) {
-    persistantStorage.save(keyPrefix, KeyConstants.MAP, obj);
-  }
-
-  static GetMap(keyPrefix, defaultValue = null) {
-    return persistantStorage.get(keyPrefix, KeyConstants.MAP, defaultValue);
-  }
-
-  static SetMapStatic(keyPrefix, obj) {
-    persistantStorage.save(keyPrefix, KeyConstants.MAP_STATIC, obj);
-  }
-
-  static GetMapStatic(keyPrefix, defaultValue = null) {
     return persistantStorage.get(
-      keyPrefix,
+      this.storageKey,
+      KeyConstants.MAPS,
+      defaultValue
+    );
+  }
+
+  static SetMap(obj) {
+    persistantStorage.save(this.storageKey, KeyConstants.MAP, obj);
+  }
+
+  static GetMap(defaultValue = null) {
+    return persistantStorage.get(
+      this.storageKey,
+      KeyConstants.MAP,
+      defaultValue
+    );
+  }
+
+  static SetMapStatic(obj) {
+    persistantStorage.save(this.storageKey, KeyConstants.MAP_STATIC, obj);
+  }
+
+  static GetMapStatic(defaultValue = null) {
+    return persistantStorage.get(
+      this.storageKey,
       KeyConstants.MAP_STATIC,
       defaultValue
     );
   }
 
-  static SetNode(keyPrefix, obj) {
-    persistantStorage.save(keyPrefix, KeyConstants.NODE, obj);
+  static SetNode(obj) {
+    persistantStorage.save(this.storageKey, KeyConstants.NODE, obj);
   }
 
-  static GetNode(keyPrefix, defaultValue = null) {
-    return persistantStorage.get(keyPrefix, KeyConstants.NODE, defaultValue);
-  }
-
-  static SetNodeStatic(keyPrefix, obj) {
-    persistantStorage.save(keyPrefix, KeyConstants.NODE_STATIC, obj);
-  }
-
-  static GetNodeStatic(keyPrefix, defaultValue = null) {
+  static GetNode(defaultValue = null) {
     return persistantStorage.get(
-      keyPrefix,
+      this.storageKey,
+      KeyConstants.NODE,
+      defaultValue
+    );
+  }
+
+  static SetNodeStatic(obj) {
+    persistantStorage.save(this.storageKey, KeyConstants.NODE_STATIC, obj);
+  }
+
+  static GetNodeStatic(defaultValue = null) {
+    return persistantStorage.get(
+      this.storageKey,
       KeyConstants.NODE_STATIC,
       defaultValue
     );
   }
 
-  static SetServerStatic(keyPrefix, obj) {
-    persistantStorage.save(keyPrefix, KeyConstants.SERVER_STATIC, obj);
+  static SetServerStatic(obj) {
+    persistantStorage.save(this.storageKey, KeyConstants.SERVER_STATIC, obj);
   }
 
-  static GetServerStatic(keyPrefix, defaultValue = null) {
+  static GetServerStatic(defaultValue = null) {
     return persistantStorage.get(
-      keyPrefix,
+      this.storageKey,
       KeyConstants.SERVER_STATIC,
       defaultValue
     );
   }
 
-  static SetDynamicObjects(keyPrefix, obj) {
-    persistantStorage.save(keyPrefix, KeyConstants.DYNAMIC_OBJECTS, obj);
+  static SetDynamicObjects(obj) {
+    persistantStorage.save(this.storageKey, KeyConstants.DYNAMIC_OBJECTS, obj);
   }
 
-  static GetDynamicObjects(keyPrefix, defaultValue = null) {
+  static GetDynamicObjects(defaultValue = null) {
     return persistantStorage.get(
-      keyPrefix,
+      this.storageKey,
       KeyConstants.DYNAMIC_OBJECTS,
       defaultValue
     );
   }
 
-  static SetNodesVisited(keyPrefix, obj) {
-    persistantStorage.save(keyPrefix, KeyConstants.VISIT_ONCE_NODE_LIST, obj);
+  static SetNodesVisited(obj) {
+    persistantStorage.save(
+      this.storageKey,
+      KeyConstants.VISIT_ONCE_NODE_LIST,
+      obj
+    );
   }
 
-  static GetNodesVisited(keyPrefix, defaultValue = null) {
+  static GetNodesVisited(defaultValue = []) {
     return persistantStorage.get(
-      keyPrefix,
+      this.storageKey,
       KeyConstants.VISIT_ONCE_NODE_LIST,
       defaultValue
     );
