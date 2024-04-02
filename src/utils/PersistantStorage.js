@@ -51,7 +51,9 @@ class PersistantStorage {
       return appSettings;
     } catch (error) {
       throw new Error(
-        `could not parse '${keyPrefix}' settings. ${JSON.stringify(error)}`
+        `could not parse '${keyPrefix}${key}' settings. ${JSON.stringify(
+          error
+        )}`
       );
     }
   }

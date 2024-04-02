@@ -1,6 +1,15 @@
 {
   "configurations": [
     {
+      "type": "firefox",
+      "request": "launch",
+      "reAttach": true,
+      "name": "Firefox",
+      "url": "http://localhost:3000/player",
+      "webRoot": "${workspaceFolder}"
+    },
+
+    {
       "name": "General",
       "request": "launch",
       "type": "chrome",

@@ -112,7 +112,7 @@ class PlayerState {
     persistantStorage.save(this.storageKey, KeyConstants.WATCH_PROFILE, obj);
   }
 
-  static GetAtrium(defaultValue = {}) {
+  static GetAtrium(defaultValue = { roomName: "" }) {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.ATRIUM,
@@ -120,7 +120,7 @@ class PlayerState {
     );
   }
 
-  static SetAtrium(obj) {
+  static SetAtrium(obj = { roomName: "" }) {
     persistantStorage.save(this.storageKey, KeyConstants.ATRIUM, obj);
   }
 
