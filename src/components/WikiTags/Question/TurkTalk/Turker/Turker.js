@@ -23,7 +23,7 @@ class OlabModeratorTag extends React.Component {
   constructor(props) {
     super(props);
 
-    let atrium = playerState.GetAtrium({ roomName: "" });
+    let atrium = playerState.GetAtrium();
 
     const questionSettings = JSON.parse(this.props.props.question.settings);
 
@@ -34,14 +34,14 @@ class OlabModeratorTag extends React.Component {
       this.onScreenPopup({ message: "No room name defined" });
     }
 
-    const { roomName: previousRoomName } = playerState.GetConnectionInfo(null, {
+    const { roomName: previousRoomName } = playerState.GetConnectionInfo({
       roomName: "",
     });
 
     if (newRoomName != previousRoomName) {
       atrium = {};
-      playerState.SetAtrium(null);
-      playerState.SetConnectionInfo(null, null);
+      playerState.SetAtrium();
+      playerState.SetConnectionInfo(null);
     }
 
     this.state = {

@@ -1,6 +1,15 @@
 {
   "configurations": [
     {
+      "type": "firefox",
+      "request": "launch",
+      "reAttach": true,
+      "name": "Firefox",
+      "url": "http://localhost:3000/player",
+      "webRoot": "${workspaceFolder}"
+    },
+
+    {
       "name": "General",
       "request": "launch",
       "type": "chrome",
@@ -18,7 +27,7 @@
       "name": "Learner",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:3000/player/1649/0",
+      "url": "http://localhost:3000/player/1703/33067",
       "webRoot": "${workspaceFolder}"
     },
     {

@@ -15,6 +15,7 @@ import {
 } from "../../utils/AppHelpers";
 import Logout from "./../Logout/";
 import MapSessions from "../Sessions/Sessions";
+import { config } from "../../config";
 
 var constants = require("../../services/constants");
 const playerState = require("../../utils/PlayerState").PlayerState;
@@ -159,7 +160,11 @@ class App extends PureComponent {
     if (directPlay && directPlayError) {
       return (
         <div>
-          <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
+          <Header
+            version={this.reactVersion}
+            authActions={authActions}
+            externalPlay={externalPlay}
+          />
           <center>
             <p>{directPlayError}</p>
           </center>
@@ -173,18 +178,22 @@ class App extends PureComponent {
       if (token && !isExpired) {
         return (
           <div className="wrapper">
-            <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
+            <Header
+              version={this.reactVersion}
+              authActions={authActions}
+              externalPlay={externalPlay}
+            />
             <Routes>
               <Route
-                path={`/player/:mapId/sessions`}
+                path={`${config.APP_BASEPATH}/:mapId/sessions`}
                 element={<MapSessions authActions={authActions} />}
               />
               <Route
-                path={`/player/:mapId/:nodeId`}
+                path={`${config.APP_BASEPATH}/:mapId/:nodeId`}
                 element={<Player authActions={authActions} />}
               />
               <Route
-                path={`/player/logout`}
+                path={`${config.APP_BASEPATH}/logout`}
                 element={<Logout authActions={authActions} />}
               />
               <Route path="*" element={<NoMatch />} />
@@ -200,28 +209,32 @@ class App extends PureComponent {
     if (tokenType == constants.TOKEN_TYPE_NATIVE) {
       return (
         <div className="wrapper">
-          <Header version={this.reactVersion} authActions={authActions} externalPlay={externalPlay} />
+          <Header
+            version={this.reactVersion}
+            authActions={authActions}
+            externalPlay={externalPlay}
+          />
           <Routes>
             <Route
-              path={`/player`}
+              path={`${config.APP_BASEPATH}`}
               element={<Home authActions={authActions} />}
             />
             <Route
-              path={`/player/home`}
+              path={`${config.APP_BASEPATH}/home`}
               element={<Home authActions={authActions} />}
             />
             <Route
-              path={`/player/:mapId/sessions`}
+              path={`${config.APP_BASEPATH}/:mapId/sessions`}
               element={<MapSessions authActions={authActions} />}
             />
             <Route
-              path={`/player/:mapId/:nodeId`}
+              path={`${config.APP_BASEPATH}/:mapId/:nodeId`}
               element={<Player authActions={authActions} />}
             />
             <Route
-                path={`/player/logout`}
-                element={<Logout authActions={authActions} />}
-              />
+              path={`${config.APP_BASEPATH}/logout`}
+              element={<Logout authActions={authActions} />}
+            />
             <Route path="*" element={<NoMatch />} />
           </Routes>
         </div>
@@ -243,109 +256,5 @@ function NoMatch() {
     </div>
   );
 }
-
-// import { useState } from "react";
-// import jwt_decode from "jwt-decode";
-// import log from "loglevel";
-// const playerState = require("../../utils/PlayerState").PlayerState;
-
-// export default function useToken() {
-//   const getRole = () => {
-//     const { role } = playerState.GetSessionInfo(null);
-//     return role;
-//   };
-
-//   const setUserName = (userName) => {
-//     const sessionInfo = playerState.GetSessionInfo(null);
-//     sessionInfo.userName = userName;
-//     playerState.SetSessionInfo(null, sessionInfo);
-//   };
-
-//   const getUserName = () => {
-//     const { userName } = playerState.GetSessionInfo(null);
-//     return userName;
-//   };
-
-//   const getTokenType = () => {
-//     const { tokenType } = playerState.GetSessionInfo(null);
-//     return tokenType;
-//   };
-
-//   const getToken = () => {
-//     const {
-//       authInfo: { token },
-//     } = playerState.GetSessionInfo(null);
-//     return token;
-//   };
-
-//   const saveToken = (loginInfo, tokenType) => {
-//     let authInfo = loginInfo.authInfo;
-
-//     var decoded = jwt_decode(authInfo.token);
-//     log.debug(`Token decoded: ${JSON.stringify(decoded, null, 2)}`);
-
-//     let sessionInfo = playerState.GetSessionInfo(null);
-//     sessionInfo = loginInfo;
-
-//     const expiry = new Date(decoded.exp * 1000);
-//     sessionInfo.authInfo.expires = expiry;
-//     sessionInfo.tokenType = tokenType;
-
-//     playerState.SetSessionInfo(null, sessionInfo);
-
-//     log.debug(`Saving session info: ${JSON.stringify(sessionInfo, null, 2)}`);
-
-//     setToken(sessionInfo.authInfo);
-//     setUserName(decoded.sub);
-//   };
-
-//   const session = () => {
-//     const authInfoObject = playerState.GetSessionInfo(null);
-//     return authInfoObject;
-//   };
-
-//   const logout = () => {
-//     initializeState(true);
-
-//     let url = `${process.env.PUBLIC_URL}/`;
-//     window.location.href = url;
-//   };
-
-//   const initializeState = (clear = true) => {
-//     if (clear) {
-//       playerState.clear();
-//     }
-//   };
-
-//   const isExpiredSession = () => {
-//     const {
-//       authInfo: { expires },
-//     } = playerState.GetSessionInfo(null);
-//     const expiryDate = new Date(expires);
-//     const now = new Date();
-//     return expiryDate < now;
-//   };
-
-//   initializeState(false);
-
-//   const [sessionInfo] = useState(session());
-//   const [token, setToken] = useState(getToken());
-
-//   return {
-//     token,
-//     authActions: {
-//       isExpiredSession: isExpiredSession,
-//       getTokenType: getTokenType,
-//       setToken: saveToken,
-//       getToken: getToken,
-//       getRole: getRole,
-//       logout: logout,
-//       getUserName: getUserName,
-//       setUserName: setUserName,
-//     },
-
-//     session: sessionInfo,
-//   };
-// }
 
 export default App;

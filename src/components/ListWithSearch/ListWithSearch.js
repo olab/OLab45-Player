@@ -133,10 +133,10 @@ class ListWithSearch extends PureComponent {
                 <ListItemContentWrapper>
                   <div disabled={isItemsDisabled}>
                     <Grid container spacing={0}>
-                      <Grid item xs={3} style={{ minWidth: "125px" }}>
+                      <Grid item xs={2} style={{ minWidth: "125px" }}>
                         {getIcon(showIcons, listItem)}
                       </Grid>
-                      <Grid item xs={9}>
+                      <Grid item xs={10}>
                         <ListItemText
                           primary={primarytext(listItem)}
                           secondary={removeHTMLTags(

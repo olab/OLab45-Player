@@ -10,6 +10,7 @@ import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 import BrokenImageIcon from "@material-ui/icons/BrokenImage";
 import { Tooltip } from "@material-ui/core";
+import { config } from "../../../config";
 
 class OlabMediaResourceTag extends React.Component {
   constructor(props) {
@@ -142,7 +143,7 @@ class OlabMediaResourceTag extends React.Component {
             <div>
               <a
                 id={`file-link-${item.id}`}
-                download={item.originUrl}
+                download={item.fileName}
                 href={item.originUrl}
               >
                 {item.fileName}

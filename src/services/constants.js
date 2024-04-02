@@ -5,7 +5,7 @@ module.exports = Object.freeze({
   CMD_ADDTURKEE: "ADDATTENDEE",
   CMD_DELLEARNER: "DELATTENDEE",
 
-  SIGNALCMD_REGISTERTURKEE: "registerAttendee",
+  SIGNALCMD_REGISTERLEARNER: "registerLearner",
   SIGNALCMD_REGISTERTURKER: "registerModerator",
   SIGNALCMD_ASSIGNTURKEE: "assignAttendee",
   SIGNALMETHOD_MESSAGE: "message",

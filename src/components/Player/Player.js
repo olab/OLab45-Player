@@ -4,12 +4,12 @@ import { FormControl } from "@material-ui/core";
 import JsxParser from "react-jsx-parser";
 import { Log, LogInfo, LogError, LogEnable } from "../../utils/Logger";
 import log from "loglevel";
-import MuiAlert from "@material-ui/lab/Alert";
 
 import ErrorPopup from "../ErrorPopup/ErrorPopup";
 import OlabConstantTag from "../WikiTags/Constant/Constant";
 import OlabCountersTag from "../WikiTags/Counters/Counter";
 import OlabCounterTag from "../WikiTags/Counter/Counter";
+import OlabSessionTag from "../WikiTags/Session/Session";
 import OlabLinksTag from "../WikiTags/Links/Links";
 import OlabReportTag from "../WikiTags/Report/Report";
 import OlabMediaResourceTag from "../WikiTags/MediaResource/MediaResource";
@@ -17,6 +17,7 @@ import OlabQuestionTag from "../WikiTags/Question/Question";
 import OlabAttendeeTag from "../WikiTags/Question/TurkTalk/Turkee/Turkee";
 import OlabModeratorTag from "../WikiTags/Question/TurkTalk/Turker/Turker";
 import { withParams } from "../ComponentWrapper";
+import { config } from "../../config";
 
 import styles from "./styles";
 import {
@@ -29,10 +30,6 @@ import {
 } from "../../services/api";
 
 const playerState = require("../../utils/PlayerState").PlayerState;
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 class Player extends PureComponent {
   constructor(props) {
@@ -58,7 +55,7 @@ class Player extends PureComponent {
 
     if (this.state.disableCache) {
       LogInfo(`disabled cache`);
-      playerState.clear(null);
+      playerState.clear();
     } else {
       const persistedState = playerState.Get();
 
@@ -78,12 +75,12 @@ class Player extends PureComponent {
     });
   }
 
-  handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpen(false);
-  };
+  // handleClose = (event, reason) => {
+  //   if (reason === "clickaway") {
+  //     return;
+  //   }
+  //   setOpen(false);
+  // };
 
   showError = (message) => {
     this.setState({
@@ -160,7 +157,7 @@ class Player extends PureComponent {
     });
 
     if (!this.state.disableCache) {
-      playerState.SetServerStatic(null, this.state.scopedObjects.server);
+      playerState.SetServerStatic(this.state.scopedObjects.server);
     }
 
     log.debug("read server data");
@@ -193,8 +190,8 @@ class Player extends PureComponent {
     });
 
     if (!this.state.disableCache) {
-      playerState.SetMapStatic(null, this.state.scopedObjects.map);
-      playerState.SetMap(null, this.state.map);
+      playerState.SetMapStatic(this.state.scopedObjects.map);
+      playerState.SetMap(this.state.map);
     }
 
     log.debug("read map data");
@@ -206,7 +203,7 @@ class Player extends PureComponent {
     // reset nodes visited if entering map via 'root node'
     if (nodeId == 0) {
       this.setState({ nodesVisited: [] });
-      playerState.SetNodesVisited(null, []);
+      playerState.SetNodesVisited([]);
     }
 
     // test if already have node loaded (and it's the same one)
@@ -228,8 +225,7 @@ class Player extends PureComponent {
 
     // do a check if the first node played, based
     // on if there was a previous node in local storage
-    var nodeState = playerState.GetNodeStatic(null, null);
-    const newPlay = nodeState == null;
+    const newPlay = nodeId == 0;
     dynamicObjects.newPlay = newPlay;
 
     const { data: nodeData } = await getMapNode(
@@ -254,9 +250,9 @@ class Player extends PureComponent {
     // if new play, should be new contextId from server,
     // otherwise get it out of local state
     if (newPlay) {
-      playerState.SetContextId(null, nodeData.contextId);
+      playerState.SetContextId(nodeData.contextId);
     } else {
-      nodeData.contextId = playerState.GetContextId(null);
+      nodeData.contextId = playerState.GetContextId();
     }
 
     LogInfo(`contextId: ${nodeData.contextId}`);
@@ -273,9 +269,9 @@ class Player extends PureComponent {
     });
 
     if (!this.state.disableCache) {
-      playerState.SetNode(null, this.state.node);
-      playerState.SetDynamicObjects(null, this.state.dynamicObjects);
-      playerState.SetNodeStatic(null, this.state.scopedObjects.node);
+      playerState.SetNode(this.state.node);
+      playerState.SetDynamicObjects(this.state.dynamicObjects);
+      playerState.SetNodeStatic(this.state.scopedObjects.node);
     }
 
     log.debug("read node data");
@@ -298,7 +294,7 @@ class Player extends PureComponent {
         dynamicObjects: scopedObjectsData,
       });
 
-      playerState.SetDynamicObjects(null, this.state.dynamicObjects);
+      playerState.SetDynamicObjects(this.state.dynamicObjects);
 
       log.debug("read dynamic data");
     } catch (error) {
@@ -311,7 +307,7 @@ class Player extends PureComponent {
   };
 
   onNavigateToNode = (mapId, nodeId, urlParam) => {
-    let url = `/player/${mapId}/${nodeId}`;
+    let url = `${config.APP_BASEPATH}/${mapId}/${nodeId}`;
     if (urlParam) {
       url += `/${urlParam}`;
     }
@@ -322,7 +318,7 @@ class Player extends PureComponent {
 
   onUpdateDynamicObjects = (dynamicObjects) => {
     this.setState({ dynamicObjects: dynamicObjects });
-    playerState.SetDynamicObjects(null, this.state.dynamicObjects);
+    playerState.SetDynamicObjects(this.state.dynamicObjects);
   };
 
   onJsxParseError(arg) {
@@ -395,13 +391,12 @@ class Player extends PureComponent {
                 },
               }}
               components={{
-                OlabAttendeeTag,
                 OlabConstantTag,
                 OlabCountersTag,
                 OlabCounterTag,
+                OlabSessionTag,
                 OlabLinksTag,
                 OlabMediaResourceTag,
-                OlabModeratorTag,
                 OlabReportTag,
                 OlabQuestionTag,
               }}
@@ -432,13 +427,12 @@ class Player extends PureComponent {
                 },
               }}
               components={{
-                OlabAttendeeTag,
                 OlabConstantTag,
                 OlabCountersTag,
                 OlabCounterTag,
+                OlabSessionTag,
                 OlabLinksTag,
                 OlabMediaResourceTag,
-                OlabModeratorTag,
                 OlabReportTag,
                 OlabQuestionTag,
               }}
@@ -474,6 +468,7 @@ class Player extends PureComponent {
               OlabConstantTag,
               OlabCountersTag,
               OlabCounterTag,
+              OlabSessionTag,
               OlabLinksTag,
               OlabMediaResourceTag,
               OlabModeratorTag,
@@ -495,7 +490,7 @@ class Player extends PureComponent {
         this.setState({ nodesVisited: newNodesVisited });
 
         log.debug(`saving visited node id: ${this.state.node.id}`);
-        playerState.SetNodesVisited(null, newNodesVisited);
+        playerState.SetNodesVisited(newNodesVisited);
 
         log.debug(`Added node id ${this.state.node.id} to visitOnce list`);
       }

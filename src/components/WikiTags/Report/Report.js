@@ -4,6 +4,7 @@ import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 import { getSessionReport } from "../../../services/api";
 import OlabReportContents from "./Contents";
+import { config } from "../../../config";
 
 const playerState = require("../../../utils/PlayerState").PlayerState;
 
@@ -15,7 +16,7 @@ class OlabReportTag extends React.Component {
   }
 
   async componentDidMount() {
-    const contextId = playerState.GetContextId(null);
+    const contextId = playerState.GetContextId();
 
     let report;
 
