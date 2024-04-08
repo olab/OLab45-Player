@@ -133,7 +133,7 @@ class OlabModeratorTag extends React.Component {
         }' onModeratorAssigned localInfo = ${JSON.stringify(payload, null, 2)}]`
       );
 
-      playerState.SetConnectionInfo(null, localInfo);
+      playerState.SetConnectionInfo(localInfo);
     } catch (error) {
       LogError(
         `'${localInfo.connectionId}' onModeratorAssigned exception: ${error.message}`
