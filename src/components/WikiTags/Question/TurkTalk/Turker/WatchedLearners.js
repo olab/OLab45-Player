@@ -8,7 +8,7 @@ class WatchedLearners {
       let { roomName: roomId } = questionSettings;
 
       this.watchProfileKey = `${mapId}/${roomId}`;
-      this.watchProfile = playerState.GetWatchProfile(this.watchProfileKey);
+      this.watchProfile = playerState.GetWatchProfile();
 
       log.debug(
         `current watchProfile: ${JSON.stringify(this.watchProfile, null, 2)}`
@@ -48,7 +48,7 @@ class WatchedLearners {
   SetWatchedLearners(watchedLearners) {
     try {
       this.watchProfile.watchedLearners = watchedLearners;
-      playerState.SetWatchProfile(this.watchProfileKey, this.watchProfile);
+      playerState.SetWatchProfile(this.watchProfile);
       log.debug(
         `new watchedLearners: ${JSON.stringify(
           this.watchProfile.watchedLearners,
@@ -63,7 +63,7 @@ class WatchedLearners {
 
   SetAutoAssign(value) {
     this.watchProfile.autoAssign = value;
-    playerState.SetWatchProfile(this.watchProfileKey, this.watchProfile);
+    playerState.SetWatchProfile(this.watchProfile);
     log.debug(`new autoAssign: ${value}`);
   }
 }
