@@ -45,6 +45,12 @@ class Turker extends TurkTalk {
     super.connect(this);
   }
 
+  onServerError(message) {
+    if (this.component.onServerError) {
+      this.component.onServerError(message);
+    }
+  }
+
   // *****
   onConnected() {
     LogInfo(

@@ -76,7 +76,10 @@ class TurkTalk {
         }
       })
       .catch(function (error) {
-        console.error(error.message);
+        log.error(error.message);
+        if (clientObject?.onServerError) {
+          clientObject.onServerError(error.message);
+        }
       });
   }
 
