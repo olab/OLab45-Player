@@ -23,7 +23,7 @@ class OlabModeratorTag extends React.Component {
   constructor(props) {
     super(props);
 
-    let atrium = playerState.GetAtrium();
+    let atrium = playerState.GetAtrium({ roomName: "" });
 
     const questionSettings = JSON.parse(this.props.props.question.settings);
 
@@ -40,8 +40,8 @@ class OlabModeratorTag extends React.Component {
 
     if (newRoomName != previousRoomName) {
       atrium = {};
-      playerState.SetAtrium();
-      playerState.SetConnectionInfo(null);
+      playerState.SetAtrium(null);
+      playerState.SetConnectionInfo(null, null);
     }
 
     this.state = {

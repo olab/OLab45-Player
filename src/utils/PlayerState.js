@@ -99,17 +99,18 @@ class PlayerState {
   }
 
   static GetWatchProfile(
+    storageKey,
     defaultValue = { autoAssign: false, watchedLearners: [] }
   ) {
     return persistantStorage.get(
-      this.storageKey,
+      storageKey,
       KeyConstants.WATCH_PROFILE,
       defaultValue
     );
   }
 
-  static SetWatchProfile(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.WATCH_PROFILE, obj);
+  static SetWatchProfile(storageKey, obj) {
+    persistantStorage.save(storageKey, KeyConstants.WATCH_PROFILE, obj);
   }
 
   static GetAtrium(defaultValue = { roomName: "" }) {
@@ -118,6 +119,7 @@ class PlayerState {
       KeyConstants.ATRIUM,
       defaultValue
     );
+    2;
   }
 
   static SetAtrium(obj = { roomName: "" }) {
