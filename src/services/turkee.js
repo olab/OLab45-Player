@@ -2,40 +2,31 @@ import TurkTalk from "./turktalk";
 import { Log, LogInfo, LogError } from "../utils/Logger";
 import log from "loglevel";
 var constants = require("./constants");
+
 const playerState = require("../utils/PlayerState").PlayerState;
 
-class Turker extends TurkTalk {
+class Turkee extends TurkTalk {
   // *****
   constructor(component) {
     super(component);
 
-    const {
-      // onAtriumUpdate,
-      onAddTurkee,
-      onRemoveTurkey,
-      onRoomAssigned,
-    } = component;
+    this.session = component.state.session;
+    this.session.referringNode = component.props.props.node.title;
+    this.session.nodeId = component.props.props.node.id;
+    this.session.mapId = component.props.props.map.id;
 
-    // this.onAtriumUpdate = onAtriumUpdate;
-    this.onRoomAssigned = onRoomAssigned;
-    this.onAddTurkee = onAddTurkee;
-    this.onRemoveTurkey = onRemoveTurkey;
-    this.playerState = component.props.props;
-
-    // this.onAssignTurkee = this.onAssignLearner.bind(this);
-    this.onCommand = this.onCommand.bind(this);
+    this.bindConnectionMessage(this.connection);
     this.onDisconnected = this.onDisconnected.bind(this);
-
-    this.bindConnectionMessage();
+    this.playerState = component.props.props;
   }
 
   // *****
   bindConnectionMessage() {
     super.bindConnectionMessage();
-    var turkerSelf = this;
+    var turkeeSelf = this;
 
     this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
-      turkerSelf.onCommand(payload);
+      turkeeSelf.onCommand(payload);
     });
   }
 
@@ -67,49 +58,29 @@ class Turker extends TurkTalk {
 
     // get room name from persistant storage in case
     // user refreshes the window
-    let roomName = this.penName;
-    let moderator = playerState.GetConnectionInfo(null, null);
-    if (moderator != null) {
-      if (moderator.roomName) {
-        roomName = moderator.roomName;
+    this.session.roomName = this.penName;
+
+    let learner = playerState.GetConnectionInfo(null);
+    if (learner != null) {
+      if (learner.roomName) {
+        this.session.roomName = learner.roomName;
       }
     }
 
     log.debug(
-      `'${this.connectionId}' registering turker for room name: ${roomName}`
+      `'${this.connectionId}' registering turkee for session: ${JSON.stringify(
+        this.session,
+        null,
+        1
+      )}`
     );
 
-    this.signalr.send(
-      constants.SIGNALCMD_REGISTERTURKER,
-      this.component.props.props.map.id,
-      this.component.props.props.node.id,
-      roomName,
-      false
-    );
-  }
-
-  // *****
-  onDisconnected() {
-    try {
-      log.warn(`'${this.connectionId}' onDisconnected`);
-      if (this.component.onConnectionChanged) {
-        if (this.component.onConnectionChanged) {
-          this.component.onConnectionChanged({
-            connection: this.connection.connection,
-            Name: this.username,
-          });
-        }
-      }
-    } catch (error) {
-      LogError(
-        `'${this.connectionId}' onDisconnected exception: ${error.message}`
-      );
-    }
+    this.signalr.send(constants.SIGNALCMD_REGISTERTURKEE, this.session);
   }
 
   onReconnecting(error) {
     try {
-      log.warn(`'${this.connectionId}' onReconnecting: ${error}`);
+      log.debug(`'${this.connectionId}' onReconnecting: ${error}`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -126,7 +97,7 @@ class Turker extends TurkTalk {
 
   onReconnected(connectionId) {
     try {
-      log.warn(`'${this.connectionId}' onReconnected: ${connectionId}`);
+      log.debug(`'${connectionId}' onReconnected`);
       if (this.component.onConnectionChanged) {
         this.component.onConnectionChanged({
           connectionStatus: this.connection._connectionState,
@@ -135,8 +106,29 @@ class Turker extends TurkTalk {
         });
       }
     } catch (error) {
+      log.error(`'${connectionId}' onReconnected exception: ${error.message}`);
+    }
+  }
+
+  // *****
+  onDisconnected() {
+    try {
+      if (!this?.component?.componentMounted) {
+        return;
+      }
+
+      log.debug(`'${this.connectionId}' onDisconnected`);
+
+      if (this?.component?.onConnectionChanged) {
+        this.component.onConnectionChanged({
+          connectionStatus: this.connection._connectionState,
+          connectionId: "",
+          Name: this.username,
+        });
+      }
+    } catch (error) {
       LogError(
-        `'${this.connectionId}' onReconnected exception: ${error.message}`
+        `'${this.connectionId}' onDisconnected exception: ${error.message}`
       );
     }
   }
@@ -149,17 +141,23 @@ class Turker extends TurkTalk {
       // test if command NOT handled in base class
       if (super.onCommand(payload)) {
         return;
+      }
+
+      if (payload.command === constants.SIGNALCMD_MODERATOR_STATUS) {
+        if (this.component.onModeratorStatus) {
+          this.component.onModeratorStatus(payload.data);
+        }
+
+        return true;
       } else {
         log.debug(
-          `'${this.connectionId}' turker.js onCommand unknown command: '${payload.command}'`
+          `'${this.connectionId}' onCommand unknown command: '${payload.command}'`
         );
       }
     } catch (error) {
-      LogError(
-        `'${this.connectionId}' turker.js onCommand exception: ${error.message}`
-      );
+      LogError(`'${this.connectionId}' onCommand exception: ${error.message}`);
     }
   }
 }
 
-export default Turker;
+export default Turkee;
