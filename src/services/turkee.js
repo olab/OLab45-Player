@@ -75,7 +75,7 @@ class Turkee extends TurkTalk {
       )}`
     );
 
-    this.signalr.send(constants.SIGNALCMD_REGISTERTURKEE, this.session);
+    this.signalr.send(constants.SIGNALCMD_REGISTERLEARNER, this.session);
   }
 
   onReconnecting(error) {
