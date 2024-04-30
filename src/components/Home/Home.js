@@ -244,7 +244,6 @@ class Home extends PureComponent {
               data={mapDetails}
             />
           )}
-          ;
         </HomeWrapper>
       </>
     );
