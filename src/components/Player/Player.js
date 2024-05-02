@@ -242,8 +242,8 @@ class Player extends PureComponent {
 
     const { scopedObjects } = this.state;
 
-    // delete the dynamic objects that piggy-back
-    // on the node object
+    // extract and delete the all-scope dynamic objects that
+    // piggy-back on the node object
     dynamicObjects = nodeData.dynamicObjects;
     delete nodeData.dynamicObjects;
 
