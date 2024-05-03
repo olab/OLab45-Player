@@ -40,7 +40,8 @@ class OlabCounterTag extends React.Component {
           item.value = "";
         }
 
-        return <>{parse(item.value)}</>;
+        let id = `CR:${name}`;
+        return <span id={id}>{parse(item.value)}</span>;
       }
     } catch (error) {
       return (

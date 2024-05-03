@@ -17,8 +17,10 @@ class OlabConstantTag extends React.Component {
 
   render() {
     const { debug } = this.state;
-
     const { name } = this.props;
+    const styles = () => ({
+      backgroundColor: "blue",
+    });
 
     log.debug(`OlabConstantTag render '${name}'`);
 
@@ -36,7 +38,8 @@ class OlabConstantTag extends React.Component {
           );
         }
 
-        return <>{parse(item.value)}</>;
+        let id = `CONST:${name}`;
+        return <span id={id}>{parse(item.value)}</span>;
       }
     } catch (error) {
       return (

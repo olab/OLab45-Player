@@ -114,10 +114,16 @@ class OlabSinglePickQuestion extends React.Component {
       selectedIndex = Number(this.state.question.value);
     }
 
+    let index = 0;
     for (const response of question.responses) {
       var item = (
         <div key={key++}>
-          {this.buildQuestionResponse(question, response, selectedIndex)}
+          {this.buildQuestionResponse(
+            question,
+            response,
+            selectedIndex,
+            index++
+          )}
         </div>
       );
       responses.push(item);
@@ -126,7 +132,7 @@ class OlabSinglePickQuestion extends React.Component {
     return responses;
   }
 
-  buildQuestionResponse(question, response, selectedIndex) {
+  buildQuestionResponse(question, response, selectedIndex, index) {
     let choice = (
       <FormControlLabel
         id={`qr-${response.id}`}

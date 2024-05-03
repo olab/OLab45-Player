@@ -48,6 +48,8 @@ class OlabLinksTag extends React.Component {
       }
     }
 
+    let index = 0;
+
     if (debug.disableWikiRendering) {
       return (
         <div className={className}>
@@ -59,6 +61,7 @@ class OlabLinksTag extends React.Component {
           >
             {links.map((link) => (
               <Button
+                id={`LINKS:${link.name}`}
                 key={link.id}
                 onClick={() => {
                   this.onNavigateToNode(mapId, link.destinationId, urlParam);
@@ -82,6 +85,7 @@ class OlabLinksTag extends React.Component {
           >
             {links.map((link) => (
               <Button
+                id={`LINKS:${index++}`}
                 key={link.id}
                 style={{ textTransform: "none" }}
                 onClick={() => {

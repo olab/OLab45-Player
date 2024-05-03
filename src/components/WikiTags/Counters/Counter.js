@@ -73,7 +73,7 @@ class OlabCountersTag extends React.Component {
 
       if (counters.length > 0) {
         return (
-          <TableContainer component={Paper}>
+          <TableContainer id={`COUNTERS`} component={Paper}>
             <Table aria-label="simple table">
               <TableHead>
                 <TableRow>
@@ -92,7 +92,9 @@ class OlabCountersTag extends React.Component {
                     <TableCell align="right">
                       {row.name} ({row.id})
                     </TableCell>
-                    <TableCell align="right">{row.value}</TableCell>
+                    <TableCell align="right">
+                      <span id={`COUNTERS:CR:${row.name}`}>{row.value}</span>
+                    </TableCell>
                     <TableCell align="right">{row.updatedat}</TableCell>
                   </TableRow>
                 ))}

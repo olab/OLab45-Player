@@ -156,13 +156,15 @@ class OlabMultiPickQuestion extends React.Component {
     }
 
     let selectedIndexes = selectedIndexStrings.map((item) => Number(item));
+    let index = 0;
 
     for (const response of question.responses) {
       let responseHtml = this.buildQuestionResponse(
         question,
         response,
         currentChoices,
-        selectedIndexes
+        selectedIndexes,
+        index++
       );
       responses.push(responseHtml);
     }
@@ -170,8 +172,15 @@ class OlabMultiPickQuestion extends React.Component {
     return responses;
   }
 
-  buildQuestionResponse(question, response, currentChoices, responseIndexes) {
-    let correctnessIndicator = <>{response.response}</>;
+  buildQuestionResponse(
+    question,
+    response,
+    currentChoices,
+    responseIndexes,
+    index
+  ) {
+    let id = `QU:${question.name ?? question.id}:${index}`;
+    let correctnessIndicator = <span id={id}>{response.response}</span>;
     let feedback = null;
 
     if (responseIndexes.includes(response.id)) {
@@ -236,7 +245,7 @@ class OlabMultiPickQuestion extends React.Component {
       return (
         <div
           className={`${styles["qumultichoice"]} ${siteStyles[id]}`}
-          id={`${id}`}
+          id={`QU:${id ?? name}`}
         >
           <FormControl component="fieldset" disabled={disabled}>
             <FormLabel component="legend">{question.stem}</FormLabel>

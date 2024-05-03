@@ -143,13 +143,15 @@ class OlabDropDownQuestion extends React.Component {
       return (
         <div
           className={`${styles["quddropdown"]} ${siteStyles[id]}`}
-          id={`${id}`}
+          id={`QU:${name ?? id}`}
         >
           <Box width={question.width}>
             <FormControl fullWidth disabled={disabled}>
-              <InputLabel id={`${id}-label`}>{question.stem}</InputLabel>
+              <InputLabel id={`QU:${name ?? id}:LABEL`}>
+                {question.stem}
+              </InputLabel>
               <Select
-                id={`${id}-select`}
+                id={`QU:${name ?? id}:SELECT`}
                 value={question.value}
                 onChange={(event) =>
                   this.setValue(event, this.setInProgress, this.setIsDisabled)

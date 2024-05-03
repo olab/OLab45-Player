@@ -133,7 +133,7 @@ class OlabDragAndDropQuestion extends React.Component {
       return (
         <>
           <p>{question.stem}</p>
-          <DragDropContext onDragEnd={this.onDragEnd}>
+          <DragDropContext id={`QU:${name}`} onDragEnd={this.onDragEnd}>
             <Droppable droppableId="droppable">
               {(provided, snapshot) => (
                 <div

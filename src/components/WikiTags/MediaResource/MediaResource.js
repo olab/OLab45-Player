@@ -93,7 +93,7 @@ class OlabMediaResourceTag extends React.Component {
         return (
           <div
             className={`${styles["mraudio"]} ${siteStyles[item.id]}`}
-            id={`${item.id}`}
+            id={`MR:${item.name}`}
           >
             <audio
               alt={item.fileName}
@@ -110,7 +110,7 @@ class OlabMediaResourceTag extends React.Component {
         return (
           <div
             className={`${styles["mrimage"]} ${siteStyles[item.id]}`}
-            id={`${item.id}`}
+            id={`MR:${item.name}`}
           >
             <img {...sizeProps} alt={item.fileName} src={item.originUrl} />
           </div>
@@ -119,7 +119,7 @@ class OlabMediaResourceTag extends React.Component {
         return (
           <div
             className={`${styles["mrvideo"]} ${siteStyles[item.id]}`}
-            id={`${item.id}`}
+            id={`MR:${item.name}`}
           >
             <video controls>
               <source type={item.mime} src={item.originUrl} />
