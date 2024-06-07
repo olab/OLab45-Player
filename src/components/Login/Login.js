@@ -125,7 +125,7 @@ const Login = ({ setCredentials, message, authActions, classes }) => {
                   onChange={(e) => setUserName(e.target.value)}
                 />
               </FormControl>
-              <FormControl margin="normal" required fullWidth>
+              <FormControl margin="normal" fullWidth>
                 <InputLabel htmlFor="password">Password</InputLabel>
                 <Input
                   name="password"
