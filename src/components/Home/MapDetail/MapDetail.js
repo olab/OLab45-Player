@@ -8,6 +8,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import JsxParser from "react-jsx-parser";
 
 class MapDetail extends PureComponent {
   constructor(props) {
@@ -52,6 +53,8 @@ class MapDetail extends PureComponent {
               <b>Created:&nbsp;</b>
               {data.createdAt}
               <br />
+              <b>Abstract:&nbsp;</b>
+              <JsxParser jsx={data.abstract} />
             </DialogContentText>
           </DialogContent>
           <DialogActions>
