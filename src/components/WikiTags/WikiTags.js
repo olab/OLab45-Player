@@ -133,6 +133,30 @@ const getConstant = (name, props) => {
   return item;
 };
 
+const getScript = (name, props) => {
+  let item = null;
+
+  try {
+    const {
+      props: {
+        scopedObjects: { map, node, server },
+      },
+    } = props;
+
+    const array = [...node?.scripts, ...map?.scripts, ...server?.scripts];
+
+    item = findWikiInList(array, name);
+
+    if (item == null) {
+      LogError(`Could not find script '${name}'`);
+    }
+  } catch (error) {
+    LogError(`error looking up script ${name}: ${error}`);
+  }
+
+  return item;
+};
+
 const combineStyles = (...styles) => {
   return function CombineStyles(theme) {
     const outStyles = styles.map((arg) => {
@@ -156,4 +180,5 @@ export {
   getCounters,
   getFile,
   combineStyles,
+  getScript,
 };

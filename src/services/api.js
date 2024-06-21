@@ -30,7 +30,7 @@ async function internetJsonFetch(
 
   if (payload) {
     settings.body = JSON.stringify(payload);
-    log.debug(`URL: ${url} payload: ${settings.body})`);
+    // log.debug(`URL: ${url} payload: ${settings.body})`);
   }
 
   while (tries++ < retryCount) {

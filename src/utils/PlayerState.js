@@ -119,7 +119,6 @@ class PlayerState {
       KeyConstants.ATRIUM,
       defaultValue
     );
-    2;
   }
 
   static SetAtrium(obj = { roomName: "" }) {

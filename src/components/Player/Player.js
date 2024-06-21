@@ -13,6 +13,7 @@ import OlabSessionTag from "../WikiTags/Session/Session";
 import OlabLinksTag from "../WikiTags/Links/Links";
 import OlabReportTag from "../WikiTags/Report/Report";
 import OlabMediaResourceTag from "../WikiTags/MediaResource/MediaResource";
+import OlabScriptTag from "../WikiTags/Script/Script";
 import OlabQuestionTag from "../WikiTags/Question/Question";
 import OlabAttendeeTag from "../WikiTags/Question/TurkTalk/Turkee/Turkee";
 import OlabModeratorTag from "../WikiTags/Question/TurkTalk/Turker/Turker";
@@ -399,6 +400,7 @@ class Player extends PureComponent {
                 OlabMediaResourceTag,
                 OlabReportTag,
                 OlabQuestionTag,
+                OlabScriptTag,
               }}
               jsx={theme?.header}
               onError={(arg) => this.onJsxParseError(arg)}
@@ -435,6 +437,7 @@ class Player extends PureComponent {
                 OlabMediaResourceTag,
                 OlabReportTag,
                 OlabQuestionTag,
+                OlabScriptTag,
               }}
               jsx={theme?.footer}
               onError={(arg) => this.onJsxParseError(arg)}
@@ -474,6 +477,7 @@ class Player extends PureComponent {
               OlabModeratorTag,
               OlabReportTag,
               OlabQuestionTag,
+              OlabScriptTag,
             }}
             jsx={node.text}
             onError={(arg) => this.onJsxParseError(arg)}

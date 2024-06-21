@@ -27,7 +27,7 @@ class PersistantStorage {
 
       for (const key of prefixKeys) {
         localStorage.removeItem(key);
-        log.debug(`deleted '${key}'`);
+        // log.debug(`deleted '${key}'`);
       }
     }
   }
@@ -38,15 +38,15 @@ class PersistantStorage {
 
     if (value == null && defaultValue != null) {
       this.save(keyPrefix, key, defaultValue);
-      log.debug(
-        `get '${fullKey}' = '${JSON.stringify(defaultValue)}' (default)`
-      );
+      // log.debug(
+      //   `get '${fullKey}' = '${JSON.stringify(defaultValue)}' (default)`
+      // );
       return defaultValue;
     }
 
     try {
       const appSettings = JSON.parse(value);
-      log.debug(`get '${fullKey}' = '${JSON.stringify(appSettings)}'`);
+      // log.debug(`get '${fullKey}' = '${JSON.stringify(appSettings)}'`);
 
       return appSettings;
     } catch (error) {
@@ -65,7 +65,7 @@ class PersistantStorage {
 
   static saveObject(key, obj) {
     const value = JSON.stringify(obj);
-    log.debug(`save '${key}' = '${value}'`);
+    // log.debug(`save '${key}' = '${value}'`);
     localStorage.setItem(key, value);
   }
 }
