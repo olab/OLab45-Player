@@ -1,6 +1,7 @@
 // @flow
 import React from "react";
 import { getScript } from "../WikiTags";
+import { OlabClientAPI } from "./OLabClientApi";
 const playerState = require("../../../utils/PlayerState").PlayerState;
 import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
@@ -20,25 +21,32 @@ class OlabScriptTag extends React.Component {
   }
 
   render() {
-    const { debug } = this.state;
+    const { debug, script } = this.state;
     const { name } = this.props;
 
     log.debug(`OlabScriptTag render '${name}'`);
 
     try {
-      /* render it */
       if (debug.disableWikiRendering) {
         return (
           <>
+            <br />
             <b>[[SCRIPT:{name}]]</b>
+            <br />
+            <textarea rows="10" cols="50" defaultValue={script.source} />
+            <br />
+            <br />
           </>
         );
       }
+
+      var func = new Function(script.source);
+      func();
     } catch (error) {
       return (
         <>
           <b>
-            [[SCRIPT:{name}]] "{error.message}"
+            [[SCRIPT:{name}]] error: {error.message}
           </b>
         </>
       );

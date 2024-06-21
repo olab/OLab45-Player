@@ -105,7 +105,7 @@ class OlabSinglePickQuestion extends React.Component {
     log.debug(`set disabled: ${disabled}`);
   }
 
-  buildQuestionResponses(question) {
+  buildQuestionResponses(question, id) {
     let responses = [];
     let key = 0;
     let selectedIndex = null;
@@ -117,7 +117,7 @@ class OlabSinglePickQuestion extends React.Component {
     for (const response of question.responses) {
       var item = (
         <div key={key++}>
-          {this.buildQuestionResponse(question, response, selectedIndex)}
+          {this.buildQuestionResponse(question, id, response, selectedIndex)}
         </div>
       );
       responses.push(item);
@@ -126,10 +126,10 @@ class OlabSinglePickQuestion extends React.Component {
     return responses;
   }
 
-  buildQuestionResponse(question, response, selectedIndex) {
+  buildQuestionResponse(question, id, response, selectedIndex) {
     let choice = (
       <FormControlLabel
-        id={`qr-${response.id}`}
+        id={`${id}/QR:${response.id}`}
         value={response.id}
         control={<Radio />}
         label={response.response}
@@ -196,7 +196,7 @@ class OlabSinglePickQuestion extends React.Component {
         );
       }
 
-      var responses = this.buildQuestionResponses(question);
+      var responses = this.buildQuestionResponses(question, id);
       var disabled = question.disabled == 0 ? false : true;
 
       return (
@@ -205,8 +205,11 @@ class OlabSinglePickQuestion extends React.Component {
           id={`${id}`}
         >
           <FormControl component="fieldset" disabled={disabled}>
-            <FormLabel component="legend">{question.stem}</FormLabel>
+            <FormLabel id={`${id}/stem`} component="legend">
+              {question.stem}
+            </FormLabel>
             <RadioGroup
+              id={`${id}/choices`}
               style={{ float: "left" }}
               name={`${id}-radio`}
               onChange={(event) => this.setValue(event)}

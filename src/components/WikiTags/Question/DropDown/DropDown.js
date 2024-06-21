@@ -10,6 +10,7 @@ import {
 
 import CloseIcon from "@material-ui/icons/Close";
 import CheckIcon from "@material-ui/icons/Check";
+import Spinner from "../../../../shared/assets/loading_med.gif";
 
 import { withStyles } from "@material-ui/core/styles";
 import { Log, LogInfo, LogError } from "../../../../utils/Logger";
@@ -106,12 +107,16 @@ class OlabDropDownQuestion extends React.Component {
     log.debug(`set disabled: ${disabled}`);
   }
 
-  buildQuestionResponses(question) {
+  buildQuestionResponses(question, id) {
     let responses = [];
     let key = 0;
     for (const response of question.responses) {
       var item = (
-        <MenuItem key={key++} value={Number(response.id)}>
+        <MenuItem
+          id={`${id}/QR:${response.id}`}
+          key={key++}
+          value={Number(response.id)}
+        >
           {response.response}
         </MenuItem>
       );
@@ -137,7 +142,7 @@ class OlabDropDownQuestion extends React.Component {
         );
       }
 
-      var responses = this.buildQuestionResponses(question);
+      var responses = this.buildQuestionResponses(question, id);
       var disabled = question.disabled == 0 ? false : true;
 
       return (
@@ -147,9 +152,14 @@ class OlabDropDownQuestion extends React.Component {
         >
           <Box width={question.width}>
             <FormControl fullWidth disabled={disabled}>
-              <InputLabel id={`${id}-label`}>{question.stem}</InputLabel>
+              <div
+                id={`${id}/stem`}
+                className={`${styles["qumultiline-stem"]}`}
+              >
+                {question.stem}
+              </div>
               <Select
-                id={`${id}-select`}
+                id={`${id}/value`}
                 value={question.value}
                 onChange={(event) =>
                   this.setValue(event, this.setInProgress, this.setIsDisabled)

@@ -52,7 +52,10 @@ class OlabQuestionTag extends React.Component {
   }
 
   static getQuestionId(question) {
-    return "QU-" + question.id;
+    if (question.name != null) {
+      return "QU:" + question.name;
+    }
+    return "QU:" + question.id;
   }
 
   sleep = (ms) => {

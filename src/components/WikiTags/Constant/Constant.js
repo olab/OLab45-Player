@@ -11,14 +11,30 @@ class OlabConstantTag extends React.Component {
   constructor(props) {
     super(props);
 
+    let constant = getConstant(this.props.name, this.props);
     const debug = playerState.GetDebug();
-    this.state = { debug };
+    this.state = {
+      constant,
+      debug,
+    };
+  }
+
+  static getConstantId(constant) {
+    if (constant.name != null) {
+      return "CONST:" + constant.name;
+    }
+    return "CONST:" + constant.id;
   }
 
   render() {
-    const { debug } = this.state;
+    const { debug, constant } = this.state;
 
     const { name } = this.props;
+
+    const customId = OlabConstantTag.getConstantId(this.state.constant);
+    const questionDivStyle = {
+      whiteSpace: "nowrap",
+    };
 
     log.debug(`OlabConstantTag render '${name}'`);
 
@@ -36,7 +52,7 @@ class OlabConstantTag extends React.Component {
           );
         }
 
-        return <>{parse(item.value)}</>;
+        return <span id={customId}>{parse(item.value)}</span>;
       }
     } catch (error) {
       return (

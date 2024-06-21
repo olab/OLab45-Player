@@ -131,7 +131,10 @@ class OlabDragAndDropQuestion extends React.Component {
 
     try {
       return (
-        <>
+        <div
+          className={`${styles["qudraganddrop"]} ${siteStyles[id]}`}
+          id={`${id}`}
+        >
           <p>{question.stem}</p>
           <DragDropContext onDragEnd={this.onDragEnd}>
             <Droppable droppableId="droppable">
@@ -143,6 +146,7 @@ class OlabDragAndDropQuestion extends React.Component {
                 >
                   {question.responses.map((item, index) => (
                     <Draggable
+                      id={`${id}/QR:${response.id}`}
                       key={item.id}
                       draggableId={item.name}
                       index={index}
@@ -167,7 +171,7 @@ class OlabDragAndDropQuestion extends React.Component {
               )}
             </Droppable>
           </DragDropContext>
-        </>
+        </div>
       );
     } catch (error) {
       return (

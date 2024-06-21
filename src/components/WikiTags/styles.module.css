@@ -1,14 +1,12 @@
 .quddropdown {
   background-color: rgb(240, 240, 240);
   color: black;
-  width: 95%;
   padding: 10px;
 }
 
 .qudraganddrop {
   background-color: rgb(240, 240, 240);
   color: black;
-  width: 95%;
   padding: 10px;
 }
 
@@ -22,7 +20,6 @@
 .qusinglechoice {
   background-color: rgb(240, 240, 240);
   color: black;
-  width: 95%;
   padding: 10px;
 }
 
@@ -43,7 +40,6 @@
 .qumultichoice {
   background-color: rgb(240, 240, 240);
   color: black;
-  width: 95%;
   padding: 10px;
 }
 
@@ -67,12 +63,12 @@
 .qumultiline {
   background-color: rgb(240, 240, 240);
   color: black;
-  width: 95%;
   padding: 10px;
 }
 
-.qumultiline-value-container {
-  padding: 10px;
+.qumultiline-stem {
+  color: black;
+  padding-bottom: 15px;
 }
 
 .qumultiline-required {
@@ -80,10 +76,10 @@
 }
 
 .qumultiline-value {
+  color: black;
   resize: none;
-  width: 99%;
-  padding: 15px;
-  margin: -10px;
+  width: 100%;
+  padding: 0px;
   outline: none;
 }
 

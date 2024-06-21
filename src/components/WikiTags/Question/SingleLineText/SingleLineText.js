@@ -102,31 +102,31 @@ class OlabSinglelineTextQuestion extends React.Component {
     try {
       return (
         <>
-          <div
+          <span
             className={`${styles["qusingleline"]} ${siteStyles[id]}`}
             id={`${id}`}
           >
-            <div
-              id={`${id}-label`}
-              className={`${styles["qusingleline-label"]}  ${siteStyles[id]}`}
+            <span
+              id={`${id}/stem`}
+              className={`${styles["qusingleline-stem"]}  ${siteStyles[id]}`}
             >
               {question.stem}
-            </div>
-            <div className={`${styles["qusingleline-value-container"]}`}>
+            </span>
+            <span className={`${styles["qusingleline-value-container"]}`}>
               <form
                 onSubmit={(event) => this.setValue(event, this.setInProgress)}
               >
                 <input
                   className={`${styles["qusingleline-value"]}`}
-                  id={`${id}-value`}
+                  id={`${id}/value`}
                   value={question.value}
                   placeholder={`${question.prompt}`}
                   onChange={this.handleChange}
                 ></input>
                 <input type="submit" hidden />
               </form>
-            </div>
-          </div>
+            </span>
+          </span>
         </>
       );
     } catch (error) {

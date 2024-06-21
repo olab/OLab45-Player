@@ -349,6 +349,7 @@ class Player extends PureComponent {
     } = this.state;
 
     const { history, authActions } = this.props;
+    let player = this;
 
     // paint an error box
     if (errorFound) {
@@ -454,16 +455,17 @@ class Player extends PureComponent {
             bindings={{
               props: {
                 authActions,
-                linkHandler,
-                onUpdateDynamicObjects,
+                contextId,
+                dynamicObjects,
                 history,
+                linkHandler,
                 map,
                 node,
-                scopedObjects,
-                dynamicObjects,
-                urlParam,
                 nodesVisited,
-                contextId,
+                onUpdateDynamicObjects,
+                player,
+                scopedObjects,
+                urlParam,
               },
             }}
             components={{

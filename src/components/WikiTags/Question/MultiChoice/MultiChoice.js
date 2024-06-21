@@ -147,7 +147,7 @@ class OlabMultiPickQuestion extends React.Component {
     log.debug(`set disabled: ${disabled}`);
   }
 
-  buildQuestionResponses(question, currentChoices) {
+  buildQuestionResponses(question, id, currentChoices) {
     let responses = [];
     let selectedIndexStrings = [];
 
@@ -160,6 +160,7 @@ class OlabMultiPickQuestion extends React.Component {
     for (const response of question.responses) {
       let responseHtml = this.buildQuestionResponse(
         question,
+        id,
         response,
         currentChoices,
         selectedIndexes
@@ -170,7 +171,13 @@ class OlabMultiPickQuestion extends React.Component {
     return responses;
   }
 
-  buildQuestionResponse(question, response, currentChoices, responseIndexes) {
+  buildQuestionResponse(
+    question,
+    id,
+    response,
+    currentChoices,
+    responseIndexes
+  ) {
     let correctnessIndicator = <>{response.response}</>;
     let feedback = null;
 
@@ -208,6 +215,7 @@ class OlabMultiPickQuestion extends React.Component {
 
     let responseHtml = (
       <FormControlLabel
+        id={`${id}/QR:${response.id}`}
         onChange={(event) =>
           this.setValue(event, currentChoices, response.id.toString())
         }
@@ -230,7 +238,7 @@ class OlabMultiPickQuestion extends React.Component {
       let row = question.layoutType === 1 ? true : false;
       let currentChoices = this.createArrayFromValue(question.value);
 
-      var responses = this.buildQuestionResponses(question, currentChoices);
+      var responses = this.buildQuestionResponses(question, id, currentChoices);
       var disabled = question.disabled == 0 ? false : true;
 
       return (
@@ -239,7 +247,9 @@ class OlabMultiPickQuestion extends React.Component {
           id={`${id}`}
         >
           <FormControl component="fieldset" disabled={disabled}>
-            <FormLabel component="legend">{question.stem}</FormLabel>
+            <FormLabel id={`${id}/stem`} component="legend">
+              {question.stem}
+            </FormLabel>
             <FormGroup row={row}>{responses}</FormGroup>
           </FormControl>
         </div>
