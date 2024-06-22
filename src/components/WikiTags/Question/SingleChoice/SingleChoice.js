@@ -14,6 +14,7 @@ import CheckIcon from "@material-ui/icons/Check";
 import { withStyles } from "@material-ui/core/styles";
 import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
+import JsxParser from "react-jsx-parser";
 
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
@@ -206,7 +207,7 @@ class OlabSinglePickQuestion extends React.Component {
         >
           <FormControl component="fieldset" disabled={disabled}>
             <FormLabel id={`${id}/stem`} component="legend">
-              {question.stem}
+              <JsxParser jsx={question.stem} />
             </FormLabel>
             <RadioGroup
               id={`${id}/choices`}

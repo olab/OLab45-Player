@@ -10,6 +10,7 @@ import {
 import { withStyles } from "@material-ui/core/styles";
 import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
+import JsxParser from "react-jsx-parser";
 
 import CloseIcon from "@material-ui/icons/Close";
 import CheckIcon from "@material-ui/icons/Check";
@@ -248,7 +249,7 @@ class OlabMultiPickQuestion extends React.Component {
         >
           <FormControl component="fieldset" disabled={disabled}>
             <FormLabel id={`${id}/stem`} component="legend">
-              {question.stem}
+              <JsxParser jsx={question.stem} />
             </FormLabel>
             <FormGroup row={row}>{responses}</FormGroup>
           </FormControl>

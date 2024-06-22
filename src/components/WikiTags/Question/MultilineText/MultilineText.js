@@ -3,6 +3,7 @@ import { Button } from "@material-ui/core";
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import log from "loglevel";
+import JsxParser from "react-jsx-parser";
 
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
@@ -113,7 +114,7 @@ class OlabMultilineTextQuestion extends React.Component {
           id={`${id}`}
         >
           <div id={`${id}/stem`} className={`${styles["qumultiline-stem"]}`}>
-            {question.stem}
+            <JsxParser jsx={question.stem} />
           </div>
           <div className={`${styles["qumultiline-value"]}`}>
             <textarea

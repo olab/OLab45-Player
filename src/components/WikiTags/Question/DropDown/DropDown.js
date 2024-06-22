@@ -11,6 +11,7 @@ import {
 import CloseIcon from "@material-ui/icons/Close";
 import CheckIcon from "@material-ui/icons/Check";
 import Spinner from "../../../../shared/assets/loading_med.gif";
+import JsxParser from "react-jsx-parser";
 
 import { withStyles } from "@material-ui/core/styles";
 import { Log, LogInfo, LogError } from "../../../../utils/Logger";
@@ -156,7 +157,7 @@ class OlabDropDownQuestion extends React.Component {
                 id={`${id}/stem`}
                 className={`${styles["qumultiline-stem"]}`}
               >
-                {question.stem}
+                <JsxParser jsx={question.stem} />
               </div>
               <Select
                 id={`${id}/value`}

@@ -45,19 +45,21 @@
 
 .qusingleline {
   background-color: rgb(240, 240, 240);
-  color: white;
-  width: 95%;
+  color: black;
   padding: 10px;
 }
 
-.qusingleline-label {
+.qusingleline-stem {
   color: black;
-  width: 100%;
+  padding-bottom: 15px;
 }
 
 .qusingleline-value {
-  padding: 5px;
-  height: 25px;
+  color: black;
+  resize: none;
+  width: 100%;
+  padding: 0px;
+  outline: none;
 }
 
 .qumultiline {

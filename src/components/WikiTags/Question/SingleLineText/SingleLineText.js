@@ -3,6 +3,7 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
+import JsxParser from "react-jsx-parser";
 
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
@@ -102,17 +103,15 @@ class OlabSinglelineTextQuestion extends React.Component {
     try {
       return (
         <>
-          <span
+          <div
             className={`${styles["qusingleline"]} ${siteStyles[id]}`}
             id={`${id}`}
           >
-            <span
-              id={`${id}/stem`}
-              className={`${styles["qusingleline-stem"]}  ${siteStyles[id]}`}
-            >
-              {question.stem}
-            </span>
-            <span className={`${styles["qusingleline-value-container"]}`}>
+            <div id={`${id}/stem`} className={`${styles["qusingleline-stem"]}`}>
+              <JsxParser jsx={question.stem} />
+            </div>
+
+            <div className={`${styles["qusingleline-value"]}`}>
               <form
                 onSubmit={(event) => this.setValue(event, this.setInProgress)}
               >
@@ -125,8 +124,8 @@ class OlabSinglelineTextQuestion extends React.Component {
                 ></input>
                 <input type="submit" hidden />
               </form>
-            </span>
-          </span>
+            </div>
+          </div>
         </>
       );
     } catch (error) {
