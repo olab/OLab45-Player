@@ -21,7 +21,9 @@ class OlabSliderQuestion extends React.Component {
     if (typeof this.state.question.previousValue == "undefined") {
       // eslint-disable-next-line
       const settings = JSON.parse(this.state.question.settings);
-      this.state.question.value = Number(settings.defaultValue);
+      if (typeof settings.defaultValue != "undefined") {
+        this.state.question.value = Number(settings.defaultValue);
+      }
     }
 
     // Binding this keyword
@@ -96,13 +98,13 @@ class OlabSliderQuestion extends React.Component {
                 : ""
             }
           >
-            <Typography id={`${id}-stem`} component="div" gutterBottom>
+            <Typography id={`${id}/stem`} component="div" gutterBottom>
               {question.stem}
             </Typography>
             <input
               readOnly
               className={`${styles["quslider-value"]}`}
-              id={`${id}-value`}
+              id={`${id}/value`}
               value={question.value}
             ></input>
             <Slider
@@ -126,7 +128,7 @@ class OlabSliderQuestion extends React.Component {
       return (
         <>
           <b>
-            [[QU:{id}]] "{error.message}"
+            [[{id}]] "{error.message}"
           </b>
         </>
       );
