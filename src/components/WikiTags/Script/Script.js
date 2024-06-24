@@ -40,6 +40,8 @@ class OlabScriptTag extends React.Component {
         );
       }
 
+      // load the script text into a function object
+      // and execute it
       var func = new Function(script.source);
       func();
     } catch (error) {
