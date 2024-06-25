@@ -6,17 +6,20 @@ import { Log, LogInfo, LogError, LogEnable } from "../../utils/Logger";
 import log from "loglevel";
 
 import ErrorPopup from "../ErrorPopup/ErrorPopup";
-import OlabConstantTag from "../WikiTags/Constant/Constant";
-import OlabCountersTag from "../WikiTags/Counters/Counter";
-import OlabCounterTag from "../WikiTags/Counter/Counter";
-import OlabSessionTag from "../WikiTags/Session/Session";
-import OlabLinksTag from "../WikiTags/Links/Links";
-import OlabReportTag from "../WikiTags/Report/Report";
-import OlabMediaResourceTag from "../WikiTags/MediaResource/MediaResource";
-import OlabScriptTag from "../WikiTags/Script/Script";
-import OlabQuestionTag from "../WikiTags/Question/Question";
-import OlabAttendeeTag from "../WikiTags/Question/TurkTalk/Turkee/Turkee";
-import OlabModeratorTag from "../WikiTags/Question/TurkTalk/Turker/Turker";
+import {
+  OlabConstantTag,
+  OlabCountersTag,
+  OlabCounterTag,
+  OlabSessionTag,
+  OlabLinksTag,
+  OlabReportTag,
+  OlabMediaResourceTag,
+  OlabScriptTag,
+  OlabQuestionTag,
+  OlabAttendeeTag,
+  OlabModeratorTag,
+} from "../WikiTags/WikiTags";
+
 import { withParams } from "../ComponentWrapper";
 import { config } from "../../config";
 

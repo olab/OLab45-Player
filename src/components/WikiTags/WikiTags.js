@@ -1,4 +1,16 @@
 import { Log, LogInfo, LogError } from "../../utils/Logger";
+import ErrorPopup from "../ErrorPopup/ErrorPopup";
+import OlabAttendeeTag from "./Question/TurkTalk/Turkee/Turkee";
+import OlabConstantTag from "./Constant/Constant";
+import OlabCountersTag from "./Counters/Counter";
+import OlabCounterTag from "./Counter/Counter";
+import OlabLinksTag from "./Links/Links";
+import OlabMediaResourceTag from "./MediaResource/MediaResource";
+import OlabModeratorTag from "./Question/TurkTalk/Turker/Turker";
+import OlabQuestionTag from "./Question/Question";
+import OlabReportTag from "./Report/Report";
+import OlabScriptTag from "./Script/Script";
+import OlabSessionTag from "./Session/Session";
 import log from "loglevel";
 
 const findWikiInList = (list, wiki) => {
@@ -173,12 +185,23 @@ const combineStyles = (...styles) => {
 };
 
 export {
+  combineStyles,
   findWikiInList,
   getConstant,
-  getQuestion,
   getCounter,
   getCounters,
   getFile,
-  combineStyles,
+  getQuestion,
   getScript,
+  OlabAttendeeTag,
+  OlabConstantTag,
+  OlabCountersTag,
+  OlabCounterTag,
+  OlabLinksTag,
+  OlabMediaResourceTag,
+  OlabModeratorTag,
+  OlabQuestionTag,
+  OlabReportTag,
+  OlabScriptTag,
+  OlabSessionTag,
 };
