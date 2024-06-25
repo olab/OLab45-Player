@@ -1,7 +1,7 @@
 // @flow
 import React from "react";
 import { getScript } from "../WikiTags";
-import { OlabClientAPI } from "./OLabClientApi";
+import { OLabClientApi } from "./OLabClientApi";
 const playerState = require("../../../utils/PlayerState").PlayerState;
 import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
@@ -40,10 +40,18 @@ class OlabScriptTag extends React.Component {
         );
       }
 
+      // var olabClientApi = {};
+      var olabClientApi = new OLabClientApi({
+        scopedObjects: this.props.props.scopedObjects,
+        dynamicObjects: this.props.props.dynamicObjects,
+      });
+
       // load the script text into a function object
       // and execute it
-      var func = new Function(script.source);
-      func();
+      // var func = new Function(script.source);
+      // func();
+      var func = new Function("olabClientApi", script.source);
+      func(olabClientApi);
     } catch (error) {
       return (
         <>
