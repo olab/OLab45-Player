@@ -18,6 +18,37 @@ class OlabScriptTag extends React.Component {
       ...props.props,
       debug,
     };
+
+    // var olabClientApi = {};
+    this.olabClientApi = new OLabClientApi({
+      scopedObjects: this.props.props.scopedObjects,
+      dynamicObjects: this.props.props.dynamicObjects,
+    });
+
+    this.onLoaded = this.onLoaded.bind(this);
+  }
+
+  componentDidMount() {
+    // window.addEventListener('load', this.onLoaded);
+    const { debug, script } = this.state;
+
+    // load the script text into a function object
+    // and execute it
+    // var func = new Function(script.source);
+    // func();
+    var func = new Function("olabClientApi", script.source);
+    func(this.olabClientApi);
+  }
+
+  onLoaded() {
+    const { debug, script } = this.state;
+
+    // load the script text into a function object
+    // and execute it
+    // var func = new Function(script.source);
+    // func();
+    var func = new Function("olabClientApi", script.source);
+    func(this.olabClientApi);
   }
 
   render() {
@@ -40,18 +71,7 @@ class OlabScriptTag extends React.Component {
         );
       }
 
-      // var olabClientApi = {};
-      var olabClientApi = new OLabClientApi({
-        scopedObjects: this.props.props.scopedObjects,
-        dynamicObjects: this.props.props.dynamicObjects,
-      });
-
-      // load the script text into a function object
-      // and execute it
-      // var func = new Function(script.source);
-      // func();
-      var func = new Function("olabClientApi", script.source);
-      func(olabClientApi);
+      return <></>;
     } catch (error) {
       return (
         <>
