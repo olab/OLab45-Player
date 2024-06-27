@@ -130,7 +130,8 @@ class OlabSinglePickQuestion extends React.Component {
   buildQuestionResponse(question, id, response, selectedIndex) {
     let choice = (
       <FormControlLabel
-        id={`${id}/QR:${response.id}`}
+        id={`${id}::QR:${response.name}::label`}
+        name={response.name}
         value={response.id}
         control={<Radio />}
         label={response.response}
@@ -171,10 +172,10 @@ class OlabSinglePickQuestion extends React.Component {
     }
 
     return (
-      <>
+      <div id={`${id}::QR:${response.name}`} name={response.name}>
         {choice}
         {correctnessIndicator}
-      </>
+      </div>
     );
   }
 
@@ -206,11 +207,11 @@ class OlabSinglePickQuestion extends React.Component {
           id={`${id}`}
         >
           <FormControl component="fieldset" disabled={disabled}>
-            <FormLabel id={`${id}/stem`} component="legend">
+            <FormLabel id={`${id}::stem`} component="legend">
               <JsxParser jsx={question.stem} />
             </FormLabel>
             <RadioGroup
-              id={`${id}/choices`}
+              id={`${id}::choices`}
               style={{ float: "left" }}
               name={`${id}-radio`}
               onChange={(event) => this.setValue(event)}

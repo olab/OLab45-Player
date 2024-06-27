@@ -113,7 +113,7 @@ class OlabMultilineTextQuestion extends React.Component {
           className={`${styles["qumultiline"]} ${siteStyles[id]}`}
           id={`${id}`}
         >
-          <div id={`${id}/stem`} className={`${styles["qumultiline-stem"]}`}>
+          <div id={`${id}::stem`} className={`${styles["qumultiline-stem"]}`}>
             <JsxParser jsx={question.stem} />
           </div>
           <div className={`${styles["qumultiline-value"]}`}>
@@ -122,7 +122,7 @@ class OlabMultilineTextQuestion extends React.Component {
               cols={`${question.width}`}
               placeholder={`${question.prompt}`}
               className={`${valueClasses.join(" ")}`}
-              id={`${id}/value`}
+              id={`${id}::value`}
               value={question.value}
               disabled={disabled}
               onChange={this.onTextChanged}

@@ -107,7 +107,10 @@ class OlabSinglelineTextQuestion extends React.Component {
             className={`${styles["qusingleline"]} ${siteStyles[id]}`}
             id={`${id}`}
           >
-            <div id={`${id}/stem`} className={`${styles["qusingleline-stem"]}`}>
+            <div
+              id={`${id}::stem`}
+              className={`${styles["qusingleline-stem"]}`}
+            >
               <JsxParser jsx={question.stem} />
             </div>
 
@@ -117,7 +120,7 @@ class OlabSinglelineTextQuestion extends React.Component {
               >
                 <input
                   className={`${styles["qusingleline-value"]}`}
-                  id={`${id}/value`}
+                  id={`${id}::value`}
                   value={question.value}
                   placeholder={`${question.prompt}`}
                   onChange={this.handleChange}

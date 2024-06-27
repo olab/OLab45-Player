@@ -216,12 +216,18 @@ class OlabMultiPickQuestion extends React.Component {
 
     let responseHtml = (
       <FormControlLabel
-        id={`${id}/QR:${response.id}`}
+        id={`${id}::QR:${response.id}`}
+        name={response.response.replace(/\W/g, "")}
         onChange={(event) =>
           this.setValue(event, currentChoices, response.id.toString())
         }
         key={response.id}
-        control={<Checkbox name={`qr-${response.id}`} />}
+        control={
+          <Checkbox
+            id={`${response.id}`}
+            name={`${response.response.replace(/\W/g, "")}`}
+          />
+        }
         label={correctnessIndicator}
         checked={currentChoices.includes(response.id.toString())}
       />
@@ -248,10 +254,12 @@ class OlabMultiPickQuestion extends React.Component {
           id={`${id}`}
         >
           <FormControl component="fieldset" disabled={disabled}>
-            <FormLabel id={`${id}/stem`} component="legend">
+            <FormLabel id={`${id}::stem`} component="legend">
               <JsxParser jsx={question.stem} />
             </FormLabel>
-            <FormGroup row={row}>{responses}</FormGroup>
+            <FormGroup id={`${id}::choices`} row={row}>
+              {responses}
+            </FormGroup>
           </FormControl>
         </div>
       );

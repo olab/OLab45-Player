@@ -146,7 +146,7 @@ class OlabDragAndDropQuestion extends React.Component {
                 >
                   {question.responses.map((item, index) => (
                     <Draggable
-                      id={`${id}/QR:${item.id}`}
+                      id={`${id}::QR:${item.id}`}
                       key={item.id}
                       draggableId={item.name}
                       index={index}

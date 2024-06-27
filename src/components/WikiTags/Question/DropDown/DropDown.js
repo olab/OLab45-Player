@@ -114,7 +114,7 @@ class OlabDropDownQuestion extends React.Component {
     for (const response of question.responses) {
       var item = (
         <MenuItem
-          id={`${id}/QR:${response.id}`}
+          id={`${id}::QR:${response.id}`}
           key={key++}
           value={Number(response.id)}
         >
@@ -154,13 +154,13 @@ class OlabDropDownQuestion extends React.Component {
           <Box width={question.width}>
             <FormControl fullWidth disabled={disabled}>
               <div
-                id={`${id}/stem`}
+                id={`${id}::stem`}
                 className={`${styles["qumultiline-stem"]}`}
               >
                 <JsxParser jsx={question.stem} />
               </div>
               <Select
-                id={`${id}/value`}
+                id={`${id}::value`}
                 value={question.value}
                 onChange={(event) =>
                   this.setValue(event, this.setInProgress, this.setIsDisabled)

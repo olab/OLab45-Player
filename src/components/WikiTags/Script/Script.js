@@ -25,28 +25,21 @@ class OlabScriptTag extends React.Component {
       dynamicObjects: this.props.props.dynamicObjects,
     });
 
-    this.onLoaded = this.onLoaded.bind(this);
+    // this.onLoaded = this.onLoaded.bind(this);
   }
 
   componentDidMount() {
-    // window.addEventListener('load', this.onLoaded);
     const { debug, script } = this.state;
+
+    // dump all elements with an 'id' attribute
+    // for reference purposes
+    var elements = document.querySelectorAll("*[id]");
+    elements.forEach((element) => {
+      console.log(`  ${element.id}`);
+    });
 
     // load the script text into a function object
     // and execute it
-    // var func = new Function(script.source);
-    // func();
-    var func = new Function("olabClientApi", script.source);
-    func(this.olabClientApi);
-  }
-
-  onLoaded() {
-    const { debug, script } = this.state;
-
-    // load the script text into a function object
-    // and execute it
-    // var func = new Function(script.source);
-    // func();
     var func = new Function("olabClientApi", script.source);
     func(this.olabClientApi);
   }
