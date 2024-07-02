@@ -1,7 +1,7 @@
 ﻿"use strict";
-import { OLabObject } from "./OLabObject";
+import { OLabApiObject } from "./OLabApiObject";
 
-export class OLabCounter extends OLabObject {
+export class OLabApiCounter extends OLabApiObject {
   constructor(clientApi, params) {
     super(clientApi, params);
     this.target = this.clientApi.player.getCounter(this.params.id);

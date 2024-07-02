@@ -20,6 +20,8 @@ class OlabMultilineTextQuestion extends React.Component {
       ...props.props,
     };
 
+    log.debug(`OlabMultilineTextQuestion ctor`);
+
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);
     this.onSubmitClicked = this.onSubmitClicked.bind(this);

@@ -1,46 +1,52 @@
 ﻿"use strict";
-import { OLabObject } from "./OLabObject";
+import { OLabApiObject } from "./OLabApiObject";
 
-export class OLabQuestion extends OLabObject {
+export class OLabApiQuestion extends OLabApiObject {
   constructor(clientApi, id) {
     super(clientApi, "QU:" + id, id, "questions");
     this.stem = null;
   }
+
+  onChange(callback) {
+    this.onEvent("change", callback);
+  }
 }
 
-export class OLabDragAndDropQuestion extends OLabQuestion {
+export class OLabApiDragAndDropQuestion extends OLabApiQuestion {
   constructor(clientApi, id) {
     super(clientApi, id);
   }
 }
 
-export class OLabDropdownQuestion extends OLabQuestion {
+export class OLabApiDropdownQuestion extends OLabApiQuestion {
   constructor(clientApi, id) {
     super(clientApi, id);
   }
 }
 
-export class OLabSliderQuestion extends OLabQuestion {
+export class OLabApiSliderQuestion extends OLabApiQuestion {
   constructor(clientApi, id) {
     super(clientApi, id);
   }
 }
-export class OLabTextQuestion extends OLabQuestion {
+export class OLabApiTextQuestion extends OLabApiQuestion {
   constructor(clientApi, id) {
     super(clientApi, id);
   }
 }
 
-export class OLabChoicesQuestion extends OLabQuestion {
+export class OLabApiChoicesQuestion extends OLabApiQuestion {
   choices;
 
   constructor(clientApi, id) {
     super(clientApi, id);
 
-    let qrElements = document.querySelectorAll(`[id*="${this.elementId}::QR"]`);
+    let qrDomElements = document.querySelectorAll(
+      `[id*="${this.elementId}::QR"]`
+    );
     this.choices = [];
 
-    for (const qrElement of qrElements) {
+    for (const qrElement of qrDomElements) {
       this.choices.push({
         id: qrElement.id,
       });
@@ -48,7 +54,7 @@ export class OLabChoicesQuestion extends OLabQuestion {
   }
 }
 
-export class OLabMultipleChoiceQuestion extends OLabChoicesQuestion {
+export class OLabApiMultipleChoiceQuestion extends OLabApiChoicesQuestion {
   constructor(clientApi, id) {
     super(clientApi, id);
   }
@@ -70,7 +76,7 @@ export class OLabMultipleChoiceQuestion extends OLabChoicesQuestion {
   }
 }
 
-export class OLabSingleChoiceQuestion extends OLabChoicesQuestion {
+export class OLabApiSingleChoiceQuestion extends OLabApiChoicesQuestion {
   constructor(clientApi, id) {
     super(clientApi, id);
   }

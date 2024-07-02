@@ -28,6 +28,8 @@ class OlabSinglePickQuestion extends React.Component {
       ...props.props,
     };
 
+    log.debug(`OlabSinglePickQuestion ctor`);
+
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);
     this.setValue = this.setValue.bind(this);
@@ -117,7 +119,7 @@ class OlabSinglePickQuestion extends React.Component {
 
     for (const response of question.responses) {
       var item = (
-        <div key={key++}>
+        <div id={`${id}::QR:${response.name}`} key={key++}>
           {this.buildQuestionResponse(question, id, response, selectedIndex)}
         </div>
       );
@@ -131,9 +133,8 @@ class OlabSinglePickQuestion extends React.Component {
     let choice = (
       <FormControlLabel
         id={`${id}::QR:${response.name}::label`}
-        name={response.name}
         value={response.id}
-        control={<Radio />}
+        control={<Radio id={`${id}::QR:${response.name}::value`} />}
         label={response.response}
       />
     );
@@ -211,9 +212,8 @@ class OlabSinglePickQuestion extends React.Component {
               <JsxParser jsx={question.stem} />
             </FormLabel>
             <RadioGroup
-              id={`${id}::choices`}
+              id={`${id}::QR`}
               style={{ float: "left" }}
-              name={`${id}-radio`}
               onChange={(event) => this.setValue(event)}
               row={row}
               value={question.value}

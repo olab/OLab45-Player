@@ -17,6 +17,8 @@ class OlabSliderQuestion extends React.Component {
       ...props.props,
     };
 
+    log.debug(`OlabSliderQuestion ctor`);
+
     // post initial value to server if initializine
     // question value
     if (typeof this.state.question.previousValue == "undefined") {

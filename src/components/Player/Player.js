@@ -512,11 +512,11 @@ class Player extends PureComponent {
             {footer}
             <h3>Raw node</h3>
             <h4>Header</h4>
-            <p>{theme?.header}</p>
+            <div>{theme?.header}</div>
             <h4>Node Text</h4>
-            <p>{node.text}</p>
+            <div>{node.text}</div>
             <h4>Footer</h4>
-            <p>{theme?.footer}</p>
+            <div>{theme?.footer}</div>
           </FormControl>
         );
       } else {

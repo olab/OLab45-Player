@@ -10,6 +10,8 @@ class OlabScriptTag extends React.Component {
   constructor(props) {
     super(props);
 
+    log.debug(`OlabScriptTag ctor`);
+
     let script = getScript(this.props.name, this.props);
     const debug = playerState.GetDebug();
 
@@ -19,36 +21,42 @@ class OlabScriptTag extends React.Component {
       debug,
     };
 
-    // var olabClientApi = {};
     this.olabClientApi = new OLabClientApi({
       scopedObjects: this.props.props.scopedObjects,
       dynamicObjects: this.props.props.dynamicObjects,
     });
-
-    // this.onLoaded = this.onLoaded.bind(this);
   }
 
   componentDidMount() {
     const { debug, script } = this.state;
 
-    // dump all elements with an 'id' attribute
-    // for reference purposes
-    var elements = document.querySelectorAll("*[id]");
-    elements.forEach((element) => {
-      console.log(`  ${element.id}`);
-    });
+    // uncomment this, to see expose html elements with id attribute
+    // this.olabClientApi.getOLabObjectList();
 
     // load the script text into a function object
     // and execute it
-    var func = new Function("olabClientApi", script.source);
-    func(this.olabClientApi);
+    try {
+      this.func = new Function("olabClientApi", script.source);
+      this.func(this.olabClientApi);
+
+      Log("script componentDidMount");
+    } catch (error) {
+      alert(`Script '${script.name}' error: ${error.message}`);
+    }
+  }
+
+  componentWillUnmount() {
+    Log("script componentWillUnmount");
+    delete this.func;
+
+    this.olabClientApi.shutdown();
   }
 
   render() {
     const { debug, script } = this.state;
     const { name } = this.props;
 
-    log.debug(`OlabScriptTag render '${name}'`);
+    Log(`OlabScriptTag render '${name}'`);
 
     try {
       if (debug.disableWikiRendering) {

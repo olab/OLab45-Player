@@ -27,6 +27,8 @@ class OlabMultiPickQuestion extends React.Component {
       hasInitialAnswer: false,
     };
 
+    log.debug(`OlabMultiPickQuestion ctor`);
+
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);
     this.setValue = this.setValue.bind(this);
@@ -217,14 +219,14 @@ class OlabMultiPickQuestion extends React.Component {
     let responseHtml = (
       <FormControlLabel
         id={`${id}::QR:${response.id}`}
-        name={response.response.replace(/\W/g, "")}
+        name={response.name}
         onChange={(event) =>
           this.setValue(event, currentChoices, response.id.toString())
         }
         key={response.id}
         control={
           <Checkbox
-            id={`${response.id}`}
+            id={`${id}::QR:${response.name}::value`}
             name={`${response.response.replace(/\W/g, "")}`}
           />
         }

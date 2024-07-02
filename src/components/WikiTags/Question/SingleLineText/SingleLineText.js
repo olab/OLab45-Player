@@ -22,6 +22,8 @@ class OlabSinglelineTextQuestion extends React.Component {
       ...props.props,
     };
 
+    log.debug(`OlabSinglelineTextQuestion ctor`);
+
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);
     this.setValue = this.setValue.bind(this);

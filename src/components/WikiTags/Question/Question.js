@@ -7,8 +7,8 @@ import { postQuestionValue } from "../../../services/api";
 import styles from "../styles.module.css";
 import OlabMultilineTextQuestion from "./MultilineText/MultilineText";
 import OlabSinglelineTextQuestion from "./SingleLineText/SingleLineText";
-import OlabSinglePickQuestion from "./SingleChoice/SingleChoice";
-import OlabMultiPickQuestion from "./MultiChoice/MultiChoice";
+import OlabSinglePickQuestion from "./SinglePick/SinglePick";
+import OlabMultiPickQuestion from "./MultiplePick/MultiplePick";
 import OlabSliderQuestion from "./Slider/Slider";
 import OlabDropDownQuestion from "./DropDown/DropDown";
 import OlabDragAndDropQuestion from "./DragAndDrop/DragAndDrop";
@@ -19,7 +19,6 @@ import { config } from "../../../config";
 const playerState = require("../../../utils/PlayerState").PlayerState;
 import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
-
 class OlabQuestionTag extends React.Component {
   constructor(props) {
     super(props);

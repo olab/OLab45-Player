@@ -39,7 +39,7 @@ class OlabConstantTag extends React.Component {
     log.debug(`OlabConstantTag render '${name}'`);
 
     try {
-      let item = getConstant(name, this.props);
+      let item = constant; // getConstant(name, this.props);
 
       if (item != null) {
         if (debug.disableWikiRendering) {

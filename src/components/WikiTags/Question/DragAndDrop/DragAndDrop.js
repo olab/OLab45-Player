@@ -2,7 +2,7 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-
+import { FormLabel } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
@@ -135,7 +135,9 @@ class OlabDragAndDropQuestion extends React.Component {
           className={`${styles["qudraganddrop"]} ${siteStyles[id]}`}
           id={`${id}`}
         >
-          <p>{question.stem}</p>
+          <FormLabel id={`${id}::stem`} component="legend">
+            <JsxParser jsx={question.stem} />
+          </FormLabel>
           <DragDropContext onDragEnd={this.onDragEnd}>
             <Droppable droppableId="droppable">
               {(provided, snapshot) => (
