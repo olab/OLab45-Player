@@ -33,15 +33,17 @@ class OlabScriptTag extends React.Component {
     // uncomment this, to see expose html elements with id attribute
     // this.olabClientApi.getOLabObjectList();
 
-    // load the script text into a function object
-    // and execute it
-    try {
-      this.func = new Function("olabClientApi", script.source);
-      this.func(this.olabClientApi);
+    if (!debug.disableWikiRendering) {
+      // load the script text into a function object
+      // and execute it
+      try {
+        this.func = new Function("olabClientApi", script.source);
+        this.func(this.olabClientApi);
 
-      Log("script componentDidMount");
-    } catch (error) {
-      alert(`Script '${script.name}' error: ${error.message}`);
+        Log("script componentDidMount");
+      } catch (error) {
+        alert(`Script '${script.name}' error: ${error.message}`);
+      }
     }
   }
 
