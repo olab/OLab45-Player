@@ -2,9 +2,6 @@
 import React from "react";
 import {
   Box,
-  List,
-  ListItem,
-  ListItemText,
   Paper,
   TableContainer,
   Table,
@@ -13,7 +10,6 @@ import {
   TableCell,
   TableBody,
 } from "@material-ui/core";
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 import { getCounters } from "../WikiTags";
 import { config } from "../../../config";
@@ -24,6 +20,11 @@ class OlabCountersTag extends React.Component {
   constructor(props) {
     super(props);
 
+    const counters = getCounters(
+      node.id,
+      this.props.props.dynamicObjects.map.counters,
+      counterActions
+    );
     const debug = playerState.GetDebug();
 
     this.state = {
@@ -38,6 +39,7 @@ class OlabCountersTag extends React.Component {
       node: props.props.node,
       counterActions: props.props.scopedObjects.map.counteractions,
       debug,
+      counters,
     };
   }
 
@@ -45,13 +47,7 @@ class OlabCountersTag extends React.Component {
     log.debug(`OlabCountersTag render`);
 
     try {
-      const { counterActions, node, debug } = this.state;
-
-      let counters = getCounters(
-        node.id,
-        this.props.props.dynamicObjects.map.counters,
-        counterActions
-      );
+      const { counters, counterActions, node, debug } = this.state;
 
       if (debug.disableWikiRendering) {
         return (
@@ -100,26 +96,11 @@ class OlabCountersTag extends React.Component {
             </Table>
           </TableContainer>
         );
-        // return (
-        //   <div className={`${styles['counters']} ${siteStyles['counters']}`}>
-        //     <Box width="300px;">
-        //       <List component="span" dense={true}>
-        //         {counters.map((counter) => (
-        //           <ListItem>
-        //             <ListItemText
-        //               primary={`${counter.name}: ${counter.value}`}
-        //             />
-        //           </ListItem>
-        //         ))}
-        //       </List>
-        //     </Box>
-        //   </div>
-        // );
       }
 
       return <></>;
     } catch (error) {
-      LogError(`OlabMediaResourceTag render error: ${error}`);
+      log.error(`OlabMediaResourceTag render error: ${error}`);
       return (
         <>
           <b>[[COUNTERS]] "{error.message}"</b>

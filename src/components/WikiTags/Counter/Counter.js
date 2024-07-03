@@ -1,7 +1,6 @@
 // @flow
 import React from "react";
 import parse from "html-react-parser";
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 import { getCounter } from "../WikiTags";
 const playerState = require("../../../utils/PlayerState").PlayerState;
@@ -11,37 +10,42 @@ class OlabCounterTag extends React.Component {
   constructor(props) {
     super(props);
 
+    let counter = getCounter(name, this.props.props.dynamicObjects);
     const debug = playerState.GetDebug();
-    this.state = { debug };
+
+    this.state = {
+      counter,
+      debug,
+    };
   }
 
   render() {
-    const { debug } = this.state;
+    const { debug, counter } = this.state;
 
     const { name } = this.props;
 
     log.debug(`OlabConstantTag render '${name}'`);
 
     try {
-      let item = getCounter(name, this.props.props.dynamicObjects);
-
-      if (item != null) {
+      if (counter != null) {
         if (debug.disableWikiRendering) {
           return (
             <>
               <b>
-                [[CR:{name}]] "{item.value}"
+                [[CR:{name}]] "{counter.value}"
               </b>
             </>
           );
         }
 
-        if (item.value == null) {
-          item.value = "";
+        if (counter.value == null) {
+          counter.value = "";
         }
 
-        return <>{parse(item.value)}</>;
+        return <>{parse(counter.value)}</>;
       }
+
+      throw new Error(`'${this.props.name}' not found`);
     } catch (error) {
       return (
         <>

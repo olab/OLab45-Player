@@ -68,6 +68,10 @@ class App extends PureComponent {
     this.setCredentials = this.setCredentials.bind(this);
   }
 
+  componentWillUnmount() {
+    log.debug(`${this.constructor["name"]} componentWillUnmount`);
+  }
+
   anonymousMapCheck = (data) => {
     const { authActions } = this.state;
     if (data) {

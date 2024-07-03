@@ -376,7 +376,7 @@ class Player extends PureComponent {
       document.title = node.title;
       this.setPageTitle(map.name, node.title);
 
-      let header = (
+      const header = (
         <div id="olabHeader">
           {haveTheme && (
             <JsxParser
@@ -413,7 +413,7 @@ class Player extends PureComponent {
         </div>
       );
 
-      let footer = (
+      const footer = (
         <div id="olabFooter">
           {haveTheme && (
             <JsxParser
@@ -450,7 +450,7 @@ class Player extends PureComponent {
         </div>
       );
 
-      let body = (
+      const body = (
         <div id="olabNodeHtml">
           <JsxParser
             autoCloseVoidElements

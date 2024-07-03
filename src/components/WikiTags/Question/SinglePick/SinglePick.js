@@ -12,7 +12,6 @@ import CloseIcon from "@material-ui/icons/Close";
 import CheckIcon from "@material-ui/icons/Check";
 
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
 import JsxParser from "react-jsx-parser";
 
@@ -24,11 +23,11 @@ class OlabSinglePickQuestion extends React.Component {
   constructor(props) {
     super(props);
 
+    log.debug(`${this.constructor["name"]} ctor`);
+
     this.state = {
       ...props.props,
     };
-
-    log.debug(`OlabSinglePickQuestion ctor`);
 
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);

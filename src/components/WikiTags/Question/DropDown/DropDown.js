@@ -14,7 +14,6 @@ import Spinner from "../../../../shared/assets/loading_med.gif";
 import JsxParser from "react-jsx-parser";
 
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
 
 import styles from "../../styles.module.css";
@@ -23,6 +22,8 @@ import siteStyles from "../../site.module.css";
 class OlabDropDownQuestion extends React.Component {
   constructor(props) {
     super(props);
+
+    log.debug(`${this.constructor["name"]} ctor`);
 
     this.state = {
       ...props.props,
@@ -132,7 +133,6 @@ class OlabDropDownQuestion extends React.Component {
 
     log.debug(`OlabDropDownQuestion render '${name}'`);
     try {
-      let progressButtonHtml = "";
       if (this.state.showProgressSpinner) {
         progressButtonHtml = (
           <img

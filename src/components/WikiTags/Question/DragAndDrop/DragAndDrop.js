@@ -4,8 +4,8 @@ import ReactDOM from "react-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { FormLabel } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
+import JsxParser from "react-jsx-parser";
 
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
@@ -13,6 +13,8 @@ import siteStyles from "../../site.module.css";
 class OlabDragAndDropQuestion extends React.Component {
   constructor(props) {
     super(props);
+
+    log.debug(`${this.constructor["name"]} ctor`);
 
     this.state = {
       ...props.props,

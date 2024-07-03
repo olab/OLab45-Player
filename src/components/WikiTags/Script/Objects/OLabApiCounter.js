@@ -1,4 +1,4 @@
-﻿"use strict";
+﻿// "use strict";
 import { OLabApiObject } from "./OLabApiObject";
 
 export class OLabApiCounter extends OLabApiObject {

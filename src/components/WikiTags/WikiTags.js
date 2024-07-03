@@ -14,16 +14,16 @@ import OlabSessionTag from "./Session/Session";
 import log from "loglevel";
 
 const findWikiInList = (list, wiki) => {
-  const match = {};
+  let match = null;
 
   for (let element of list) {
     if (element.name === wiki || element.id === Number(wiki)) {
-      match.item = element;
+      match = element;
       break;
     }
   }
 
-  return match.item;
+  return match;
 };
 
 const getCounters = (nodeId, mapCounters, counterActions) => {

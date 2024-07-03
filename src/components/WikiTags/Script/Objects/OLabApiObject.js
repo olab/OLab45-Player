@@ -1,13 +1,12 @@
-﻿"use strict";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
-
+﻿// "use strict";
+import log from "loglevel";
 export class OLabApiObject {
   self = this;
 
   clientApi;
 
   constructor(clientApi, elementId, objectIdName = null, scopeIndex = null) {
-    Log(
+    log.debug(
       `creating ${this.constructor["name"]} '${elementId}' '${objectIdName}' '${scopeIndex}'`
     );
 
@@ -29,21 +28,21 @@ export class OLabApiObject {
       scopeIndex
     ]) {
       if (scopedObject.id === idName || scopedObject.name === idName) {
-        console.log(`found server ${scopeIndex} '${idName}'`);
+        log.debug(`found server ${scopeIndex} '${idName}'`);
         return scopedObject;
       }
     }
 
     for (const scopedObject of this.clientApi.scopedObjects.map[scopeIndex]) {
       if (scopedObject.id === idName || scopedObject.name === idName) {
-        console.log(`found map ${scopeIndex} '${idName}'`);
+        log.debug(`found map ${scopeIndex} '${idName}'`);
         return scopedObject;
       }
     }
 
     for (const scopedObject of this.clientApi.scopedObjects.node[scopeIndex]) {
       if (scopedObject.id === idName || scopedObject.name === idName) {
-        console.log(`found node ${scopeIndex} '${idName}'`);
+        log.debug(`found node ${scopeIndex} '${idName}'`);
         return scopedObject;
       }
     }
@@ -65,7 +64,7 @@ export class OLabApiObject {
 
   onEvent(event, callback) {
     this.domElement.addEventListener(event, callback);
-    Log(`added event '${event}' handler for '${this.domElement.id}'`);
+    log.debug(`added event '${event}' handler for '${this.domElement.id}'`);
   }
 
   enable() {

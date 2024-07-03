@@ -8,7 +8,6 @@ import {
   FormControl,
 } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
 import JsxParser from "react-jsx-parser";
 
@@ -22,12 +21,22 @@ class OlabMultiPickQuestion extends React.Component {
   constructor(props) {
     super(props);
 
+    log.debug(`${this.constructor["name"]} ctor`);
+
+    let currentChoices = this.createArrayFromValue(
+      this.props.props.question.value
+    );
+    var responses = this.buildQuestionResponses(
+      this.props.props.question,
+      this.props.props.id,
+      currentChoices
+    );
+
     this.state = {
       ...props.props,
       hasInitialAnswer: false,
+      responses,
     };
-
-    log.debug(`OlabMultiPickQuestion ctor`);
 
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);
@@ -91,7 +100,7 @@ class OlabMultiPickQuestion extends React.Component {
     }
 
     log.debug(
-      `OlabMultiPickQuestion set question '${question.id}' value = '${value}'`
+      `${this.constructor["name"]} set question '${question.id}' value = '${value}'`
     );
 
     // if single try question, disabled it
@@ -154,8 +163,8 @@ class OlabMultiPickQuestion extends React.Component {
     let responses = [];
     let selectedIndexStrings = [];
 
-    if (this.state.question.value) {
-      selectedIndexStrings = this.state.question.value.split(",");
+    if (question.value) {
+      selectedIndexStrings = question.value.split(",");
     }
 
     let selectedIndexes = selectedIndexStrings.map((item) => Number(item));
@@ -239,15 +248,12 @@ class OlabMultiPickQuestion extends React.Component {
   }
 
   render() {
-    const { id, name, question } = this.state;
+    const { id, name, question, responses } = this.state;
 
-    log.debug(`OlabMultiPickQuestion render '${name}'`);
+    log.debug(`${this.constructor["name"]} render '${name}'`);
 
     try {
       let row = question.layoutType === 1 ? true : false;
-      let currentChoices = this.createArrayFromValue(question.value);
-
-      var responses = this.buildQuestionResponses(question, id, currentChoices);
       var disabled = question.disabled == 0 ? false : true;
 
       return (

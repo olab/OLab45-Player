@@ -3,7 +3,6 @@ import React from "react";
 import { getScript } from "../WikiTags";
 import { OLabClientApi } from "./OLabClientApi";
 const playerState = require("../../../utils/PlayerState").PlayerState;
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 
 class OlabScriptTag extends React.Component {
@@ -21,10 +20,7 @@ class OlabScriptTag extends React.Component {
       debug,
     };
 
-    this.olabClientApi = new OLabClientApi({
-      scopedObjects: this.props.props.scopedObjects,
-      dynamicObjects: this.props.props.dynamicObjects,
-    });
+    this.olabClientApi = new OLabClientApi(this.props.props);
   }
 
   componentDidMount() {
@@ -40,7 +36,7 @@ class OlabScriptTag extends React.Component {
         this.func = new Function("olabClientApi", script.source);
         this.func(this.olabClientApi);
 
-        Log("script componentDidMount");
+        log.debug("script componentDidMount");
       } catch (error) {
         alert(`Script '${script.name}' error: ${error.message}`);
       }
@@ -48,9 +44,11 @@ class OlabScriptTag extends React.Component {
   }
 
   componentWillUnmount() {
-    Log("script componentWillUnmount");
-    delete this.func;
+    const { name } = this.props;
 
+    log.debug(`script '${name}' componentWillUnmount`);
+
+    delete this.func;
     this.olabClientApi.shutdown();
   }
 
@@ -58,9 +56,13 @@ class OlabScriptTag extends React.Component {
     const { debug, script } = this.state;
     const { name } = this.props;
 
-    Log(`OlabScriptTag render '${name}'`);
+    log.debug(`OlabScriptTag render '${name}'`);
 
     try {
+      if (script == null) {
+        throw new Error(`'${this.props.name}' not found`);
+      }
+
       if (debug.disableWikiRendering) {
         return (
           <>
@@ -74,7 +76,11 @@ class OlabScriptTag extends React.Component {
         );
       }
 
-      return <></>;
+      return (
+        <div id={script.name} style={{ display: "none" }}>
+          script
+        </div>
+      );
     } catch (error) {
       return (
         <>

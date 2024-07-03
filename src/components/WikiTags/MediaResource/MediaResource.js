@@ -6,7 +6,6 @@ import siteStyles from "../site.module.css";
 import { getFile } from "../WikiTags";
 import { getDownload } from "../../../services/api";
 const playerState = require("../../../utils/PlayerState").PlayerState;
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 import BrokenImageIcon from "@material-ui/icons/BrokenImage";
 import { Tooltip } from "@material-ui/core";
@@ -16,8 +15,12 @@ class OlabMediaResourceTag extends React.Component {
   constructor(props) {
     super(props);
 
+    let file = getFile(name, this.props);
     const debug = playerState.GetDebug();
-    this.state = { debug };
+    this.state = {
+      file,
+      debug,
+    };
   }
 
   downloadFile(item) {
@@ -41,14 +44,14 @@ class OlabMediaResourceTag extends React.Component {
   }
 
   render() {
-    const { debug } = this.state;
+    const { debug, file } = this.state;
 
     const { name } = this.props;
 
     log.debug(`OlabMediaResourceTag render '${name}'`);
 
     try {
-      let item = getFile(name, this.props);
+      let item = file;
 
       if (!item) {
         const toolTip = `Unknown MR: '${name}'`;
@@ -126,23 +129,12 @@ class OlabMediaResourceTag extends React.Component {
             </video>
           </div>
         );
-      }
-
-      // else if (item.isEmbedded === 1) {
-
-      //   // handle special case of PDF file
-      //   if (item.mime === "application/pdf") {
-      //     return (
-      //       <embed src={url} width="500" height="375" type='application/pdf' />
-      //     );
-      //   }
-      // }
-      else {
+      } else {
         return (
           <>
             <div>
               <a
-                id={`file-link-${item.id}`}
+                id={`MR:${item.id}`}
                 download={item.fileName}
                 href={item.originUrl}
               >
@@ -153,7 +145,7 @@ class OlabMediaResourceTag extends React.Component {
         );
       }
     } catch (error) {
-      LogError(
+      log.error(
         `OlabMediaResourceTag render error: ${JSON.stringify(error, null, 2)}`
       );
       return (

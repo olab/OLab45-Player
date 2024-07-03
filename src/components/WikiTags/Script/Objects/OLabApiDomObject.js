@@ -1,4 +1,4 @@
-"use strict";
+// "use strict";
 import { OLabApiObject } from "./OLabApiObject";
 import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 

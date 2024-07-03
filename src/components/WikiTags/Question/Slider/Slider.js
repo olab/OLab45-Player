@@ -2,7 +2,6 @@
 import React from "react";
 import { Box, Typography, Slider } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
 import JsxParser from "react-jsx-parser";
 
@@ -13,11 +12,11 @@ class OlabSliderQuestion extends React.Component {
   constructor(props) {
     super(props);
 
+    log.debug(`${this.constructor["name"]} ctor`);
+
     this.state = {
       ...props.props,
     };
-
-    log.debug(`OlabSliderQuestion ctor`);
 
     // post initial value to server if initializine
     // question value
@@ -101,7 +100,7 @@ class OlabSliderQuestion extends React.Component {
                 : ""
             }
           >
-            <Typography id={`${id}/stem`} component="div" gutterBottom>
+            <Typography id={`${id}/stem`} component="span" gutterBottom>
               <JsxParser jsx={question.stem} />
             </Typography>
             <input

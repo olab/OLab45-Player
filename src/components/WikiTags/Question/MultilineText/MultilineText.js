@@ -12,6 +12,9 @@ import Spinner from "../../../../shared/assets/loading_med.gif";
 class OlabMultilineTextQuestion extends React.Component {
   constructor(props) {
     super(props);
+
+    log.debug(`${this.constructor["name"]} ctor`);
+
     this.state = {
       onSubmitResponse: props.props.onSubmitResponse,
       showProgressSpinner: false,
@@ -19,8 +22,6 @@ class OlabMultilineTextQuestion extends React.Component {
       contentsChanged: false,
       ...props.props,
     };
-
-    log.debug(`OlabMultilineTextQuestion ctor`);
 
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);

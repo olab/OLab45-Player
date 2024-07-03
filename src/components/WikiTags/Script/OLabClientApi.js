@@ -9,23 +9,20 @@
 import { OLabApiConstant } from "./Objects/OLabApiConstant";
 
 import { OLabApiDomObject } from "./Objects/OLabApiDomObject";
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
+import log from "loglevel";
 
 // main view class
 export class OLabClientApi {
   timers = {};
 
-  constructor(params) {
+  constructor(props) {
     var vm = this;
-
-    vm.scopedObjects = params.scopedObjects;
-    vm.dynamicObjects = params.dynamicObjects;
 
     // these are the methods/properties we expose to the outside
     vm.service = {
       createTimer: vm.createTimer,
       destroyTimer: vm.destroyTimer,
-      dynamicObjects: vm.dynamicObjects,
+      dynamicObjects: props.dynamicObjects,
       getConstant: vm.getConstant,
       getDomObject: vm.getDomObject,
       getDragAndDropQuestion: vm.getDragAndDropQuestion,
@@ -38,7 +35,7 @@ export class OLabClientApi {
       hello: vm.hello,
       onClick: vm.onClick,
       onEvent: vm.onEvent,
-      scopedObjects: vm.scopedObjects,
+      scopedObjects: props.scopedObjects,
       shutdown: vm.shutdown,
       timers: vm.timers,
     };
@@ -49,11 +46,11 @@ export class OLabClientApi {
   }
 
   hello() {
-    Log("hello from OLabClientApi.");
+    log.debug("hello from OLabClientApi.");
   }
 
   shutdown() {
-    Log("shutdown OLabClientApi.");
+    log.debug("shutdown OLabClientApi.");
 
     var timerNames = Object.keys(this.timers);
     for (let timerName of timerNames) {
@@ -64,7 +61,7 @@ export class OLabClientApi {
   createTimer(key, frequencyMs, callback) {
     callback();
     this.timers[key] = setInterval(callback, frequencyMs, this, document);
-    Log(`created timer '${key}' frequency ${frequencyMs} ms`);
+    log.debug(`created timer '${key}' frequency ${frequencyMs} ms`);
   }
 
   destroyTimer(key) {
@@ -74,7 +71,7 @@ export class OLabClientApi {
       this.timers[key] = null;
       delete this.timers[key];
 
-      Log(`destroyed timer '${key}'`);
+      log.debug(`destroyed timer '${key}'`);
     } else throw new Error(`timer '${key}' does not exist`);
   }
 
@@ -88,18 +85,18 @@ export class OLabClientApi {
     var element = document.getElementById(id);
     if (element != null) {
       element.addEventListener(event, callback);
-      Log(`added event '${event}' handler for '${id}'`);
+      log.debug(`added event '${event}' handler for '${id}'`);
     } else throw new Error(`element '${id}' does not exist`);
   }
 
   // dump all elements with an 'id' attribute
   // for reference purposes
   getOLabObjectList() {
-    Log(`Id elements list:`);
+    log.debug(`Id elements list:`);
 
     var elements = document.querySelectorAll("*[id]");
     elements.forEach((element) => {
-      Log(`  ${element.id}`);
+      log.debug(`  ${element.id}`);
     });
   }
 

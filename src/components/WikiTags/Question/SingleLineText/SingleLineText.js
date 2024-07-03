@@ -1,7 +1,6 @@
 // @flow
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
 import JsxParser from "react-jsx-parser";
 
@@ -12,6 +11,8 @@ class OlabSinglelineTextQuestion extends React.Component {
   constructor(props) {
     super(props);
 
+    log.debug(`${this.constructor["name"]} ctor`);
+
     this.state = {
       // id: props.props.id,
       // name: props.props.name,
@@ -21,8 +22,6 @@ class OlabSinglelineTextQuestion extends React.Component {
       disabled: false,
       ...props.props,
     };
-
-    log.debug(`OlabSinglelineTextQuestion ctor`);
 
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);

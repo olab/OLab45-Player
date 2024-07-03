@@ -3,7 +3,6 @@ import React from "react";
 import parse from "html-react-parser";
 import { getConstant } from "../WikiTags";
 const playerState = require("../../../utils/PlayerState").PlayerState;
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 import { config } from "../../../config";
 
@@ -28,32 +27,28 @@ class OlabConstantTag extends React.Component {
 
   render() {
     const { debug, constant } = this.state;
-
     const { name } = this.props;
-
-    const customId = OlabConstantTag.getConstantId(this.state.constant);
-    const questionDivStyle = {
-      whiteSpace: "nowrap",
-    };
 
     log.debug(`OlabConstantTag render '${name}'`);
 
     try {
-      let item = constant; // getConstant(name, this.props);
-
-      if (item != null) {
+      if (constant != null) {
         if (debug.disableWikiRendering) {
           return (
             <>
               <b>
-                [[CONST:{name}]] "{item.value}"
+                [[CONST:{name}]] "{constant.value}"
               </b>
             </>
           );
         }
 
-        return <span id={customId}>{parse(item.value)}</span>;
+        const customId = OlabConstantTag.getConstantId(constant);
+
+        return <span id={customId}>{parse(constant.value)}</span>;
       }
+
+      throw new Error(`'${this.props.name}' not found`);
     } catch (error) {
       return (
         <>
