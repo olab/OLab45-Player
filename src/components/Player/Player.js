@@ -2,7 +2,6 @@ import React, { PureComponent } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { FormControl } from "@material-ui/core";
 import JsxParser from "react-jsx-parser";
-import { Log, LogInfo, LogError, LogEnable } from "../../utils/Logger";
 import log from "loglevel";
 
 import ErrorPopup from "../ErrorPopup/ErrorPopup";
@@ -39,10 +38,8 @@ class Player extends PureComponent {
   constructor(props) {
     super(props);
 
-    LogEnable();
-
     const { mapId, nodeId } = arguments[0].params;
-    LogInfo(`playing map ${mapId}, node ${nodeId}`);
+    log.info(`playing map ${mapId}, node ${nodeId}`);
 
     this.state = {
       isMounted: false,
@@ -58,7 +55,7 @@ class Player extends PureComponent {
     this.onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
 
     if (this.state.disableCache) {
-      LogInfo(`disabled cache`);
+      log.info(`disabled cache`);
       playerState.clear();
     } else {
       const persistedState = playerState.Get();
@@ -124,7 +121,7 @@ class Player extends PureComponent {
         theme = map.themes[0];
       }
     } catch (error) {
-      LogError(error);
+      log.error(error);
     }
 
     if (theme) {
@@ -259,7 +256,7 @@ class Player extends PureComponent {
       nodeData.contextId = playerState.GetContextId();
     }
 
-    LogInfo(`contextId: ${nodeData.contextId}`);
+    log.info(`contextId: ${nodeData.contextId}`);
 
     this.setState({
       contextId: nodeData.contextId,
@@ -302,7 +299,7 @@ class Player extends PureComponent {
 
       log.debug("read dynamic data");
     } catch (error) {
-      LogError(error);
+      log.error(error);
     }
   };
 
@@ -327,7 +324,7 @@ class Player extends PureComponent {
 
   onJsxParseError(arg) {
     const t = arg;
-    LogError(t);
+    log.error(t);
     alert(`Renderer error: ${t}`);
   }
 

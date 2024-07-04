@@ -1,4 +1,3 @@
-import { Log, LogInfo, LogError } from "../../utils/Logger";
 import ErrorPopup from "../ErrorPopup/ErrorPopup";
 import OlabAttendeeTag from "./Question/TurkTalk/Turkee/Turkee";
 import OlabConstantTag from "./Constant/Constant";

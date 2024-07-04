@@ -7,7 +7,6 @@ import {
   PauseSharp as MapResumeIcon,
 } from "@material-ui/icons";
 import { ButtonGroup, Grid, Button, Tooltip } from "@material-ui/core";
-import { Log, LogInfo, LogError } from "../../utils/Logger";
 import log from "loglevel";
 
 import styles from "./styles";
