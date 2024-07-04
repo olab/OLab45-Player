@@ -10,7 +10,8 @@ class OlabCounterTag extends React.Component {
   constructor(props) {
     super(props);
 
-    let counter = getCounter(name, this.props.props.dynamicObjects);
+    let counter = getCounter(this.props.name, this.props.props.dynamicObjects);
+
     const debug = playerState.GetDebug();
 
     this.state = {
@@ -21,10 +22,9 @@ class OlabCounterTag extends React.Component {
 
   render() {
     const { debug, counter } = this.state;
-
     const { name } = this.props;
 
-    log.debug(`OlabConstantTag render '${name}'`);
+    log.debug(`OlabCounterTag render '${name}'`);
 
     try {
       if (counter != null) {
@@ -45,7 +45,7 @@ class OlabCounterTag extends React.Component {
         return <>{parse(counter.value)}</>;
       }
 
-      throw new Error(`'${this.props.name}' not found`);
+      throw new Error(`'${name}' not found`);
     } catch (error) {
       return (
         <>

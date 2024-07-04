@@ -21,23 +21,23 @@ class OlabCountersTag extends React.Component {
     super(props);
 
     const counters = getCounters(
-      node.id,
+      this.props.props.node.id,
       this.props.props.dynamicObjects.map.counters,
-      counterActions
+      this.props.props.scopedObjects.map.counteractions
     );
     const debug = playerState.GetDebug();
 
     this.state = {
-      id: props.props.id,
-      name: props.props.name,
-      question: props.props.question,
-      authActions: props.props.authActions,
-      onSubmitResponse: props.props.onSubmitResponse,
+      id: this.props.props.id,
+      name: this.props.props.name,
+      question: this.props.props.question,
+      authActions: this.props.props.authActions,
+      onSubmitResponse: this.props.props.onSubmitResponse,
       showProgressSpinner: false,
       disabled: false,
-      map: props.props.map,
-      node: props.props.node,
-      counterActions: props.props.scopedObjects.map.counteractions,
+      map: this.props.props.map,
+      node: this.props.props.node,
+      counterActions: this.props.props.scopedObjects.map.counteractions,
       debug,
       counters,
     };

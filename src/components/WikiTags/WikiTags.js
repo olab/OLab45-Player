@@ -44,7 +44,7 @@ const getCounters = (nodeId, mapCounters, counterActions) => {
       items.push(mapCounter);
     }
   } catch (error) {
-    LogError(`error looking up counters: ${error}`);
+    log.error(`error looking up counters: ${error}`);
   }
 
   return items;
@@ -65,10 +65,10 @@ const getFile = (name, props) => {
     item = findWikiInList(array, name);
 
     if (item == null) {
-      LogError(`Could not find file '${name}'`);
+      log.error(`Could not find file '${name}'`);
     }
   } catch (error) {
-    LogError(`error looking up file ${name}: ${error}`);
+    log.error(`error looking up file ${name}: ${error}`);
   }
 
   return item;
@@ -86,10 +86,10 @@ const getCounter = (name, dynamicObjects) => {
     );
 
     if (item == null) {
-      LogError(`Could not find counter '${name}'`);
+      log.error(`Could not find counter '${name}'`);
     }
   } catch (error) {
-    LogError(`error looking up counter ${name}: ${error}`);
+    log.error(`error looking up counter ${name}: ${error}`);
   }
 
   return item;
@@ -111,10 +111,10 @@ const getQuestion = (name, props) => {
     );
 
     if (question == null) {
-      LogError(`Could not find question ${name}`);
+      log.error(`Could not find question ${name}`);
     }
   } catch (error) {
-    LogError(`error looking up question ${name}: ${error}`);
+    log.error(`error looking up question ${name}: ${error}`);
   }
 
   return question;
@@ -136,10 +136,10 @@ const getConstant = (name, props) => {
     );
 
     if (item == null) {
-      LogError(`Could not find constant ${name}`);
+      log.error(`Could not find constant ${name}`);
     }
   } catch (error) {
-    LogError(`error looking up constant ${name}: ${error}`);
+    log.error(`error looking up constant ${name}: ${error}`);
   }
 
   return item;
@@ -160,10 +160,10 @@ const getScript = (name, props) => {
     item = findWikiInList(array, name);
 
     if (item == null) {
-      LogError(`Could not find script '${name}'`);
+      log.error(`Could not find script '${name}'`);
     }
   } catch (error) {
-    LogError(`error looking up script ${name}: ${error}`);
+    log.error(`error looking up script ${name}: ${error}`);
   }
 
   return item;
