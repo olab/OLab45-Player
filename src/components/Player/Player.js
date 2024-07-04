@@ -15,6 +15,13 @@ import {
   OlabMediaResourceTag,
   OlabScriptTag,
   OlabQuestionTag,
+  OlabDragAndDropQuestion,
+  OlabDropDownQuestion,
+  OlabMultilineTextQuestion,
+  OlabMultiPickQuestion,
+  OlabSinglelineTextQuestion,
+  OlabSinglePickQuestion,
+  OlabSliderQuestion,
   OlabAttendeeTag,
   OlabModeratorTag,
 } from "../WikiTags/WikiTags";
@@ -401,6 +408,13 @@ class Player extends PureComponent {
                 OlabMediaResourceTag,
                 OlabReportTag,
                 OlabQuestionTag,
+                OlabDragAndDropQuestion,
+                OlabDropDownQuestion,
+                OlabMultilineTextQuestion,
+                OlabMultiPickQuestion,
+                OlabSinglelineTextQuestion,
+                OlabSinglePickQuestion,
+                OlabSliderQuestion,
                 OlabScriptTag,
               }}
               jsx={theme?.header}
@@ -438,6 +452,13 @@ class Player extends PureComponent {
                 OlabMediaResourceTag,
                 OlabReportTag,
                 OlabQuestionTag,
+                OlabDragAndDropQuestion,
+                OlabDropDownQuestion,
+                OlabMultilineTextQuestion,
+                OlabMultiPickQuestion,
+                OlabSinglelineTextQuestion,
+                OlabSinglePickQuestion,
+                OlabSliderQuestion,
                 OlabScriptTag,
               }}
               jsx={theme?.footer}
@@ -479,6 +500,13 @@ class Player extends PureComponent {
               OlabModeratorTag,
               OlabReportTag,
               OlabQuestionTag,
+              OlabDragAndDropQuestion,
+              OlabDropDownQuestion,
+              OlabMultilineTextQuestion,
+              OlabMultiPickQuestion,
+              OlabSinglelineTextQuestion,
+              OlabSinglePickQuestion,
+              OlabSliderQuestion,
               OlabScriptTag,
             }}
             jsx={node.text}

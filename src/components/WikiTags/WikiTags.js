@@ -7,6 +7,15 @@ import OlabLinksTag from "./Links/Links";
 import OlabMediaResourceTag from "./MediaResource/MediaResource";
 import OlabModeratorTag from "./Question/TurkTalk/Turker/Turker";
 import OlabQuestionTag from "./Question/Question";
+
+import OlabDragAndDropQuestion from "./Question/DragAndDrop/DragAndDrop";
+import OlabDropDownQuestion from "./Question/DropDown/DropDown";
+import OlabMultilineTextQuestion from "./Question/MultilineText/MultilineText";
+import OlabMultiPickQuestion from "./Question/MultiplePick/MultiplePick";
+import OlabSinglelineTextQuestion from "./Question/SingleLineText/SingleLineText";
+import OlabSinglePickQuestion from "./Question/SinglePick/SinglePick";
+import OlabSliderQuestion from "./Question/Slider/Slider";
+
 import OlabReportTag from "./Report/Report";
 import OlabScriptTag from "./Script/Script";
 import OlabSessionTag from "./Session/Session";
@@ -200,6 +209,13 @@ export {
   OlabMediaResourceTag,
   OlabModeratorTag,
   OlabQuestionTag,
+  OlabDragAndDropQuestion,
+  OlabDropDownQuestion,
+  OlabMultilineTextQuestion,
+  OlabMultiPickQuestion,
+  OlabSinglelineTextQuestion,
+  OlabSinglePickQuestion,
+  OlabSliderQuestion,
   OlabReportTag,
   OlabScriptTag,
   OlabSessionTag,
