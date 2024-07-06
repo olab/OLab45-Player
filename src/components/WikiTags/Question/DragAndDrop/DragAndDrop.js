@@ -10,13 +10,22 @@ import JsxParser from "react-jsx-parser";
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
+import { getQuestion } from "../../WikiTags";
+import { postQuestionValue } from "../../../../services/api";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
+
 class OlabDragAndDropQuestion extends React.Component {
   constructor(props) {
     super(props);
 
     log.debug(`${this.constructor["name"]} ctor`);
 
+    let question = getQuestion(this.props.name, this.props);
+    const debug = playerState.GetDebug();
+
     this.state = {
+      debug,
+      question,
       ...props.props,
     };
 
@@ -71,13 +80,11 @@ class OlabDragAndDropQuestion extends React.Component {
       map,
       node,
       contextId,
-      setInProgress: this.setInProgress,
       setIsDisabled: this.setIsDisabled,
+      setInProgress: this.setInProgress,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
+    this.onSubmitResponse(responseState);
   }
 
   // a little function to help us with reordering the result
@@ -127,11 +134,22 @@ class OlabDragAndDropQuestion extends React.Component {
   // Normally you would want to split things out into separate components.
   // But in this example everything is just done in one place for simplicity
   render() {
-    const { id, name, question } = this.state;
+    const { debug, question } = this.state;
+    const { id, name } = this.props;
 
-    log.debug(`OlabDragAndDropQuestion render '${name}'`);
+    log.debug(`${this.constructor["name"]} render`);
 
     try {
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({question.id})
+            </b>
+          </>
+        );
+      }
+
       return (
         <div
           className={`${styles["qudraganddrop"]} ${siteStyles[id]}`}
@@ -181,12 +199,25 @@ class OlabDragAndDropQuestion extends React.Component {
       return (
         <>
           <b>
-            [[QU:{id}]] "{error.message}"
+            [[{id}]] error "{error.message}"
           </b>
         </>
       );
     }
   }
+
+  onSubmitResponse = async (newState) => {
+    // send question response to server and get the
+    // new dynamic objects state
+    var { data } = await postQuestionValue(newState);
+
+    // bubble up the dynamic object to player since the
+    // dynamic objects may be shared to other components
+    if (data != null && this.props.props.onUpdateDynamicObjects) {
+      this.props.props.onUpdateDynamicObjects(data);
+      this.setInProgress(false);
+    }
+  };
 }
 
 export default withStyles(styles)(OlabDragAndDropQuestion);

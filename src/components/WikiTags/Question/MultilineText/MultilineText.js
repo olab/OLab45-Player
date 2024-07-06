@@ -23,7 +23,6 @@ class OlabMultilineTextQuestion extends React.Component {
     const debug = playerState.GetDebug();
 
     this.state = {
-      onSubmitResponse: props.props.onSubmitResponse,
       showProgressSpinner: false,
       disabled: false,
       contentsChanged: false,

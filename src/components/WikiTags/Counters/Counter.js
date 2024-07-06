@@ -20,6 +20,8 @@ class OlabCountersTag extends React.Component {
   constructor(props) {
     super(props);
 
+    log.debug(`${this.constructor["name"]} ctor`);
+
     const counters = getCounters(
       this.props.props.node.id,
       this.props.props.dynamicObjects.map.counters,
@@ -32,7 +34,6 @@ class OlabCountersTag extends React.Component {
       name: this.props.props.name,
       question: this.props.props.question,
       authActions: this.props.props.authActions,
-      onSubmitResponse: this.props.props.onSubmitResponse,
       showProgressSpinner: false,
       disabled: false,
       map: this.props.props.map,
@@ -44,11 +45,11 @@ class OlabCountersTag extends React.Component {
   }
 
   render() {
-    log.debug(`OlabCountersTag render`);
+    const { counters, debug } = this.state;
+
+    log.debug(`${this.constructor["name"]} render`);
 
     try {
-      const { counters, counterActions, node, debug } = this.state;
-
       if (debug.disableWikiRendering) {
         return (
           <>
@@ -100,7 +101,6 @@ class OlabCountersTag extends React.Component {
 
       return <></>;
     } catch (error) {
-      log.error(`OlabMediaResourceTag render error: ${error}`);
       return (
         <>
           <b>[[COUNTERS]] "{error.message}"</b>

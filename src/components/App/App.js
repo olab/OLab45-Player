@@ -1,6 +1,7 @@
 import { PureComponent } from "react";
 import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
+import queryString from "query-string";
 import "./App.css";
 import Home from "../Home/Home";
 import Header from "../Header/Header";
@@ -23,6 +24,9 @@ const playerState = require("../../utils/PlayerState").PlayerState;
 class App extends PureComponent {
   constructor(props) {
     super(props);
+
+    // check for any debug query string overrides
+    this.processDebugQueryString();
 
     this.reactVersion = process.env.REACT_APP_VERSION;
     log.debug(JSON.stringify(process.env));
@@ -66,6 +70,25 @@ class App extends PureComponent {
     };
 
     this.setCredentials = this.setCredentials.bind(this);
+  }
+
+  processDebugQueryString() {
+    const debug = playerState.GetDebug();
+    const queryParams = queryString.parse(window.location.search);
+
+    if (queryParams.render != null) {
+      debug.disableWikiRendering = queryParams.render == "0";
+    }
+
+    if (queryParams.log != null) {
+      debug.logLevel = queryParams.log;
+    }
+
+    if (queryParams.cache != null) {
+      debug.disableCache = queryParams.cache == "0";
+    }
+
+    playerState.SetDebug(debug);
   }
 
   componentWillUnmount() {

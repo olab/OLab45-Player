@@ -3,6 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { FormControl } from "@material-ui/core";
 import JsxParser from "react-jsx-parser";
 import log from "loglevel";
+const playerState = require("../../utils/PlayerState").PlayerState;
 
 import ErrorPopup from "../ErrorPopup/ErrorPopup";
 import {
@@ -39,11 +40,12 @@ import {
   getDynamicScopedObjects,
 } from "../../services/api";
 
-const playerState = require("../../utils/PlayerState").PlayerState;
-
 class Player extends PureComponent {
   constructor(props) {
     super(props);
+
+    const debug = playerState.GetDebug();
+    log.setLevel(debug.logLevel);
 
     const { mapId, nodeId } = arguments[0].params;
     log.info(`playing map ${mapId}, node ${nodeId}`);
@@ -61,22 +63,14 @@ class Player extends PureComponent {
 
     this.onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
 
-    if (this.state.disableCache) {
-      log.info(`disabled cache`);
-      playerState.clear();
-    } else {
-      const debug = playerState.GetDebug();
-      log.setLevel(debug.logLevel);
+    const persistedState = playerState.Get();
 
-      const persistedState = playerState.Get();
-
-      this.state = {
-        ...this.state,
-        ...persistedState,
-        errorFound: false,
-        errorMessage: null,
-      };
-    }
+    this.state = {
+      ...this.state,
+      ...persistedState,
+      errorFound: false,
+      errorMessage: null,
+    };
 
     // eslint-disable-next-line
     window.addEventListener("popstate", function (event) {
@@ -85,13 +79,6 @@ class Player extends PureComponent {
       alert("Back button disabled during case play.");
     });
   }
-
-  // handleClose = (event, reason) => {
-  //   if (reason === "clickaway") {
-  //     return;
-  //   }
-  //   setOpen(false);
-  // };
 
   showError = (message) => {
     this.setState({

@@ -35,7 +35,12 @@ class PlayerState {
   }
 
   static clear() {
+    // persist debug settings
+    let debug = this.GetDebug();
+
     persistantStorage.clear(this.storageKey);
+
+    this.SetDebug(debug);
   }
 
   static ClearMap() {

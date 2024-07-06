@@ -43,7 +43,7 @@ class OlabConstantTag extends React.Component {
         return <span id={name}>{parse(constant.value)}</span>;
       }
 
-      throw new Error(`'${this.props.name}' not found`);
+      throw new Error(`'${name}' not found`);
     } catch (error) {
       return (
         <>

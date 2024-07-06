@@ -9,6 +9,7 @@ import siteStyles from "../../site.module.css";
 
 import { getQuestion } from "../../WikiTags";
 import { postQuestionValue } from "../../../../services/api";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
 
 class OlabSinglelineTextQuestion extends React.Component {
   constructor(props) {
@@ -17,11 +18,13 @@ class OlabSinglelineTextQuestion extends React.Component {
     log.debug(`${this.constructor["name"]} ctor`);
 
     let question = getQuestion(this.props.name, this.props);
+    const debug = playerState.GetDebug();
 
     this.state = {
-      question,
       showProgressSpinner: false,
       disabled: false,
+      debug,
+      question,
       ...props.props,
     };
 
@@ -29,6 +32,12 @@ class OlabSinglelineTextQuestion extends React.Component {
     this.setInProgress = this.setInProgress.bind(this);
     this.setValue = this.setValue.bind(this);
     this.transmitResponse = this.transmitResponse.bind(this);
+  }
+
+  componentWillUnmount() {
+    log.debug(
+      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+    );
   }
 
   setValue = (event, setInProgress) => {
@@ -91,15 +100,22 @@ class OlabSinglelineTextQuestion extends React.Component {
   };
 
   render() {
-    const {
-      question,
-      // disabled
-    } = this.state;
+    const { debug, question } = this.state;
     const { id, name } = this.props;
 
-    log.debug(`OlabSinglePickQuestion render '${name}'`);
+    log.debug(`${this.constructor["name"]} render`);
 
     try {
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({question.id})
+            </b>
+          </>
+        );
+      }
+
       return (
         <>
           <div

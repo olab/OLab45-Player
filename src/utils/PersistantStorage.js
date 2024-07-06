@@ -27,7 +27,6 @@ class PersistantStorage {
 
       for (const key of prefixKeys) {
         localStorage.removeItem(key);
-        // log.debug(`deleted '${key}'`);
       }
     }
   }
