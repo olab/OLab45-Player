@@ -89,7 +89,11 @@ class PlayerState {
 
   static GetDebug(
     userId = null,
-    defaultValue = { disableWikiRendering: false, disableCache: false }
+    defaultValue = {
+      disableWikiRendering: false,
+      disableCache: false,
+      logLevel: "error",
+    }
   ) {
     return persistantStorage.get(
       this.storageKey,

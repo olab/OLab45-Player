@@ -19,14 +19,25 @@ import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 import Spinner from "../../../../shared/assets/loading_med.gif";
 
+import { getQuestion } from "../../WikiTags";
+import { postQuestionValue } from "../../../../services/api";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
+
 class OlabSinglePickQuestion extends React.Component {
   constructor(props) {
     super(props);
 
     log.debug(`${this.constructor["name"]} ctor`);
 
+    let question = getQuestion(this.props.name, this.props);
+    var responses = this.buildQuestionResponses(question, this.props.id);
+    const debug = playerState.GetDebug();
+
     this.state = {
+      debug,
+      question,
       ...props.props,
+      responses,
     };
 
     // Binding this keyword
@@ -35,12 +46,28 @@ class OlabSinglePickQuestion extends React.Component {
     this.transmitResponse = this.transmitResponse.bind(this);
   }
 
+  componentWillUnmount() {
+    log.debug(
+      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+    );
+  }
+
+  setInProgress(inProgress) {
+    this.setState({ showProgressSpinner: inProgress });
+    log.debug(`set progress spinner: ${inProgress}`);
+  }
+
+  setIsDisabled(disabled) {
+    this.setState({ disabled: disabled });
+    log.debug(`set disabled: ${disabled}`);
+  }
+
   setValue = (event) => {
     const value = Number(event.target.value);
-    const question = this.state.question;
+    let question = this.state.question;
 
     log.debug(
-      `OlabSinglePickQuestion set question '${question.id}' value = '${value}'.`
+      `${this.constructor["name"]}  set question '${question.id}' value = '${value}'.`
     );
 
     let response = null;
@@ -62,7 +89,7 @@ class OlabSinglePickQuestion extends React.Component {
     question.valueOverride = response.response;
 
     log.debug(
-      `OlabSinglePickQuestion set question '${question.id}' value = '${value}'`
+      `${this.constructor["name"]}  set question '${question.id}' value = '${value}'`
     );
 
     // if single try question, disabled it
@@ -74,13 +101,20 @@ class OlabSinglePickQuestion extends React.Component {
     // indicators, if called on
     question.showAnswerIndicators = true;
 
-    this.setState({ question });
-    this.transmitResponse();
+    this.setState(
+      (state) => {
+        question = question;
+        return { question };
+      },
+      () => this.transmitResponse()
+    );
+
+    // this.setState({ question });
+    // this.transmitResponse();
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -92,19 +126,7 @@ class OlabSinglePickQuestion extends React.Component {
       setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
-  }
-
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
-  }
-
-  setIsDisabled(disabled) {
-    this.setState({ disabled: disabled });
-    log.debug(`set disabled: ${disabled}`);
+    this.onSubmitResponse(responseState);
   }
 
   buildQuestionResponses(question, id) {
@@ -112,8 +134,8 @@ class OlabSinglePickQuestion extends React.Component {
     let key = 0;
     let selectedIndex = null;
 
-    if (this.state.question.value) {
-      selectedIndex = Number(this.state.question.value);
+    if (question.value) {
+      selectedIndex = Number(question.value);
     }
 
     for (const response of question.responses) {
@@ -180,9 +202,10 @@ class OlabSinglePickQuestion extends React.Component {
   }
 
   render() {
-    const { id, name, question } = this.state;
+    const { debug, question, responses } = this.state;
+    const { id, name } = this.props;
 
-    log.debug(`OlabSinglePickQuestion render '${name}'`);
+    log.debug(`${this.constructor["name"]} render`);
 
     try {
       let row = question.layoutType === 1 ? true : false;
@@ -198,7 +221,16 @@ class OlabSinglePickQuestion extends React.Component {
         );
       }
 
-      var responses = this.buildQuestionResponses(question, id);
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({question.id})
+            </b>
+          </>
+        );
+      }
+
       var disabled = question.disabled == 0 ? false : true;
 
       return (
@@ -227,12 +259,25 @@ class OlabSinglePickQuestion extends React.Component {
       return (
         <>
           <b>
-            [[QU:{id}]] "{error.message}"
+            [[{id}]] error "{error.message}"
           </b>
         </>
       );
     }
   }
+
+  onSubmitResponse = async (newState) => {
+    // send question response to server and get the
+    // new dynamic objects state
+    var { data } = await postQuestionValue(newState);
+
+    // bubble up the dynamic object to player since the
+    // dynamic objects may be shared to other components
+    if (data != null && this.props.props.onUpdateDynamicObjects) {
+      this.props.props.onUpdateDynamicObjects(data);
+      this.setInProgress(false);
+    }
+  };
 }
 
 export default withStyles(styles)(OlabSinglePickQuestion);

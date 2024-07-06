@@ -8,13 +8,22 @@ import JsxParser from "react-jsx-parser";
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
+import { getQuestion } from "../../WikiTags";
+import { postQuestionValue } from "../../../../services/api";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
+
 class OlabSliderQuestion extends React.Component {
   constructor(props) {
     super(props);
 
     log.debug(`${this.constructor["name"]} ctor`);
 
+    let question = getQuestion(this.props.name, this.props);
+    const debug = playerState.GetDebug();
+
     this.state = {
+      debug,
+      question,
       ...props.props,
     };
 
@@ -34,10 +43,16 @@ class OlabSliderQuestion extends React.Component {
     this.transmitResponse = this.transmitResponse.bind(this);
   }
 
+  componentWillUnmount() {
+    log.debug(
+      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+    );
+  }
+
   setValue = (event, value) => {
     const question = this.state.question;
     log.debug(
-      `OlabSliderQuestion set question '${question.id}' value = '${value}'`
+      `${this.constructor["name"]}  set question '${question.id}' value = '${value}'`
     );
 
     this.setState(
@@ -52,8 +67,7 @@ class OlabSliderQuestion extends React.Component {
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -65,9 +79,7 @@ class OlabSliderQuestion extends React.Component {
       setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
+    this.onSubmitResponse(responseState);
   }
 
   setInProgress(inProgress) {
@@ -76,19 +88,25 @@ class OlabSliderQuestion extends React.Component {
   }
 
   render() {
-    const {
-      id,
-      name,
-      question,
-      // disabled
-    } = this.state;
+    const { debug, question } = this.state;
+    const { id, name } = this.props;
 
-    log.debug(`OlabSliderQuestion render '${name}'`);
+    log.debug(`${this.constructor["name"]}  render '${name}'`);
 
     try {
       // eslint-disable-next-line
       const settings = JSON.parse(question.settings);
       question.width = 200; // use fixed width - @see https://olabrats.atlassian.net/browse/OD-28
+
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({question.id})
+            </b>
+          </>
+        );
+      }
 
       return (
         <div className={`${styles["quslider"]} ${siteStyles[id]}`} id={`${id}`}>
@@ -130,12 +148,25 @@ class OlabSliderQuestion extends React.Component {
       return (
         <>
           <b>
-            [[{id}]] "{error.message}"
+            [[{id}]] error "{error.message}"
           </b>
         </>
       );
     }
   }
+
+  onSubmitResponse = async (newState) => {
+    // send question response to server and get the
+    // new dynamic objects state
+    var { data } = await postQuestionValue(newState);
+
+    // bubble up the dynamic object to player since the
+    // dynamic objects may be shared to other components
+    if (data != null && this.props.props.onUpdateDynamicObjects) {
+      this.props.props.onUpdateDynamicObjects(data);
+      this.setInProgress(false);
+    }
+  };
 }
 
 export default withStyles(styles)(OlabSliderQuestion);

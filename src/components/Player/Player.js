@@ -65,6 +65,9 @@ class Player extends PureComponent {
       log.info(`disabled cache`);
       playerState.clear();
     } else {
+      const debug = playerState.GetDebug();
+      log.setLevel(debug.logLevel);
+
       const persistedState = playerState.Get();
 
       this.state = {
@@ -324,9 +327,45 @@ class Player extends PureComponent {
     window.location.href = url;
   };
 
-  onUpdateDynamicObjects = (dynamicObjects) => {
+  onUpdateDynamicObjects = (newDynamicObjects) => {
+    let dynamicObjects = this.state.dynamicObjects;
+
+    dynamicObjects.nodesVisitedList = newDynamicObjects.nodesVisitedList;
+    dynamicObjects.checksum = newDynamicObjects.checksum;
+
+    this.compareCounterArray(
+      newDynamicObjects.map.counters,
+      dynamicObjects.map.counters
+    );
+
+    this.compareCounterArray(
+      newDynamicObjects.node.counters,
+      dynamicObjects.node.counters
+    );
+
+    this.compareCounterArray(
+      newDynamicObjects.server.counters,
+      dynamicObjects.server.counters
+    );
+
     this.setState({ dynamicObjects: dynamicObjects });
     playerState.SetDynamicObjects(this.state.dynamicObjects);
+  };
+
+  compareCounterArray = (source, target) => {
+    for (let index = 0; index < source.length; index++) {
+      if (source[index].isSystem === 1) {
+        continue;
+      }
+
+      if (source[index].value != target[index].value) {
+        log.trace(
+          `counter ${source[index].name}: ${source[index].value} => ${target[index].value}`
+        );
+        source[index].value = target[index].value;
+        source[index].updatedat = target[index].updatedat;
+      }
+    }
   };
 
   onJsxParseError(arg) {

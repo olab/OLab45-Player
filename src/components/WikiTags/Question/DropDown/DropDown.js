@@ -19,13 +19,22 @@ import log from "loglevel";
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
+import { getQuestion } from "../../WikiTags";
+import { postQuestionValue } from "../../../../services/api";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
+
 class OlabDropDownQuestion extends React.Component {
   constructor(props) {
     super(props);
 
     log.debug(`${this.constructor["name"]} ctor`);
 
+    let question = getQuestion(this.props.name, this.props);
+    const debug = playerState.GetDebug();
+
     this.state = {
+      debug,
+      question,
       ...props.props,
     };
 
@@ -35,6 +44,22 @@ class OlabDropDownQuestion extends React.Component {
     this.transmitResponse = this.transmitResponse.bind(this);
   }
 
+  componentWillUnmount() {
+    log.debug(
+      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+    );
+  }
+
+  setInProgress(inProgress) {
+    this.setState({ showProgressSpinner: inProgress });
+    log.debug(`set progress spinner: ${inProgress}`);
+  }
+
+  setIsDisabled(disabled) {
+    this.setState({ disabled: disabled });
+    log.debug(`set disabled: ${disabled}`);
+  }
+
   setValue = (event, setInProgress, setIsDisabled) => {
     const value = Number(event.target.value);
     const question = this.state.question;
@@ -42,7 +67,7 @@ class OlabDropDownQuestion extends React.Component {
     this.setState((state) => {
       question.value = value;
       log.debug(
-        `OlabDropDownQuestion set question '${question.id}' value = '${value}'.`
+        `${this.constructor["name"]}  set question '${question.id}' value = '${value}'.`
       );
       return { question };
     });
@@ -64,7 +89,7 @@ class OlabDropDownQuestion extends React.Component {
     question.value = question.responseId;
 
     log.debug(
-      `OlabSinglePickQuestion set question '${question.id}' value = '${value}'`
+      `${this.constructor["name"]}  set question '${question.id}' value = '${value}'`
     );
 
     // if single try question, disabled it
@@ -81,8 +106,7 @@ class OlabDropDownQuestion extends React.Component {
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -94,19 +118,7 @@ class OlabDropDownQuestion extends React.Component {
       setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
-  }
-
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
-  }
-
-  setIsDisabled(disabled) {
-    this.setState({ disabled: disabled });
-    log.debug(`set disabled: ${disabled}`);
+    this.onSubmitResponse(responseState);
   }
 
   buildQuestionResponses(question, id) {
@@ -129,10 +141,13 @@ class OlabDropDownQuestion extends React.Component {
   }
 
   render() {
-    const { id, name, question } = this.state;
+    const { debug, question } = this.state;
+    const { id, name } = this.props;
 
-    log.debug(`OlabDropDownQuestion render '${name}'`);
+    log.debug(`${this.constructor["name"]} render`);
+
     try {
+      let progressButtonHtml = "";
       if (this.state.showProgressSpinner) {
         progressButtonHtml = (
           <img
@@ -140,6 +155,16 @@ class OlabDropDownQuestion extends React.Component {
             src={Spinner}
             alt=""
           />
+        );
+      }
+
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({question.id})
+            </b>
+          </>
         );
       }
 
@@ -179,12 +204,25 @@ class OlabDropDownQuestion extends React.Component {
       return (
         <>
           <b>
-            [[QU:{id}]] "{error.message}"
+            [[{id}]] error "{error.message}"
           </b>
         </>
       );
     }
   }
+
+  onSubmitResponse = async (newState) => {
+    // send question response to server and get the
+    // new dynamic objects state
+    var { data } = await postQuestionValue(newState);
+
+    // bubble up the dynamic object to player since the
+    // dynamic objects may be shared to other components
+    if (data != null && this.props.props.onUpdateDynamicObjects) {
+      this.props.props.onUpdateDynamicObjects(data);
+      this.setInProgress(false);
+    }
+  };
 }
 
 export default withStyles(styles)(OlabDropDownQuestion);

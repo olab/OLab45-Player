@@ -5,21 +5,24 @@ import styles from "../styles.module.css";
 import siteStyles from "../site.module.css";
 import { getFile } from "../WikiTags";
 import { getDownload } from "../../../services/api";
-const playerState = require("../../../utils/PlayerState").PlayerState;
 import log from "loglevel";
 import BrokenImageIcon from "@material-ui/icons/BrokenImage";
 import { Tooltip } from "@material-ui/core";
-import { config } from "../../../config";
+const playerState = require("../../../utils/PlayerState").PlayerState;
 
 class OlabMediaResourceTag extends React.Component {
   constructor(props) {
     super(props);
 
-    let file = getFile(name, this.props);
+    log.debug(`${this.constructor["name"]} ctor`);
+
+    let file = getFile(this.props.name, this.props);
     const debug = playerState.GetDebug();
+
     this.state = {
-      file,
       debug,
+      file,
+      ...props.props,
     };
   }
 
@@ -45,10 +48,9 @@ class OlabMediaResourceTag extends React.Component {
 
   render() {
     const { debug, file } = this.state;
+    const { id, name } = this.props;
 
-    const { name } = this.props;
-
-    log.debug(`OlabMediaResourceTag render '${name}'`);
+    log.debug(`${this.constructor["name"]} render`);
 
     try {
       let item = file;
@@ -61,8 +63,6 @@ class OlabMediaResourceTag extends React.Component {
           </Tooltip>
         );
       }
-
-      log.debug(`file object: '${JSON.stringify(item, null, 2)}'`);
 
       let sizeProps = {};
 
@@ -77,7 +77,7 @@ class OlabMediaResourceTag extends React.Component {
         return (
           <>
             <b>
-              [[MR:{name}]] "{item.path}"
+              [[{id}]] ({file.id}) "{item.path}"
             </b>
           </>
         );
@@ -133,11 +133,7 @@ class OlabMediaResourceTag extends React.Component {
         return (
           <>
             <div>
-              <a
-                id={`MR:${item.id}`}
-                download={item.fileName}
-                href={item.originUrl}
-              >
+              <a id={`${id}`} download={item.fileName} href={item.originUrl}>
                 {item.fileName}
               </a>
             </div>
@@ -145,13 +141,10 @@ class OlabMediaResourceTag extends React.Component {
         );
       }
     } catch (error) {
-      log.error(
-        `OlabMediaResourceTag render error: ${JSON.stringify(error, null, 2)}`
-      );
       return (
         <>
           <b>
-            [[MR:{name}]] "{error.message}"
+            [[{id}]] "{error.message}"
           </b>
         </>
       );

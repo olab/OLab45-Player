@@ -7,17 +7,19 @@ import JsxParser from "react-jsx-parser";
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
+import { getQuestion } from "../../WikiTags";
+import { postQuestionValue } from "../../../../services/api";
+
 class OlabSinglelineTextQuestion extends React.Component {
   constructor(props) {
     super(props);
 
     log.debug(`${this.constructor["name"]} ctor`);
 
+    let question = getQuestion(this.props.name, this.props);
+
     this.state = {
-      // id: props.props.id,
-      // name: props.props.name,
-      // question: props.props.question,
-      // dynamicObjects: props.props.dynamicObjects,
+      question,
       showProgressSpinner: false,
       disabled: false,
       ...props.props,
@@ -52,8 +54,7 @@ class OlabSinglelineTextQuestion extends React.Component {
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -65,9 +66,7 @@ class OlabSinglelineTextQuestion extends React.Component {
       setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
+    this.onSubmitResponse(responseState);
   }
 
   setInProgress(inProgress) {
@@ -93,11 +92,10 @@ class OlabSinglelineTextQuestion extends React.Component {
 
   render() {
     const {
-      id,
-      name,
       question,
       // disabled
     } = this.state;
+    const { id, name } = this.props;
 
     log.debug(`OlabSinglePickQuestion render '${name}'`);
 
@@ -136,12 +134,24 @@ class OlabSinglelineTextQuestion extends React.Component {
       return (
         <>
           <b>
-            [[QU:{id}]] "{error.message}"
+            [[{id}]] error "{error.message}"
           </b>
         </>
       );
     }
   }
+
+  onSubmitResponse = async (newState) => {
+    // send question response to server and get the
+    // new dynamic objects state
+    var { data } = await postQuestionValue(newState);
+
+    // bubble up the dynamic object to player since the
+    // dynamic objects may be shared to other components
+    if (data != null && this.props.props.onUpdateDynamicObjects) {
+      this.props.props.onUpdateDynamicObjects(data);
+    }
+  };
 }
 
 export default withStyles(styles)(OlabSinglelineTextQuestion);

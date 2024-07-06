@@ -10,6 +10,8 @@ class OlabLinksTag extends React.Component {
   constructor(props) {
     super(props);
 
+    log.debug(`${this.constructor["name"]} ctor`);
+
     const debug = playerState.GetDebug();
 
     this.state = { debug };
@@ -27,7 +29,7 @@ class OlabLinksTag extends React.Component {
   };
 
   render() {
-    log.debug("OlabLinksTag render");
+    log.debug(`${this.constructor["name"]} render`);
 
     const { debug } = this.state;
 

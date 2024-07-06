@@ -43,9 +43,9 @@ class OlabQuestionTag extends React.Component {
     const customId = OlabQuestionTag.getQuestionId(question);
 
     this.state = {
+      debug,
       question,
       ...props.props,
-      debug,
       customId,
     };
 

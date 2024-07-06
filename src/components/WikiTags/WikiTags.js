@@ -120,6 +120,20 @@ const getQuestion = (name, props) => {
 
     if (question == null) {
       log.error(`Could not find question ${name}`);
+    } else {
+      if (question.questionType !== 3 && question.questionType !== 2) {
+        if (question.value === null) {
+          question.value = 0;
+        }
+      } else {
+        if (question.value === null) {
+          question.value = "";
+        }
+      }
+
+      if (question.width === 0) {
+        question.width = 300;
+      }
     }
   } catch (error) {
     log.error(`error looking up question ${name}: ${error}`);

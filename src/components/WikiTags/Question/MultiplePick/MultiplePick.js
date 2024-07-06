@@ -16,6 +16,11 @@ import CheckIcon from "@material-ui/icons/Check";
 
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
+import Spinner from "../../../../shared/assets/loading_med.gif";
+
+import { getQuestion } from "../../WikiTags";
+import { postQuestionValue } from "../../../../services/api";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
 
 class OlabMultiPickQuestion extends React.Component {
   constructor(props) {
@@ -23,25 +28,26 @@ class OlabMultiPickQuestion extends React.Component {
 
     log.debug(`${this.constructor["name"]} ctor`);
 
-    let currentChoices = this.createArrayFromValue(
-      this.props.props.question.value
-    );
-    var responses = this.buildQuestionResponses(
-      this.props.props.question,
-      this.props.props.id,
-      currentChoices
-    );
+    let question = getQuestion(this.props.name, this.props);
+    const debug = playerState.GetDebug();
 
     this.state = {
+      debug,
+      question,
       ...props.props,
       hasInitialAnswer: false,
-      responses,
     };
 
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);
     this.setValue = this.setValue.bind(this);
     this.transmitResponse = this.transmitResponse.bind(this);
+  }
+
+  componentWillUnmount() {
+    log.debug(
+      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+    );
   }
 
   createArrayFromValue(source) {
@@ -131,8 +137,7 @@ class OlabMultiPickQuestion extends React.Component {
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -144,9 +149,7 @@ class OlabMultiPickQuestion extends React.Component {
       setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
+    this.onSubmitResponse(responseState);
   }
 
   setInProgress(inProgress) {
@@ -248,11 +251,40 @@ class OlabMultiPickQuestion extends React.Component {
   }
 
   render() {
-    const { id, name, question, responses } = this.state;
+    const { debug, question } = this.state;
+    const { id, name } = this.props;
 
     log.debug(`${this.constructor["name"]} render '${name}'`);
 
     try {
+      let progressButtonHtml = "";
+      if (this.state.showProgressSpinner) {
+        progressButtonHtml = (
+          <img
+            style={{ float: "left", width: 40, height: 40 }}
+            src={Spinner}
+            alt=""
+          />
+        );
+      }
+
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({question.id})
+            </b>
+          </>
+        );
+      }
+
+      let currentChoices = this.createArrayFromValue(question.value);
+      var responses = this.buildQuestionResponses(
+        question,
+        this.props.props.id,
+        currentChoices
+      );
+
       let row = question.layoutType === 1 ? true : false;
       var disabled = question.disabled == 0 ? false : true;
 
@@ -268,6 +300,7 @@ class OlabMultiPickQuestion extends React.Component {
             <FormGroup id={`${id}::choices`} row={row}>
               {responses}
             </FormGroup>
+            {progressButtonHtml}
           </FormControl>
         </div>
       );
@@ -275,12 +308,25 @@ class OlabMultiPickQuestion extends React.Component {
       return (
         <>
           <b>
-            [[QU:{id}]] "{error.message}"
+            [[{id}]] error "{error.message}"
           </b>
         </>
       );
     }
   }
+
+  onSubmitResponse = async (newState) => {
+    // send question response to server and get the
+    // new dynamic objects state
+    var { data } = await postQuestionValue(newState);
+
+    // bubble up the dynamic object to player since the
+    // dynamic objects may be shared to other components
+    if (data != null && this.props.props.onUpdateDynamicObjects) {
+      this.props.props.onUpdateDynamicObjects(data);
+      this.setInProgress(false);
+    }
+  };
 }
 
 export default withStyles(styles)(OlabMultiPickQuestion);

@@ -9,23 +9,39 @@ import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 import Spinner from "../../../../shared/assets/loading_med.gif";
 
+import { getQuestion } from "../../WikiTags";
+import { postQuestionValue } from "../../../../services/api";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
+
 class OlabMultilineTextQuestion extends React.Component {
   constructor(props) {
     super(props);
 
     log.debug(`${this.constructor["name"]} ctor`);
 
+    let question = getQuestion(this.props.name, this.props);
+    const debug = playerState.GetDebug();
+
     this.state = {
       onSubmitResponse: props.props.onSubmitResponse,
       showProgressSpinner: false,
       disabled: false,
       contentsChanged: false,
+      debug,
+      question,
       ...props.props,
     };
 
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);
     this.onSubmitClicked = this.onSubmitClicked.bind(this);
+    this.transmitResponse = this.transmitResponse.bind(this);
+  }
+
+  componentWillUnmount() {
+    log.debug(
+      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+    );
   }
 
   setInProgress(inProgress) {
@@ -53,8 +69,7 @@ class OlabMultilineTextQuestion extends React.Component {
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -66,9 +81,7 @@ class OlabMultilineTextQuestion extends React.Component {
       setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
+    this.onSubmitResponse(responseState);
   }
 
   onFocus = (event) => {
@@ -89,9 +102,10 @@ class OlabMultilineTextQuestion extends React.Component {
   };
 
   render() {
-    const { id, name, question, contentsChanged, disabled } = this.state;
+    const { debug, question, contentsChanged, disabled } = this.state;
+    const { id, name } = this.props;
 
-    log.debug(`OlabMultilineTextQuestion render '${name}'`);
+    log.debug(`${this.constructor["name"]} render`);
 
     try {
       let progressButtonHtml = "";
@@ -102,6 +116,16 @@ class OlabMultilineTextQuestion extends React.Component {
             src={Spinner}
             alt=""
           />
+        );
+      }
+
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({question.id})
+            </b>
+          </>
         );
       }
 
@@ -150,12 +174,25 @@ class OlabMultilineTextQuestion extends React.Component {
       return (
         <>
           <b>
-            [[QU:{id}]] "{error.message}"
+            [[{id}]] error "{error.message}"
           </b>
         </>
       );
     }
   }
+
+  onSubmitResponse = async (newState) => {
+    // send question response to server and get the
+    // new dynamic objects state
+    var { data } = await postQuestionValue(newState);
+
+    // bubble up the dynamic object to player since the
+    // dynamic objects may be shared to other components
+    if (data != null && this.props.props.onUpdateDynamicObjects) {
+      this.props.props.onUpdateDynamicObjects(data);
+      this.setInProgress(false);
+    }
+  };
 }
 
 export default withStyles(styles)(OlabMultilineTextQuestion);

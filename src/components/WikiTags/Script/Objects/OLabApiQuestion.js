@@ -2,8 +2,8 @@
 import { OLabApiObject } from "./OLabApiObject";
 
 export class OLabApiQuestion extends OLabApiObject {
-  constructor(clientApi, id) {
-    super(clientApi, "QU:" + id, id, "questions");
+  constructor(clientApi, questionType, id) {
+    super(clientApi, `${questionType}:${id}`, id, "questions");
     this.stem = null;
   }
 
@@ -38,8 +38,8 @@ export class OLabApiTextQuestion extends OLabApiQuestion {
 export class OLabApiChoicesQuestion extends OLabApiQuestion {
   choices;
 
-  constructor(clientApi, id) {
-    super(clientApi, id);
+  constructor(clientApi, questionType, id) {
+    super(clientApi, questionType, id);
 
     let qrDomElements = document.querySelectorAll(
       `[id*="${this.elementId}::QR"]`
@@ -56,7 +56,7 @@ export class OLabApiChoicesQuestion extends OLabApiQuestion {
 
 export class OLabApiMultipleChoiceQuestion extends OLabApiChoicesQuestion {
   constructor(clientApi, id) {
-    super(clientApi, id);
+    super(clientApi, "QUMP", id);
   }
 
   get value() {
@@ -78,7 +78,7 @@ export class OLabApiMultipleChoiceQuestion extends OLabApiChoicesQuestion {
 
 export class OLabApiSingleChoiceQuestion extends OLabApiChoicesQuestion {
   constructor(clientApi, id) {
-    super(clientApi, id);
+    super(clientApi, "QUSP", id);
   }
 
   get value() {
