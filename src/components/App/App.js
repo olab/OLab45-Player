@@ -59,17 +59,19 @@ class App extends PureComponent {
     }
 
     this.state = {
+      anonymousPlay: tokenType == constants.TOKEN_TYPE_ANONYMOUS,
       authActions: authActions,
+      directPlay: directPlay,
+      directPlayError: null,
+      externalPlay: tokenType == constants.TOKEN_TYPE_EXTERNAL,
+      impersonateUserOpen: false,
+      isMounted: false,
       token: authActions.getToken(),
       tokenType: authActions.getTokenType(),
-      externalPlay: tokenType == constants.TOKEN_TYPE_EXTERNAL,
-      anonymousPlay: tokenType == constants.TOKEN_TYPE_ANONYMOUS,
-      directPlayError: null,
-      directPlay: directPlay,
-      isMounted: false,
     };
 
     this.setCredentials = this.setCredentials.bind(this);
+    this.onImpersonateClicked = this.onImpersonateClicked.bind(this);
   }
 
   processDebugQueryString() {
@@ -165,6 +167,12 @@ class App extends PureComponent {
     this.evaluatePlayType();
   }
 
+  onImpersonateClicked() {
+    this.setState({
+      impersonateUserOpen: true,
+    });
+  }
+
   render() {
     let {
       isMounted,
@@ -175,7 +183,9 @@ class App extends PureComponent {
       anonymousPlay,
       tokenType,
       directPlayError,
+      impersonateUserOpen,
     } = this.state;
+
     const isExpired = authActions.isExpiredSession();
 
     if (!token || isExpired) {
@@ -240,11 +250,17 @@ class App extends PureComponent {
             version={this.reactVersion}
             authActions={authActions}
             externalPlay={externalPlay}
+            onImpersonateClicked={this.onImpersonateClicked}
           />
           <Routes>
             <Route
               path={`${config.APP_BASEPATH}`}
-              element={<Home authActions={authActions} />}
+              element={
+                <Home
+                  authActions={authActions}
+                  impersonateUserOpen={impersonateUserOpen}
+                />
+              }
             />
             <Route
               path={`${config.APP_BASEPATH}/home`}

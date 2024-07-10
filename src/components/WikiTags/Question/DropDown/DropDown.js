@@ -8,8 +8,6 @@ import {
   MenuItem,
 } from "@material-ui/core";
 
-import CloseIcon from "@material-ui/icons/Close";
-import CheckIcon from "@material-ui/icons/Check";
 import Spinner from "../../../../shared/assets/loading_med.gif";
 import JsxParser from "react-jsx-parser";
 

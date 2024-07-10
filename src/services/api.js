@@ -90,6 +90,18 @@ async function loginUserAsync(credentials) {
   return await internetJsonFetch("POST", url, payload);
 }
 
+async function impersonateUserAsync(credentials) {
+  var payload = {
+    UserName: credentials.username,
+  };
+  let url = `${config.API_URL}/auth/login`;
+  let token = props.authActions.getToken();
+
+  return await internetJsonFetch("POST", url, payload, {
+    Authorization: `Bearer ${token}`,
+  });
+}
+
 async function loginExternalUserAsync(token) {
   let payload = { ExternalToken: token };
   let url = `${config.API_URL}/auth/loginexternal`;

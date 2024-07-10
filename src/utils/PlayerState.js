@@ -1,3 +1,4 @@
+import log from "loglevel";
 import { config } from "../config";
 
 const persistantStorage = require("./PersistantStorage").PersistantStorage;
@@ -9,6 +10,8 @@ const KeyConstants = {
   DEBUG: "debug",
   DYNAMIC_OBJECTS: "dynamic-objects",
   GLOBAL: null,
+  IMPERSONATE_MODE: "impersonateMode",
+  LOG_LEVEL: "logLevel",
   MAP_STATIC: "map-static",
   MAP: "map",
   MAPS: "maps",
@@ -37,10 +40,12 @@ class PlayerState {
   static clear() {
     // persist debug settings
     let debug = this.GetDebug();
+    let logLevel = this.GetLogLevel();
 
     persistantStorage.clear(this.storageKey);
 
     this.SetDebug(debug);
+    this.SetLogLevel(logLevel);
   }
 
   static ClearMap() {
@@ -58,6 +63,7 @@ class PlayerState {
   // Get all settings as object
   static Get() {
     const debug = this.GetDebug();
+    const logLevel = this.GetLogLevel();
     const contextId = this.GetContextId();
     const dynamicObjects = this.GetDynamicObjects();
     const map = this.GetMap();
@@ -71,6 +77,7 @@ class PlayerState {
 
     return {
       debug: debug,
+      logLevel: logLevel,
       contextId: contextId,
       dynamicObjects: dynamicObjects,
       map: map,
@@ -88,12 +95,22 @@ class PlayerState {
     };
   }
 
+  static GetLogLevel() {
+    let debug = this.GetDebug();
+    return debug[KeyConstants.LOG_LEVEL];
+  }
+
+  static SetLogLevel(obj) {
+    let debug = this.GetDebug();
+    debug[KeyConstants.LOG_LEVEL] = obj;
+    this.SetDebug(debug);
+  }
+
   static SetDebug(obj) {
     persistantStorage.save(this.storageKey, KeyConstants.DEBUG, obj);
   }
 
   static GetDebug(
-    userId = null,
     defaultValue = {
       disableWikiRendering: false,
       disableCache: false,
@@ -218,6 +235,17 @@ class PlayerState {
       KeyConstants.NODE,
       defaultValue
     );
+  }
+
+  static SetImpersonateMode(value) {
+    let sessionInfo = this.GetSessionInfo();
+    sessionInfo[IMPERSONATE_MODE] = value;
+    this.SetSessionInfo(sessionInfo);
+  }
+
+  static GetImpersonateMode() {
+    let sessionInfo = this.GetSessionInfo();
+    return sessionInfo[IMPERSONATE_MODE];
   }
 
   static SetNodeStatic(obj) {
