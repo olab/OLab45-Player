@@ -8,10 +8,9 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import JsxParser from "react-jsx-parser";
 import log from "loglevel";
 
-class MapDetailDlg extends PureComponent {
+class ImpersonateDlg extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -43,23 +42,9 @@ class MapDetailDlg extends PureComponent {
           <DialogTitle id="alert-dialog-title">{data.name}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              <b>Id:&nbsp;</b>
-              {data.id}
+              <b>User to Impersonate:&nbsp;</b>
+              {data.userName}
               <br />
-              <b>Author:&nbsp;</b>
-              {data.author}
-              <br />
-              <b>Nodes:&nbsp;</b>
-              {data.nodeCount}
-              <br />
-              <b>Links:&nbsp;</b>
-              {data.nodeLinkCount}
-              <br />
-              <b>Created:&nbsp;</b>
-              {data.createdAt}
-              <br />
-              <b>Abstract:&nbsp;</b>
-              <JsxParser jsx={data.abstract} />
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -73,4 +58,4 @@ class MapDetailDlg extends PureComponent {
   }
 }
 
-export default withStyles(styles)(MapDetailDlg);
+export default withStyles(styles)(ImpersonateDlg);

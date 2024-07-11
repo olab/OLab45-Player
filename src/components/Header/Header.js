@@ -16,11 +16,19 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
-const Header = ({ version, authActions, isScreenBusy, externalPlay }) => {
+const Header = ({
+  version,
+  authActions,
+  isScreenBusy,
+  externalPlay,
+  onImpersonateClicked,
+}) => {
   const [logoutDialogOpen, toggleLogoutDialogOpen] = React.useReducer(
     (state) => !state,
     false
   );
+
+  const isSuperUser = authActions.isSuperUser();
 
   return (
     <>
@@ -51,15 +59,20 @@ const Header = ({ version, authActions, isScreenBusy, externalPlay }) => {
               >
                 &nbsp;Logout&nbsp;
               </Button>
+              &nbsp;
+              {isSuperUser ? (
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  size="large"
+                  aria-label="Impersonate user"
+                  onClick={() => onImpersonateClicked()}
+                >
+                  <span>Impersonate</span>
+                </Button>
+              ) : null}
             </>
           )}
-          {/* {!authActions && (
-            <VersionWrapper>
-              User: anonymous
-              <br />
-              Version: {version}
-            </VersionWrapper>
-          )} */}
         </div>
         {isScreenBusy ? <LinearProgress /> : <FakeProgress />}
       </HeaderWrapper>

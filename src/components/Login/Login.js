@@ -14,7 +14,6 @@ import {
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import { Log, LogInfo, LogError } from "../../utils/Logger";
-import log from "loglevel";
 import styles from "./styles";
 import { config } from "../../config";
 import { ReactComponent as LogoIcon } from "../../shared/assets/icons/olab4_logo.svg";

@@ -11,7 +11,8 @@ import log from "loglevel";
 
 import styles from "./styles";
 import ListWithSearch from "../ListWithSearch/ListWithSearch";
-import MapDetail from "./MapDetail/MapDetail";
+import MapDetailDlg from "./MapDetail/MapDetail";
+import ImpersonateDlg from "./Impersonate/Impersonate";
 import styled from "styled-components";
 import { PAGE_TITLES } from "../config";
 import filterByName from "../../helpers/filterByName";
@@ -33,20 +34,27 @@ class Home extends PureComponent {
     super(props);
 
     const debug = playerState.GetDebug();
+    log.debug(`${this.constructor["name"]} ctor`);
 
     this.state = {
+      debug,
       error: null,
+      impersonateUserOpen:
+        this.props.impersonateUserOpen == null
+          ? false
+          : this.props.impersonateUserOpen,
+      isButtonsDisabled: false,
+      isMapInfoFetched: false,
+      isMapsFetching: true,
+      mapDetails: {},
       mapId: null,
-      nodeId: null,
       maps: [],
       mapsFiltered: [],
-      mapDetails: {},
-      isButtonsDisabled: false,
-      isMapsFetching: true,
-      isMapInfoFetched: false,
+      nodeId: null,
       sessionId: null,
-      debug,
     };
+
+    log.debug(`${this.constructor["name"]} ${JSON.stringify(this.state)}`);
 
     this.listWithSearchRef = React.createRef();
     this.setPageTitle();
@@ -78,6 +86,18 @@ class Home extends PureComponent {
     log.debug(`map clicked. url ${url}`);
 
     window.location.href = url;
+  };
+
+  handleImpersonateUserClick = async () => {
+    this.setState({
+      impersonateUserOpen: true,
+    });
+  };
+
+  impersonateUserHandleClose = () => {
+    this.setState({
+      impersonateUserOpen: false,
+    });
   };
 
   handleMapInfoClick = async (map) => {
@@ -198,16 +218,19 @@ class Home extends PureComponent {
 
   render() {
     const {
+      impersonateUserOpen,
+      isButtonsDisabled,
+      isMapInfoFetched,
+      isMapsFetching,
+      mapDetails,
+      mapInfoOpen,
       maps,
       mapsFiltered,
-      isMapsFetching,
-      isButtonsDisabled,
-      mapDetails,
-      isMapInfoFetched,
-      mapInfoOpen,
     } = this.state;
 
-    var role = this.props.authActions.getRole();
+    log.debug(`${this.constructor["name"]} render`);
+
+    var isSuperUser = this.props.authActions.isSuperUser();
 
     return (
       <>
@@ -235,11 +258,18 @@ class Home extends PureComponent {
               &nbsp;maps.
             </Grid>
           </Grid>
-          {role === "olab:superuser" && <Import props={this.props} />}
+          {isSuperUser && <Import props={this.props} />}
           {isMapInfoFetched && mapDetails && mapDetails.id !== null && (
-            <MapDetail
+            <MapDetailDlg
               open={mapInfoOpen}
               onClose={this.mapInfoHandleClose}
+              data={mapDetails}
+            />
+          )}
+          {impersonateUserOpen && (
+            <ImpersonateDlg
+              open={impersonateUserOpen}
+              onClose={this.impersonateUserHandleClose}
               data={mapDetails}
             />
           )}

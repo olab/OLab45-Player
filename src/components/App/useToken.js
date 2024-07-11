@@ -17,8 +17,17 @@ class useToken {
       logout: this.logout,
       getUserName: this.getUserName,
       setUserName: this.setUserName,
+      isSuperUser: this.isSuperUser,
     };
   }
+
+  isSuperUser = () => {
+    const role = this.getRole();
+    if (!role) {
+      return false;
+    }
+    return role.includes("olab:superuser");
+  };
 
   getRole = () => {
     const { role } = playerState.GetSessionInfo();
