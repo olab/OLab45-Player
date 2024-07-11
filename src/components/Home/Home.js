@@ -12,7 +12,6 @@ import log from "loglevel";
 import styles from "./styles";
 import ListWithSearch from "../ListWithSearch/ListWithSearch";
 import MapDetailDlg from "./MapDetail/MapDetail";
-import ImpersonateDlg from "./Impersonate/Impersonate";
 import styled from "styled-components";
 import { PAGE_TITLES } from "../config";
 import filterByName from "../../helpers/filterByName";
@@ -39,15 +38,12 @@ class Home extends PureComponent {
     this.state = {
       debug,
       error: null,
-      impersonateUserOpen:
-        this.props.impersonateUserOpen == null
-          ? false
-          : this.props.impersonateUserOpen,
       isButtonsDisabled: false,
       isMapInfoFetched: false,
       isMapsFetching: true,
       mapDetails: {},
       mapId: null,
+      mapInfoDlgOpen: false,
       maps: [],
       mapsFiltered: [],
       nodeId: null,
@@ -77,9 +73,9 @@ class Home extends PureComponent {
     }));
   };
 
-  handleMapItemClick = (scopeLevel) => {};
+  onItemClicked = (scopeLevel) => {};
 
-  handleMapPlayClick = (map, nodeId) => {
+  onMapPlayClicked = (map, nodeId) => {
     this.setState({ mapId: map.id, nodeId: nodeId });
 
     const url = `${config.APP_BASEPATH}/${map.id}/${nodeId}`;
@@ -88,32 +84,24 @@ class Home extends PureComponent {
     window.location.href = url;
   };
 
-  handleImpersonateUserClick = async () => {
-    this.setState({
-      impersonateUserOpen: true,
-    });
-  };
+  onMapInfoClicked = async (map) => {
+    log.debug(`${this.constructor["name"]} onMapInfoClicked`);
 
-  impersonateUserHandleClose = () => {
-    this.setState({
-      impersonateUserOpen: false,
-    });
-  };
-
-  handleMapInfoClick = async (map) => {
     this.setState({ isMapInfoFetched: false });
     const { data } = await getMap(this.props, map.id);
 
     this.setState({
-      mapInfoOpen: true,
+      mapInfoDlgOpen: true,
       isMapInfoFetched: true,
       mapDetails: data,
     });
   };
 
-  mapInfoHandleClose = () => {
+  onMapInfoClosed = () => {
+    log.debug(`${this.constructor["name"]} onMapInfoClosed`);
+
     this.setState({
-      mapInfoOpen: false,
+      mapInfoDlgOpen: false,
     });
   };
 
@@ -131,7 +119,7 @@ class Home extends PureComponent {
     this.setState({ mapsFiltered });
   };
 
-  clearSearchInput = () => {
+  onSearchClearClicked = () => {
     const { maps: mapsFiltered } = this.state;
     this.setState({ mapsFiltered });
   };
@@ -186,7 +174,7 @@ class Home extends PureComponent {
               <Button>
                 <MapInfoIcon
                   onClick={() => {
-                    this.handleMapInfoClick(scopedObject);
+                    this.onMapInfoClicked(scopedObject);
                   }}
                 />
               </Button>
@@ -195,7 +183,7 @@ class Home extends PureComponent {
               <Button>
                 <MapPlayIcon
                   onClick={() => {
-                    this.handleMapPlayClick(scopedObject, 0);
+                    this.onMapPlayClicked(scopedObject, 0);
                   }}
                 />
               </Button>
@@ -218,12 +206,11 @@ class Home extends PureComponent {
 
   render() {
     const {
-      impersonateUserOpen,
       isButtonsDisabled,
       isMapInfoFetched,
       isMapsFetching,
       mapDetails,
-      mapInfoOpen,
+      mapInfoDlgOpen,
       maps,
       mapsFiltered,
     } = this.state;
@@ -245,8 +232,8 @@ class Home extends PureComponent {
                 isItemsFetching={isMapsFetching}
                 label="Search for map by keyword or index"
                 list={mapsFiltered}
-                onClear={this.clearSearchInput}
-                onItemClick={this.handleMapItemClick}
+                onClear={this.onSearchClearClicked}
+                onItemClick={this.onItemClicked}
                 onSearch={this.handleItemsSearch}
                 isWithSpinner={this.isMapsFetching}
               />
@@ -261,15 +248,8 @@ class Home extends PureComponent {
           {isSuperUser && <Import props={this.props} />}
           {isMapInfoFetched && mapDetails && mapDetails.id !== null && (
             <MapDetailDlg
-              open={mapInfoOpen}
-              onClose={this.mapInfoHandleClose}
-              data={mapDetails}
-            />
-          )}
-          {impersonateUserOpen && (
-            <ImpersonateDlg
-              open={impersonateUserOpen}
-              onClose={this.impersonateUserHandleClose}
+              open={mapInfoDlgOpen}
+              close={this.onMapInfoClosed}
               data={mapDetails}
             />
           )}

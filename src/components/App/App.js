@@ -25,6 +25,8 @@ class App extends PureComponent {
   constructor(props) {
     super(props);
 
+    this.homeRef = React.createRef();
+
     // check for any debug query string overrides
     this.processDebugQueryString();
 
@@ -71,7 +73,6 @@ class App extends PureComponent {
     };
 
     this.setCredentials = this.setCredentials.bind(this);
-    this.onImpersonateClicked = this.onImpersonateClicked.bind(this);
   }
 
   processDebugQueryString() {
@@ -167,12 +168,6 @@ class App extends PureComponent {
     this.evaluatePlayType();
   }
 
-  onImpersonateClicked() {
-    this.setState({
-      impersonateUserOpen: true,
-    });
-  }
-
   render() {
     let {
       isMounted,
@@ -250,7 +245,7 @@ class App extends PureComponent {
             version={this.reactVersion}
             authActions={authActions}
             externalPlay={externalPlay}
-            onImpersonateClicked={this.onImpersonateClicked}
+            setCredentials={this.setCredentials}
           />
           <Routes>
             <Route
@@ -259,12 +254,9 @@ class App extends PureComponent {
                 <Home
                   authActions={authActions}
                   impersonateUserOpen={impersonateUserOpen}
+                  ref={this.homeRef}
                 />
               }
-            />
-            <Route
-              path={`${config.APP_BASEPATH}/home`}
-              element={<Home authActions={authActions} />}
             />
             <Route
               path={`${config.APP_BASEPATH}/:mapId/sessions`}

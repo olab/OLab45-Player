@@ -95,10 +95,9 @@ async function impersonateUserAsync(credentials) {
     UserName: credentials.username,
   };
   let url = `${config.API_URL}/auth/login`;
-  let token = props.authActions.getToken();
 
   return await internetJsonFetch("POST", url, payload, {
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${credentials.token}`,
   });
 }
 
@@ -393,6 +392,7 @@ export {
   getNodeScopedObjects,
   getServerScopedObjects,
   getSessionReport,
+  impersonateUserAsync,
   importer,
   postQuestionValue,
   getMapSessions,

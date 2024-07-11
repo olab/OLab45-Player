@@ -49,3 +49,7 @@ export const FakeProgress = styled.div`
   height: 4px;
   width: 100%;
 `;
+
+export const styles = styled.div`
+  width: 100%;
+`;

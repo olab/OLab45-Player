@@ -13,9 +13,7 @@ import {
   Snackbar,
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
-import { Log, LogInfo, LogError } from "../../utils/Logger";
 import styles from "./styles";
-import { config } from "../../config";
 import { ReactComponent as LogoIcon } from "../../shared/assets/icons/olab4_logo.svg";
 import { loginUserAsync } from "../../services/api";
 var constants = require("../../services/constants");

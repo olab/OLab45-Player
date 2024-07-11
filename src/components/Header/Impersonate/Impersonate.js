@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { withStyles } from "@material-ui/core/styles";
-import styles from "../styles";
+import { styles } from "../styles";
 
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
@@ -18,18 +18,24 @@ class ImpersonateDlg extends PureComponent {
 
     this.state = {
       open: this.props.open,
-      data: this.props.data,
+      data: { userName: "olab4s", title: "Impersonate User" },
     };
   }
 
   handleClose = () => {
     this.setState({ open: false });
+    this.props.close();
   };
 
+  open = () => {
+    this.setState({ open: true });
+  };
   render() {
     const { open, data } = this.state;
 
-    log.debug(`${this.constructor["name"]} render`);
+    log.debug(
+      `${this.constructor["name"]} render ${JSON.stringify(this.state)}`
+    );
 
     return (
       <div>
@@ -39,7 +45,7 @@ class ImpersonateDlg extends PureComponent {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">{data.name}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">{data.title}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
               <b>User to Impersonate:&nbsp;</b>

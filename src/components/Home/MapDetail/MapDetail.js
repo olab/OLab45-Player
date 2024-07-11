@@ -25,12 +25,15 @@ class MapDetailDlg extends PureComponent {
 
   handleClose = () => {
     this.setState({ open: false });
+    this.props.close();
   };
 
   render() {
     const { open, data } = this.state;
 
-    log.debug(`${this.constructor["name"]} render`);
+    log.debug(
+      `${this.constructor["name"]} render ${JSON.stringify(this.state)}`
+    );
 
     return (
       <div>
