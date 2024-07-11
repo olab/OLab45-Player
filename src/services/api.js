@@ -205,7 +205,7 @@ async function postQuestionValue(state) {
     node,
     authActions,
     dynamicObjects,
-    question,
+    olabObject,
     responseId,
     value,
     setInProgress,
@@ -213,10 +213,10 @@ async function postQuestionValue(state) {
   } = state;
 
   let token = authActions.getToken();
-  let url = `${config.API_URL}/response/${question.id}`;
+  let url = `${config.API_URL}/response/${olabObject.id}`;
 
   log.debug(
-    `postQuestionValue(${question.id}, ${responseId}, ${value}, [func]) url: ${url})`
+    `postQuestionValue(${olabObject.id}, ${responseId}, ${value}, [func]) url: ${url})`
   );
 
   // signal to caller that we are starting the work
@@ -227,11 +227,11 @@ async function postQuestionValue(state) {
   let body = {
     mapId: map.id,
     nodeId: node.id,
-    questionId: question.id,
-    responseId: question.responseId,
-    previousResponseId: question.previousResponseId,
-    value: question.valueOverride ?? question.value,
-    previousValue: question.previousValue,
+    questionId: olabObject.id,
+    responseId: olabObject.responseId,
+    previousResponseId: olabObject.previousResponseId,
+    value: olabObject.valueOverride ?? olabObject.value,
+    previousValue: olabObject.previousValue,
     dynamicObjects: dynamicObjects,
   };
 

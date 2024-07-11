@@ -19,23 +19,18 @@ import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 import Spinner from "../../../../shared/assets/loading_med.gif";
 
-import { getQuestion } from "../../WikiTags";
-import { postQuestionValue } from "../../../../services/api";
-const playerState = require("../../../../utils/PlayerState").PlayerState;
+import { getQuestion } from "../../WikiUtils";
+import OlabTag from "../../OlabTag";
 
-class OlabSinglePickQuestion extends React.Component {
+class OlabSinglePickQuestion extends OlabTag {
   constructor(props) {
-    super(props);
-
-    log.debug(`${this.constructor["name"]} ctor`);
-
-    let question = getQuestion(this.props.name, this.props);
-    var responses = this.buildQuestionResponses(question, this.props.id);
-    const debug = playerState.GetDebug();
+    let olabObject = getQuestion(props.name, props);
+    super(props, olabObject);
+    var responses = this.buildQuestionResponses(olabObject, this.props.id);
 
     this.state = {
       debug,
-      question,
+      olabObject,
       ...props.props,
       responses,
     };
@@ -256,28 +251,9 @@ class OlabSinglePickQuestion extends React.Component {
         </div>
       );
     } catch (error) {
-      return (
-        <>
-          <b>
-            [[{id}]] error "{error.message}"
-          </b>
-        </>
-      );
+      return this.errorJsx(id, error);
     }
   }
-
-  onSubmitResponse = async (newState) => {
-    // send question response to server and get the
-    // new dynamic objects state
-    var { data } = await postQuestionValue(newState);
-
-    // bubble up the dynamic object to player since the
-    // dynamic objects may be shared to other components
-    if (data != null && this.props.props.onUpdateDynamicObjects) {
-      this.props.props.onUpdateDynamicObjects(data);
-      this.setInProgress(false);
-    }
-  };
 }
 
 export default withStyles(styles)(OlabSinglePickQuestion);

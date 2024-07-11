@@ -1,6 +1,6 @@
 // @flow
 import React from "react";
-import { getScript } from "../WikiTags";
+import { getScript } from "../WikiUtils";
 import { OLabClientApi } from "./OLabClientApi";
 const playerState = require("../../../utils/PlayerState").PlayerState;
 import log from "loglevel";

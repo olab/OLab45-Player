@@ -25,7 +25,7 @@ import {
   OlabSliderQuestion,
   OlabAttendeeTag,
   OlabModeratorTag,
-} from "../WikiTags/WikiTags";
+} from "../WikiTags/WikiUtils";
 
 import { withParams } from "../ComponentWrapper";
 import { config } from "../../config";

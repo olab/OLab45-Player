@@ -3,55 +3,39 @@ import React from "react";
 import parse from "html-react-parser";
 import log from "loglevel";
 
-import { getConstant } from "../WikiTags";
-const playerState = require("../../../utils/PlayerState").PlayerState;
+import { getConstant } from "../WikiUtils";
+import OlabTag from "../OlabTag";
 
-class OlabConstantTag extends React.Component {
+class OlabConstantTag extends OlabTag {
   constructor(props) {
-    super(props);
-
-    log.debug(`${this.constructor["name"]} ctor`);
-
-    let constant = getConstant(this.props.name, this.props);
-    const debug = playerState.GetDebug();
-
-    this.state = {
-      constant,
-      debug,
-      ...props.props,
-    };
+    let olabObject = getConstant(props.name, props);
+    super(props, olabObject);
   }
 
   render() {
-    const { debug, constant } = this.state;
+    const { debug, olabObject } = this.state;
     const { id, name } = this.props;
 
-    log.debug(`${this.constructor["name"]} render`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
-      if (constant != null) {
-        if (debug.disableWikiRendering) {
-          return (
-            <>
-              <b>
-                [[{id}]] ({constant.id}) "{parse(constant.value)}"
-              </b>
-            </>
-          );
-        }
-
-        return <span id={name}>{parse(constant.value)}</span>;
+      if (olabObject == null) {
+        throw new Error(`'${name}' not found`);
       }
 
-      throw new Error(`'${name}' not found`);
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({olabObject.id}) "{parse(olabObject.value)}"
+            </b>
+          </>
+        );
+      }
+
+      return <span id={name}>{parse(olabObject.value)}</span>;
     } catch (error) {
-      return (
-        <>
-          <b>
-            [[{id}]] error "{error.message}"
-          </b>
-        </>
-      );
+      return this.errorJsx(id, error);
     }
   }
 }

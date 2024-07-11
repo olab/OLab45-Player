@@ -2,7 +2,7 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 
-import { getQuestion } from "../WikiTags";
+import { getQuestion } from "../WikiUtils";
 import { postQuestionValue } from "../../../services/api";
 import styles from "../styles.module.css";
 import OlabMultilineTextQuestion from "./MultilineText/MultilineText";

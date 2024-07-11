@@ -6,15 +6,11 @@ import log from "loglevel";
 const playerState = require("../../../utils/PlayerState").PlayerState;
 import { config } from "../../../config";
 
-class OlabLinksTag extends React.Component {
+import OlabTag from "../OlabTag";
+
+class OlabLinksTag extends OlabTag {
   constructor(props) {
     super(props);
-
-    log.debug(`${this.constructor["name"]} ctor`);
-
-    const debug = playerState.GetDebug();
-
-    this.state = { debug };
   }
 
   onNavigateToNode = (mapId, nodeId, urlParam) => {

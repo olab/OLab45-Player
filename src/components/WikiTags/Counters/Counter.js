@@ -1,5 +1,8 @@
 // @flow
 import React from "react";
+import parse from "html-react-parser";
+import log from "loglevel";
+
 import {
   Box,
   Paper,
@@ -10,42 +13,22 @@ import {
   TableCell,
   TableBody,
 } from "@material-ui/core";
-import log from "loglevel";
-import { getCounters } from "../WikiTags";
-import { config } from "../../../config";
 
-const playerState = require("../../../utils/PlayerState").PlayerState;
+import { getCounters } from "../WikiUtils";
+import OlabTag from "../OlabTag";
 
-class OlabCountersTag extends React.Component {
+class OlabCountersTag extends OlabTag {
   constructor(props) {
-    super(props);
-
-    log.debug(`${this.constructor["name"]} ctor`);
-
-    const counters = getCounters(
-      this.props.props.node.id,
-      this.props.props.dynamicObjects.map.counters,
-      this.props.props.scopedObjects.map.counteractions
+    const olabObject = getCounters(
+      props.props.node.id,
+      props.props.dynamicObjects.map.counters,
+      props.props.scopedObjects.map.counteractions
     );
-    const debug = playerState.GetDebug();
-
-    this.state = {
-      id: this.props.props.id,
-      name: this.props.props.name,
-      question: this.props.props.question,
-      authActions: this.props.props.authActions,
-      showProgressSpinner: false,
-      disabled: false,
-      map: this.props.props.map,
-      node: this.props.props.node,
-      counterActions: this.props.props.scopedObjects.map.counteractions,
-      debug,
-      counters,
-    };
+    super(props, olabObject);
   }
 
   render() {
-    const { counters, debug } = this.state;
+    const { olabObject, debug } = this.state;
 
     log.debug(`${this.constructor["name"]} render`);
 
@@ -55,7 +38,7 @@ class OlabCountersTag extends React.Component {
           <>
             <b>[[COUNTERS]]</b>
             <Box width="300px;">
-              {counters.map((counter) => (
+              {olabObject.map((counter) => (
                 <p>
                   &nbsp;
                   <b>
@@ -68,7 +51,7 @@ class OlabCountersTag extends React.Component {
         );
       }
 
-      if (counters.length > 0) {
+      if (olabObject.length > 0) {
         return (
           <TableContainer component={Paper}>
             <Table aria-label="simple table">
@@ -81,7 +64,7 @@ class OlabCountersTag extends React.Component {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {counters.map((row) => (
+                {olabObject.map((row) => (
                   <TableRow key={row.name}>
                     <TableCell component="th" scope="row">
                       {row.scopeLevel} ({row.parentId})
@@ -101,11 +84,7 @@ class OlabCountersTag extends React.Component {
 
       return <></>;
     } catch (error) {
-      return (
-        <>
-          <b>[[COUNTERS]] "{error.message}"</b>
-        </>
-      );
+      return this.errorJsx("COUNTERS", error);
     }
   }
 }

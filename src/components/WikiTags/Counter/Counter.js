@@ -2,63 +2,45 @@
 import React from "react";
 import parse from "html-react-parser";
 import log from "loglevel";
-import { getCounter } from "../WikiTags";
-const playerState = require("../../../utils/PlayerState").PlayerState;
-import { config } from "../../../config";
 
-class OlabCounterTag extends React.Component {
+import { getCounter } from "../WikiUtils";
+import OlabTag from "../OlabTag";
+
+class OlabCounterTag extends OlabTag {
   constructor(props) {
-    super(props);
-
-    log.debug(`${this.constructor["name"]} ctor`);
-
-    let counter = getCounter(this.props.name, this.props.props.dynamicObjects);
-    const debug = playerState.GetDebug();
-
-    this.state = {
-      counter,
-      debug,
-      ...props.props,
-    };
+    let olabObject = getCounter(props.name, props.props.dynamicObjects);
+    super(props, olabObject);
   }
 
   render() {
-    const { debug, counter } = this.state;
+    const { debug, olabObject } = this.state;
     const { id, name } = this.props;
 
     log.debug(`${this.constructor["name"]} render`);
 
     try {
-      if (counter != null) {
-        if (debug.disableWikiRendering) {
-          return (
-            <>
-              <b>
-                [[{id}]] ({counter.id}) "{counter.value}"
-              </b>
-            </>
-          );
-        }
-
-        if (counter.value == null) {
-          counter.value = "";
-        }
-
-        return <>{parse(counter.value)}</>;
+      if (olabObject == null) {
+        throw new Error(`'${name}' not found`);
       }
 
-      throw new Error(`'${name}' not found`);
-    } catch (error) {
-      return (
-        <>
-          <b>
-            [[{id}]] error "{error.message}"
-          </b>
-        </>
-      );
-    }
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({olabObject.id}) "{olabObject.value}"
+            </b>
+          </>
+        );
+      }
 
-    return "";
+      if (olabObject.value == null) {
+        olabObject.value = "";
+      }
+
+      return <>{parse(olabObject.value)}</>;
+    } catch (error) {
+      return this.errorJsx(id, error);
+    }
   }
 }
 

@@ -1,6 +1,5 @@
 // @flow
-import React, { Component } from "react";
-import ReactDOM from "react-dom";
+import React from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { FormLabel } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
@@ -10,39 +9,21 @@ import JsxParser from "react-jsx-parser";
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
-import { getQuestion } from "../../WikiTags";
-import { postQuestionValue } from "../../../../services/api";
-const playerState = require("../../../../utils/PlayerState").PlayerState;
+import { getQuestion } from "../../WikiUtils";
+import OlabTag from "../../OlabTag";
 
-class OlabDragAndDropQuestion extends React.Component {
+class OlabDragAndDropQuestion extends OlabTag {
   constructor(props) {
-    super(props);
-
-    log.debug(`${this.constructor["name"]} ctor`);
-
-    let question = getQuestion(this.props.name, this.props);
-    const debug = playerState.GetDebug();
-
-    this.state = {
-      debug,
-      question,
-      ...props.props,
-    };
+    let olabObject = getQuestion(props.name, props);
+    super(props, olabObject);
 
     this.grid = 8;
 
-    // Binding this keyword
-    this.setInProgress = this.setInProgress.bind(this);
     this.onDragEnd = this.onDragEnd.bind(this);
   }
 
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
-  }
-
   setValue = (responses) => {
-    const question = this.state.question;
+    const { debug, olabObject } = this.state;
     log.debug(`responses`);
 
     let values = [];
@@ -52,27 +33,26 @@ class OlabDragAndDropQuestion extends React.Component {
       values.push(iterator.id);
     }
 
-    if (typeof question.previousValue == "undefined") {
-      question.previousValue = null;
+    if (typeof olabObject.previousValue == "undefined") {
+      olabObject.previousValue = null;
     } else {
-      question.previousValue = question.value;
+      olabObject.previousValue = olabObject.value;
     }
 
-    question.value = values.join(",");
+    olabObject.value = values.join(",");
 
     log.debug(
-      `OlabSinglePickQuestion set question '${question.id}' value = '${question.value}'.`
+      `OlabSinglePickQuestion set question '${olabObject.id}' value = '${olabObject.value}'.`
     );
 
-    question.responses = responses;
+    olabObject.responses = responses;
 
-    this.setState({ question });
+    this.setState({ olabObject });
     this.transmitResponse();
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -111,7 +91,7 @@ class OlabDragAndDropQuestion extends React.Component {
   getListStyle = (isDraggingOver) => ({
     background: "lightgrey",
     padding: this.grid,
-    width: this.state.question.width ? this.state.question.width : 450,
+    width: this.state.olabObject.width ? this.state.olabObject.width : 450,
   });
 
   onDragEnd(result) {
@@ -123,7 +103,7 @@ class OlabDragAndDropQuestion extends React.Component {
     }
 
     const responses = this.reorder(
-      this.state.question.responses,
+      this.state.olabObject.responses,
       result.source.index,
       result.destination.index
     );
@@ -134,7 +114,7 @@ class OlabDragAndDropQuestion extends React.Component {
   // Normally you would want to split things out into separate components.
   // But in this example everything is just done in one place for simplicity
   render() {
-    const { debug, question } = this.state;
+    const { debug, olabObject } = this.state;
     const { id, name } = this.props;
 
     log.debug(`${this.constructor["name"]} render`);
@@ -144,7 +124,7 @@ class OlabDragAndDropQuestion extends React.Component {
         return (
           <>
             <b>
-              [[{id}]] ({question.id})
+              [[{id}]] ({olabObject.id})
             </b>
           </>
         );
@@ -156,7 +136,7 @@ class OlabDragAndDropQuestion extends React.Component {
           id={`${id}`}
         >
           <FormLabel id={`${id}::stem`} component="legend">
-            <JsxParser jsx={question.stem} />
+            <JsxParser jsx={olabObject.stem} />
           </FormLabel>
           <DragDropContext onDragEnd={this.onDragEnd}>
             <Droppable droppableId="droppable">
@@ -166,7 +146,7 @@ class OlabDragAndDropQuestion extends React.Component {
                   ref={provided.innerRef}
                   style={this.getListStyle()}
                 >
-                  {question.responses.map((item, index) => (
+                  {olabObject.responses.map((item, index) => (
                     <Draggable
                       id={`${id}::QR:${item.id}`}
                       key={item.id}
@@ -196,28 +176,9 @@ class OlabDragAndDropQuestion extends React.Component {
         </div>
       );
     } catch (error) {
-      return (
-        <>
-          <b>
-            [[{id}]] error "{error.message}"
-          </b>
-        </>
-      );
+      return this.errorJsx(id, error);
     }
   }
-
-  onSubmitResponse = async (newState) => {
-    // send question response to server and get the
-    // new dynamic objects state
-    var { data } = await postQuestionValue(newState);
-
-    // bubble up the dynamic object to player since the
-    // dynamic objects may be shared to other components
-    if (data != null && this.props.props.onUpdateDynamicObjects) {
-      this.props.props.onUpdateDynamicObjects(data);
-      this.setInProgress(false);
-    }
-  };
 }
 
 export default withStyles(styles)(OlabDragAndDropQuestion);
