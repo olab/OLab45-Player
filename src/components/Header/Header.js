@@ -22,6 +22,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import log from "loglevel";
 import { impersonateUserAsync } from "../../services/api";
+var constants = require("../../services/constants");
 
 const Header = ({
   version,
@@ -31,6 +32,12 @@ const Header = ({
   setCredentials,
 }) => {
   const [userName, setUserName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [showError, toggleShowError] = React.useReducer(
+    (state) => !state,
+    false
+  );
 
   const [inProgress, toggleInProgress] = React.useReducer(
     (state) => !state,
@@ -59,10 +66,15 @@ const Header = ({
 
   const onUserOkClicked = async (event) => {
     log.debug(`Header onUserOkClicked`);
+
     toggleInProgress();
+    if (showError) toggleShowError();
 
     try {
       const token = authActions.getToken();
+
+      // clean up any spaces
+      setUserName(userName.replace(/\s/g, ""));
 
       const data = await impersonateUserAsync({
         username: userName,
@@ -74,16 +86,21 @@ const Header = ({
       }
 
       if (data.error_code == 401) {
-        log.error("an error occured");
+        throw new Error("Unauthorized/Invalid User");
       } else {
         if (data.data.authInfo) {
-          setCredentials(data.data, username, constants.TOKEN_TYPE_NATIVE);
+          setCredentials(data.data, userName, constants.TOKEN_TYPE_NATIVE);
         } else {
           throw JSON.stringify(data, null, 2);
         }
       }
+
+      setUserName("");
+      toggleImpersonateDialogOpen();
     } catch (error) {
       log.error(`error: ${JSON.stringify(error, null, 2)})`);
+      setErrorMessage(error.message);
+      toggleShowError();
     }
 
     toggleInProgress();
@@ -159,11 +176,19 @@ const Header = ({
             </DialogContentText>
           </DialogContent>
         )}
+
+        {showError && (
+          <center>
+            <b>{errorMessage}</b>
+          </center>
+        )}
+
         {inProgress && (
           <center>
             <CircularProgress color="inherit" />
           </center>
         )}
+
         <DialogActions>
           <Button onClick={() => onUserOkClicked()} color="secondary">
             OK
