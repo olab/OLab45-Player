@@ -9,11 +9,14 @@ import siteStyles from "../../site.module.css";
 
 import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
 
 class OlabSinglelineTextQuestion extends OlabTag {
   constructor(props) {
     let olabObject = getQuestion(props.name, props);
     super(props, olabObject);
+
+    const debug = playerState.GetDebug();
 
     this.state = {
       showProgressSpinner: false,
@@ -31,22 +34,22 @@ class OlabSinglelineTextQuestion extends OlabTag {
 
   componentWillUnmount() {
     log.debug(
-      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+      `${this.constructor["name"]} '${this.state.olabObject.name}' componentWillUnmount`
     );
   }
 
   setValue = (event, setInProgress) => {
-    const question = this.state.question;
-    const value = question.value;
+    const olabObject = this.state.olabObject;
+    const value = olabObject.value;
     let disabled = this.state.disabled;
 
     // test if only one respond allowed.  Disable control
     // if this is the case
-    if (question.numTries === -1 || question.numTries === 1) {
+    if (olabObject.numTries === -1 || olabObject.numTries === 1) {
       this.setState((state) => {
         disabled = true;
         log.debug(
-          `OlabSinglelineTextQuestion disabled question '${question.id}' value = '${value}'.`
+          `${this.constructor["name"]} disabled question '${olabObject.id}' value = '${value}'.`
         );
         return { disabled };
       });
@@ -85,17 +88,17 @@ class OlabSinglelineTextQuestion extends OlabTag {
 
   handleChange = (event) => {
     const value = event.target.value;
-    const question = this.state.question;
+    const olabObject = this.state.olabObject;
 
-    // set the question value in trackable state
+    // set the olabObject value in trackable state
     this.setState((state) => {
-      question.value = value;
-      return { question };
+      olabObject.value = value;
+      return { olabObject };
     });
   };
 
   render() {
-    const { debug, question } = this.state;
+    const { debug, olabObject } = this.state;
     const { id, name } = this.props;
 
     log.debug(`${this.constructor["name"]} render`);
@@ -105,7 +108,7 @@ class OlabSinglelineTextQuestion extends OlabTag {
         return (
           <>
             <b>
-              [[{id}]] ({question.id})
+              [[{id}]] ({olabObject.id})
             </b>
           </>
         );
@@ -121,7 +124,7 @@ class OlabSinglelineTextQuestion extends OlabTag {
               id={`${id}::stem`}
               className={`${styles["qusingleline-stem"]}`}
             >
-              <JsxParser jsx={question.stem} />
+              <JsxParser jsx={olabObject.stem} />
             </div>
 
             <div className={`${styles["qusingleline-value"]}`}>
@@ -131,8 +134,8 @@ class OlabSinglelineTextQuestion extends OlabTag {
                 <input
                   className={`${styles["qusingleline-value"]}`}
                   id={`${id}::value`}
-                  value={question.value}
-                  placeholder={`${question.prompt}`}
+                  value={olabObject.value}
+                  placeholder={`${olabObject.prompt}`}
                   onChange={this.handleChange}
                 ></input>
                 <input type="submit" hidden />

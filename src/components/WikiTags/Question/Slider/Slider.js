@@ -10,11 +10,14 @@ import siteStyles from "../../site.module.css";
 
 import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
 
 class OlabSliderQuestion extends OlabTag {
   constructor(props) {
     let olabObject = getQuestion(props.name, props);
     super(props, olabObject);
+
+    const debug = playerState.GetDebug();
 
     this.state = {
       debug,
@@ -24,11 +27,11 @@ class OlabSliderQuestion extends OlabTag {
 
     // post initial value to server if initializine
     // question value
-    if (typeof this.state.question.previousValue == "undefined") {
+    if (typeof this.state.olabObject.previousValue == "undefined") {
       // eslint-disable-next-line
-      const settings = JSON.parse(this.state.question.settings);
+      const settings = JSON.parse(this.state.olabObject.settings);
       if (typeof settings.defaultValue != "undefined") {
-        this.state.question.value = Number(settings.defaultValue);
+        this.state.olabObject.value = Number(settings.defaultValue);
       }
     }
 
@@ -40,22 +43,22 @@ class OlabSliderQuestion extends OlabTag {
 
   componentWillUnmount() {
     log.debug(
-      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+      `${this.constructor["name"]} '${this.state.olabObject.name}' componentWillUnmount`
     );
   }
 
   setValue = (event, value) => {
-    const question = this.state.question;
+    const olabObject = this.state.olabObject;
     log.debug(
-      `${this.constructor["name"]}  set question '${question.id}' value = '${value}'`
+      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'`
     );
 
     this.setState(
       (state) => {
-        question.previousValue = question.value;
-        question.value = value;
+        olabObject.previousValue = olabObject.value;
+        olabObject.value = value;
 
-        return { question };
+        return { olabObject };
       },
       () => this.transmitResponse()
     );
@@ -83,21 +86,21 @@ class OlabSliderQuestion extends OlabTag {
   }
 
   render() {
-    const { debug, question } = this.state;
+    const { debug, olabObject } = this.state;
     const { id, name } = this.props;
 
     log.debug(`${this.constructor["name"]}  render '${name}'`);
 
     try {
       // eslint-disable-next-line
-      const settings = JSON.parse(question.settings);
-      question.width = 200; // use fixed width - @see https://olabrats.atlassian.net/browse/OD-28
+      const settings = JSON.parse(olabObject.settings);
+      olabObject.width = 200; // use fixed width - @see https://olabrats.atlassian.net/browse/OD-28
 
       if (debug.disableWikiRendering) {
         return (
           <>
             <b>
-              [[{id}]] ({question.id})
+              [[{id}]] ({olabObject.id})
             </b>
           </>
         );
@@ -106,7 +109,7 @@ class OlabSliderQuestion extends OlabTag {
       return (
         <div className={`${styles["quslider"]} ${siteStyles[id]}`} id={`${id}`}>
           <Box
-            width={question.width}
+            width={olabObject.width}
             className={
               "hor" != settings.orientation
                 ? styles["quslider_box_vertical"]
@@ -114,16 +117,16 @@ class OlabSliderQuestion extends OlabTag {
             }
           >
             <Typography id={`${id}/stem`} component="span" gutterBottom>
-              <JsxParser jsx={question.stem} />
+              <JsxParser jsx={olabObject.stem} />
             </Typography>
             <input
               readOnly
               className={`${styles["quslider-value"]}`}
               id={`${id}/value`}
-              value={question.value}
+              value={olabObject.value}
             ></input>
             <Slider
-              defaultValue={question.value}
+              defaultValue={olabObject.value}
               onChangeCommitted={(event, value) => this.setValue(event, value)}
               step={Number(settings.stepValue)}
               orientation={

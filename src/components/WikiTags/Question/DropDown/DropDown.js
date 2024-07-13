@@ -36,7 +36,7 @@ class OlabDropDownQuestion extends OlabTag {
       log.debug(
         `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'.`
       );
-      return { question: olabObject };
+      return { olabObject };
     });
 
     let response = null;
@@ -88,10 +88,10 @@ class OlabDropDownQuestion extends OlabTag {
     this.onSubmitResponse(responseState);
   }
 
-  buildQuestionResponses(question, id) {
+  buildQuestionResponses(olabObject, id) {
     let responses = [];
     let key = 0;
-    for (const response of question.responses) {
+    for (const response of olabObject.responses) {
       var item = (
         <MenuItem
           id={`${id}::QR:${response.id}`}
@@ -108,7 +108,7 @@ class OlabDropDownQuestion extends OlabTag {
   }
 
   render() {
-    const { debug, question } = this.state;
+    const { debug, olabObject } = this.state;
     const { id, name } = this.props;
 
     log.debug(`${this.constructor["name"]} render`);
@@ -129,31 +129,31 @@ class OlabDropDownQuestion extends OlabTag {
         return (
           <>
             <b>
-              [[{id}]] ({question.id})
+              [[{id}]] ({olabObject.id})
             </b>
           </>
         );
       }
 
-      var responses = this.buildQuestionResponses(question, id);
-      var disabled = question.disabled == 0 ? false : true;
+      var responses = this.buildQuestionResponses(olabObject, id);
+      var disabled = olabObject.disabled == 0 ? false : true;
 
       return (
         <div
           className={`${styles["quddropdown"]} ${siteStyles[id]}`}
           id={`${id}`}
         >
-          <Box width={question.width}>
+          <Box width={olabObject.width}>
             <FormControl fullWidth disabled={disabled}>
               <div
                 id={`${id}::stem`}
                 className={`${styles["qumultiline-stem"]}`}
               >
-                <JsxParser jsx={question.stem} />
+                <JsxParser jsx={olabObject.stem} />
               </div>
               <Select
                 id={`${id}::value`}
-                value={question.value}
+                value={olabObject.value}
                 onChange={(event) =>
                   this.setValue(event, this.setInProgress, this.setIsDisabled)
                 }

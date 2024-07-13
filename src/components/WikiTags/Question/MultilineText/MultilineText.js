@@ -11,11 +11,14 @@ import Spinner from "../../../../shared/assets/loading_med.gif";
 
 import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
 
 class OlabMultilineTextQuestion extends OlabTag {
   constructor(props) {
     let olabObject = getQuestion(props.name, props);
     super(props, olabObject);
+
+    const debug = playerState.GetDebug();
 
     this.state = {
       showProgressSpinner: false,
@@ -34,7 +37,7 @@ class OlabMultilineTextQuestion extends OlabTag {
 
   componentWillUnmount() {
     log.debug(
-      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+      `${this.constructor["name"]} '${this.state.olabObject.name}' componentWillUnmount`
     );
   }
 
@@ -44,16 +47,16 @@ class OlabMultilineTextQuestion extends OlabTag {
   }
 
   onSubmitClicked = (event) => {
-    const question = this.state.question;
-    const value = question.value;
+    const olabObject = this.state.olabObject;
+    const value = olabObject.value;
     let disabled = this.state.disabled;
 
     // test if only one respond allowed.  Disable control
     // if this is the case
-    if (question.numTries === -1 || question.numTries === 1) {
+    if (olabObject.numTries === -1 || olabObject.numTries === 1) {
       this.setState({ disabled: true });
       log.debug(
-        `OlabMultilineTextQuestion disabled question '${question.id}' value = '${value}'.`
+        `${this.constructor["name"]} disabled question '${olabObject.id}' value = '${value}'.`
       );
     }
 
@@ -84,19 +87,19 @@ class OlabMultilineTextQuestion extends OlabTag {
 
   onTextChanged = (event) => {
     const value = event.target.value;
-    const question = this.state.question;
+    const olabObject = this.state.olabObject;
 
-    question.value = value;
+    olabObject.value = value;
 
     // set the question value in trackable state
     this.setState({
-      question: question,
+      olabObject: olabObject,
       contentsChanged: true,
     });
   };
 
   render() {
-    const { debug, question, contentsChanged, disabled } = this.state;
+    const { debug, olabObject, contentsChanged, disabled } = this.state;
     const { id, name } = this.props;
 
     log.debug(`${this.constructor["name"]} render`);
@@ -117,7 +120,7 @@ class OlabMultilineTextQuestion extends OlabTag {
         return (
           <>
             <b>
-              [[{id}]] ({question.id})
+              [[{id}]] ({olabObject.id})
             </b>
           </>
         );
@@ -125,7 +128,7 @@ class OlabMultilineTextQuestion extends OlabTag {
 
       let valueClasses = [];
       valueClasses.push(styles["qumultiline-value"]);
-      if (question.numTries === -1) {
+      if (olabObject.numTries === -1) {
         valueClasses.push(styles["qumultiline-required"]);
       }
 
@@ -135,16 +138,16 @@ class OlabMultilineTextQuestion extends OlabTag {
           id={`${id}`}
         >
           <div id={`${id}::stem`} className={`${styles["qumultiline-stem"]}`}>
-            <JsxParser jsx={question.stem} />
+            <JsxParser jsx={olabObject.stem} />
           </div>
           <div className={`${styles["qumultiline-value"]}`}>
             <textarea
-              rows={`${question.height}`}
-              cols={`${question.width}`}
-              placeholder={`${question.prompt}`}
+              rows={`${olabObject.height}`}
+              cols={`${olabObject.width}`}
+              placeholder={`${olabObject.prompt}`}
               className={`${valueClasses.join(" ")}`}
               id={`${id}::value`}
-              value={question.value}
+              value={olabObject.value}
               disabled={disabled}
               onChange={this.onTextChanged}
               onFocus={this.onFocus}

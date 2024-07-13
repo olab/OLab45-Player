@@ -21,12 +21,15 @@ import Spinner from "../../../../shared/assets/loading_med.gif";
 
 import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
 
 class OlabSinglePickQuestion extends OlabTag {
   constructor(props) {
     let olabObject = getQuestion(props.name, props);
     super(props, olabObject);
+
     var responses = this.buildQuestionResponses(olabObject, this.props.id);
+    const debug = playerState.GetDebug();
 
     this.state = {
       debug,
@@ -43,7 +46,7 @@ class OlabSinglePickQuestion extends OlabTag {
 
   componentWillUnmount() {
     log.debug(
-      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+      `${this.constructor["name"]} '${this.state.olabObject.name}' componentWillUnmount`
     );
   }
 
@@ -59,47 +62,51 @@ class OlabSinglePickQuestion extends OlabTag {
 
   setValue = (event) => {
     const value = Number(event.target.value);
-    let question = this.state.question;
+    let olabObject = this.state.olabObject;
 
     log.debug(
-      `${this.constructor["name"]}  set question '${question.id}' value = '${value}'.`
+      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'.`
     );
 
     let response = null;
 
     // if value corresponds to a response id, match it to a response
-    for (let index = 0; index < this.state.question.responses.length; index++) {
-      response = this.state.question.responses[index];
+    for (
+      let index = 0;
+      index < this.state.olabObject.responses.length;
+      index++
+    ) {
+      response = this.state.olabObject.responses[index];
       if (response.id === value) {
         break;
       }
     }
 
-    if (typeof question.responseId == "undefined")
-      question.previousResponseId = null;
-    else question.previousResponseId = question.responseId;
+    if (typeof olabObject.responseId == "undefined")
+      olabObject.previousResponseId = null;
+    else olabObject.previousResponseId = olabObject.responseId;
 
-    question.responseId = response.id;
-    question.value = question.responseId;
-    question.valueOverride = response.response;
+    olabObject.responseId = response.id;
+    olabObject.value = olabObject.responseId;
+    olabObject.valueOverride = response.response;
 
     log.debug(
-      `${this.constructor["name"]}  set question '${question.id}' value = '${value}'`
+      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'`
     );
 
     // if single try question, disabled it
-    if (question.numTries > 0) {
-      question.disabled = true;
+    if (olabObject.numTries > 0) {
+      olabObject.disabled = true;
     }
 
     // first attempt to answer, so show answer
     // indicators, if called on
-    question.showAnswerIndicators = true;
+    olabObject.showAnswerIndicators = true;
 
     this.setState(
       (state) => {
-        question = question;
-        return { question };
+        olabObject = olabObject;
+        return { olabObject };
       },
       () => this.transmitResponse()
     );
@@ -124,19 +131,19 @@ class OlabSinglePickQuestion extends OlabTag {
     this.onSubmitResponse(responseState);
   }
 
-  buildQuestionResponses(question, id) {
+  buildQuestionResponses(olabObject, id) {
     let responses = [];
     let key = 0;
     let selectedIndex = null;
 
-    if (question.value) {
-      selectedIndex = Number(question.value);
+    if (olabObject.value) {
+      selectedIndex = Number(olabObject.value);
     }
 
-    for (const response of question.responses) {
+    for (const response of olabObject.responses) {
       var item = (
         <div id={`${id}::QR:${response.name}`} key={key++}>
-          {this.buildQuestionResponse(question, id, response, selectedIndex)}
+          {this.buildQuestionResponse(olabObject, id, response, selectedIndex)}
         </div>
       );
       responses.push(item);
@@ -145,7 +152,7 @@ class OlabSinglePickQuestion extends OlabTag {
     return responses;
   }
 
-  buildQuestionResponse(question, id, response, selectedIndex) {
+  buildQuestionResponse(olabObject, id, response, selectedIndex) {
     let choice = (
       <FormControlLabel
         id={`${id}::QR:${response.name}::label`}
@@ -162,12 +169,12 @@ class OlabSinglePickQuestion extends OlabTag {
 
     let correctnessIndicator = <></>;
 
-    if (question.showAnswer) {
+    if (olabObject.showAnswer) {
       // check if response is selected, meaning we display
       // is_correct and feedback.
       if (selectedIndex == response.id) {
         // test for 'correct' answer
-        if (response.isCorrect == 1 && question.showAnswerIndicators) {
+        if (response.isCorrect == 1 && olabObject.showAnswerIndicators) {
           correctnessIndicator = (
             <>
               <CheckIcon style={{ color: "green" }} />
@@ -177,7 +184,7 @@ class OlabSinglePickQuestion extends OlabTag {
         }
 
         // test for 'incorrect' answer
-        if (response.isCorrect == -1 && question.showAnswerIndicators) {
+        if (response.isCorrect == -1 && olabObject.showAnswerIndicators) {
           correctnessIndicator = (
             <>
               <CloseIcon style={{ color: "red" }} />
@@ -197,13 +204,13 @@ class OlabSinglePickQuestion extends OlabTag {
   }
 
   render() {
-    const { debug, question, responses } = this.state;
+    const { debug, olabObject, responses } = this.state;
     const { id, name } = this.props;
 
     log.debug(`${this.constructor["name"]} render`);
 
     try {
-      let row = question.layoutType === 1 ? true : false;
+      let row = olabObject.layoutType === 1 ? true : false;
 
       let progressButtonHtml = "";
       if (this.state.showProgressSpinner) {
@@ -220,13 +227,13 @@ class OlabSinglePickQuestion extends OlabTag {
         return (
           <>
             <b>
-              [[{id}]] ({question.id})
+              [[{id}]] ({olabObject.id})
             </b>
           </>
         );
       }
 
-      var disabled = question.disabled == 0 ? false : true;
+      var disabled = olabObject.disabled == 0 ? false : true;
 
       return (
         <div
@@ -235,14 +242,14 @@ class OlabSinglePickQuestion extends OlabTag {
         >
           <FormControl component="fieldset" disabled={disabled}>
             <FormLabel id={`${id}::stem`} component="legend">
-              <JsxParser jsx={question.stem} />
+              <JsxParser jsx={olabObject.stem} />
             </FormLabel>
             <RadioGroup
               id={`${id}::QR`}
               style={{ float: "left" }}
               onChange={(event) => this.setValue(event)}
               row={row}
-              value={question.value}
+              value={olabObject.value}
             >
               {responses}
             </RadioGroup>

@@ -20,11 +20,14 @@ import Spinner from "../../../../shared/assets/loading_med.gif";
 
 import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
 
 class OlabMultiPickQuestion extends OlabTag {
   constructor(props) {
     let olabObject = getQuestion(props.name, props);
     super(props, olabObject);
+
+    const debug = playerState.GetDebug();
 
     this.state = {
       debug,
@@ -41,7 +44,7 @@ class OlabMultiPickQuestion extends OlabTag {
 
   componentWillUnmount() {
     log.debug(
-      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+      `${this.constructor["name"]} '${this.state.olabObject.name}' componentWillUnmount`
     );
   }
 
@@ -66,7 +69,7 @@ class OlabMultiPickQuestion extends OlabTag {
   }
 
   setValue = (event, choiceArray, choiceId) => {
-    const question = this.state.question;
+    const olabObject = this.state.olabObject;
 
     if (choiceArray == null) {
       choiceArray = [];
@@ -79,7 +82,7 @@ class OlabMultiPickQuestion extends OlabTag {
 
     if (checked && choiceArray.length === 0) {
       value = choiceId;
-      valueOverride = question.responses.find(
+      valueOverride = olabObject.responses.find(
         (res) => res.id == choiceId
       )?.response;
     } else {
@@ -94,31 +97,31 @@ class OlabMultiPickQuestion extends OlabTag {
 
       value = this.createValueFromArray(choiceArray);
       valueOverride = this.createValueFromArray(
-        question.responses
+        olabObject.responses
           .filter((res) => choiceArray.map((n) => +n).includes(res.id))
           .map((res) => res.response)
       );
     }
 
     log.debug(
-      `${this.constructor["name"]} set question '${question.id}' value = '${value}'`
+      `${this.constructor["name"]} set question '${olabObject.id}' value = '${value}'`
     );
 
     // if single try question, disabled it
-    if (question.numTries > 0) {
-      question.disabled = true;
+    if (olabObject.numTries > 0) {
+      olabObject.disabled = true;
     }
 
     // first attempt to answer, so show answer
     // indicators, if called on
-    question.showAnswerIndicators = true;
+    olabObject.showAnswerIndicators = true;
 
     this.setState(
       (state) => {
-        question.previousValue = question.value;
-        question.value = value;
-        question.valueOverride = valueOverride;
-        return { question };
+        olabObject.previousValue = olabObject.value;
+        olabObject.value = value;
+        olabObject.valueOverride = valueOverride;
+        return { olabObject };
       },
       () => this.transmitResponse()
     );
@@ -157,19 +160,19 @@ class OlabMultiPickQuestion extends OlabTag {
     log.debug(`set disabled: ${disabled}`);
   }
 
-  buildQuestionResponses(question, id, currentChoices) {
+  buildQuestionResponses(olabObject, id, currentChoices) {
     let responses = [];
     let selectedIndexStrings = [];
 
-    if (question.value) {
-      selectedIndexStrings = question.value.split(",");
+    if (olabObject.value) {
+      selectedIndexStrings = olabObject.value.split(",");
     }
 
     let selectedIndexes = selectedIndexStrings.map((item) => Number(item));
 
-    for (const response of question.responses) {
+    for (const response of olabObject.responses) {
       let responseHtml = this.buildQuestionResponse(
-        question,
+        olabObject,
         id,
         response,
         currentChoices,
@@ -182,7 +185,7 @@ class OlabMultiPickQuestion extends OlabTag {
   }
 
   buildQuestionResponse(
-    question,
+    olabObject,
     id,
     response,
     currentChoices,
@@ -195,12 +198,12 @@ class OlabMultiPickQuestion extends OlabTag {
       feedback = response.feedback;
     }
 
-    if (question.showAnswer) {
+    if (olabObject.showAnswer) {
       // check if response is selected, meaning we display
       // is_correct and feedback.
       if (currentChoices.includes(`${response.id}`)) {
         // test for 'correct' answer
-        if (response.isCorrect == 1 && question.showAnswerIndicators) {
+        if (response.isCorrect == 1 && olabObject.showAnswerIndicators) {
           correctnessIndicator = (
             <>
               {response.response}
@@ -211,7 +214,7 @@ class OlabMultiPickQuestion extends OlabTag {
         }
 
         // test for 'incorrect' answer
-        if (response.isCorrect == -1 && question.showAnswerIndicators) {
+        if (response.isCorrect == -1 && olabObject.showAnswerIndicators) {
           correctnessIndicator = (
             <>
               {response.response}
@@ -246,7 +249,7 @@ class OlabMultiPickQuestion extends OlabTag {
   }
 
   render() {
-    const { debug, question } = this.state;
+    const { debug, olabObject } = this.state;
     const { id, name } = this.props;
 
     log.debug(`${this.constructor["name"]} render '${name}'`);
@@ -267,21 +270,21 @@ class OlabMultiPickQuestion extends OlabTag {
         return (
           <>
             <b>
-              [[{id}]] ({question.id})
+              [[{id}]] ({olabObject.id})
             </b>
           </>
         );
       }
 
-      let currentChoices = this.createArrayFromValue(question.value);
+      let currentChoices = this.createArrayFromValue(olabObject.value);
       var responses = this.buildQuestionResponses(
-        question,
+        olabObject,
         this.props.props.id,
         currentChoices
       );
 
-      let row = question.layoutType === 1 ? true : false;
-      var disabled = question.disabled == 0 ? false : true;
+      let row = olabObject.layoutType === 1 ? true : false;
+      var disabled = olabObject.disabled == 0 ? false : true;
 
       return (
         <div
@@ -290,7 +293,7 @@ class OlabMultiPickQuestion extends OlabTag {
         >
           <FormControl component="fieldset" disabled={disabled}>
             <FormLabel id={`${id}::stem`} component="legend">
-              <JsxParser jsx={question.stem} />
+              <JsxParser jsx={olabObject.stem} />
             </FormLabel>
             <FormGroup id={`${id}::choices`} row={row}>
               {responses}
