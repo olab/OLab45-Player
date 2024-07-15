@@ -116,7 +116,7 @@ class OlabSliderQuestion extends OlabTag {
                 : ""
             }
           >
-            <Typography id={`${id}/stem`} component="span" gutterBottom>
+            <Typography id={`${id}::stem`} component="span" gutterBottom>
               <JsxParser jsx={olabObject.stem} />
             </Typography>
             <input
