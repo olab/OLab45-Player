@@ -118,10 +118,11 @@ class OlabSinglelineTextQuestion extends OlabTag {
         <>
           <div
             className={`${styles["qusingleline"]} ${siteStyles[id]}`}
-            id={`${id}`}
+            id={olabObject.htmlIdBase}
+            name={olabObject.name}
           >
             <div
-              id={`${id}::stem`}
+              id={`${olabObject.htmlIdBase}::stem`}
               className={`${styles["qusingleline-stem"]}`}
             >
               <JsxParser jsx={olabObject.stem} />
@@ -133,7 +134,7 @@ class OlabSinglelineTextQuestion extends OlabTag {
               >
                 <input
                   className={`${styles["qusingleline-value"]}`}
-                  id={`${id}::value`}
+                  id={`${olabObject.htmlIdBase}::value`}
                   value={olabObject.value}
                   placeholder={`${olabObject.prompt}`}
                   onChange={this.handleChange}

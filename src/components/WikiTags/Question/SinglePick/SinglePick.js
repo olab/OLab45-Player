@@ -250,7 +250,7 @@ class OlabSinglePickQuestion extends OlabTag {
               <JsxParser jsx={olabObject.stem} />
             </FormLabel>
             <RadioGroup
-              id={`${olabObject.htmlIdBase}::QR`}
+              id={`${olabObject.htmlIdBase}::choices`}
               style={{ float: "left" }}
               onChange={(event) => this.setValue(event)}
               row={row}

@@ -141,18 +141,19 @@ class OlabDropDownQuestion extends OlabTag {
       return (
         <div
           className={`${styles["quddropdown"]} ${siteStyles[id]}`}
-          id={`${id}`}
+          id={olabObject.htmlIdBase}
+          name={olabObject.name}
         >
           <Box width={olabObject.width}>
             <FormControl fullWidth disabled={disabled}>
               <div
-                id={`${id}::stem`}
+                id={`${olabObject.name}::stem`}
                 className={`${styles["qumultiline-stem"]}`}
               >
                 <JsxParser jsx={olabObject.stem} />
               </div>
               <Select
-                id={`${id}::value`}
+                id={`${olabObject.name}::value`}
                 value={olabObject.value}
                 onChange={(event) =>
                   this.setValue(event, this.setInProgress, this.setIsDisabled)

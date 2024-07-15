@@ -107,7 +107,11 @@ class OlabSliderQuestion extends OlabTag {
       }
 
       return (
-        <div className={`${styles["quslider"]} ${siteStyles[id]}`} id={`${id}`}>
+        <div
+          className={`${styles["quslider"]} ${siteStyles[id]}`}
+          id={olabObject.htmlIdBase}
+          name={olabObject.name}
+        >
           <Box
             width={olabObject.width}
             className={
@@ -116,13 +120,17 @@ class OlabSliderQuestion extends OlabTag {
                 : ""
             }
           >
-            <Typography id={`${id}::stem`} component="span" gutterBottom>
+            <Typography
+              id={`${olabObject.htmlIdBase}::stem`}
+              component="span"
+              gutterBottom
+            >
               <JsxParser jsx={olabObject.stem} />
             </Typography>
             <input
               readOnly
               className={`${styles["quslider-value"]}`}
-              id={`${id}/value`}
+              id={`${olabObject.htmlIdBase}::input`}
               value={olabObject.value}
             ></input>
             <Slider
@@ -133,7 +141,7 @@ class OlabSliderQuestion extends OlabTag {
                 "hor" != settings.orientation ? "vertical" : "horizontal"
               }
               marks
-              name={`${id}-slider`}
+              name={`${olabObject.htmlIdBase}::slider`}
               min={Number(settings.minValue)}
               max={Number(settings.maxValue)}
               track={false}
