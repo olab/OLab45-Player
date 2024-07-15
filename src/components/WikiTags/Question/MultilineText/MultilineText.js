@@ -135,9 +135,13 @@ class OlabMultilineTextQuestion extends OlabTag {
       return (
         <div
           className={`${styles["qumultiline"]} ${siteStyles[id]}`}
-          id={`${id}`}
+          id={olabObject.htmlIdBase}
+          name={olabObject.name}
         >
-          <div id={`${id}::stem`} className={`${styles["qumultiline-stem"]}`}>
+          <div
+            id={`${olabObject.htmlIdBase}::stem`}
+            className={`${styles["qumultiline-stem"]}`}
+          >
             <JsxParser jsx={olabObject.stem} />
           </div>
           <div className={`${styles["qumultiline-value"]}`}>
@@ -146,7 +150,7 @@ class OlabMultilineTextQuestion extends OlabTag {
               cols={`${olabObject.width}`}
               placeholder={`${olabObject.prompt}`}
               className={`${valueClasses.join(" ")}`}
-              id={`${id}::value`}
+              id={`${olabObject.htmlIdBase}::value`}
               value={olabObject.value}
               disabled={disabled}
               onChange={this.onTextChanged}

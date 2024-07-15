@@ -171,14 +171,23 @@ class OlabMultiPickQuestion extends OlabTag {
     let selectedIndexes = selectedIndexStrings.map((item) => Number(item));
 
     for (const response of olabObject.responses) {
-      let responseHtml = this.buildQuestionResponse(
-        olabObject,
-        id,
-        response,
-        currentChoices,
-        selectedIndexes
+      var item = (
+        <div
+          id={`QR:${response.id}`}
+          name={response.name}
+          parentId={olabObject.htmlIdBase}
+          key={response.id}
+        >
+          {this.buildQuestionResponse(
+            olabObject,
+            id,
+            response,
+            currentChoices,
+            selectedIndexes
+          )}
+        </div>
       );
-      responses.push(responseHtml);
+      responses.push(item);
     }
 
     return responses;
@@ -228,7 +237,7 @@ class OlabMultiPickQuestion extends OlabTag {
 
     let responseHtml = (
       <FormControlLabel
-        id={`${id}::QR:${response.id}`}
+        id={`QR:${response.id}::label`}
         name={response.name}
         onChange={(event) =>
           this.setValue(event, currentChoices, response.id.toString())
@@ -236,7 +245,7 @@ class OlabMultiPickQuestion extends OlabTag {
         key={response.id}
         control={
           <Checkbox
-            id={`${id}::QR:${response.name}::value`}
+            id={`QR:${response.id}::input`}
             name={`${response.response.replace(/\W/g, "")}`}
           />
         }
@@ -289,13 +298,14 @@ class OlabMultiPickQuestion extends OlabTag {
       return (
         <div
           className={`${styles["qumultichoice"]} ${siteStyles[id]}`}
-          id={`${id}`}
+          id={olabObject.htmlIdBase}
+          name={olabObject.name}
         >
           <FormControl component="fieldset" disabled={disabled}>
-            <FormLabel id={`${id}::stem`} component="legend">
+            <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="legend">
               <JsxParser jsx={olabObject.stem} />
             </FormLabel>
-            <FormGroup id={`${id}::choices`} row={row}>
+            <FormGroup id={`${olabObject.htmlIdBase}::choices`} row={row}>
               {responses}
             </FormGroup>
             {progressButtonHtml}

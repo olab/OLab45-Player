@@ -133,9 +133,10 @@ class OlabDragAndDropQuestion extends OlabTag {
       return (
         <div
           className={`${styles["qudraganddrop"]} ${siteStyles[id]}`}
-          id={`${id}`}
+          id={olabObject.htmlIdBase}
+          name={olabObject.name}
         >
-          <FormLabel id={`${id}::stem`} component="legend">
+          <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="legend">
             <JsxParser jsx={olabObject.stem} />
           </FormLabel>
           <DragDropContext onDragEnd={this.onDragEnd}>
@@ -148,13 +149,15 @@ class OlabDragAndDropQuestion extends OlabTag {
                 >
                   {olabObject.responses.map((item, index) => (
                     <Draggable
-                      id={`${id}::QR:${item.id}`}
                       key={item.id}
                       draggableId={item.name}
                       index={index}
                     >
                       {(provided, snapshot) => (
                         <div
+                          id={`QR:${item.id}`}
+                          parentId={olabObject.htmlIdBase}
+                          name={item.name}
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}

@@ -133,7 +133,6 @@ class OlabSinglePickQuestion extends OlabTag {
 
   buildQuestionResponses(olabObject, id) {
     let responses = [];
-    let key = 0;
     let selectedIndex = null;
 
     if (olabObject.value) {
@@ -142,7 +141,12 @@ class OlabSinglePickQuestion extends OlabTag {
 
     for (const response of olabObject.responses) {
       var item = (
-        <div id={`${id}::QR:${response.name}`} key={key++}>
+        <div
+          id={`QR:${response.id}`}
+          name={response.name}
+          parentId={olabObject.htmlIdBase}
+          key={response.id}
+        >
           {this.buildQuestionResponse(olabObject, id, response, selectedIndex)}
         </div>
       );
@@ -155,9 +159,9 @@ class OlabSinglePickQuestion extends OlabTag {
   buildQuestionResponse(olabObject, id, response, selectedIndex) {
     let choice = (
       <FormControlLabel
-        id={`${id}::QR:${response.name}::label`}
+        id={`QR:${response.id}::label`}
         value={response.id}
-        control={<Radio id={`${id}::QR:${response.name}::value`} />}
+        control={<Radio id={`QR:${response.id}::input`} />}
         label={response.response}
       />
     );
@@ -196,7 +200,7 @@ class OlabSinglePickQuestion extends OlabTag {
     }
 
     return (
-      <div id={`${id}::QR:${response.name}`} name={response.name}>
+      <div>
         {choice}
         {correctnessIndicator}
       </div>
@@ -238,14 +242,15 @@ class OlabSinglePickQuestion extends OlabTag {
       return (
         <div
           className={`${styles["qusinglechoice"]} ${siteStyles[id]}`}
-          id={`${id}`}
+          id={olabObject.htmlIdBase}
+          name={olabObject.name}
         >
           <FormControl component="fieldset" disabled={disabled}>
-            <FormLabel id={`${id}::stem`} component="legend">
+            <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="legend">
               <JsxParser jsx={olabObject.stem} />
             </FormLabel>
             <RadioGroup
-              id={`${id}::QR`}
+              id={`${olabObject.htmlIdBase}::choices`}
               style={{ float: "left" }}
               onChange={(event) => this.setValue(event)}
               row={row}

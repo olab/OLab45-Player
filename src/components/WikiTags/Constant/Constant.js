@@ -27,13 +27,13 @@ class OlabConstantTag extends OlabTag {
         return (
           <>
             <b>
-              [[{id}]] ({olabObject.id}) "{parse(olabObject.value)}"
+              [[CONST:{id}]] ({olabObject.id}) "{parse(olabObject.value)}"
             </b>
           </>
         );
       }
 
-      return <span id={name}>{parse(olabObject.value)}</span>;
+      return <span id={`CONST:${name}`}>{parse(olabObject.value)}</span>;
     } catch (error) {
       return this.errorJsx(id, error);
     }
