@@ -1,14 +1,12 @@
-﻿import {
-  OLabApiDragAndDropQuestion,
-  OLabApiDropdownQuestion,
-  OLabApiMultipleChoiceQuestion,
-  OLabApiSingleChoiceQuestion,
-  OLabApiSliderQuestion,
-  OLabApiTextQuestion,
-} from "./Objects/OLabApiQuestion";
-import { OLabApiConstant } from "./Objects/OLabApiConstant";
-
+﻿import { OLabApiConstant } from "./Objects/OLabApiConstant";
 import { OLabApiDomObject } from "./Objects/OLabApiDomObject";
+import { OLabApiDragAndDropQuestion } from "./Objects/OLabApiDragAndDropQuestion";
+import { OLabApiDropdownQuestion } from "./Objects/OLabApiDropdownQuestion";
+import { OLabApiMultipleChoiceQuestion } from "./Objects/OLabApiMultipleChoiceQuestion";
+import { OLabApiSingleChoiceQuestion } from "./Objects/OLabApiSingleChoiceQuestion";
+import { OLabApiSliderQuestion } from "./Objects/OLabApiSliderQuestion";
+import { OLabApiTextQuestion } from "./Objects/OLabApiTextQuestion";
+
 import log from "loglevel";
 
 // main view class

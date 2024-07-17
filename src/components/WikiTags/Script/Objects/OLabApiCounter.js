@@ -1,5 +1,5 @@
 ﻿// "use strict";
-import { OLabApiObject } from "./OLabApiObject";
+import { OLabApiObject } from "../OLabApiObject";
 
 export class OLabApiCounter extends OLabApiObject {
   constructor(clientApi, params) {
