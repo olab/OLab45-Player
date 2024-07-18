@@ -135,7 +135,11 @@ const getQuestion = (name, props) => {
         question.width = 300;
       }
 
-      question.htmlIdBase = `QU:${question.id}`;
+      if (question.name != null) {
+        question.htmlIdBase = `QU:${question.name}`;
+      } else {
+        question.htmlIdBase = `QU:${question.id}`;
+      }
     }
   } catch (error) {
     log.error(`error looking up question ${name}: ${error}`);

@@ -110,7 +110,7 @@ class OlabSliderQuestion extends OlabTag {
         <div
           className={`${styles["quslider"]} ${siteStyles[id]}`}
           id={olabObject.htmlIdBase}
-          name={olabObject.name}
+          olabid={olabObject.id}
         >
           <Box
             width={olabObject.width}

@@ -142,7 +142,7 @@ class OlabDropDownQuestion extends OlabTag {
         <div
           className={`${styles["quddropdown"]} ${siteStyles[id]}`}
           id={olabObject.htmlIdBase}
-          name={olabObject.name}
+          olabid={olabObject.id}
         >
           <Box width={olabObject.width}>
             <FormControl fullWidth disabled={disabled}>

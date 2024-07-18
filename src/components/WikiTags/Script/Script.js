@@ -20,7 +20,7 @@ class OlabScriptTag extends React.Component {
       debug,
     };
 
-    this.olabClientApi = new OLabClientApi(this.props.props);
+    this.olabClientApi = new OLabClientApi(this);
   }
 
   componentDidMount() {
@@ -50,6 +50,11 @@ class OlabScriptTag extends React.Component {
 
     delete this.func;
     this.olabClientApi.shutdown();
+  }
+
+  updateState(newState) {
+    log.debug(`updating state`);
+    this.props.props.onUpdateScopedObjects(newState);
   }
 
   render() {

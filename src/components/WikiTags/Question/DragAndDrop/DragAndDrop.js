@@ -134,7 +134,7 @@ class OlabDragAndDropQuestion extends OlabTag {
         <div
           className={`${styles["qudraganddrop"]} ${siteStyles[id]}`}
           id={olabObject.htmlIdBase}
-          name={olabObject.name}
+          olabid={olabObject.id}
         >
           <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="legend">
             <JsxParser jsx={olabObject.stem} />
@@ -156,7 +156,7 @@ class OlabDragAndDropQuestion extends OlabTag {
                       {(provided, snapshot) => (
                         <div
                           id={`QR:${item.id}`}
-                          parentId={olabObject.htmlIdBase}
+                          parentid={olabObject.htmlIdBase}
                           name={item.name}
                           ref={provided.innerRef}
                           {...provided.draggableProps}

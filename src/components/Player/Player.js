@@ -62,6 +62,7 @@ class Player extends PureComponent {
     this.onErrorDismissed = this.onErrorDismissed.bind(this);
 
     this.onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
+    this.onUpdateScopedObjects = this.onUpdateScopedObjects.bind(this);
 
     const persistedState = playerState.Get();
 
@@ -314,30 +315,31 @@ class Player extends PureComponent {
     window.location.href = url;
   };
 
-  onUpdateDynamicObjects = (newDynamicObjects) => {
-    let dynamicObjects = this.state.dynamicObjects;
+  onUpdateDynamicObjects = (newObjects) => {
+    let orgObjects = this.state.dynamicObjects;
 
-    dynamicObjects.nodesVisitedList = newDynamicObjects.nodesVisitedList;
-    dynamicObjects.checksum = newDynamicObjects.checksum;
+    orgObjects.nodesVisitedList = newObjects.nodesVisitedList;
+    orgObjects.checksum = newObjects.checksum;
+
+    this.compareCounterArray(newObjects.map.counters, orgObjects.map.counters);
 
     this.compareCounterArray(
-      newDynamicObjects.map.counters,
-      dynamicObjects.map.counters
+      newObjects.node.counters,
+      orgObjects.node.counters
     );
 
     this.compareCounterArray(
-      newDynamicObjects.node.counters,
-      dynamicObjects.node.counters
+      newObjects.server.counters,
+      orgObjects.server.counters
     );
 
-    this.compareCounterArray(
-      newDynamicObjects.server.counters,
-      dynamicObjects.server.counters
-    );
-
-    this.setState({ dynamicObjects: dynamicObjects });
+    this.setState({ dynamicObjects: orgObjects });
     playerState.SetDynamicObjects(this.state.dynamicObjects);
   };
+
+  onUpdateScopedObjects(newState) {
+    // this.setState({ newState });
+  }
 
   compareCounterArray = (source, target) => {
     for (let index = 0; index < source.length; index++) {
@@ -400,6 +402,7 @@ class Player extends PureComponent {
     if (isMounted) {
       const linkHandler = this.onNavigateToNode;
       const onUpdateDynamicObjects = this.onUpdateDynamicObjects;
+      const onUpdateScopedObjects = this.onUpdateScopedObjects;
       const theme = this.lookupTheme();
       const haveTheme = theme != null;
 
@@ -510,6 +513,7 @@ class Player extends PureComponent {
                 node,
                 nodesVisited,
                 onUpdateDynamicObjects,
+                onUpdateScopedObjects,
                 player,
                 scopedObjects,
                 urlParam,

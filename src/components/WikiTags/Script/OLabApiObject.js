@@ -5,52 +5,55 @@ export class OLabApiObject {
 
   clientApi;
 
-  constructor(clientApi, elementId, objectIdName = null, scopeIndex = null) {
+  constructor(clientApi, elementId, name = null, type = null) {
     log.debug(
-      `creating ${this.constructor["name"]} '${elementId}' '${objectIdName}' '${scopeIndex}'`
+      `building ${this.constructor["name"]} '${elementId}' '${name}' '${type}'`
     );
 
     this.clientApi = clientApi;
     this.elementId = elementId;
-    this.domElement = this.findDomElement(this.elementId);
 
-    if (objectIdName != null) {
-      this.id = objectIdName;
+    if (name != null && type != null) {
+      this.scopedObject = this.findOLabObject(name, type);
+      this.id = name;
+    } else {
+      this.id = elementId;
     }
 
-    if (scopeIndex != null) {
-      this.scopedObject = this.findScopedObject(this.id, scopeIndex);
-    }
+    this.domElement = this.findDomObject(this.elementId);
   }
 
-  findScopedObject(idName, scopeIndex) {
-    for (const scopedObject of this.clientApi.scopedObjects.server[
-      scopeIndex
-    ]) {
-      if (scopedObject.id === idName || scopedObject.name === idName) {
-        log.debug(`found server ${scopeIndex} '${idName}'`);
-        return scopedObject;
+  // find an OLab scoped object of a certain type
+  // by id or name
+  findOLabObject(idName, type) {
+    const scopedObjects = this.clientApi.scopedObjects;
+
+    for (const obj of scopedObjects.server[type]) {
+      if (obj.id === idName || obj.name === idName) {
+        log.debug(`found server ${type} '${idName}'`);
+        return obj;
       }
     }
 
-    for (const scopedObject of this.clientApi.scopedObjects.map[scopeIndex]) {
-      if (scopedObject.id === idName || scopedObject.name === idName) {
-        log.debug(`found map ${scopeIndex} '${idName}'`);
-        return scopedObject;
+    for (const obj of scopedObjects.map[type]) {
+      if (obj.id === idName || obj.name === idName) {
+        log.debug(`found map ${type} '${idName}'`);
+        return obj;
       }
     }
 
-    for (const scopedObject of this.clientApi.scopedObjects.node[scopeIndex]) {
-      if (scopedObject.id === idName || scopedObject.name === idName) {
-        log.debug(`found node ${scopeIndex} '${idName}'`);
-        return scopedObject;
+    for (const obj of scopedObjects.node[type]) {
+      if (obj.id === idName || obj.name === idName) {
+        log.debug(`found node ${type} '${idName}'`);
+        return obj;
       }
     }
 
-    throw new Error(`unknown ${scopeIndex} scopedObject with id '${idName}'`);
+    throw new Error(`unknown ${type} scopedObject with id '${idName}'`);
   }
 
-  findDomElement(id) {
+  // find an HTML DOM object by id attribute
+  findDomObject(id) {
     let domElement = document.getElementById(id);
     if (domElement == null) {
       throw new Error(`unknown dom element with id '${id}'`);

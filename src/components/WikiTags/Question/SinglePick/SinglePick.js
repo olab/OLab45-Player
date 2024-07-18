@@ -140,14 +140,15 @@ class OlabSinglePickQuestion extends OlabTag {
     }
 
     for (const response of olabObject.responses) {
+      const baseHtmlId = `QR:${response.name}`;
       var item = (
-        <div
-          id={`QR:${response.id}`}
-          name={response.name}
-          parentId={olabObject.htmlIdBase}
-          key={response.id}
-        >
-          {this.buildQuestionResponse(olabObject, id, response, selectedIndex)}
+        <div id={baseHtmlId} parentid={olabObject.baseHtmlId} key={response.id}>
+          {this.buildQuestionResponse(
+            olabObject,
+            baseHtmlId,
+            response,
+            selectedIndex
+          )}
         </div>
       );
       responses.push(item);
@@ -156,12 +157,12 @@ class OlabSinglePickQuestion extends OlabTag {
     return responses;
   }
 
-  buildQuestionResponse(olabObject, id, response, selectedIndex) {
+  buildQuestionResponse(olabObject, baseHtmlId, response, selectedIndex) {
     let choice = (
       <FormControlLabel
-        id={`QR:${response.id}::label`}
-        value={response.id}
-        control={<Radio id={`QR:${response.id}::input`} />}
+        id={`${baseHtmlId}::label`}
+        value={response.id} // must be the response ID
+        control={<Radio id={`${baseHtmlId}::input`} />}
         label={response.response}
       />
     );
@@ -243,7 +244,7 @@ class OlabSinglePickQuestion extends OlabTag {
         <div
           className={`${styles["qusinglechoice"]} ${siteStyles[id]}`}
           id={olabObject.htmlIdBase}
-          name={olabObject.name}
+          olabid={olabObject.id}
         >
           <FormControl component="fieldset" disabled={disabled}>
             <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="legend">
@@ -255,6 +256,7 @@ class OlabSinglePickQuestion extends OlabTag {
               onChange={(event) => this.setValue(event)}
               row={row}
               value={olabObject.value}
+              parentid={`${olabObject.htmlIdBase}`}
             >
               {responses}
             </RadioGroup>

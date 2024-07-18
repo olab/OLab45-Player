@@ -119,7 +119,7 @@ class OlabSinglelineTextQuestion extends OlabTag {
           <div
             className={`${styles["qusingleline"]} ${siteStyles[id]}`}
             id={olabObject.htmlIdBase}
-            name={olabObject.name}
+            olabid={olabObject.id}
           >
             <div
               id={`${olabObject.htmlIdBase}::stem`}

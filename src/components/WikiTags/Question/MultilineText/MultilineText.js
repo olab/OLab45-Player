@@ -136,7 +136,7 @@ class OlabMultilineTextQuestion extends OlabTag {
         <div
           className={`${styles["qumultiline"]} ${siteStyles[id]}`}
           id={olabObject.htmlIdBase}
-          name={olabObject.name}
+          olabid={olabObject.id}
         >
           <div
             id={`${olabObject.htmlIdBase}::stem`}

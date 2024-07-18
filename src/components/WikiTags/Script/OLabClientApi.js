@@ -1,46 +1,57 @@
 ﻿import { OLabApiConstant } from "./Objects/OLabApiConstant";
 import { OLabApiDomObject } from "./Objects/OLabApiDomObject";
-import { OLabApiDragAndDropQuestion } from "./Objects/OLabApiDragAndDropQuestion";
-import { OLabApiDropdownQuestion } from "./Objects/OLabApiDropdownQuestion";
-import { OLabApiMultipleChoiceQuestion } from "./Objects/OLabApiMultipleChoiceQuestion";
-import { OLabApiSingleChoiceQuestion } from "./Objects/OLabApiSingleChoiceQuestion";
-import { OLabApiSliderQuestion } from "./Objects/OLabApiSliderQuestion";
-import { OLabApiTextQuestion } from "./Objects/OLabApiTextQuestion";
+import { OLabApiDragAndDropQuestion } from "./Objects/Question/OLabApiDragAndDropQuestion";
+import { OLabApiDropdownQuestion } from "./Objects/Question/OLabApiDropdownQuestion";
+import { OLabApiMultipleChoiceQuestion } from "./Objects/Question/OLabApiMultipleChoiceQuestion";
+import { OLabApiSingleChoiceQuestion } from "./Objects/Question/OLabApiSingleChoiceQuestion";
+import { OLabApiSliderQuestion } from "./Objects/Question/OLabApiSliderQuestion";
+import { OLabApiTextQuestion } from "./Objects/Question/OLabApiTextQuestion";
 
 import log from "loglevel";
 
 // main view class
 export class OLabClientApi {
   timers = {};
+  component;
+  dynamicObjects;
+  scopedObjects;
+  state;
 
-  constructor(props) {
+  constructor(component) {
     var vm = this;
 
+    this.component = component;
+    this.dynamicObjects = vm.component.state.dynamicObjects;
+    this.scopedObjects = vm.component.state.scopedObjects;
+    this.timers = vm.timers;
+    this.state = vm.component.state;
+
     // these are the methods/properties we expose to the outside
-    vm.service = {
-      createTimer: vm.createTimer,
-      destroyTimer: vm.destroyTimer,
-      dynamicObjects: props.dynamicObjects,
-      getConstant: vm.getConstant,
-      getDomObject: vm.getDomObject,
-      getDragAndDropQuestion: vm.getDragAndDropQuestion,
-      getDropDownQuestion: vm.getDropDownQuestion,
-      getMultipleChoiceQuestion: vm.getMultipleChoiceQuestion,
-      getOLabObjectList: vm.getOLabObjectList,
-      getSingleChoiceQuestion: vm.getSingleChoiceQuestion,
-      getSliderQuestion: vm.getSliderQuestion,
-      getTextQuestion: vm.getTextQuestion,
-      hello: vm.hello,
-      onClick: vm.onClick,
-      onEvent: vm.onEvent,
-      scopedObjects: props.scopedObjects,
-      shutdown: vm.shutdown,
-      timers: vm.timers,
-    };
+    // vm.service = {
+    //   createTimer: vm.createTimer,
+    //   destroyTimer: vm.destroyTimer,
+    //   dynamicObjects: vm.component.state.dynamicObjects,
+    //   getConstant: vm.getConstant,
+    //   getDomObject: vm.getDomObject,
+    //   getDragAndDropQuestion: vm.getDragAndDropQuestion,
+    //   getDropDownQuestion: vm.getDropDownQuestion,
+    //   getMultipleChoiceQuestion: vm.getMultipleChoiceQuestion,
+    //   getOLabObjectList: vm.getOLabObjectList,
+    //   getSingleChoiceQuestion: vm.getSingleChoiceQuestion,
+    //   getSliderQuestion: vm.getSliderQuestion,
+    //   getTextQuestion: vm.getTextQuestion,
+    //   hello: vm.hello,
+    //   onClick: vm.onClick,
+    //   onEvent: vm.onEvent,
+    //   scopedObjects: vm.component.state.scopedObjects,
+    //   shutdown: vm.shutdown,
+    //   state: vm.component.state,
+    //   timers: vm.timers,
+    // };
 
-    vm.hello();
+    this.hello();
 
-    return vm.service;
+    // return vm.service;
   }
 
   hello() {
@@ -54,6 +65,10 @@ export class OLabClientApi {
     for (let timerName of timerNames) {
       this.destroyTimer(timerName);
     }
+  }
+
+  updateState() {
+    this.component.updateState(this.state);
   }
 
   createTimer(key, frequencyMs, callback) {

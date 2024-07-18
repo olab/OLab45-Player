@@ -74,7 +74,7 @@ class OlabMediaResourceTag extends OlabTag {
       }
 
       if (!olabObject.originUrl) {
-        const toolTip = `${olabObject.scopeLevel}(${olabObject.parentId}): '${olabObject.name}'`;
+        const toolTip = `${olabObject.scopeLevel}(${olabObject.parentid}): '${olabObject.name}'`;
         return (
           <Tooltip placement="top" title={toolTip}>
             <BrokenImageIcon color="error" fontSize="large" />

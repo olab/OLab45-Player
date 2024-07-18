@@ -171,16 +171,13 @@ class OlabMultiPickQuestion extends OlabTag {
     let selectedIndexes = selectedIndexStrings.map((item) => Number(item));
 
     for (const response of olabObject.responses) {
+      const baseHtmlId = `QR:${response.name}`;
+
       var item = (
-        <div
-          id={`QR:${response.id}`}
-          name={response.name}
-          parentId={olabObject.htmlIdBase}
-          key={response.id}
-        >
+        <div id={baseHtmlId} parentid={olabObject.htmlIdBase} key={response.id}>
           {this.buildQuestionResponse(
             olabObject,
-            id,
+            baseHtmlId,
             response,
             currentChoices,
             selectedIndexes
@@ -195,7 +192,7 @@ class OlabMultiPickQuestion extends OlabTag {
 
   buildQuestionResponse(
     olabObject,
-    id,
+    baseHtmlId,
     response,
     currentChoices,
     responseIndexes
@@ -237,15 +234,14 @@ class OlabMultiPickQuestion extends OlabTag {
 
     let responseHtml = (
       <FormControlLabel
-        id={`QR:${response.id}::label`}
-        name={response.name}
+        id={`${baseHtmlId}::label`}
         onChange={(event) =>
           this.setValue(event, currentChoices, response.id.toString())
         }
         key={response.id}
         control={
           <Checkbox
-            id={`QR:${response.id}::input`}
+            id={`QR:${response.name}::input`}
             name={`${response.response.replace(/\W/g, "")}`}
           />
         }
@@ -299,7 +295,7 @@ class OlabMultiPickQuestion extends OlabTag {
         <div
           className={`${styles["qumultichoice"]} ${siteStyles[id]}`}
           id={olabObject.htmlIdBase}
-          name={olabObject.name}
+          olabid={olabObject.id}
         >
           <FormControl component="fieldset" disabled={disabled}>
             <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="legend">
