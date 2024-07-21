@@ -31,6 +31,9 @@ const findWikiInList = (list, wiki) => {
     }
   }
 
+  if (match == null) {
+    throw new Error(`object '${wiki}' not found`);
+  }
   return match;
 };
 
@@ -118,28 +121,24 @@ const getQuestion = (name, props) => {
       name
     );
 
-    if (question == null) {
-      log.error(`Could not find question ${name}`);
+    if (question.questionType !== 3 && question.questionType !== 2) {
+      if (question.value === null) {
+        question.value = 0;
+      }
     } else {
-      if (question.questionType !== 3 && question.questionType !== 2) {
-        if (question.value === null) {
-          question.value = 0;
-        }
-      } else {
-        if (question.value === null) {
-          question.value = "";
-        }
+      if (question.value === null) {
+        question.value = "";
       }
+    }
 
-      if (question.width === 0) {
-        question.width = 300;
-      }
+    if (question.width === 0) {
+      question.width = 300;
+    }
 
-      if (question.name != null) {
-        question.htmlIdBase = `QU:${question.name}`;
-      } else {
-        question.htmlIdBase = `QU:${question.id}`;
-      }
+    if (question.name != null) {
+      question.htmlIdBase = `QU:${question.name}`;
+    } else {
+      question.htmlIdBase = `QU:${question.id}`;
     }
   } catch (error) {
     log.error(`error looking up question ${name}: ${error}`);
