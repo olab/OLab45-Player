@@ -321,41 +321,33 @@ class Player extends PureComponent {
     orgObjects.nodesVisitedList = newObjects.nodesVisitedList;
     orgObjects.checksum = newObjects.checksum;
 
-    this.compareCounterArray(newObjects.map.counters, orgObjects.map.counters);
+    // 1. Make a shallow copy of the items
+    let items = [...orgObjects.counters.counters];
 
-    this.compareCounterArray(
-      newObjects.node.counters,
-      orgObjects.node.counters
-    );
+    for (let index = 0; index < items.length; index++) {
+      // 2. Make a shallow copy of the item you want to mutate
+      let item = { ...items[index] };
 
-    this.compareCounterArray(
-      newObjects.server.counters,
-      orgObjects.server.counters
-    );
+      if (item.value != newObjects.counters.counters[index].value) {
+        log.debug(
+          `counter ${item.name}: ${item.value} => ${newObjects.counters.counters[index].value}`
+        );
+        item.value = newObjects.counters.counters[index].value;
+        item.updatedat = newObjects.counters.counters[index].updatedat;
 
-    this.setState({ dynamicObjects: orgObjects });
+        // 4. Put it back into our array. N.B. we *are* mutating the array here,
+        //    but that's why we made a copy first
+        items[index] = item;
+      }
+    }
+
+    this.setState({ dynamicObjects: { counters: { counters: items } } });
     playerState.SetDynamicObjects(this.state.dynamicObjects);
   };
 
   onUpdateScopedObjects(newState) {
     // this.setState({ newState });
   }
-
-  compareCounterArray = (source, target) => {
-    for (let index = 0; index < source.length; index++) {
-      if (source[index].isSystem === 1) {
-        continue;
-      }
-
-      if (source[index].value != target[index].value) {
-        log.trace(
-          `counter ${source[index].name}: ${source[index].value} => ${target[index].value}`
-        );
-        source[index].value = target[index].value;
-        source[index].updatedat = target[index].updatedat;
-      }
-    }
-  };
 
   onJsxParseError(arg) {
     const t = arg;

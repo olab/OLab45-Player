@@ -42,6 +42,10 @@ const getCounters = (nodeId, mapCounters, counterActions) => {
 
   try {
     for (const mapCounter of mapCounters) {
+      if (mapCounter.scopeLevel != "Maps") {
+        continue;
+      }
+
       var nodeCounterAction = counterActions.find(
         (action) => action.nodeId == nodeId && action.counterId == mapCounter.id
       );
@@ -89,12 +93,9 @@ const getCounter = (name, dynamicObjects) => {
   let item = null;
 
   try {
-    const { map, node, server } = dynamicObjects;
+    const { counters } = dynamicObjects;
 
-    item = findWikiInList(
-      [...node?.counters, ...map?.counters, ...server?.counters],
-      name
-    );
+    item = findWikiInList(counters?.counters, name);
 
     if (item == null) {
       log.error(`Could not find counter '${name}'`);

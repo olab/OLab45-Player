@@ -21,7 +21,7 @@ class OlabCountersTag extends OlabTag {
   constructor(props) {
     const olabObject = getCounters(
       props.props.node.id,
-      props.props.dynamicObjects.map.counters,
+      props.props.dynamicObjects.counters.counters,
       props.props.scopedObjects.map.counteractions
     );
     super(props, olabObject);
