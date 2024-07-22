@@ -52,9 +52,9 @@ class OlabScriptTag extends React.Component {
     this.olabClientApi.shutdown();
   }
 
-  updateState(newState) {
-    log.debug(`updating state`);
-    this.props.props.onUpdateScopedObjects(newState);
+  updateObject(newObject) {
+    log.debug(`updating object`);
+    this.props.props.onUpdateScopedObjects(newObject);
   }
 
   render() {

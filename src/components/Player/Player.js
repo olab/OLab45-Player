@@ -345,8 +345,27 @@ class Player extends PureComponent {
     playerState.SetDynamicObjects(this.state.dynamicObjects);
   };
 
-  onUpdateScopedObjects(newState) {
-    // this.setState({ newState });
+  onUpdateScopedObjects(newObject) {
+    let orgObjects = this.state.scopedObjects;
+
+    // 1. Make a shallow copy of the items
+    let items = [...orgObjects.map.questions];
+
+    for (let index = 0; index < items.length; index++) {
+      // 2. Make a shallow copy of the item you want to mutate
+      let item = { ...items[index] };
+
+      if (item.id === newObject.id) {
+        log.debug(`${item.type} object '${item.name}': changed}`);
+
+        item.stem = newObject.stem;
+        items[index] = item;
+
+        break;
+      }
+    }
+
+    this.setState({ scopedObjects: { map: { questions: items } } });
   }
 
   onJsxParseError(arg) {

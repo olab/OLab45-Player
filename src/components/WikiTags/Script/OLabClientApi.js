@@ -26,32 +26,7 @@ export class OLabClientApi {
     this.timers = vm.timers;
     this.state = vm.component.state;
 
-    // these are the methods/properties we expose to the outside
-    // vm.service = {
-    //   createTimer: vm.createTimer,
-    //   destroyTimer: vm.destroyTimer,
-    //   dynamicObjects: vm.component.state.dynamicObjects,
-    //   getConstant: vm.getConstant,
-    //   getDomObject: vm.getDomObject,
-    //   getDragAndDropQuestion: vm.getDragAndDropQuestion,
-    //   getDropDownQuestion: vm.getDropDownQuestion,
-    //   getMultipleChoiceQuestion: vm.getMultipleChoiceQuestion,
-    //   getOLabObjectList: vm.getOLabObjectList,
-    //   getSingleChoiceQuestion: vm.getSingleChoiceQuestion,
-    //   getSliderQuestion: vm.getSliderQuestion,
-    //   getTextQuestion: vm.getTextQuestion,
-    //   hello: vm.hello,
-    //   onClick: vm.onClick,
-    //   onEvent: vm.onEvent,
-    //   scopedObjects: vm.component.state.scopedObjects,
-    //   shutdown: vm.shutdown,
-    //   state: vm.component.state,
-    //   timers: vm.timers,
-    // };
-
     this.hello();
-
-    // return vm.service;
   }
 
   hello() {
@@ -67,8 +42,8 @@ export class OLabClientApi {
     }
   }
 
-  updateState() {
-    this.component.updateState(this.state);
+  updateObject(newObject) {
+    this.component.updateObject(newObject);
   }
 
   createTimer(key, frequencyMs, callback) {

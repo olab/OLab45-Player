@@ -23,6 +23,6 @@ export class OLabApiQuestion extends OLabApiObject {
 
     question.stem = value;
 
-    this.clientApi.updateState();
+    this.clientApi.updateObject(question);
   }
 }
