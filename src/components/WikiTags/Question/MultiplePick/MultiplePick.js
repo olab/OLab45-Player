@@ -42,12 +42,6 @@ class OlabMultiPickQuestion extends OlabTag {
     this.transmitResponse = this.transmitResponse.bind(this);
   }
 
-  componentWillUnmount() {
-    log.debug(
-      `${this.constructor["name"]} '${this.state.olabObject.name}' componentWillUnmount`
-    );
-  }
-
   createArrayFromValue(source) {
     if (!source.includes(",") && !source.length) {
       return [];
@@ -150,16 +144,6 @@ class OlabMultiPickQuestion extends OlabTag {
     this.onSubmitResponse(responseState);
   }
 
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
-  }
-
-  setIsDisabled(disabled) {
-    this.setState({ disabled: disabled });
-    log.debug(`set disabled: ${disabled}`);
-  }
-
   buildQuestionResponses(olabObject, id, currentChoices) {
     let responses = [];
     let selectedIndexStrings = [];
@@ -257,7 +241,7 @@ class OlabMultiPickQuestion extends OlabTag {
     const { debug, olabObject } = this.state;
     const { id, name } = this.props;
 
-    log.debug(`${this.constructor["name"]} render '${name}'`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
       let progressButtonHtml = "";

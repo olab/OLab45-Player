@@ -111,7 +111,7 @@ class OlabDropDownQuestion extends OlabTag {
     const { debug, olabObject } = this.state;
     const { id, name } = this.props;
 
-    log.debug(`${this.constructor["name"]} render`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
       let progressButtonHtml = "";

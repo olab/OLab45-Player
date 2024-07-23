@@ -32,12 +32,6 @@ class OlabSinglelineTextQuestion extends OlabTag {
     this.transmitResponse = this.transmitResponse.bind(this);
   }
 
-  componentWillUnmount() {
-    log.debug(
-      `${this.constructor["name"]} '${this.state.olabObject.name}' componentWillUnmount`
-    );
-  }
-
   setValue = (event, setInProgress) => {
     const olabObject = this.state.olabObject;
     const value = olabObject.value;
@@ -76,16 +70,6 @@ class OlabSinglelineTextQuestion extends OlabTag {
     this.onSubmitResponse(responseState);
   }
 
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
-  }
-
-  setIsDisabled(disabled) {
-    this.setState({ disabled: disabled });
-    log.debug(`set disabled: ${disabled}`);
-  }
-
   handleChange = (event) => {
     const value = event.target.value;
     const olabObject = this.state.olabObject;
@@ -101,7 +85,7 @@ class OlabSinglelineTextQuestion extends OlabTag {
     const { debug, olabObject } = this.state;
     const { id, name } = this.props;
 
-    log.debug(`${this.constructor["name"]} render`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
       if (debug.disableWikiRendering) {

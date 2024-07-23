@@ -1,44 +1,36 @@
 // @flow
 import React from "react";
-import { getScript } from "../WikiUtils";
-import { OLabClientApi } from "./OLabClientApi";
 const playerState = require("../../../utils/PlayerState").PlayerState;
 import log from "loglevel";
 
-class OlabScriptTag extends React.Component {
+import { OLabClientApi } from "./OLabClientApi";
+import { getScript } from "../WikiUtils";
+import OlabTag from "../OlabTag";
+
+class OlabScriptTag extends OlabTag {
   constructor(props) {
-    super(props);
-
-    log.debug(`OlabScriptTag ctor`);
-
-    let script = getScript(this.props.name, this.props);
-    const debug = playerState.GetDebug();
-
-    this.state = {
-      script,
-      ...props.props,
-      debug,
-    };
-
+    let olabObject = getScript(props.name, props);
+    super(props, olabObject);
     this.olabClientApi = new OLabClientApi(this);
   }
 
   componentDidMount() {
-    const { debug, script } = this.state;
+    const { debug, olabObject } = this.state;
 
-    // uncomment this, to see expose html elements with id attribute
+    // uncomment this, to see html elements with id attribute
+    // dumped to the console
     // this.olabClientApi.getOLabObjectList();
 
     if (!debug.disableWikiRendering) {
       // load the script text into a function object
       // and execute it
       try {
-        this.func = new Function("olabClientApi", script.source);
+        this.func = new Function("olabClientApi", olabObject.source);
         this.func(this.olabClientApi);
 
         log.debug("script componentDidMount");
       } catch (error) {
-        alert(`Script '${script.name}' error: ${error.message}`);
+        alert(`Script '${olabObject.name}' error: ${error.message}`);
       }
     }
   }

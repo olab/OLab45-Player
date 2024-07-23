@@ -111,12 +111,16 @@ class Player extends PureComponent {
         scopedObjects: { map, server },
       } = this.state;
 
-      if (server.themes.length > 0) {
-        theme = server.themes[0];
+      if (server != null && server.themes != null) {
+        if (server.themes.length > 0) {
+          theme = server.themes[0];
+        }
       }
 
-      if (map.themes.length > 0) {
-        theme = map.themes[0];
+      if (map != null && map.themes != null) {
+        if (map.themes.length > 0) {
+          theme = map.themes[0];
+        }
       }
     } catch (error) {
       log.error(error);
@@ -346,10 +350,12 @@ class Player extends PureComponent {
   };
 
   onUpdateScopedObjects(newObject) {
-    let orgObjects = this.state.scopedObjects;
+    return;
+
+    let orgObjects = { ...this.state.scopedObjects };
 
     // 1. Make a shallow copy of the items
-    let items = [...orgObjects.map.questions];
+    let items = [...this.state.scopedObjects.map.questions];
 
     for (let index = 0; index < items.length; index++) {
       // 2. Make a shallow copy of the item you want to mutate
@@ -365,7 +371,18 @@ class Player extends PureComponent {
       }
     }
 
-    this.setState({ scopedObjects: { map: { questions: items } } });
+    const newState = {
+      ...this.state,
+      scopedObjects: {
+        ...this.state.scopedObjects, // Copy other fields
+        map: {
+          ...orgObjects.map,
+          questions: items,
+        },
+      },
+    };
+
+    this.setState(newState);
   }
 
   onJsxParseError(arg) {

@@ -35,17 +35,6 @@ class OlabMultilineTextQuestion extends OlabTag {
     this.transmitResponse = this.transmitResponse.bind(this);
   }
 
-  componentWillUnmount() {
-    log.debug(
-      `${this.constructor["name"]} '${this.state.olabObject.name}' componentWillUnmount`
-    );
-  }
-
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
-  }
-
   onSubmitClicked = (event) => {
     const olabObject = this.state.olabObject;
     const value = olabObject.value;
@@ -102,7 +91,7 @@ class OlabMultilineTextQuestion extends OlabTag {
     const { debug, olabObject, contentsChanged, disabled } = this.state;
     const { id, name } = this.props;
 
-    log.debug(`${this.constructor["name"]} render`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
       let progressButtonHtml = "";

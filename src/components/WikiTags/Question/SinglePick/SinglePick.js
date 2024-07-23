@@ -29,12 +29,9 @@ class OlabSinglePickQuestion extends OlabTag {
     super(props, olabObject);
 
     var responses = this.buildQuestionResponses(olabObject, this.props.id);
-    const debug = playerState.GetDebug();
 
     this.state = {
-      debug,
-      olabObject,
-      ...props.props,
+      ...this.state,
       responses,
     };
 
@@ -42,22 +39,6 @@ class OlabSinglePickQuestion extends OlabTag {
     this.setInProgress = this.setInProgress.bind(this);
     this.setValue = this.setValue.bind(this);
     this.transmitResponse = this.transmitResponse.bind(this);
-  }
-
-  componentWillUnmount() {
-    log.debug(
-      `${this.constructor["name"]} '${this.state.olabObject.name}' componentWillUnmount`
-    );
-  }
-
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
-  }
-
-  setIsDisabled(disabled) {
-    this.setState({ disabled: disabled });
-    log.debug(`set disabled: ${disabled}`);
   }
 
   setValue = (event) => {
@@ -212,7 +193,7 @@ class OlabSinglePickQuestion extends OlabTag {
     const { debug, olabObject, responses } = this.state;
     const { id, name } = this.props;
 
-    log.debug(`${this.constructor["name"]} render`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
       let row = olabObject.layoutType === 1 ? true : false;

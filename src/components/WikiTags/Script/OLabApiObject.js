@@ -23,29 +23,29 @@ export class OLabApiObject {
     this.domElement = this.findDomObject(this.elementId);
   }
 
-  // find an OLab scoped object of a certain type
-  // by id or name
+  // find and return a copy of an OLab scoped object
+  // of a certain type by id or name
   findOLabObject(idName, type) {
     const scopedObjects = this.clientApi.scopedObjects;
 
     for (const obj of scopedObjects.server[type]) {
       if (obj.id === idName || obj.name === idName) {
         log.debug(`found server ${type} '${idName}'`);
-        return obj;
+        return { ...obj };
       }
     }
 
     for (const obj of scopedObjects.map[type]) {
       if (obj.id === idName || obj.name === idName) {
         log.debug(`found map ${type} '${idName}'`);
-        return obj;
+        return { ...obj };
       }
     }
 
     for (const obj of scopedObjects.node[type]) {
       if (obj.id === idName || obj.name === idName) {
         log.debug(`found node ${type} '${idName}'`);
-        return obj;
+        return { ...obj };
       }
     }
 

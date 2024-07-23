@@ -41,12 +41,6 @@ class OlabSliderQuestion extends OlabTag {
     this.transmitResponse = this.transmitResponse.bind(this);
   }
 
-  componentWillUnmount() {
-    log.debug(
-      `${this.constructor["name"]} '${this.state.olabObject.name}' componentWillUnmount`
-    );
-  }
-
   setValue = (event, value) => {
     const olabObject = this.state.olabObject;
     log.debug(
@@ -80,16 +74,11 @@ class OlabSliderQuestion extends OlabTag {
     this.onSubmitResponse(responseState);
   }
 
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
-  }
-
   render() {
     const { debug, olabObject } = this.state;
     const { id, name } = this.props;
 
-    log.debug(`${this.constructor["name"]}  render '${name}'`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
       // eslint-disable-next-line
