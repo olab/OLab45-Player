@@ -44,9 +44,6 @@ class Player extends PureComponent {
   constructor(props) {
     super(props);
 
-    const logLevel = playerState.GetLogLevel();
-    log.setLevel(logLevel);
-
     const { mapId, nodeId } = arguments[0].params;
     log.info(`playing map ${mapId}, node ${nodeId}`);
 

@@ -33,6 +33,10 @@ class Home extends PureComponent {
     super(props);
 
     const debug = playerState.GetDebug();
+
+    const logLevel = playerState.GetLogLevel();
+    log.setLevel(logLevel);
+
     log.debug(`${this.constructor["name"]} ctor`);
 
     this.state = {

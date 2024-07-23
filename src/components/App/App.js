@@ -30,6 +30,8 @@ class App extends PureComponent {
     // check for any debug query string overrides
     this.processDebugQueryString();
 
+    log.debug(`${this.constructor["name"]} ctor`);
+
     this.reactVersion = process.env.REACT_APP_VERSION;
     log.debug(JSON.stringify(process.env));
 
@@ -180,6 +182,8 @@ class App extends PureComponent {
       directPlayError,
       impersonateUserOpen,
     } = this.state;
+
+    log.debug(`${this.constructor["name"]} render`);
 
     const isExpired = authActions.isExpiredSession();
 
