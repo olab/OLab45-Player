@@ -25,6 +25,7 @@ export class OLabClientApi {
     this.scopedObjects = vm.component.state.scopedObjects;
     this.timers = vm.timers;
     this.state = vm.component.state;
+    this.mounted = false;
 
     this.hello();
   }

@@ -342,13 +342,16 @@ class Player extends PureComponent {
       }
     }
 
-    this.setState({ dynamicObjects: { counters: { counters: items } } });
+    this.setState({
+      dynamicObjects: {
+        ...this.state.dynamicObjects,
+        counters: { counters: items },
+      },
+    });
     playerState.SetDynamicObjects(this.state.dynamicObjects);
   };
 
   onUpdateScopedObjects(newObject) {
-    return;
-
     let orgObjects = { ...this.state.scopedObjects };
 
     // 1. Make a shallow copy of the items

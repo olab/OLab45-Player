@@ -145,6 +145,7 @@ class OlabSinglePickQuestion extends OlabTag {
         value={response.id} // must be the response ID
         control={<Radio id={`${baseHtmlId}::input`} />}
         label={response.response}
+        name={response.name}
       />
     );
 
