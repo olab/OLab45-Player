@@ -39,12 +39,11 @@ class OlabCountersTag extends OlabTag {
             <b>[[COUNTERS]]</b>
             <Box width="300px;">
               {olabObject.map((counter) => (
-                <p>
-                  &nbsp;
+                <div key={counter.id}>
                   <b>
-                    [[CR:{counter.name}]]: {counter.value}
+                    -> [[CR:{counter.name}]]: {counter.value}
                   </b>
-                </p>
+                </div>
               ))}
             </Box>
           </>
@@ -65,7 +64,7 @@ class OlabCountersTag extends OlabTag {
               </TableHead>
               <TableBody>
                 {olabObject.map((row) => (
-                  <TableRow key={row.name}>
+                  <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
                       {row.scopeLevel} ({row.parentId})
                     </TableCell>
