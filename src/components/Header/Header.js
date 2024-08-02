@@ -121,13 +121,14 @@ const Header = ({
             <>
               {isSuperUser && (
                 <VersionWrapper>
-                  User: &nbsp;
                   <a
                     style={{ textDecoration: "underline" }}
                     onClick={onUserNameClicked}
                   >
-                    {authActions.getUserName()}
+                    User
                   </a>
+                  : &nbsp;
+                  {authActions.getUserName()}
                   <br />
                   Version: {version}
                 </VersionWrapper>

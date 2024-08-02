@@ -11,7 +11,7 @@ import log from "loglevel";
 
 import styles from "./styles";
 import ListWithSearch from "../ListWithSearch/ListWithSearch";
-import MapDetailDlg from "./MapDetail/MapDetail";
+import MapDetailDlg from "./MapDetailDlg/MapDetailDlg";
 import styled from "styled-components";
 import { PAGE_TITLES } from "../config";
 import filterByName from "../../helpers/filterByName";
