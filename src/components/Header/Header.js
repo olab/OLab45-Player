@@ -90,6 +90,8 @@ const Header = ({
       } else {
         if (data.data.authInfo) {
           setCredentials(data.data, userName, constants.TOKEN_TYPE_NATIVE);
+          // Refresh the page
+          location.reload();
         } else {
           throw JSON.stringify(data, null, 2);
         }
