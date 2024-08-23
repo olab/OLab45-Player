@@ -47,14 +47,14 @@ class ImpersonateDlg extends PureComponent {
         >
           <DialogTitle id="alert-dialog-title">{data.title}</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
+            <DialogContentText id="alert-dialog-description" autoFocus>
               <b>User to Impersonate:&nbsp;</b>
               {data.userName}
               <br />
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.handleClose} color="primary" autoFocus>
+            <Button onClick={this.handleClose} color="primary">
               OK
             </Button>
           </DialogActions>
