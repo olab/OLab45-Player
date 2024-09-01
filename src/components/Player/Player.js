@@ -573,20 +573,6 @@ class Player extends PureComponent {
         </div>
       );
 
-      // if node is 'visit once', save it to list in storage
-      if (this.state.node.visitOnce) {
-        nodesVisited.push(this.state.node.id);
-
-        // remove any duplicates.
-        var newNodesVisited = [...new Set(nodesVisited)];
-        this.setState({ nodesVisited: newNodesVisited });
-
-        log.debug(`saving visited node id: ${this.state.node.id}`);
-        playerState.SetNodesVisited(newNodesVisited);
-
-        log.debug(`Added node id ${this.state.node.id} to visitOnce list`);
-      }
-
       if (debug.disableWikiRendering) {
         return (
           <FormControl>
