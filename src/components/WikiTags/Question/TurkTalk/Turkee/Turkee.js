@@ -104,17 +104,6 @@ class OlabAttendeeTag extends React.Component {
     }
   }
 
-  onNavigateToNode = (mapId, nodeId, urlParam = null) => {
-    let url = `/player/${mapId}/${nodeId}`;
-    if (urlParam) {
-      url += `/${urlParam}`;
-    }
-
-    log.debug(`navigating to ${url}`);
-
-    window.location.href = url;
-  };
-
   // system is sending a message to turkee
   onServerMessage(payload) {
     try {
@@ -142,7 +131,7 @@ class OlabAttendeeTag extends React.Component {
       // pause for 5 seconds
       await new Promise((r) => setTimeout(r, 4000));
 
-      this.onNavigateToNode(mapId, nodeId);
+      this.props.props.onNavigateToNode(mapId, nodeId);
     } catch (error) {
       LogError(`'${this.connectionId}' onJumpNode exception: ${error.message}`);
     }

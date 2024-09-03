@@ -21,6 +21,7 @@ const KeyConstants = {
   SERVER: "server",
   SESSION_INFO: "session-info",
   VISIT_ONCE_NODE_LIST: "visit-once-node-list",
+  CLICK_ONCE_LINK_LIST: "click-once-link-list",
   WATCH_PROFILE: "watchProfile",
 };
 
@@ -74,6 +75,7 @@ class PlayerState {
     const serverStatic = this.GetServerStatic();
     const sessionInfo = this.GetSessionInfo();
     const visitOnceList = this.GetNodesVisited();
+    const clickOnceList = this.GetLinksClicked();
 
     return {
       debug: debug,
@@ -91,6 +93,7 @@ class PlayerState {
         server: serverStatic,
       },
       nodesVisited: visitOnceList,
+      linksClicked: clickOnceList,
       sessionInfo: sessionInfo,
     };
   }
@@ -296,6 +299,22 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.VISIT_ONCE_NODE_LIST,
+      defaultValue
+    );
+  }
+
+  static SetLinksClicked(obj) {
+    persistantStorage.save(
+      this.storageKey,
+      KeyConstants.CLICK_ONCE_LINK_LIST,
+      obj
+    );
+  }
+
+  static GetLinksClicked(defaultValue = []) {
+    return persistantStorage.get(
+      this.storageKey,
+      KeyConstants.CLICK_ONCE_LINK_LIST,
       defaultValue
     );
   }

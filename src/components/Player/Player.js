@@ -428,7 +428,7 @@ class Player extends PureComponent {
     }
 
     if (isMounted) {
-      const linkHandler = this.onNavigateToNode;
+      const onNavigateToNode = this.onNavigateToNode;
       const onUpdateDynamicObjects = this.onUpdateDynamicObjects;
       const onUpdateScopedObjects = this.onUpdateScopedObjects;
       const theme = this.lookupTheme();
@@ -448,12 +448,12 @@ class Player extends PureComponent {
                   contextId,
                   dynamicObjects,
                   history,
-                  linkHandler,
                   map,
                   node,
                   nodesVisited,
                   scopedObjects,
                   urlParam,
+                  onNavigateToNode,
                 },
               }}
               components={{
@@ -492,12 +492,12 @@ class Player extends PureComponent {
                   contextId,
                   dynamicObjects,
                   history,
-                  linkHandler,
                   map,
                   node,
                   nodesVisited,
                   scopedObjects,
                   urlParam,
+                  onNavigateToNode,
                 },
               }}
               components={{
@@ -536,7 +536,6 @@ class Player extends PureComponent {
                 contextId,
                 dynamicObjects,
                 history,
-                linkHandler,
                 map,
                 node,
                 nodesVisited,
@@ -545,6 +544,7 @@ class Player extends PureComponent {
                 player,
                 scopedObjects,
                 urlParam,
+                onNavigateToNode,
               },
             }}
             components={{

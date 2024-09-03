@@ -13,19 +13,20 @@ class OlabLinksTag extends OlabTag {
     super(props);
   }
 
-  onNavigateToNode = (mapId, nodeId, urlParam) => {
-    let url = `${config.APP_BASEPATH}/${mapId}/${nodeId}`;
-    if (urlParam) {
-      url += `/${urlParam}`;
+  onNavigateToNode = (link, mapId, nodeId, urlParam) => {
+    if (link.followOnce) {
+      var newLinksClicked = playerState.GetLinksClicked();
+      newLinksClicked.push(link.id);
+      playerState.SetLinksClicked(newLinksClicked);
     }
 
-    log.debug(`navigating to ${url}`);
-
-    window.location.href = url;
+    this.props.props.onNavigateToNode(mapId, nodeId, urlParam);
   };
 
   render() {
     log.debug(`${this.constructor["name"]} render`);
+
+    var linksClicked = playerState.GetLinksClicked();
 
     const { debug } = this.state;
 
@@ -39,9 +40,18 @@ class OlabLinksTag extends OlabTag {
       },
     } = this.props;
 
+    // remove link based on visit-once nodes
     for (let index = links.length - 1; index >= 0; index--) {
       const link = links[index];
       if (nodesVisited.includes(link.destinationId)) {
+        links.splice(index, 1);
+      }
+    }
+
+    // remove link based on click-once links
+    for (let index = links.length - 1; index >= 0; index--) {
+      const link = links[index];
+      if (linksClicked.includes(link.id)) {
         links.splice(index, 1);
       }
     }
@@ -59,7 +69,12 @@ class OlabLinksTag extends OlabTag {
               <Button
                 key={link.id}
                 onClick={() => {
-                  this.onNavigateToNode(mapId, link.destinationId, urlParam);
+                  this.onNavigateToNode(
+                    link,
+                    mapId,
+                    link.destinationId,
+                    urlParam
+                  );
                 }}
               >
                 {link.destinationTitle} (id: {link.id} -&gt;{" "}
@@ -83,7 +98,12 @@ class OlabLinksTag extends OlabTag {
                 key={link.id}
                 style={{ textTransform: "none" }}
                 onClick={() => {
-                  this.onNavigateToNode(mapId, link.destinationId, urlParam);
+                  this.onNavigateToNode(
+                    link,
+                    mapId,
+                    link.destinationId,
+                    urlParam
+                  );
                 }}
               >
                 {link.linkText}
