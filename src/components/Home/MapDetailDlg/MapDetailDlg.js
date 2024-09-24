@@ -63,8 +63,9 @@ class MapDetailDlg extends PureComponent {
               <br />
               <b>Abstract:&nbsp;</b>
               <JsxParser jsx={data.abstract} />
-              <b>Groups:&nbsp;</b>
-              {data.groups.join(", ")}
+              <b>Group/Roles:</b>
+              <br />
+              {data.groupsRoles.join(", ")}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
