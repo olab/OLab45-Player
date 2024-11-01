@@ -117,6 +117,7 @@ class OlabQuestionTag extends React.Component {
           node: this.state.node,
           dynamicObjects: this.state.dynamicObjects,
           contextId: this.props.props.contextId,
+          onNavigateToNode: this.props.props.onNavigateToNode,
         };
 
         let questionType = props.question.questionType;
