@@ -84,7 +84,7 @@ class OlabMediaResourceTag extends OlabTag {
 
       // handle case if file store is not on same host as website
       if ( olabObject.hostName != null ) {
-        olabObject.originUrl = `${olabObject.hostName}/${olabObject.originUrl}`;
+        olabObject.originUrl = `${olabObject.hostName}${olabObject.originUrl}`;
       }
 
       if (this.isAudioType(olabObject.mime)) {
