@@ -43,6 +43,24 @@ export class OLabClientApi {
     }
   }
 
+  // Function to load external HTML
+  loadExternalDiv(file, targetElementId) {
+    fetch(file)
+      .then((response) => response.text())
+      .then((data) => {
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = data;
+        const externalDiv = tempDiv.querySelector("div");
+        if (externalDiv) {
+          document.getElementById(targetElementId).innerHTML =
+            externalDiv.outerHTML;
+        } else {
+          console.error("No div found in external file.");
+        }
+      })
+      .catch((error) => console.error("Error loading external HTML:", error));
+  }
+
   updateObject(newObject) {
     this.component.updateObject(newObject);
   }
