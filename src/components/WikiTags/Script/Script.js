@@ -14,41 +14,36 @@ class OlabScriptTag extends OlabTag {
     this.olabClientApi = new OLabClientApi(this);
   }
 
-  render() {
-    const { name } = this.props;
+  componentDidMount() {
+    this.loadSnippet();
+  }
 
-    log.debug(`OlabScriptTag render '${name}'`);
-
+  loadSnippet = async () => {
     try {
-      if (debug.disableWikiRendering) {
-        return (
-          <>
-            <br />
-            <b>[[SCRIPT:{name}]]</b>
-            <br />
-            <textarea rows="10" cols="50" />
-            <br />
-            <br />
-          </>
-        );
+      const response = await fetch(
+        "https://olabfiles.blob.core.windows.net/files/Maps/1451/scriptTest.html"
+      );
+      const snippet = await response.text();
+      const container = document.getElementById("snippetContainer");
+      if (container) {
+        container.innerHTML = snippet;
+        // Evaluate scripts within the snippet
+        const scriptTags = container.getElementsByTagName("script");
+        for (let i = 0; i < scriptTags.length; i++) {
+          eval(scriptTags[i].innerText); // Caution: use eval carefully
+        }
       }
-
-      // Load the external HTML file containing the div
-      this.olabClientApi.loadExternalDiv(
-        "https://olabfiles.blob.core.windows.net/files/Maps/1451/scriptTest.html",
-        "content"
-      );
-
-      return <div id="content"></div>;
     } catch (error) {
-      return (
-        <>
-          <b>
-            [[SCRIPT:{name}]] error: {error.message}
-          </b>
-        </>
-      );
+      console.error("Error loading snippet:", error);
     }
+  };
+
+  render() {
+    return (
+      <div id="snippetContainer">
+        {/* The HTML snippet will be loaded here */}
+      </div>
+    );
   }
 }
 
