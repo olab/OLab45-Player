@@ -13,7 +13,10 @@ class OlabTag extends React.Component {
 
     const debug = playerState.GetDebug();
 
+    let olabClientApi = new OLabClientApi(this);
+
     this.state = {
+      olabClientApi,
       olabObject,
       debug,
       ...props.props,

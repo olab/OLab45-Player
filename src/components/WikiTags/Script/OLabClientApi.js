@@ -31,7 +31,9 @@ export class OLabClientApi {
   }
 
   hello() {
-    log.debug("hello from OLabClientApi.");
+    let message = "hello from OLabClientApi.";
+    log.debug(message);
+    return message;
   }
 
   shutdown() {
