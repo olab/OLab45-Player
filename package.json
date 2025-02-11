@@ -47,9 +47,10 @@
     "build": "react-scripts build",
     "version:inc": "npm --no-git-tag-version version prerelease",
     "version:full": "npm --no-git-tag-version version `date +%y.%m.%d-0`",
-    "build:debug": "env-cmd -f .env.debug npm run-script build",
-    "build:release": "env-cmd -f .env.release npm run-script build",
-    "build:azure": "env-cmd -f .env.azure npm run-script build",
+    "build:debug": "env-cmd -f .env.debug npm run build",
+    "build:release": "env-cmd -f .env.release npm run build",
+    "build:local": "env-cmd -f .env.local npm run build",
+    "build:azure": "env-cmd -f .env.azure npm run build",
     "prepare": "husky install"
   },
   "eslintConfig": {

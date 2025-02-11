@@ -33,7 +33,7 @@ class App extends PureComponent {
     log.debug(`${this.constructor["name"]} ctor`);
 
     this.reactVersion = process.env.REACT_APP_VERSION;
-    log.debug(JSON.stringify(process.env));
+    console.log(JSON.stringify(process.env));
 
     const [mapId, nodeId, accessToken] = processUrl();
     const directPlay = mapId != null && nodeId != null;

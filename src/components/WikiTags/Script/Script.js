@@ -29,13 +29,18 @@ class OlabScriptTag extends OlabTag {
 
       var url = olabObject.originUrl;
       if (olabObject.hostName != null) {
-        url = `${olabObject.hostName}/url`;
+        url = `${olabObject.hostName}/${url}`;
       }
 
       const response = await fetch(
         url
         // "https://olabfiles.blob.core.windows.net/files/Maps/1451/scriptTest.html"
       );
+
+      if (!response.ok) {
+        throw new Error(`Script load error: ${response.status}`);
+      }
+
       const snippet = await response.text();
       const container = document.getElementById("snippetContainer");
       if (container) {
