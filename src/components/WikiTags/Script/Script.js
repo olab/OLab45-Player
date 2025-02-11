@@ -32,13 +32,10 @@ class OlabScriptTag extends OlabTag {
         url = `${olabObject.hostName}${url}`;
       }
 
-      const response = await fetch(
-        url
-        // "https://olabfiles.blob.core.windows.net/files/Maps/1451/scriptTest.html"
-      );
+      const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error(`Script load error: ${response.status}`);
+        throw new Error(response.status);
       }
 
       const snippet = await response.text();
@@ -48,7 +45,7 @@ class OlabScriptTag extends OlabTag {
         // Evaluate scripts within the snippet
         const scriptTags = container.getElementsByTagName("script");
         for (let i = 0; i < scriptTags.length; i++) {
-          eval(scriptTags[i].innerText); // Caution: use eval carefully
+          eval(scriptTags[i].innerText);
         }
       }
     } catch (error) {
