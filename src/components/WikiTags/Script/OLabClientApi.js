@@ -72,7 +72,7 @@ export class OLabClientApi {
         ...this.scopedObjects.server?.scripts,
       ];
 
-      item = findWikiInList(array, name);
+      item = this.findWikiInList(array, name);
 
       if (item == null) {
         log.error(`Could not find script '${name}'`);
