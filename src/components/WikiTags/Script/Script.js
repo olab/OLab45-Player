@@ -11,6 +11,7 @@ class OlabScriptTag extends OlabTag {
   constructor(props) {
     let olabObject = getScript(props.name, props);
     super(props, olabObject);
+    this.state.olabClientApi = new OLabClientApi(this);
   }
 
   componentDidMount() {
