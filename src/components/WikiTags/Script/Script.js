@@ -11,6 +11,7 @@ class OlabScriptTag extends OlabTag {
   constructor(props) {
     let olabObject = getScript(props.name, props);
     super(props, olabObject);
+
     this.state.olabClientApi = new OLabClientApi(this);
   }
 
@@ -39,11 +40,14 @@ class OlabScriptTag extends OlabTag {
       }
 
       const snippet = await response.text();
+
       const container = document.getElementById("snippetContainer");
       if (container) {
         container.innerHTML = snippet;
+
         // Evaluate scripts within the snippet
         const scriptTags = container.getElementsByTagName("script");
+
         for (let i = 0; i < scriptTags.length; i++) {
           eval(scriptTags[i].innerText);
         }

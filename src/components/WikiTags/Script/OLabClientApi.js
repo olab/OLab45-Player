@@ -27,6 +27,7 @@ export class OLabClientApi {
     this.state = vm.component.state;
     this.mounted = false;
 
+    log.setLevel(log.levels.DEBUG);
     this.hello();
   }
 
@@ -43,6 +44,44 @@ export class OLabClientApi {
     for (let timerName of timerNames) {
       this.destroyTimer(timerName);
     }
+  }
+
+  findWikiInList(list, wiki) {
+    let match = null;
+
+    for (let element of list) {
+      if (element.name === wiki || element.id === Number(wiki)) {
+        match = element;
+        break;
+      }
+    }
+
+    if (match == null) {
+      throw new Error(`object '${wiki}' not found`);
+    }
+    return match;
+  }
+
+  getScript(name) {
+    let item = null;
+
+    try {
+      const array = [
+        ...this.scopedObjects.node?.scripts,
+        ...this.scopedObjects.map?.scripts,
+        ...this.scopedObjects.server?.scripts,
+      ];
+
+      item = findWikiInList(array, name);
+
+      if (item == null) {
+        log.error(`Could not find script '${name}'`);
+      }
+    } catch (error) {
+      log.error(`error looking up script ${name}: ${error}`);
+    }
+
+    return item;
   }
 
   // Function to load external HTML
