@@ -27,8 +27,14 @@ class OlabScriptTag extends OlabTag {
     try {
       const { debug, olabObject } = this.state;
 
+      var url = olabObject.originUrl;
+      if (olabObject.hostName != null) {
+        url = `${olabObject.hostName}/url`;
+      }
+
       const response = await fetch(
-        "https://olabfiles.blob.core.windows.net/files/Maps/1451/scriptTest.html"
+        url
+        // "https://olabfiles.blob.core.windows.net/files/Maps/1451/scriptTest.html"
       );
       const snippet = await response.text();
       const container = document.getElementById("snippetContainer");
@@ -46,13 +52,13 @@ class OlabScriptTag extends OlabTag {
   };
 
   render() {
-    const { debug, script } = this.state;
+    const { debug, olabObject } = this.state;
     const { name } = this.props;
 
     log.debug(`OlabScriptTag render '${name}'`);
 
     try {
-      if (script == null) {
+      if (olabObject == null) {
         throw new Error(`'${this.props.name}' not found`);
       }
 
