@@ -29,7 +29,7 @@ class OlabScriptTag extends OlabTag {
 
       var url = olabObject.originUrl;
       if (olabObject.hostName != null) {
-        url = `${olabObject.hostName}/${url}`;
+        url = `${olabObject.hostName}${url}`;
       }
 
       const response = await fetch(
