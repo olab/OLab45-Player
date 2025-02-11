@@ -25,7 +25,7 @@ class OlabScriptTag extends OlabTag {
 
   loadSnippet = async () => {
     try {
-      const { debug, script } = this.state;
+      const { debug, olabObject } = this.state;
 
       const response = await fetch(
         "https://olabfiles.blob.core.windows.net/files/Maps/1451/scriptTest.html"
