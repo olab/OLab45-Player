@@ -47,6 +47,7 @@
     "eject": "react-scripts eject",
     "prepare": "husky install",
     "start:azure": "env-cmd -f .env.azure npm start",
+    "start:local": "env-cmd -f .env.local npm start",
     "start": "react-scripts start",
     "test": "react-scripts test",
     "version:full": "npm --no-git-tag-version version `date +%y.%m.%d-0`",
