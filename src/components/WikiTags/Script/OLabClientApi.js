@@ -46,6 +46,33 @@ export class OLabClientApi {
     }
   }
 
+  // find and return a copy of an OLab scoped object
+  // of a certain type by id or name
+  findOLabObject(idName, type) {
+    for (const obj of this.scopedObjects.server[type]) {
+      if (obj.id === idName || obj.name === idName) {
+        log.debug(`found server ${type} '${idName}'`);
+        return { ...obj };
+      }
+    }
+
+    for (const obj of this.scopedObjects.map[type]) {
+      if (obj.id === idName || obj.name === idName) {
+        log.debug(`found map ${type} '${idName}'`);
+        return { ...obj };
+      }
+    }
+
+    for (const obj of this.scopedObjects.node[type]) {
+      if (obj.id === idName || obj.name === idName) {
+        log.debug(`found node ${type} '${idName}'`);
+        return { ...obj };
+      }
+    }
+
+    throw new Error(`unknown ${type} scopedObject with id '${idName}'`);
+  }
+
   findWikiInList(list, wiki) {
     let match = null;
 
@@ -62,31 +89,9 @@ export class OLabClientApi {
     return match;
   }
 
-  getScript(name) {
-    let item = null;
-
-    try {
-      const array = [
-        ...this.scopedObjects.node?.scripts,
-        ...this.scopedObjects.map?.scripts,
-        ...this.scopedObjects.server?.scripts,
-      ];
-
-      item = this.findWikiInList(array, name);
-
-      if (item == null) {
-        log.error(`Could not find script '${name}'`);
-      }
-    } catch (error) {
-      log.error(`error looking up script ${name}: ${error}`);
-    }
-
-    return item;
-  }
-
-  // Function to load external HTML
-  loadExternalDiv(file, targetElementId) {
-    fetch(file)
+  // Function to load external HTML into current document
+  loadExternalDiv(url, targetElementId) {
+    fetch(url)
       .then((response) => response.text())
       .then((data) => {
         const tempDiv = document.createElement("div");
@@ -151,6 +156,28 @@ export class OLabClientApi {
   getDomObject(id) {
     let apiDomObject = new OLabApiDomObject(this, id);
     return apiDomObject;
+  }
+
+  getScript(name) {
+    let item = null;
+
+    try {
+      const array = [
+        ...this.scopedObjects.node?.scripts,
+        ...this.scopedObjects.map?.scripts,
+        ...this.scopedObjects.server?.scripts,
+      ];
+
+      item = this.findWikiInList(array, name);
+
+      if (item == null) {
+        log.error(`Could not find script '${name}'`);
+      }
+    } catch (error) {
+      log.error(`error looking up script ${name}: ${error}`);
+    }
+
+    return item;
   }
 
   getConstant(id) {
