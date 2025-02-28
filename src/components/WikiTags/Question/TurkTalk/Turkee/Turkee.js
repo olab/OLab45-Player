@@ -13,8 +13,12 @@ import SlotInfo from "../../../../../helpers/SlotInfo";
 import SlotManager from "../SlotManager";
 import Session from "../../../../../services/session";
 
-var constants = require("../../../../../services/constants");
-const playerState = require("../../../../../utils/PlayerState").PlayerState;
+// var constants = require("../../../../../services/constants");
+import constants from "../../../../../services/constants";
+
+// const playerState = require("../../../../../utils/PlayerState").PlayerState;
+import { PlayerState } from "../../../../../utils/PlayerState";
+const playerState = new PlayerState();
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -30,7 +34,7 @@ class OlabAttendeeTag extends React.Component {
     this.slotManager.RemoteSlots()[0].show = true;
 
     let session = new Session(props.props);
-    const debug = playerState.GetDebug();
+    const debug = PlayerState.GetDebug();
 
     this.state = {
       debug,

@@ -12,8 +12,13 @@ import styles from "../../../styles.module.css";
 import TurkerChatCellGrid from "./TurkerChatCellGrid";
 import Participant from "../../../../../helpers/participant";
 import SlotInfo from "../../../../../helpers/SlotInfo";
-const playerState = require("../../../../../utils/PlayerState").PlayerState;
-var constants = require("../../../../../services/constants");
+
+// const playerState = require("../../../../../utils/PlayerState").PlayerState;
+import { PlayerState } from "../../../../../utils/PlayerState";
+const playerState = new PlayerState();
+
+// var constants = require("../../../../../services/constants");
+import constants from "../../../../../services/constants";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -23,7 +28,7 @@ class OlabModeratorTag extends React.Component {
   constructor(props) {
     super(props);
 
-    let atrium = playerState.GetAtrium({ roomName: "" });
+    let atrium = PlayerState.GetAtrium({ roomName: "" });
 
     const questionSettings = JSON.parse(this.props.props.question.settings);
 
@@ -34,14 +39,14 @@ class OlabModeratorTag extends React.Component {
       this.onScreenPopup({ message: "No room name defined" });
     }
 
-    const { roomName: previousRoomName } = playerState.GetConnectionInfo({
+    const { roomName: previousRoomName } = PlayerState.GetConnectionInfo({
       roomName: "",
     });
 
     if (newRoomName != previousRoomName) {
       atrium = {};
-      playerState.SetAtrium(null);
-      playerState.SetConnectionInfo(null, null);
+      PlayerState.SetAtrium(null);
+      PlayerState.SetConnectionInfo(null, null);
     }
 
     this.state = {
@@ -133,7 +138,7 @@ class OlabModeratorTag extends React.Component {
         }' onModeratorAssigned localInfo = ${JSON.stringify(payload, null, 2)}]`
       );
 
-      playerState.SetConnectionInfo(null, localInfo);
+      PlayerState.SetConnectionInfo(null, localInfo);
     } catch (error) {
       LogError(
         `'${localInfo.connectionId}' onModeratorAssigned exception: ${error.message}`
@@ -245,7 +250,7 @@ class OlabModeratorTag extends React.Component {
         atriumLearners,
       };
 
-      playerState.SetAtrium(state);
+      PlayerState.SetAtrium(state);
     } catch (error) {
       LogError(
         `'${localInfo.connectionId}' updateAtriumState exception: ${error.message}`

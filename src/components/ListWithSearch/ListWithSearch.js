@@ -61,7 +61,7 @@ class ListWithSearch extends PureComponent {
 
   onInputChange = (e) => {
     const { onSearch } = this.props;
-    const { name, value } = (e.target: window.HTMLInputElement);
+    const { name, value } = e.target;
 
     onSearch(value);
     this.setState({ [name]: value });

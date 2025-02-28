@@ -7,7 +7,9 @@ import log from "loglevel";
 import styles from "../WikiTags/styles.module.css";
 import { connect } from "formik";
 import { LastPageOutlined } from "@material-ui/icons";
-var constants = require("../../services/constants");
+
+// var constants = require("../../services/constants");
+import constants from "../../services/constants";
 
 class ChatStatusBar extends React.Component {
   constructor(props) {

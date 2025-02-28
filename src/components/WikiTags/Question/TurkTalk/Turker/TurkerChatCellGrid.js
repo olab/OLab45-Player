@@ -12,10 +12,14 @@ import RememberedLearners from "./RememberedLearners/RememberedLearners";
 import SlotManager from "../SlotManager";
 import ChatCell from "../../../../ChatCell/ChatCell";
 import WatchedLearners from "./WatchedLearners";
-const persistantStorage =
-  require("../../../../../utils/PersistantStorage").PersistantStorage;
 
-var constants = require("../../../../../services/constants");
+// const persistantStorage =
+//   require("../../../../../utils/PersistantStorage").PersistantStorage;
+import { PersistantStorage } from "../../../../../utils/PersistantStorage";
+const persistantStorage = new PersistantStorage();
+  
+// var constants = require("../../../../../services/constants");
+import constants from "../../../../../services/constants";
 
 class TurkerChatCellGrid extends React.Component {
   constructor(props) {

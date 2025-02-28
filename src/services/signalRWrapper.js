@@ -2,7 +2,10 @@ import TurkTalk from "./turktalk";
 import { Log, LogInfo, LogError } from "../utils/Logger";
 import log from "loglevel";
 import { config } from "../config";
-const playerState = require("../utils/PlayerState").PlayerState;
+
+// const playerState = require("../utils/PlayerState").PlayerState;
+import { PlayerState } from "../utils/PlayerState";
+const playerState = new PlayerState();
 
 let retryCount = 10;
 if (config?.API_RETRY_COUNT) {

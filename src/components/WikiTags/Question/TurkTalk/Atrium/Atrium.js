@@ -4,8 +4,13 @@ import { LogError } from "../../../../../utils/Logger";
 import log from "loglevel";
 import SlotInfo from "../../../../../helpers/SlotInfo";
 import AssigneeSearchableList from "./AssigneeSearchableList/AssigneeSearchableList";
-const playerState = require("../../../../../utils/PlayerState").PlayerState;
-var constants = require("../../../../../services/constants");
+
+// var constants = require("../../../../../services/constants");
+import constants from "../../../../../services/constants";
+
+// const playerState = require("../../../../../utils/PlayerState").PlayerState;
+import { PlayerState } from "../../../../../utils/PlayerState";
+const playerState = new PlayerState();
 
 class Atrium extends React.Component {
   constructor(props) {
@@ -157,7 +162,7 @@ class Atrium extends React.Component {
         autoAssign,
       };
 
-      playerState.SetAtrium(state);
+      PlayerState.SetAtrium(state);
     } catch (error) {
       log.error(
         `'${this.connectionId}' updateAtriumState exception: ${error.message}`

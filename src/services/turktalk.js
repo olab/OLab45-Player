@@ -4,8 +4,12 @@ import log from "loglevel";
 import { config } from "../config";
 import SignalRWrapper from "./signalRWrapper";
 
-var constants = require("./constants");
-const playerState = require("../utils/PlayerState").PlayerState;
+// var constants = require("./constants");
+import constants from "./constants";
+
+// const playerState = require("../utils/PlayerState").PlayerState;
+import { PlayerState } from "../utils/PlayerState";
+const playerState = new PlayerState();
 
 class TurkTalk {
   // *****
@@ -23,7 +27,7 @@ class TurkTalk {
     );
     this.penName = `${component.props.props.map.name}|${this.questionSettings.roomName}`;
 
-    const sessionInfo = playerState.GetSessionInfo(null);
+    const sessionInfo = PlayerState.GetSessionInfo(null);
     const token = `${sessionInfo?.authInfo.token}`;
     const hubUrl = `${url}?access_token=${token}&contextId=${this.contextId}&mapId=${this.component.props.props.map.id}`;
 

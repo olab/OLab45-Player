@@ -27,7 +27,8 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
 import SlotInfo from "../../helpers/SlotInfo";
 
-var constants = require("../../services/constants");
+// var constants = require("../../services/constants");
+import constants from "../../services/constants";
 
 class Chat extends React.Component {
   constructor(props) {

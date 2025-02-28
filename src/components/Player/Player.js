@@ -3,7 +3,10 @@ import { withStyles } from "@material-ui/core/styles";
 import { FormControl } from "@material-ui/core";
 import JsxParser from "react-jsx-parser";
 import log from "loglevel";
-const playerState = require("../../utils/PlayerState").PlayerState;
+
+// const playerState = require("../../utils/PlayerState").PlayerState;
+import { PlayerState } from "../../utils/PlayerState";
+const playerState = new PlayerState();
 
 import ErrorPopup from "../ErrorPopup/ErrorPopup";
 import {
@@ -61,7 +64,7 @@ class Player extends PureComponent {
     this.onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
     this.onUpdateScopedObjects = this.onUpdateScopedObjects.bind(this);
 
-    const persistedState = playerState.Get();
+    const persistedState = PlayerState.Get();
 
     this.state = {
       ...this.state,
@@ -157,7 +160,7 @@ class Player extends PureComponent {
     });
 
     if (!this.state.disableCache) {
-      playerState.SetServerStatic(this.state.scopedObjects.server);
+      PlayerState.SetServerStatic(this.state.scopedObjects.server);
     }
 
     log.debug("read server data");
@@ -190,8 +193,8 @@ class Player extends PureComponent {
     });
 
     if (!this.state.disableCache) {
-      playerState.SetMapStatic(this.state.scopedObjects.map);
-      playerState.SetMap(this.state.map);
+      PlayerState.SetMapStatic(this.state.scopedObjects.map);
+      PlayerState.SetMap(this.state.map);
     }
 
     log.debug("read map data");
@@ -203,7 +206,7 @@ class Player extends PureComponent {
     // reset nodes visited if entering map via 'root node'
     if (nodeId == 0) {
       this.setState({ nodesVisited: [] });
-      playerState.SetNodesVisited([]);
+      PlayerState.SetNodesVisited([]);
     }
 
     // test if already have node loaded (and it's the same one)
@@ -250,9 +253,9 @@ class Player extends PureComponent {
     // if new play, should be new contextId from server,
     // otherwise get it out of local state
     if (newPlay) {
-      playerState.SetContextId(nodeData.contextId);
+      PlayerState.SetContextId(nodeData.contextId);
     } else {
-      nodeData.contextId = playerState.GetContextId();
+      nodeData.contextId = PlayerState.GetContextId();
     }
 
     log.info(`contextId: ${nodeData.contextId}`);
@@ -269,9 +272,9 @@ class Player extends PureComponent {
     });
 
     if (!this.state.disableCache) {
-      playerState.SetNode(this.state.node);
-      playerState.SetDynamicObjects(this.state.dynamicObjects);
-      playerState.SetNodeStatic(this.state.scopedObjects.node);
+      PlayerState.SetNode(this.state.node);
+      PlayerState.SetDynamicObjects(this.state.dynamicObjects);
+      PlayerState.SetNodeStatic(this.state.scopedObjects.node);
     }
 
     log.debug("read node data");
@@ -294,7 +297,7 @@ class Player extends PureComponent {
         dynamicObjects: scopedObjectsData,
       });
 
-      playerState.SetDynamicObjects(this.state.dynamicObjects);
+      PlayerState.SetDynamicObjects(this.state.dynamicObjects);
 
       log.debug("read dynamic data");
     } catch (error) {
@@ -348,7 +351,7 @@ class Player extends PureComponent {
         counters: { counters: items },
       },
     });
-    playerState.SetDynamicObjects(this.state.dynamicObjects);
+    PlayerState.SetDynamicObjects(this.state.dynamicObjects);
   };
 
   onUpdateScopedObjects(newObject) {

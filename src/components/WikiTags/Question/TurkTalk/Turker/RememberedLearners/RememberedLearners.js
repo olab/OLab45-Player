@@ -12,7 +12,9 @@ import {
 } from "@material-ui/core";
 import log from "loglevel";
 import localCss from "./RememberedLearners.module.css";
-var constants = require("../../../../../../services/constants");
+
+// var constants = require("../../../../../../services/constants");
+import constants from "../../../../../../services/constants";
 
 class RememberedLearners extends React.Component {
   constructor(props) {

@@ -21,7 +21,9 @@ import Import from "../Import/Import";
 import { getMaps } from "../../services/api";
 import { config } from "../../config";
 
-const playerState = require("../../utils/PlayerState").PlayerState;
+// const playerState = require("../../utils/PlayerState").PlayerState;
+import { PlayerState } from "../../utils/PlayerState";
+const playerState = new PlayerState();
 
 const HomeWrapper = styled.div`
   padding: 1rem;
@@ -32,9 +34,9 @@ class Home extends PureComponent {
   constructor(props) {
     super(props);
 
-    const debug = playerState.GetDebug();
+    const debug = PlayerState.GetDebug();
 
-    const logLevel = playerState.GetLogLevel();
+    const logLevel = PlayerState.GetLogLevel();
     log.setLevel(logLevel);
 
     log.debug(`${this.constructor["name"]} ctor`);
@@ -60,7 +62,7 @@ class Home extends PureComponent {
     this.setPageTitle();
 
     if (!this.state.disableCache) {
-      this.state.maps = playerState.GetMaps();
+      this.state.maps = PlayerState.GetMaps();
       this.state.mapsFiltered = this.state.maps;
     }
 
@@ -162,7 +164,7 @@ class Home extends PureComponent {
       mapsFiltered: objData,
     });
 
-    playerState.ClearMap();
+    PlayerState.ClearMap();
   }
 
   getIcon = (showIcons, scopedObject) => {

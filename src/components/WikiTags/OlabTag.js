@@ -2,7 +2,10 @@
 import React from "react";
 import log from "loglevel";
 
-const playerState = require("../../utils/PlayerState").PlayerState;
+// const playerState = require("../../utils/PlayerState").PlayerState;
+import { PlayerState } from "../../utils/PlayerState";
+const playerState = new PlayerState();
+
 import { postQuestionValue } from "../../services/api";
 
 class OlabTag extends React.Component {
@@ -11,7 +14,7 @@ class OlabTag extends React.Component {
 
     log.debug(`${this.constructor["name"]} '${props?.name}' ctor`);
 
-    const debug = playerState.GetDebug();
+    const debug = PlayerState.GetDebug();
 
     this.state = {
       olabObject,

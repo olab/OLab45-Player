@@ -3,7 +3,11 @@ import React from "react";
 // import { withStyles } from '@material-ui/core/styles';
 import { Button, ButtonGroup } from "@material-ui/core";
 import log from "loglevel";
-const playerState = require("../../../utils/PlayerState").PlayerState;
+
+// const playerState = require("../../../utils/PlayerState").PlayerState;
+import { PlayerState } from "../../../utils/PlayerState";
+const playerState = new PlayerState();
+
 import { config } from "../../../config";
 
 import OlabTag from "../OlabTag";
@@ -15,9 +19,9 @@ class OlabLinksTag extends OlabTag {
 
   onNavigateToNode = (link, mapId, nodeId, urlParam) => {
     if (link.followOnce) {
-      var newLinksClicked = playerState.GetLinksClicked();
+      var newLinksClicked = PlayerState.GetLinksClicked();
       newLinksClicked.push(link.id);
-      playerState.SetLinksClicked(newLinksClicked);
+      PlayerState.SetLinksClicked(newLinksClicked);
     }
 
     this.props.props.onNavigateToNode(mapId, nodeId, urlParam);
@@ -26,7 +30,7 @@ class OlabLinksTag extends OlabTag {
   render() {
     log.debug(`${this.constructor["name"]} render`);
 
-    var linksClicked = playerState.GetLinksClicked();
+    var linksClicked = PlayerState.GetLinksClicked();
 
     const { debug } = this.state;
 

@@ -38,20 +38,13 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "build:azure": "env-cmd -f .env.azure npm run-script  build",
-    "build:debug": "env-cmd -f .env.debug npm run-script  build",
-    "build:local": "env-cmd -f .env.local npm run-script  build",
-    "build:release": "env-cmd -f .env.release npm run-script  build",
-    "build": "react-scripts build",
-    "clean": "rm -Rf build/* node_modules/*",
-    "eject": "react-scripts eject",
-    "prepare": "husky install",
-    "start:azure": "env-cmd -f .env.azure npm start",
-    "start:local": "env-cmd -f .env.local npm start",
-    "start": "react-scripts start",
-    "test": "react-scripts test",
-    "version:full": "npm --no-git-tag-version version `date +%y.%m.%d-0`",
-    "version:inc": "npm --no-git-tag-version version prerelease"
+    "start:local": "vite --port 3000 --host localhost --mode localhost",
+    "start:azure": "vite --port 3000 --host localhost --mode azure",
+    "build:debug": "vite build --mode development",
+    "build:release": "vite build --mode production",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "build:azure": "vite build --mode azure",
+    "preview": "vite preview"
   },
   "eslintConfig": {
     "extends": []
@@ -69,15 +62,12 @@
     ]
   },
   "devDependencies": {
-    "dotenv-cli": "^6.0.0",
-    "env-cmd": "^10.1.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.1.2",
-    "prettier": "^2.8.4",
-    "react-scripts": "^5.0.1"
-  },
-  "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown",
-    "*.{js,css,md}": "prettier --write"
+    "@vitejs/plugin-basic-ssl": "^1.2.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "vite": "^5.4.1"
   }
 }

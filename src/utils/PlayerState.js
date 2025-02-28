@@ -1,7 +1,8 @@
 import log from "loglevel";
 import { config } from "../config";
 
-const persistantStorage = require("./PersistantStorage").PersistantStorage;
+// const PersistantStorage = require("./PersistantStorage").PersistantStorage;
+import { PersistantStorage } from "./PersistantStorage";
 
 const KeyConstants = {
   ATRIUM: "atrium",
@@ -43,7 +44,7 @@ class PlayerState {
     let debug = this.GetDebug();
     let logLevel = this.GetLogLevel();
 
-    persistantStorage.clear(this.storageKey);
+    PersistantStorage.clear(this.storageKey);
 
     this.SetDebug(debug);
     this.SetLogLevel(logLevel);
@@ -54,7 +55,7 @@ class PlayerState {
     const sessionInfo = this.GetSessionInfo();
     const debugInfo = this.GetDebug();
 
-    persistantStorage.clear(this.storageKey);
+    PersistantStorage.clear(this.storageKey);
 
     this.SetContextId(contextId);
     this.SetSessionInfo(sessionInfo);
@@ -71,7 +72,7 @@ class PlayerState {
     const mapStatic = this.GetMapStatic();
     const node = this.GetNode();
     const nodeStatic = this.GetNodeStatic();
-    const server = persistantStorage.get(KeyConstants.SERVER);
+    const server = PersistantStorage.get(KeyConstants.SERVER);
     const serverStatic = this.GetServerStatic();
     const sessionInfo = this.GetSessionInfo();
     const visitOnceList = this.GetNodesVisited();
@@ -110,7 +111,7 @@ class PlayerState {
   }
 
   static SetDebug(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.DEBUG, obj);
+    PersistantStorage.save(this.storageKey, KeyConstants.DEBUG, obj);
   }
 
   static GetDebug(
@@ -120,7 +121,7 @@ class PlayerState {
       logLevel: "error",
     }
   ) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.DEBUG,
       defaultValue
@@ -131,7 +132,7 @@ class PlayerState {
     storageKey,
     defaultValue = { autoAssign: false, watchedLearners: [] }
   ) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       storageKey,
       KeyConstants.WATCH_PROFILE,
       defaultValue
@@ -139,11 +140,11 @@ class PlayerState {
   }
 
   static SetWatchProfile(storageKey, obj) {
-    persistantStorage.save(storageKey, KeyConstants.WATCH_PROFILE, obj);
+    PersistantStorage.save(storageKey, KeyConstants.WATCH_PROFILE, obj);
   }
 
   static GetAtrium(defaultValue = { roomName: "" }) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.ATRIUM,
       defaultValue
@@ -151,17 +152,17 @@ class PlayerState {
   }
 
   static SetAtrium(obj = { roomName: "" }) {
-    persistantStorage.save(this.storageKey, KeyConstants.ATRIUM, obj);
+    PersistantStorage.save(this.storageKey, KeyConstants.ATRIUM, obj);
   }
 
   static SetConnectionInfo(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.CONNECTION_INFO, obj);
+    PersistantStorage.save(this.storageKey, KeyConstants.CONNECTION_INFO, obj);
   }
 
   static GetConnectionInfo(
     defaultValue = { authInfo: { expires: 0, token: null } }
   ) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.CONNECTION_INFO,
       defaultValue
@@ -169,11 +170,11 @@ class PlayerState {
   }
 
   static SetSessionInfo(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.SESSION_INFO, obj);
+    PersistantStorage.save(this.storageKey, KeyConstants.SESSION_INFO, obj);
   }
 
   static GetSessionInfo(defaultValue = { authInfo: { expires: 0 } }) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.SESSION_INFO,
       defaultValue
@@ -181,11 +182,11 @@ class PlayerState {
   }
 
   static SetContextId(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.CONTEXT_ID, obj);
+    PersistantStorage.save(this.storageKey, KeyConstants.CONTEXT_ID, obj);
   }
 
   static GetContextId(defaultValue = null) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.CONTEXT_ID,
       defaultValue
@@ -193,11 +194,11 @@ class PlayerState {
   }
 
   static SetMaps(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.MAPS, obj);
+    PersistantStorage.save(this.storageKey, KeyConstants.MAPS, obj);
   }
 
   static GetMaps(defaultValue = []) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.MAPS,
       defaultValue
@@ -205,11 +206,11 @@ class PlayerState {
   }
 
   static SetMap(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.MAP, obj);
+    PersistantStorage.save(this.storageKey, KeyConstants.MAP, obj);
   }
 
   static GetMap(defaultValue = null) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.MAP,
       defaultValue
@@ -217,11 +218,11 @@ class PlayerState {
   }
 
   static SetMapStatic(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.MAP_STATIC, obj);
+    PersistantStorage.save(this.storageKey, KeyConstants.MAP_STATIC, obj);
   }
 
   static GetMapStatic(defaultValue = null) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.MAP_STATIC,
       defaultValue
@@ -229,11 +230,11 @@ class PlayerState {
   }
 
   static SetNode(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.NODE, obj);
+    PersistantStorage.save(this.storageKey, KeyConstants.NODE, obj);
   }
 
   static GetNode(defaultValue = null) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.NODE,
       defaultValue
@@ -252,11 +253,11 @@ class PlayerState {
   }
 
   static SetNodeStatic(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.NODE_STATIC, obj);
+    PersistantStorage.save(this.storageKey, KeyConstants.NODE_STATIC, obj);
   }
 
   static GetNodeStatic(defaultValue = null) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.NODE_STATIC,
       defaultValue
@@ -264,11 +265,11 @@ class PlayerState {
   }
 
   static SetServerStatic(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.SERVER_STATIC, obj);
+    PersistantStorage.save(this.storageKey, KeyConstants.SERVER_STATIC, obj);
   }
 
   static GetServerStatic(defaultValue = null) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.SERVER_STATIC,
       defaultValue
@@ -276,11 +277,11 @@ class PlayerState {
   }
 
   static SetDynamicObjects(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.DYNAMIC_OBJECTS, obj);
+    PersistantStorage.save(this.storageKey, KeyConstants.DYNAMIC_OBJECTS, obj);
   }
 
   static GetDynamicObjects(defaultValue = null) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.DYNAMIC_OBJECTS,
       defaultValue
@@ -288,7 +289,7 @@ class PlayerState {
   }
 
   static SetNodesVisited(obj) {
-    persistantStorage.save(
+    PersistantStorage.save(
       this.storageKey,
       KeyConstants.VISIT_ONCE_NODE_LIST,
       obj
@@ -296,7 +297,7 @@ class PlayerState {
   }
 
   static GetNodesVisited(defaultValue = []) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.VISIT_ONCE_NODE_LIST,
       defaultValue
@@ -304,7 +305,7 @@ class PlayerState {
   }
 
   static SetLinksClicked(obj) {
-    persistantStorage.save(
+    PersistantStorage.save(
       this.storageKey,
       KeyConstants.CLICK_ONCE_LINK_LIST,
       obj
@@ -312,7 +313,7 @@ class PlayerState {
   }
 
   static GetLinksClicked(defaultValue = []) {
-    return persistantStorage.get(
+    return PersistantStorage.get(
       this.storageKey,
       KeyConstants.CLICK_ONCE_LINK_LIST,
       defaultValue

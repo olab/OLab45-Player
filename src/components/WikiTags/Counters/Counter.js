@@ -41,7 +41,7 @@ class OlabCountersTag extends OlabTag {
               {olabObject.map((counter) => (
                 <div key={counter.id}>
                   <b>
-                    -> [[CR:{counter.name}]]: {counter.value}
+                    [[CR:{counter.name}]]: {counter.value}
                   </b>
                 </div>
               ))}

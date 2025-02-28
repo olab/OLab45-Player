@@ -1,4 +1,5 @@
-module.exports = Object.freeze({
+const constants = {
+  
   BROADCAST_SENDER: "_BROADCAST_",
   TURKER_SENDER: "Turker",
 
@@ -60,4 +61,6 @@ module.exports = Object.freeze({
   TOKEN_TYPE_EXTERNAL: "external",
   TOKEN_TYPE_ANONYMOUS: "anonymous",
   TOKEN_TYPE_NATIVE: "native",
-});
+};
+
+export default constants;

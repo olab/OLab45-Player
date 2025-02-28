@@ -8,7 +8,8 @@ import styles from "../WikiTags/styles.module.css";
 
 import Chat from "./Chat";
 import ChatStatusBar from "./ChatStatusBar";
-var constants = require("../../services/constants");
+// var constants = require("../../services/constants");
+import constants from "../../services/constants";
 
 class ChatCell extends React.Component {
   constructor(props) {

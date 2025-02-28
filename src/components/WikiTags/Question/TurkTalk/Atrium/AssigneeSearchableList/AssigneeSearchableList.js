@@ -44,6 +44,11 @@ class AssigneeSearchableList extends PureComponent {
     return result;
   }
 
+  onClick(e) {
+    e.preventDefault();
+    this.props.onAtriumAssignClicked(listItem);
+  }
+
   render() {
     const { query = "" } = this.state || {};
     const { classes, list } = this.props;
@@ -68,10 +73,7 @@ class AssigneeSearchableList extends PureComponent {
               <ListItem
                 key={listItem.id}
                 classes={{ root: classes.listItem }}
-                onClick={(e) =>
-                  void e.preventDefault() ||
-                  this.props.onAtriumAssignClicked(listItem)
-                }
+                onClick={onClick}
               >
                 <ListItemContent>
                   <span>{listItem.text}</span>

@@ -8,7 +8,10 @@ import { getDownload } from "../../../services/api";
 import log from "loglevel";
 import BrokenImageIcon from "@material-ui/icons/BrokenImage";
 import { Tooltip } from "@material-ui/core";
-const playerState = require("../../../utils/PlayerState").PlayerState;
+
+// const playerState = require("../../../utils/PlayerState").PlayerState;
+import { PlayerState } from "../../../utils/PlayerState";
+const playerState = new PlayerState();
 
 import OlabTag from "../OlabTag";
 

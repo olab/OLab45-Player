@@ -18,8 +18,11 @@ import Logout from "./../Logout/";
 import MapSessions from "../Sessions/Sessions";
 import { config } from "../../config";
 
-var constants = require("../../services/constants");
-const playerState = require("../../utils/PlayerState").PlayerState;
+// var constants = require("../../services/constants");
+import constants from "../../services/constants";
+
+// const PlayerState = require("../../utils/PlayerState").PlayerState;
+import { PlayerState } from "../../utils/PlayerState";
 
 class App extends PureComponent {
   constructor(props) {
@@ -32,8 +35,8 @@ class App extends PureComponent {
 
     log.debug(`${this.constructor["name"]} ctor`);
 
-    this.reactVersion = process.env.REACT_APP_VERSION;
-    console.log(JSON.stringify(process.env));
+    this.reactVersion = import.meta.env.VITE_APP_VERSION;
+    console.log(JSON.stringify(import.meta.env));
 
     const [mapId, nodeId, accessToken] = processUrl();
     const directPlay = mapId != null && nodeId != null;
@@ -54,7 +57,7 @@ class App extends PureComponent {
       tokenType == constants.TOKEN_TYPE_ANONYMOUS ||
       tokenType == constants.TOKEN_TYPE_EXTERNAL
     ) {
-      let map = playerState.GetMap();
+      let map = PlayerState.GetMap();
 
       if (map && map?.id != mapId) {
         log.info(`map changed. logging out previous session`);
@@ -78,7 +81,7 @@ class App extends PureComponent {
   }
 
   processDebugQueryString() {
-    const debug = playerState.GetDebug();
+    const debug = PlayerState.GetDebug();
     const queryParams = queryString.parse(window.location.search);
 
     if (queryParams.render != null) {
@@ -93,7 +96,7 @@ class App extends PureComponent {
       debug.disableCache = queryParams.cache == "0";
     }
 
-    playerState.SetDebug(debug);
+    PlayerState.SetDebug(debug);
   }
 
   componentWillUnmount() {

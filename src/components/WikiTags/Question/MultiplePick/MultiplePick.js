@@ -20,14 +20,17 @@ import Spinner from "../../../../shared/assets/loading_med.gif";
 
 import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
-const playerState = require("../../../../utils/PlayerState").PlayerState;
+
+// const playerState = require("../../../../utils/PlayerState").PlayerState;
+import { PlayerState } from "../../../../utils/PlayerState";
+const playerState = new PlayerState();
 
 class OlabMultiPickQuestion extends OlabTag {
   constructor(props) {
     let olabObject = getQuestion(props.name, props);
     super(props, olabObject);
 
-    const debug = playerState.GetDebug();
+    const debug = PlayerState.GetDebug();
 
     this.state = {
       debug,

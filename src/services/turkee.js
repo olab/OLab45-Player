@@ -1,9 +1,13 @@
 import TurkTalk from "./turktalk";
 import { Log, LogInfo, LogError } from "../utils/Logger";
 import log from "loglevel";
-var constants = require("./constants");
 
-const playerState = require("../utils/PlayerState").PlayerState;
+// var constants = require("./constants");
+import constants from "./constants";
+
+// const playerState = require("../utils/PlayerState").PlayerState;
+import { PlayerState } from "../utils/PlayerState";
+const playerState = new PlayerState();
 
 class Turkee extends TurkTalk {
   // *****
@@ -60,7 +64,7 @@ class Turkee extends TurkTalk {
     // user refreshes the window
     this.session.roomName = this.penName;
 
-    let learner = playerState.GetConnectionInfo(null);
+    let learner = PlayerState.GetConnectionInfo(null);
     if (learner != null) {
       if (learner.roomName) {
         this.session.roomName = learner.roomName;

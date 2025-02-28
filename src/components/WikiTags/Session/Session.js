@@ -1,6 +1,10 @@
 // @flow
 import React from "react";
-const playerState = require("../../../utils/PlayerState").PlayerState;
+
+// const playerState = require("../../../utils/PlayerState").PlayerState;
+import { PlayerState } from "../../../utils/PlayerState";
+const playerState = new PlayerState();
+
 import log from "loglevel";
 import { Grid, TextField, Select, MenuItem, Button } from "@material-ui/core";
 import { getUserSession } from "../../../services/api";
@@ -10,7 +14,7 @@ class OlabSessionTag extends React.Component {
   constructor(props) {
     super(props);
 
-    const debug = playerState.GetDebug();
+    const debug = PlayerState.GetDebug();
 
     this.state = {
       debug,
