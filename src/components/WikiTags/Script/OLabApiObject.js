@@ -14,7 +14,7 @@ export class OLabApiObject {
     this.elementId = elementId;
 
     if (name != null && type != null) {
-      this.scopedObject = this.findOLabObject(name, type);
+      this.scopedObject = clientApi.findOLabObject(name, type);
       this.id = name;
     } else {
       this.id = elementId;

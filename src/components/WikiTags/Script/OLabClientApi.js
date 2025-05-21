@@ -139,7 +139,9 @@ export class OLabClientApi {
     if (element != null) {
       element.addEventListener(event, callback);
       log.debug(`added event '${event}' handler for '${id}'`);
-    } else throw new Error(`element '${id}' does not exist`);
+    } else {
+      throw new Error(`element '${id}' does not exist`);
+    }
   }
 
   // dump all elements with an 'id' attribute

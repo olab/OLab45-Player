@@ -6,7 +6,13 @@ import log from "loglevel";
 export class OLabApiQuestion extends OLabApiObject {
   constructor(clientApi, name) {
     super(clientApi, `QU:${name}`, name, "questions");
-    this.stem = null;
+  }
+
+  #getStemElement() {
+    const elementId = `${this.scopedObject.htmlIdBase}::stem`;
+    const stemElement = document.getElementById(elementId);
+    const childDiv = stemElement.querySelector("div");
+    return childDiv;
   }
 
   onChange(callback) {
@@ -20,12 +26,14 @@ export class OLabApiQuestion extends OLabApiObject {
     this.clientApi.updateObject(obj);
   }
 
-  get label() {
-    return this.scopedObject.stem;
+  get stem() {
+    let stemElement = this.#getStemElement();
+    return stemElement.textContent;
   }
 
-  set label(value) {
-    this.scopedObject.stem = value;
+  set stem(value) {
+    let stemElement = this.#getStemElement();
+    stemElement.textContent = value;
   }
 
   getResponses() {
