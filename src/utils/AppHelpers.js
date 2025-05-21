@@ -10,7 +10,11 @@ function processUrl() {
   let accessToken = null;
 
   const urlParts = window.location.pathname.split("/");
-  const partsCount = urlParts.length;
+  let partsCount = urlParts.length;
+
+  if (window.location.pathname == "/") {
+    partsCount = 0;
+  }
 
   if (partsCount >= 2) {
     mapId = urlParts[partsCount - 2];
