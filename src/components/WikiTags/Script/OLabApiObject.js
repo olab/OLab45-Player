@@ -13,7 +13,7 @@ export class OLabApiObject {
     this.clientApi = clientApi;
     this.elementId = elementId;
 
-    if (name != null && type != null) {
+    if (name != null && type != null && type != "links") {
       this.scopedObject = clientApi.findOLabObject(name, type);
       this.id = name;
     } else {
@@ -47,6 +47,10 @@ export class OLabApiObject {
 
   disable() {
     this.domElement.disabled = true;
+  }
+
+  isHidden() {
+    return this.domElement.style.display == "none";
   }
 
   hide() {

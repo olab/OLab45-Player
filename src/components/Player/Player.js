@@ -351,14 +351,36 @@ class Player extends PureComponent {
     playerState.SetDynamicObjects(this.state.dynamicObjects);
   };
 
+  getScopedObject(newObject) {
+    let objectType = newObject.type;
+    let scopeLevel = newObject.scopeLevel;
+
+    switch (objectType) {
+      case "question":
+        objectType = "questions";
+        break;
+      default:
+        break;
+    }
+
+    switch (scopeLevel) {
+      case "Maps":
+        scopeLevel = "map";
+        break;
+      default:
+        break;
+    }
+
+    let items = [...this.state.scopedObjects[scopeLevel][objectType]];
+    return items;
+  }
+
   onUpdateScopedObjects(newObject) {
     let orgObjects = { ...this.state.scopedObjects };
 
-    const objectType = newObject.type;
-    const scopeLevel = newObject.scopeLevel;
-
     // 1. Make a shallow copy of the items
-    let items = [...this.state.scopedObjects.map.questions];
+    // let items = [...this.state.scopedObjects.map.questions];
+    let items = this.getScopedObject(newObject);
 
     for (let index = 0; index < items.length; index++) {
       // 2. Make a shallow copy of the item you want to mutate

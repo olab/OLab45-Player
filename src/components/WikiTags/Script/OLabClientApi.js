@@ -1,4 +1,5 @@
-﻿import { OLabApiConstant } from "./Objects/OLabApiConstant";
+﻿import { OLabApiLink } from "./Objects/OLabApiLink";
+import { OLabApiConstant } from "./Objects/OLabApiConstant";
 import { OLabApiDomObject } from "./Objects/OLabApiDomObject";
 import { OLabApiDragAndDropQuestion } from "./Objects/Question/OLabApiDragAndDropQuestion";
 import { OLabApiDropdownQuestion } from "./Objects/Question/OLabApiDropdownQuestion";
@@ -182,38 +183,43 @@ export class OLabClientApi {
     return item;
   }
 
+  getLink(id) {
+    var obj = new OLabApiLink(this, id);
+    return obj;
+  }
+
   getConstant(id) {
-    var apiQuestion = new OLabApiConstant(this, id);
-    return apiQuestion;
+    var obj = new OLabApiConstant(this, id);
+    return obj;
   }
 
   getSliderQuestion(id) {
-    var apiQuestion = new OLabApiSliderQuestion(this, id);
-    return apiQuestion;
+    var obj = new OLabApiSliderQuestion(this, id);
+    return obj;
   }
 
   getDropDownQuestion(id) {
-    var apiQuestion = new OLabApiDropdownQuestion(this, id);
-    return apiQuestion;
+    var obj = new OLabApiDropdownQuestion(this, id);
+    return obj;
   }
 
   getDragAndDropQuestion(id) {
-    var apiQuestion = new OLabApiDragAndDropQuestion(this, id);
-    return apiQuestion;
+    var obj = new OLabApiDragAndDropQuestion(this, id);
+    return obj;
   }
 
   getTextQuestion(id) {
-    var apiQuestion = new OLabApiTextQuestion(this, id);
-    return apiQuestion;
+    var obj = new OLabApiTextQuestion(this, id);
+    return obj;
   }
 
   getMultipleChoiceQuestion(id) {
-    var apiQuestion = new OLabApiMultipleChoiceQuestion(this, id);
-    return apiQuestion;
+    var obj = new OLabApiMultipleChoiceQuestion(this, id);
+    return obj;
   }
 
   getSingleChoiceQuestion(id) {
-    var apiQuestion = new OLabApiSingleChoiceQuestion(this, id);
-    return apiQuestion;
+    var obj = new OLabApiSingleChoiceQuestion(this, id);
+    return obj;
   }
 }
