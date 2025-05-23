@@ -354,6 +354,9 @@ class Player extends PureComponent {
   onUpdateScopedObjects(newObject) {
     let orgObjects = { ...this.state.scopedObjects };
 
+    const objectType = newObject.type;
+    const scopeLevel = newObject.scopeLevel;
+
     // 1. Make a shallow copy of the items
     let items = [...this.state.scopedObjects.map.questions];
 
@@ -364,8 +367,9 @@ class Player extends PureComponent {
       if (item.id === newObject.id) {
         log.debug(`${item.type} object '${item.name}': changed}`);
 
-        item.stem = newObject.stem;
-        items[index] = item;
+        // item.stem = newObject.stem;
+        // items[index] = item;
+        items[index] = newObject;
 
         break;
       }

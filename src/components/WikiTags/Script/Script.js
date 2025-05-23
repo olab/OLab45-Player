@@ -16,7 +16,13 @@ class OlabScriptTag extends OlabTag {
   }
 
   componentDidMount() {
+    console.log("OlabScriptTag mounted");
     this.loadSnippet();
+  }
+
+  componentWillUnmount() {
+    console.log("OlabScriptTag unmounted");
+    this.state.olabClientApi.shutdown();
   }
 
   updateObject(newObject) {

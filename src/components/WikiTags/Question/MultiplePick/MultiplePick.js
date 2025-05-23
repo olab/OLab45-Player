@@ -282,10 +282,10 @@ class OlabMultiPickQuestion extends OlabTag {
           olabid={olabObject.id}
         >
           <FormControl component="fieldset" disabled={disabled}>
-            <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="legend">
+            <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="span">
               <JsxParser jsx={olabObject.stem} />
             </FormLabel>
-            <FormGroup id={`${olabObject.htmlIdBase}::choices`} row={row}>
+            <FormGroup id={`${olabObject.htmlIdBase}::responses`} row={row}>
               {responses}
             </FormGroup>
             {progressButtonHtml}

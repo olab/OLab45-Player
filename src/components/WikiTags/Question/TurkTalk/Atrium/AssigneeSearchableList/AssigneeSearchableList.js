@@ -83,7 +83,7 @@ class AssigneeSearchableList extends PureComponent {
             ))}
 
             {!filteredList.length && (
-              <Typography component="span" align="left">
+              <Typography component={"span"} align="left">
                 {query.trim().length > 0
                   ? "No matches found..."
                   : "Waiting for learners..."}

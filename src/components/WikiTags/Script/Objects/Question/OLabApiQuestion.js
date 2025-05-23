@@ -34,12 +34,14 @@ export class OLabApiQuestion extends OLabApiObject {
   set stem(value) {
     let stemElement = this.#getStemElement();
     stemElement.textContent = value;
+    this.scopedObject.stem = value;
+    this.update(this.scopedObject);
   }
 
   getResponses() {
     let responses = [];
 
-    const elementId = `${this.scopedObject.htmlIdBase}::choices`;
+    const elementId = `${this.scopedObject.htmlIdBase}::responses`;
     const container = document.getElementById(elementId);
     var spans = container.querySelectorAll("[id$=label]");
     for (const response of spans) {

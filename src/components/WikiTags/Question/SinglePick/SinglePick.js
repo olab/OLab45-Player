@@ -229,11 +229,11 @@ class OlabSinglePickQuestion extends OlabTag {
           olabid={olabObject.id}
         >
           <FormControl component="fieldset" disabled={disabled}>
-            <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="legend">
+            <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="span">
               <JsxParser jsx={olabObject.stem} />
             </FormLabel>
             <RadioGroup
-              id={`${olabObject.htmlIdBase}::choices`}
+              id={`${olabObject.htmlIdBase}::responses`}
               style={{ float: "left" }}
               onChange={(event) => this.setValue(event)}
               row={row}

@@ -111,7 +111,7 @@ export class OLabClientApi {
     this.component.updateObject(newObject);
   }
 
-  createTimer(key, frequencyMs, callback) {
+  createTimer(key, callback, frequencyMs) {
     callback();
     this.timers[key] = setInterval(callback, frequencyMs, this, document);
     log.debug(`created timer '${key}' frequency ${frequencyMs} ms`);
