@@ -345,7 +345,7 @@ class Player extends PureComponent {
     this.setState({
       dynamicObjects: {
         ...this.state.dynamicObjects,
-        counters: { counters: items },
+        counters: items,
       },
     });
     playerState.SetDynamicObjects(this.state.dynamicObjects);
