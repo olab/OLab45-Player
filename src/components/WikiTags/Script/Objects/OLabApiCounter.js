@@ -2,13 +2,13 @@
 import { OLabApiObject } from "../OLabApiObject";
 
 export class OLabApiCounter extends OLabApiObject {
-  constructor(clientApi, params) {
-    super(clientApi, params);
+  constructor(clientApi, id) {
+    super(clientApi, "CR:" + id, id, "counters");
     this.target = this.clientApi.player.getCounter(this.params.id);
     this.setProgressObject("progressSpinner");
   }
 
-  getValue() {
+  get value() {
     if (this.target == null) {
       throw "Object '" + params.id + "' not found.";
     }
@@ -16,11 +16,8 @@ export class OLabApiCounter extends OLabApiObject {
     return this.target["value"];
   }
 
-  setValue(value, onStarted, onCompleted) {
+  set value(value) {
     try {
-      this.onStartedUser = onStarted;
-      this.onCompletedUser = onCompleted;
-
       this.player.instance.log.debug(
         "Setting counter " + this.target.id + " = " + value
       );
@@ -28,8 +25,6 @@ export class OLabApiCounter extends OLabApiObject {
       var url =
         this.player.instance.restApiUrl + "/counters/value/" + this.target.id;
       var payload = { data: { value: value } };
-
-      this.onUpdateStarted();
 
       this.player.utilities.postJson(
         url,

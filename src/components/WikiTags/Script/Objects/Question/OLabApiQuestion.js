@@ -10,8 +10,8 @@ export class OLabApiQuestion extends OLabApiObject {
 
   #getStemElement() {
     const elementId = `${this.scopedObject.htmlIdBase}::stem`;
-    const stemElement = document.getElementById(elementId);
-    const childDiv = stemElement.querySelector("div");
+    const element = document.getElementById(elementId);
+    const childDiv = element.querySelector("div");
     return childDiv;
   }
 

@@ -323,18 +323,18 @@ class Player extends PureComponent {
     orgObjects.checksum = newObjects.checksum;
 
     // 1. Make a shallow copy of the items
-    let items = [...orgObjects.counters.counters];
+    let items = [...orgObjects.counters];
 
     for (let index = 0; index < items.length; index++) {
       // 2. Make a shallow copy of the item you want to mutate
       let item = { ...items[index] };
 
-      if (item.value != newObjects.counters.counters[index].value) {
+      if (item.value != newObjects.counters[index].value) {
         log.debug(
-          `counter ${item.name}: ${item.value} => ${newObjects.counters.counters[index].value}`
+          `counter ${item.name}: ${item.value} => ${newObjects.counters[index].value}`
         );
-        item.value = newObjects.counters.counters[index].value;
-        item.updatedat = newObjects.counters.counters[index].updatedat;
+        item.value = newObjects.counters[index].value;
+        item.updatedat = newObjects.counters[index].updatedat;
 
         // 4. Put it back into our array. N.B. we *are* mutating the array here,
         //    but that's why we made a copy first

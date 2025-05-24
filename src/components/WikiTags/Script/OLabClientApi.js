@@ -9,6 +9,7 @@ import { OLabApiSliderQuestion } from "./Objects/Question/OLabApiSliderQuestion"
 import { OLabApiTextQuestion } from "./Objects/Question/OLabApiTextQuestion";
 
 import log from "loglevel";
+import { OLabApiCounter } from "./Objects/OLabApiCounter";
 
 // main view class
 export class OLabClientApi {
@@ -50,6 +51,13 @@ export class OLabClientApi {
   // find and return a copy of an OLab scoped object
   // of a certain type by id or name
   findOLabObject(idName, type) {
+    for (const obj of this.dynamicObjects.counters) {
+      if (obj.id === idName || obj.name === idName) {
+        log.debug(`found counter ${type} '${idName}'`);
+        return { ...obj };
+      }
+    }
+
     for (const obj of this.scopedObjects.server[type]) {
       if (obj.id === idName || obj.name === idName) {
         log.debug(`found server ${type} '${idName}'`);
@@ -185,6 +193,11 @@ export class OLabClientApi {
 
   getLink(id) {
     var obj = new OLabApiLink(this, id);
+    return obj;
+  }
+
+  getCounter(id) {
+    var obj = new OLabApiCounter(this, id);
     return obj;
   }
 

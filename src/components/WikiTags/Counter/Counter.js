@@ -37,7 +37,11 @@ class OlabCounterTag extends OlabTag {
         olabObject.value = "";
       }
 
-      return <>{parse(olabObject.value)}</>;
+      return (
+        <div id={olabObject.htmlIdBase} style={{ display: "inline" }}>
+          {parse(olabObject.value)}
+        </div>
+      );
     } catch (error) {
       return this.errorJsx(id, error);
     }

@@ -95,7 +95,13 @@ const getCounter = (name, dynamicObjects) => {
   try {
     const { counters } = dynamicObjects;
 
-    item = findWikiInList(counters?.counters, name);
+    item = findWikiInList(counters, name);
+
+    if (item.name != null) {
+      item.htmlIdBase = `CR:${item.name}`;
+    } else {
+      item.htmlIdBase = `CR:${item.id}`;
+    }
 
     if (item == null) {
       log.error(`Could not find counter '${name}'`);
