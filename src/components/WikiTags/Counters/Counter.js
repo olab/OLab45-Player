@@ -14,7 +14,7 @@ import {
   TableBody,
 } from "@material-ui/core";
 
-import { getCounters } from "../WikiUtils";
+import { getCounters, getDisplay } from "../WikiUtils";
 import OlabTag from "../OlabTag";
 
 class OlabCountersTag extends OlabTag {

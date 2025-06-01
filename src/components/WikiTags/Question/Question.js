@@ -2,7 +2,7 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 
-import { getQuestion } from "../WikiUtils";
+import { getQuestion, getDisplay } from "../WikiUtils";
 import { postQuestionValue } from "../../../services/api";
 import styles from "../styles.module.css";
 import OlabMultilineTextQuestion from "./MultilineText/MultilineText";
@@ -26,18 +26,20 @@ class OlabQuestionTag extends React.Component {
     let question = getQuestion(this.props.name, this.props);
     const debug = playerState.GetDebug();
 
-    if (question.questionType !== 3 && question.questionType !== 2) {
-      if (question.value === null) {
-        question.value = 0;
+    if (question != null) {
+      if (question.questionType !== 3 && question.questionType !== 2) {
+        if (question.value === null) {
+          question.value = 0;
+        }
+      } else {
+        if (question.value === null) {
+          question.value = "";
+        }
       }
-    } else {
-      if (question.value === null) {
-        question.value = "";
-      }
-    }
 
-    if (question.width === 0) {
-      question.width = 300;
+      if (question.width === 0) {
+        question.width = 300;
+      }
     }
 
     const customId = OlabQuestionTag.getQuestionId(question);
@@ -60,6 +62,10 @@ class OlabQuestionTag extends React.Component {
   }
 
   static getQuestionId(question) {
+    if (question == null) {
+      return null;
+    }
+
     if (question.name != null) {
       return "QU:" + question.name;
     }
@@ -85,10 +91,12 @@ class OlabQuestionTag extends React.Component {
   render() {
     const { debug, question, customId } = this.state;
     const { name } = this.props;
+    const visibility = getDisplay(question);
 
-    const questionDivStyle = {
+    const divStyle = {
       paddingTop: "10px",
       paddingBottom: "10px",
+      display: visibility,
     };
 
     try {
@@ -125,55 +133,55 @@ class OlabQuestionTag extends React.Component {
         switch (questionType) {
           case 1:
             return (
-              <div style={questionDivStyle}>
+              <div style={divStyle}>
                 <OlabSinglelineTextQuestion props={props} />
               </div>
             );
           case 2:
             return (
-              <div style={questionDivStyle}>
+              <div style={divStyle}>
                 <OlabMultilineTextQuestion props={props} />
               </div>
             );
           case 3:
             return (
-              <div style={questionDivStyle}>
+              <div style={divStyle}>
                 <OlabMultiPickQuestion props={props} />
               </div>
             );
           case 4:
             return (
-              <div style={questionDivStyle}>
+              <div style={divStyle}>
                 <OlabSinglePickQuestion props={props} />
               </div>
             );
           case 5:
             return (
-              <div style={questionDivStyle}>
+              <div style={divStyle}>
                 <OlabSliderQuestion props={props} />
               </div>
             );
           case 6:
             return (
-              <div style={questionDivStyle}>
+              <div style={divStyle}>
                 <OlabDragAndDropQuestion props={props} />
               </div>
             );
           case 11:
             return (
-              <div style={questionDivStyle}>
+              <div style={divStyle}>
                 <OlabModeratorTag props={props} />
               </div>
             );
           case 12:
             return (
-              <div style={questionDivStyle}>
+              <div style={divStyle}>
                 <OlabDropDownQuestion props={props} />
               </div>
             );
           case 15:
             return (
-              <div style={questionDivStyle}>
+              <div style={divStyle}>
                 <OlabAttendeeTag props={props} />
               </div>
             );

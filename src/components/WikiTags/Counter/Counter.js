@@ -3,7 +3,7 @@ import React from "react";
 import parse from "html-react-parser";
 import log from "loglevel";
 
-import { getCounter } from "../WikiUtils";
+import { getCounter, getDisplay } from "../WikiUtils";
 import OlabTag from "../OlabTag";
 
 class OlabCounterTag extends OlabTag {
@@ -37,9 +37,11 @@ class OlabCounterTag extends OlabTag {
         olabObject.value = "";
       }
 
+      const visibility = getDisplay(olabObject);
+
       return (
-        <div id={olabObject.htmlIdBase} style={{ display: "inline" }}>
-          {parse(olabObject.value)}
+        <div id={olabObject.htmlIdBase} style={{ display: visibility }}>
+          {parse(olabObject.value.toString())}
         </div>
       );
     } catch (error) {

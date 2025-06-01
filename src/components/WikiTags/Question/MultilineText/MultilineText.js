@@ -9,7 +9,7 @@ import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 import Spinner from "../../../../shared/assets/loading_med.gif";
 
-import { getQuestion } from "../../WikiUtils";
+import { getQuestion, getDisplay } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
 const playerState = require("../../../../utils/PlayerState").PlayerState;
 
@@ -121,11 +121,17 @@ class OlabMultilineTextQuestion extends OlabTag {
         valueClasses.push(styles["qumultiline-required"]);
       }
 
+      const visibility = getDisplay(olabObject);
+      const divStyle = {
+        display: visibility,
+      };
+
       return (
         <div
           className={`${styles["qumultiline"]} ${siteStyles[id]}`}
           id={olabObject.htmlIdBase}
           olabid={olabObject.id}
+          style={divStyle}
         >
           <div
             id={`${olabObject.htmlIdBase}::stem`}

@@ -14,6 +14,7 @@ import { OLabApiCounter } from "./Objects/OLabApiCounter";
 // main view class
 export class OLabClientApi {
   timers = {};
+  events = {};
   component;
   dynamicObjects;
   scopedObjects;
@@ -26,8 +27,10 @@ export class OLabClientApi {
     this.dynamicObjects = vm.component.state.dynamicObjects;
     this.scopedObjects = vm.component.state.scopedObjects;
     this.timers = vm.timers;
+    this.events = vm.events;
     this.state = vm.component.state;
     this.mounted = false;
+    this.props = component.props.props;
 
     log.setLevel(log.levels.DEBUG);
     this.hello();
@@ -42,9 +45,14 @@ export class OLabClientApi {
   shutdown() {
     log.debug("shutdown OLabClientApi.");
 
-    var timerNames = Object.keys(this.timers);
-    for (let timerName of timerNames) {
-      this.destroyTimer(timerName);
+    var keys = Object.keys(this.timers);
+    for (let key of keys) {
+      this.destroyTimer(key);
+    }
+
+    keys = Object.keys(this.events);
+    for (let key of keys) {
+      this.destroyEventHandler(key);
     }
   }
 
@@ -120,8 +128,13 @@ export class OLabClientApi {
     this.component.updateObject(newObject);
   }
 
+  updateDynamicObject(newObject) {
+    this.component.updateDynamicObject(newObject);
+  }
+
   createTimer(key, callback, frequencyMs) {
     callback();
+    this.destroyTimer(key);
     this.timers[key] = setInterval(callback, frequencyMs, this, document);
     log.debug(`created timer '${key}' frequency ${frequencyMs} ms`);
   }
@@ -134,23 +147,53 @@ export class OLabClientApi {
       delete this.timers[key];
 
       log.debug(`destroyed timer '${key}'`);
-    } else throw new Error(`timer '${key}' does not exist`);
+    }
+  }
+
+  createEventHandler(id, eventName, callback) {
+    var element = document.getElementById(id);
+    if (element != null) {
+      const key = `${id}:${eventName}`;
+      if (this.events.hasOwnProperty(key)) {
+        return;
+      }
+      element.removeEventListener(eventName, callback);
+      element.addEventListener(eventName, callback);
+      this.events[key] = {
+        eventName: eventName,
+        element: element,
+        callback: callback,
+      };
+      log.debug(`added event '${key}' handler`);
+    } else {
+      throw new Error(`element '${id}' does not exist`);
+    }
+  }
+
+  destroyEventHandler(key) {
+    // test if handler exists
+    if (this.events.hasOwnProperty(key)) {
+      let item = this.events[key];
+      item.element.removeEventListener(item.eventName, item.callback);
+      delete this.events[key];
+
+      log.debug(`destroyed handler '${key}'`);
+    }
   }
 
   // add a click callback on a Dom element
   onClick(id, callback) {
-    this.onEvent(id, "click", callback);
+    var element = document.getElementById(id);
+    if (element != null) {
+      element.onclick = callback;
+      log.debug(`added event '${id}' onclick handler`);
+    }
+    // this.onEvent(id, "click", callback);
   }
 
   // add an event callback on a Dom element
-  onEvent(id, event, callback) {
-    var element = document.getElementById(id);
-    if (element != null) {
-      element.addEventListener(event, callback);
-      log.debug(`added event '${event}' handler for '${id}'`);
-    } else {
-      throw new Error(`element '${id}' does not exist`);
-    }
+  onEvent(id, eventName, callback) {
+    this.createEventHandler(id, eventName, callback);
   }
 
   // dump all elements with an 'id' attribute

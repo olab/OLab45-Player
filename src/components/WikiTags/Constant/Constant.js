@@ -3,7 +3,7 @@ import React from "react";
 import parse from "html-react-parser";
 import log from "loglevel";
 
-import { getConstant } from "../WikiUtils";
+import { getConstant, getDisplay } from "../WikiUtils";
 import OlabTag from "../OlabTag";
 
 class OlabConstantTag extends OlabTag {
@@ -23,6 +23,8 @@ class OlabConstantTag extends OlabTag {
         throw new Error(`'${name}' not found`);
       }
 
+      const visibility = getDisplay(olabObject);
+
       if (debug.disableWikiRendering) {
         return (
           <>
@@ -33,7 +35,11 @@ class OlabConstantTag extends OlabTag {
         );
       }
 
-      return <span id={`CONST:${name}`}>{parse(olabObject.value)}</span>;
+      return (
+        <span id={`CONST:${name}`} style={{ display: visibility }}>
+          {parse(olabObject.value)}
+        </span>
+      );
     } catch (error) {
       return this.errorJsx(id, error);
     }

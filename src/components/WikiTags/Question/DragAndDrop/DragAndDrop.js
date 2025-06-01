@@ -9,7 +9,7 @@ import JsxParser from "react-jsx-parser";
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
-import { getQuestion } from "../../WikiUtils";
+import { getQuestion, getDisplay } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
 
 class OlabDragAndDropQuestion extends OlabTag {
@@ -130,11 +130,17 @@ class OlabDragAndDropQuestion extends OlabTag {
         );
       }
 
+      const visibility = getDisplay(olabObject);
+      const divStyle = {
+        display: visibility,
+      };
+
       return (
         <div
           className={`${styles["qudraganddrop"]} ${siteStyles[id]}`}
           id={olabObject.htmlIdBase}
           olabid={olabObject.id}
+          style={divStyle}
         >
           <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="legend">
             <JsxParser jsx={olabObject.stem} />

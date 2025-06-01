@@ -3,7 +3,7 @@ import React from "react";
 
 import styles from "../styles.module.css";
 import siteStyles from "../site.module.css";
-import { getFile } from "../WikiUtils";
+import { getFile, getDisplay } from "../WikiUtils";
 import { getDownload } from "../../../services/api";
 import log from "loglevel";
 import BrokenImageIcon from "@material-ui/icons/BrokenImage";
@@ -83,7 +83,7 @@ class OlabMediaResourceTag extends OlabTag {
       }
 
       // handle case if file store is not on same host as website
-      if ( olabObject.hostName != null ) {
+      if (olabObject.hostName != null) {
         olabObject.originUrl = `${olabObject.hostName}${olabObject.originUrl}`;
       }
 

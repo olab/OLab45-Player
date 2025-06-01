@@ -67,6 +67,33 @@ async function internetJsonFetch(
       settings = { ...settings, referrerPolicy: "no-referrer-when-downgrade" };
       const response = await fetch(url, settings);
 
+      if (response.status === 401) {
+        log.error(`URL '${url}': access denied`);
+        return {
+          data: "Access Denied",
+          error_code: response.status,
+          message: `${URL}: access denied`,
+        };
+      }
+
+      if (response.status === 404) {
+        log.error(`URL '${url}': not found`);
+        return {
+          data: "Not Found",
+          error_code: response.status,
+          message: `${URL}: not found`,
+        };
+      }
+
+      if (response.status === 500) {
+        log.error(`URL '${url}': server error`);
+        return {
+          data: "Server Error",
+          error_code: response.status,
+          message: `${URL}: server error`,
+        };
+      }
+
       let data = {};
 
       if (settings.responseType == "blob") {
@@ -74,16 +101,6 @@ async function internetJsonFetch(
         data.error_code = 200;
       } else {
         data = await response.json();
-      }
-
-      if (data.error_code === 401) {
-        log.error(`URL '${url}': access denied ${JSON.stringify(data)}`);
-        return data;
-      }
-
-      if (data.error_code === 500) {
-        log.error(`URL '${url}': server error ${JSON.stringify(data)}`);
-        return data;
       }
 
       if (data.error_code !== 200) {
@@ -104,7 +121,7 @@ async function internetJsonFetch(
 
   return {
     data: "max retries exceeded",
-    errorCode: 500,
+    error_code: 500,
     message: `${URL}: server error`,
   };
 }
@@ -406,6 +423,21 @@ async function getUserSession(props, payload) {
   return data;
 }
 
+async function putCounterValue(props, counter) {
+  let url = `${config.API_URL}/counters/update/${counter.id}`;
+  let token = props.authActions.getToken();
+  const payload = {
+    counter: counter,
+    dynamicObjects: props.dynamicObjects,
+  };
+
+  const data = await internetJsonFetch("PUT", url, payload, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  return data;
+}
+
 export {
   getDownload,
   getUserSession,
@@ -424,5 +456,6 @@ export {
   impersonateUserAsync,
   importer,
   postQuestionValue,
+  putCounterValue,
   getMapSessions,
 };

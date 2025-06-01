@@ -104,7 +104,10 @@ class OlabLinksTag extends OlabTag {
               <Button
                 id={link.name}
                 key={link.id}
-                style={{ textTransform: "none" }}
+                style={{
+                  textTransform: "none",
+                  display: link.visible ? "inline" : "none",
+                }}
                 onClick={() => {
                   this.onNavigateToNode(
                     link,

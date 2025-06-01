@@ -8,7 +8,7 @@ import JsxParser from "react-jsx-parser";
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
-import { getQuestion } from "../../WikiUtils";
+import { getQuestion, getDisplay } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
 const playerState = require("../../../../utils/PlayerState").PlayerState;
 
@@ -78,6 +78,11 @@ class OlabSliderQuestion extends OlabTag {
     const { debug, olabObject } = this.state;
     const { id, name } = this.props;
 
+    const visibility = getDisplay(olabObject);
+    const divStyle = {
+      display: visibility,
+    };
+
     log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
@@ -100,6 +105,7 @@ class OlabSliderQuestion extends OlabTag {
           className={`${styles["quslider"]} ${siteStyles[id]}`}
           id={olabObject.htmlIdBase}
           olabid={olabObject.id}
+          style={divStyle}
         >
           <Box
             width={olabObject.width}

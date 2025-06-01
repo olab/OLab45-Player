@@ -1,37 +1,45 @@
 ﻿// "use strict";
 import { OLabApiObject } from "../OLabApiObject";
+import { putCounterValue } from "../../../../services/api";
+import log from "loglevel";
 
 export class OLabApiCounter extends OLabApiObject {
   constructor(clientApi, id) {
     super(clientApi, "CR:" + id, id, "counters");
-    this.target = this.clientApi.player.getCounter(this.params.id);
-    this.setProgressObject("progressSpinner");
+    // this.target = this.clientApi.player.getCounter(this.params.id);
+    // this.setProgressObject("progressSpinner");
+  }
+
+  #getElement() {
+    const elementId = this.scopedObject.htmlIdBase;
+    const element = document.getElementById(elementId);
+    return element;
+  }
+
+  updateDynamicObject(newDynamicObject) {
+    // get and make a copy of the scoped object
+    // let obj = { ...this.findOLabObject(this.scopedObject.id, "questions") };
+    let obj = { ...newDynamicObject };
+    this.clientApi.updateDynamicObject(obj);
   }
 
   get value() {
-    if (this.target == null) {
-      throw "Object '" + params.id + "' not found.";
-    }
-
-    return this.target["value"];
+    // if (this.target == null) {
+    //   throw "Object '" + params.id + "' not found.";
+    // }
+    return this.scopedObject.value;
   }
 
   set value(value) {
+    let element = this.#getElement();
+    element.textContent = value;
+    this.scopedObject.value = value;
+
     try {
-      this.player.instance.log.debug(
-        "Setting counter " + this.target.id + " = " + value
-      );
+      log.debug("Setting counter " + this.scopedObject.id + " = " + value);
 
-      var url =
-        this.player.instance.restApiUrl + "/counters/value/" + this.target.id;
-      var payload = { data: { value: value } };
-
-      this.player.utilities.postJson(
-        url,
-        payload,
-        this,
-        this.onUpdateCompleted,
-        this.onUpdateError
+      putCounterValue(this.clientApi.props, this.scopedObject).then((result) =>
+        this.updateDynamicObject(result.data)
       );
     } catch (e) {
       alert(e.message);
@@ -49,9 +57,7 @@ export class OLabApiCounter extends OLabApiObject {
         this.onStartedUser();
       }
 
-      this.player.instance.log.debug(
-        "Counter " + this.target.id + " update started"
-      );
+      log.debug("Counter " + this.target.id + " update started");
     } catch (e) {
       alert(e.message);
     }
@@ -64,7 +70,7 @@ export class OLabApiCounter extends OLabApiObject {
         context.progressTarget.hide();
       }
 
-      context.player.instance.log.debug(
+      log.debug(
         "Counter " +
           context.target.id +
           " set successfully. value = " +
@@ -93,9 +99,7 @@ export class OLabApiCounter extends OLabApiObject {
         this.onCompletedUser();
       }
 
-      this.player.instance.log.debug(
-        "Counter " + this.target.id + " update error"
-      );
+      log.debug("Counter " + this.target.id + " update error");
     } catch (e) {
       alert(e.message);
     }
@@ -110,6 +114,58 @@ export class OLabApiCounter extends OLabApiObject {
       this.progressTarget = this.progressTarget[0];
     } else {
       this.progressTarget = null;
+    }
+  }
+
+  isHidden() {
+    return this.domElement.style.display == "none";
+  }
+
+  hide(callback = null) {
+    let element = this.#getElement();
+    element.style.display = "none";
+    this.scopedObject.visible = false;
+
+    try {
+      log.debug(
+        "Setting counter " +
+          this.scopedObject.id +
+          " visibility " +
+          element.style.display
+      );
+
+      putCounterValue(this.clientApi.props, this.scopedObject).then(
+        (result) => {
+          this.updateDynamicObject(result.data);
+
+          if (callback != null) {
+            callback();
+          }
+        }
+      );
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  show() {
+    let element = this.#getElement();
+    element.style.display = "inline";
+    this.scopedObject.visible = false;
+
+    try {
+      log.debug(
+        "Setting counter " +
+          this.scopedObject.id +
+          " visibility " +
+          element.style.display
+      );
+
+      putCounterValue(this.clientApi.props, this.scopedObject).then((result) =>
+        this.updateDynamicObject(result.data)
+      );
+    } catch (e) {
+      alert(e.message);
     }
   }
 }

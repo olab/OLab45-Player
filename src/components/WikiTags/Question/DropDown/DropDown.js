@@ -17,7 +17,7 @@ import log from "loglevel";
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
-import { getQuestion } from "../../WikiUtils";
+import { getQuestion, getDisplay } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
 
 class OlabDropDownQuestion extends OlabTag {
@@ -137,12 +137,17 @@ class OlabDropDownQuestion extends OlabTag {
 
       var responses = this.buildQuestionResponses(olabObject, id);
       var disabled = olabObject.disabled == 0 ? false : true;
+      const visibility = getDisplay(olabObject);
+      const divStyle = {
+        display: visibility,
+      };
 
       return (
         <div
           className={`${styles["quddropdown"]} ${siteStyles[id]}`}
           id={olabObject.htmlIdBase}
           olabid={olabObject.id}
+          style={divStyle}
         >
           <Box width={olabObject.width}>
             <FormControl fullWidth disabled={disabled}>

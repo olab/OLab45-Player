@@ -218,12 +218,20 @@ const combineStyles = (...styles) => {
   };
 };
 
+const getDisplay = (olabObject) => {
+  if (olabObject.hasOwnProperty("visible")) {
+    return olabObject.visible ? "" : "none";
+  }
+  return "inline";
+};
+
 export {
   combineStyles,
   findWikiInList,
   getConstant,
   getCounter,
   getCounters,
+  getDisplay,
   getFile,
   getQuestion,
   getScript,

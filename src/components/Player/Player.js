@@ -316,65 +316,6 @@ class Player extends PureComponent {
     window.location.href = url;
   };
 
-  onUpdateDynamicObjects = (newObjects) => {
-    let orgObjects = this.state.dynamicObjects;
-
-    orgObjects.nodesVisitedList = newObjects.nodesVisitedList;
-    orgObjects.checksum = newObjects.checksum;
-
-    // 1. Make a shallow copy of the items
-    let items = [...orgObjects.counters];
-
-    for (let index = 0; index < items.length; index++) {
-      // 2. Make a shallow copy of the item you want to mutate
-      let item = { ...items[index] };
-
-      if (item.value != newObjects.counters[index].value) {
-        log.debug(
-          `counter ${item.name}: ${item.value} => ${newObjects.counters[index].value}`
-        );
-        item.value = newObjects.counters[index].value;
-        item.updatedat = newObjects.counters[index].updatedat;
-
-        // 4. Put it back into our array. N.B. we *are* mutating the array here,
-        //    but that's why we made a copy first
-        items[index] = item;
-      }
-    }
-
-    this.setState({
-      dynamicObjects: {
-        ...this.state.dynamicObjects,
-        counters: items,
-      },
-    });
-    playerState.SetDynamicObjects(this.state.dynamicObjects);
-  };
-
-  getScopedObject(newObject) {
-    let objectType = newObject.type;
-    let scopeLevel = newObject.scopeLevel;
-
-    switch (objectType) {
-      case "question":
-        objectType = "questions";
-        break;
-      default:
-        break;
-    }
-
-    switch (scopeLevel) {
-      case "Maps":
-        scopeLevel = "map";
-        break;
-      default:
-        break;
-    }
-
-    let items = [...this.state.scopedObjects[scopeLevel][objectType]];
-    return items;
-  }
-
   onUpdateScopedObjects(newObject) {
     let orgObjects = { ...this.state.scopedObjects };
 
@@ -409,6 +350,70 @@ class Player extends PureComponent {
     };
 
     this.setState(newState);
+  }
+
+  onUpdateDynamicObjects = (newObject) => {
+    let orgObjects = this.state.dynamicObjects;
+
+    // 1. Make a shallow copy of the items
+    let orgCounters = [...orgObjects.counters];
+
+    for (let index = 0; index < orgCounters.length; index++) {
+      // 2. Make a shallow copy of the item you want to mutate
+      let orgCounter = { ...orgCounters[index] };
+      let newCounter = newObject.counters[index];
+
+      if (orgCounter.id != newCounter.id) {
+        continue;
+      }
+
+      if (orgCounter.value != newCounter.value) {
+        log.debug(
+          `counter ${orgCounter.name}: ${orgCounter.value} => ${newCounter.value}`
+        );
+        orgCounter.value = newCounter.value;
+        orgCounter.updatedat = newCounter.updatedat;
+
+        // 4. Put it back into our array. N.B. we *are* mutating the array here,
+        //    but that's why we made a copy first
+        orgCounters[index] = orgCounter;
+      }
+    }
+
+    const newDynamicObjects = {
+      dynamicObjects: {
+        ...this.state.dynamicObjects,
+        counters: orgCounters,
+        checksum: newObject.checksum,
+      },
+    };
+
+    this.setState(newDynamicObjects);
+    playerState.SetDynamicObjects(this.state.dynamicObjects);
+  };
+
+  getScopedObject(newObject) {
+    let objectType = newObject.type;
+    let scopeLevel = newObject.scopeLevel;
+
+    switch (objectType) {
+      case "question":
+        objectType = "questions";
+        break;
+      default:
+        break;
+    }
+
+    switch (scopeLevel) {
+      case "Maps":
+        scopeLevel = "map";
+        break;
+      default:
+        break;
+    }
+
+    let items = [...this.state.scopedObjects[scopeLevel][objectType]];
+    return items;
   }
 
   onJsxParseError(arg) {

@@ -7,7 +7,7 @@ import JsxParser from "react-jsx-parser";
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
-import { getQuestion } from "../../WikiUtils";
+import { getQuestion, getDisplay } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
 const playerState = require("../../../../utils/PlayerState").PlayerState;
 
@@ -98,12 +98,18 @@ class OlabSinglelineTextQuestion extends OlabTag {
         );
       }
 
+      const visibility = getDisplay(olabObject);
+      const divStyle = {
+        display: visibility,
+      };
+
       return (
         <>
           <div
             className={`${styles["qusingleline"]} ${siteStyles[id]}`}
             id={olabObject.htmlIdBase}
             olabid={olabObject.id}
+            style={divStyle}
           >
             <div
               id={`${olabObject.htmlIdBase}::stem`}
