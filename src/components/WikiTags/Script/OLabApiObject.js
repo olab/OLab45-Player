@@ -50,14 +50,18 @@ export class OLabApiObject {
   }
 
   isHidden() {
-    return this.domElement.style.display == "none";
+    return !this.scopedObject.visible;
   }
 
   hide() {
-    this.domElement.style.display = "none";
+    this.scopedObject.visible = false;
+    let obj = { ...this.scopedObject };
+    this.clientApi.updateObject(obj);
   }
 
   show() {
-    this.domElement.style.display = "block";
+    this.scopedObject.visible = true;
+    let obj = { ...this.scopedObject };
+    this.clientApi.updateObject(obj);
   }
 }

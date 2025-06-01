@@ -25,6 +25,8 @@ import {
   OlabSliderQuestion,
   OlabAttendeeTag,
   OlabModeratorTag,
+  translateLevelToObject,
+  translateTypeToObject,
 } from "../WikiTags/WikiUtils";
 
 import { withParams } from "../ComponentWrapper";
@@ -317,23 +319,17 @@ class Player extends PureComponent {
   };
 
   onUpdateScopedObjects(newObject) {
-    let orgObjects = { ...this.state.scopedObjects };
-
     // 1. Make a shallow copy of the items
-    // let items = [...this.state.scopedObjects.map.questions];
-    let items = this.getScopedObject(newObject);
+    let { items, objectType, scopeLevel } =
+      this.getScopedObjectsForType(newObject);
 
     for (let index = 0; index < items.length; index++) {
-      // 2. Make a shallow copy of the item you want to mutate
+      // 2. Make a shallow copy of the item to mutate
       let item = { ...items[index] };
 
       if (item.id === newObject.id) {
         log.debug(`${item.type} object '${item.name}': changed}`);
-
-        // item.stem = newObject.stem;
-        // items[index] = item;
         items[index] = newObject;
-
         break;
       }
     }
@@ -342,12 +338,10 @@ class Player extends PureComponent {
       ...this.state,
       scopedObjects: {
         ...this.state.scopedObjects, // Copy other fields
-        map: {
-          ...orgObjects.map,
-          questions: items,
-        },
       },
     };
+
+    newState.scopedObjects[scopeLevel][objectType] = items;
 
     this.setState(newState);
   }
@@ -392,28 +386,12 @@ class Player extends PureComponent {
     playerState.SetDynamicObjects(this.state.dynamicObjects);
   };
 
-  getScopedObject(newObject) {
-    let objectType = newObject.type;
-    let scopeLevel = newObject.scopeLevel;
-
-    switch (objectType) {
-      case "question":
-        objectType = "questions";
-        break;
-      default:
-        break;
-    }
-
-    switch (scopeLevel) {
-      case "Maps":
-        scopeLevel = "map";
-        break;
-      default:
-        break;
-    }
+  getScopedObjectsForType(newObject) {
+    let objectType = translateTypeToObject(newObject.type);
+    let scopeLevel = translateLevelToObject(newObject.scopeLevel);
 
     let items = [...this.state.scopedObjects[scopeLevel][objectType]];
-    return items;
+    return { items, objectType, scopeLevel };
   }
 
   onJsxParseError(arg) {

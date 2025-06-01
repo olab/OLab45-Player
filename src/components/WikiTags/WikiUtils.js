@@ -225,6 +225,45 @@ const getDisplay = (olabObject) => {
   return "inline";
 };
 
+const translateTypeToObject = (type) => {
+  switch (type) {
+    case "question":
+      type = "questions";
+      break;
+    case "constant":
+      type = "constants";
+      break;
+    case "counter":
+      type = "counters";
+      break;
+    case "file":
+      type = "files";
+      break;
+    default:
+      break;
+  }
+
+  return type;
+};
+
+const translateLevelToObject = (level) => {
+  switch (level) {
+    case "Maps":
+      level = "map";
+      break;
+    case "Nodes":
+      level = "node";
+      break;
+    case "Servers":
+      level = "server";
+      break;
+    default:
+      break;
+  }
+
+  return level;
+};
+
 export {
   combineStyles,
   findWikiInList,
@@ -253,4 +292,6 @@ export {
   OlabReportTag,
   OlabScriptTag,
   OlabSessionTag,
+  translateLevelToObject,
+  translateTypeToObject,
 };
