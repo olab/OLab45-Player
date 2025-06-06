@@ -43,7 +43,8 @@ class OlabLinksTag extends OlabTag {
     // decorate link with name based on link text
     for (let index = links.length - 1; index >= 0; index--) {
       let link = links[index];
-      link.name = "LINK:" + link.linkText.toLowerCase().replace(/[\W_]/g, "");
+      link.htmlIdBase =
+        "LINK:" + link.linkText.toLowerCase().replace(/[\W_]/g, "");
     }
 
     // remove link based on visit-once nodes
@@ -73,7 +74,7 @@ class OlabLinksTag extends OlabTag {
           >
             {links.map((link) => (
               <Button
-                id={link.name}
+                id={link.htmlIdBase}
                 key={link.id}
                 onClick={() => {
                   this.onNavigateToNode(
@@ -102,7 +103,7 @@ class OlabLinksTag extends OlabTag {
           >
             {links.map((link) => (
               <Button
-                id={link.name}
+                id={link.htmlIdBase}
                 key={link.id}
                 style={{
                   textTransform: "none",

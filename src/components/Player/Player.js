@@ -61,7 +61,9 @@ class Player extends PureComponent {
     this.onErrorDismissed = this.onErrorDismissed.bind(this);
 
     this.onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
+    this.onUpdateObjects = this.onUpdateObjects.bind(this);
     this.onUpdateScopedObjects = this.onUpdateScopedObjects.bind(this);
+    this.searchCollection = this.searchCollection.bind(this);
 
     const persistedState = playerState.Get();
 
@@ -318,6 +320,58 @@ class Player extends PureComponent {
     window.location.href = url;
   };
 
+  searchCollection(array, elementId) {
+    if (!Array.isArray(array)) {
+      return null;
+    }
+    for (const obj of array) {
+      if (obj.htmlIdBase === elementId) {
+        log.debug(`found '${elementId}'`);
+        return { ...obj };
+      }
+    }
+    return null;
+  }
+
+  onUpdateObjects(newObject) {
+    let obj = null;
+
+    if (newObject.type === "link") {
+      if (this.state.node.links) {
+        obj = this.searchCollection(
+          this.state.node.links,
+          newObject.htmlIdBase
+        );
+      }
+    }
+
+    if (obj == null) {
+      log.error(`could not find ${newObject.type} object`);
+      return;
+    }
+
+    let items = this.state.node.links;
+    for (let index = 0; index < items.length; index++) {
+      // 2. Make a shallow copy of the item to mutate
+      let item = { ...items[index] };
+
+      if (item.id === newObject.id) {
+        log.debug(`${item.type} object '${item.name}': changed}`);
+        items[index] = newObject;
+        break;
+      }
+    }
+
+    const newState = {
+      ...this.state,
+      node: {
+        ...this.state.node,
+      },
+    };
+
+    this.setState(newState);
+  }
+
   onUpdateScopedObjects(newObject) {
     // 1. Make a shallow copy of the items
     let { items, objectType, scopeLevel } =
@@ -440,6 +494,7 @@ class Player extends PureComponent {
       const onNavigateToNode = this.onNavigateToNode;
       const onUpdateDynamicObjects = this.onUpdateDynamicObjects;
       const onUpdateScopedObjects = this.onUpdateScopedObjects;
+      const onUpdateObjects = this.onUpdateObjects;
       const theme = this.lookupTheme();
       const haveTheme = theme != null;
 
@@ -550,6 +605,7 @@ class Player extends PureComponent {
                 nodesVisited,
                 onUpdateDynamicObjects,
                 onUpdateScopedObjects,
+                onUpdateObjects,
                 player,
                 scopedObjects,
                 urlParam,

@@ -27,12 +27,17 @@ class OlabScriptTag extends OlabTag {
 
   updateObject(newObject) {
     log.debug(`updating object`);
-    this.props.props.onUpdateScopedObjects(newObject);
+    this.player.onUpdateObjects(newObject);
+  }
+
+  updateScopedObject(newObject) {
+    log.debug(`updating scoped object`);
+    this.player.onUpdateScopedObjects(newObject);
   }
 
   updateDynamicObject(newObject) {
-    log.debug(`updating object`);
-    this.props.props.onUpdateDynamicObjects(newObject);
+    log.debug(`updating dynamic object`);
+    this.player.onUpdateDynamicObjects(newObject);
   }
 
   loadSnippet = async () => {

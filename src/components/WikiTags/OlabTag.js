@@ -21,6 +21,8 @@ class OlabTag extends React.Component {
       disabled: false,
     };
 
+    this.player = props.props.player;
+
     this.setInProgress = this.setInProgress.bind(this);
   }
 

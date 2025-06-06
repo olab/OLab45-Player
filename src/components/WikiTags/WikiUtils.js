@@ -79,8 +79,10 @@ const getFile = (name, props) => {
 
     item = findWikiInList(array, name);
 
-    if (item == null) {
-      log.error(`Could not find file '${name}'`);
+    if (item.name != null) {
+      item.htmlIdBase = `FILE:${item.name}`;
+    } else {
+      item.htmlIdBase = `FILE:${item.id}`;
     }
   } catch (error) {
     log.error(`error looking up file ${name}: ${error}`);
@@ -102,10 +104,6 @@ const getCounter = (name, dynamicObjects) => {
     } else {
       item.htmlIdBase = `CR:${item.id}`;
     }
-
-    if (item == null) {
-      log.error(`Could not find counter '${name}'`);
-    }
   } catch (error) {
     log.error(`error looking up counter ${name}: ${error}`);
   }
@@ -114,7 +112,7 @@ const getCounter = (name, dynamicObjects) => {
 };
 
 const getQuestion = (name, props) => {
-  let question = null;
+  let item = null;
 
   try {
     const {
@@ -123,35 +121,35 @@ const getQuestion = (name, props) => {
       },
     } = props;
 
-    question = findWikiInList(
+    item = findWikiInList(
       [...node?.questions, ...map?.questions, ...server?.questions],
       name
     );
 
-    if (question.questionType !== 3 && question.questionType !== 2) {
-      if (question.value === null) {
-        question.value = 0;
+    if (item.questionType !== 3 && item.questionType !== 2) {
+      if (item.value === null) {
+        item.value = 0;
       }
     } else {
-      if (question.value === null) {
-        question.value = "";
+      if (item.value === null) {
+        item.value = "";
       }
     }
 
-    if (question.width === 0) {
-      question.width = 300;
+    if (item.width === 0) {
+      item.width = 300;
     }
 
-    if (question.name != null) {
-      question.htmlIdBase = `QU:${question.name}`;
+    if (item.name != null) {
+      item.htmlIdBase = `QU:${item.name}`;
     } else {
-      question.htmlIdBase = `QU:${question.id}`;
+      item.htmlIdBase = `QU:${item.id}`;
     }
   } catch (error) {
     log.error(`error looking up question ${name}: ${error}`);
   }
 
-  return question;
+  return item;
 };
 
 const getConstant = (name, props) => {
@@ -169,8 +167,10 @@ const getConstant = (name, props) => {
       name
     );
 
-    if (item == null) {
-      log.error(`Could not find constant ${name}`);
+    if (item.name != null) {
+      item.htmlIdBase = `CONST:${item.name}`;
+    } else {
+      item.htmlIdBase = `CONST:${item.id}`;
     }
   } catch (error) {
     log.error(`error looking up constant ${name}: ${error}`);

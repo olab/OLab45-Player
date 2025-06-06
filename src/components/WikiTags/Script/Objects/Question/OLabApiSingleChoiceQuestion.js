@@ -19,7 +19,7 @@ export class OLabApiSingleChoiceQuestion extends OLabApiChoicesQuestion {
       let name = item.id.replace("QR:", "");
       name = name.replace("::input", "");
 
-      for (const response of this.scopedObject.responses) {
+      for (const response of this.olabObject.responses) {
         if (response.name === name) {
           items.push({
             id: response.id,

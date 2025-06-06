@@ -1,15 +1,13 @@
 ﻿// "use strict";
-import { OLabApiObject } from "../../OLabApiObject";
-import { render } from "react-dom";
-import log from "loglevel";
+import { OLabApiScopedObject } from "../OLabApiScopedObject";
 
-export class OLabApiQuestion extends OLabApiObject {
+export class OLabApiQuestion extends OLabApiScopedObject {
   constructor(clientApi, name) {
     super(clientApi, `QU:${name}`, name, "questions");
   }
 
   #getStemElement() {
-    const elementId = `${this.scopedObject.htmlIdBase}::stem`;
+    const elementId = `${this.olabObject.htmlIdBase}::stem`;
     const element = document.getElementById(elementId);
     const childDiv = element.querySelector("div");
     return childDiv;
@@ -22,7 +20,7 @@ export class OLabApiQuestion extends OLabApiObject {
   update() {
     // get and make a copy of the scoped object
     // let obj = { ...this.findOLabObject(this.scopedObject.id, "questions") };
-    let obj = { ...this.scopedObject };
+    let obj = { ...this.olabObject };
     this.clientApi.updateObject(obj);
   }
 
@@ -34,14 +32,14 @@ export class OLabApiQuestion extends OLabApiObject {
   set stem(value) {
     let stemElement = this.#getStemElement();
     stemElement.textContent = value;
-    this.scopedObject.stem = value;
-    this.update(this.scopedObject);
+    this.olabObject.stem = value;
+    this.update(this.olabObject);
   }
 
   getResponses() {
     let responses = [];
 
-    const elementId = `${this.scopedObject.htmlIdBase}::responses`;
+    const elementId = `${this.olabObject.htmlIdBase}::responses`;
     const container = document.getElementById(elementId);
     var spans = container.querySelectorAll("[id$=label]");
     for (const response of spans) {
@@ -63,7 +61,7 @@ export class OLabApiQuestion extends OLabApiObject {
   }
 
   setResponse(name, value) {
-    for (const response of this.scopedObject.responses) {
+    for (const response of this.olabObject.responses) {
       if (response.name === name) {
         response.response = value;
         break;

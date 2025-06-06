@@ -56,38 +56,73 @@ export class OLabClientApi {
     }
   }
 
+  #searchCollection(array, elementId) {
+    if (!Array.isArray(array)) {
+      return null;
+    }
+    for (const obj of array) {
+      if (obj.htmlIdBase === elementId) {
+        log.debug(`found '${elementId}'`);
+        return { ...obj };
+      }
+    }
+    return null;
+  }
+
   // find and return a copy of an OLab scoped object
   // of a certain type by id or name
-  findOLabObject(idName, type) {
-    for (const obj of this.dynamicObjects.counters) {
-      if (obj.id === idName || obj.name === idName) {
-        log.debug(`found counter ${type} '${idName}'`);
+  findOLabObject(elementId, type) {
+    if (type === "counters") {
+      if (this.dynamicObjects.counters) {
+        var obj = this.#searchCollection(
+          this.dynamicObjects.counters,
+          elementId
+        );
+        if (obj != null) {
+          return { ...obj };
+        }
+        return null;
+      }
+    }
+
+    if (type === "links") {
+      if (this.props.node.links) {
+        var obj = this.#searchCollection(this.props.node.links, elementId);
+        if (obj != null) {
+          return { ...obj };
+        }
+        return null;
+      }
+    }
+
+    if (this.scopedObjects.server[type]) {
+      var obj = this.#searchCollection(
+        this.scopedObjects.server[type],
+        elementId
+      );
+      if (obj != null) {
         return { ...obj };
       }
     }
 
-    for (const obj of this.scopedObjects.server[type]) {
-      if (obj.id === idName || obj.name === idName) {
-        log.debug(`found server ${type} '${idName}'`);
+    if (this.scopedObjects.map[type]) {
+      var obj = this.#searchCollection(this.scopedObjects.map[type], elementId);
+      if (obj != null) {
         return { ...obj };
       }
     }
 
-    for (const obj of this.scopedObjects.map[type]) {
-      if (obj.id === idName || obj.name === idName) {
-        log.debug(`found map ${type} '${idName}'`);
+    if (this.scopedObjects.node[type]) {
+      var obj = this.#searchCollection(
+        this.scopedObjects.node[type],
+        elementId
+      );
+      if (obj != null) {
         return { ...obj };
       }
     }
 
-    for (const obj of this.scopedObjects.node[type]) {
-      if (obj.id === idName || obj.name === idName) {
-        log.debug(`found node ${type} '${idName}'`);
-        return { ...obj };
-      }
-    }
-
-    throw new Error(`unknown ${type} scopedObject with id '${idName}'`);
+    throw new Error(`unknown ${type} scopedObject with id '${elementId}'`);
   }
 
   findWikiInList(list, wiki) {
@@ -122,6 +157,10 @@ export class OLabClientApi {
         }
       })
       .catch((error) => console.error("Error loading external HTML:", error));
+  }
+
+  updateScopedObject(newObject) {
+    this.component.updateScopedObject(newObject);
   }
 
   updateObject(newObject) {

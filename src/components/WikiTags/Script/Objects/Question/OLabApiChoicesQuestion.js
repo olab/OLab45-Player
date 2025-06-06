@@ -8,7 +8,7 @@ export class OLabApiChoicesQuestion extends OLabApiQuestion {
 
   get choices() {
     let items = [];
-    for (const response of this.scopedObject.responses) {
+    for (const response of this.olabObject.responses) {
       items.push({
         id: response.id,
         name: response.name,

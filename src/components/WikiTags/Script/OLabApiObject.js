@@ -12,15 +12,11 @@ export class OLabApiObject {
 
     this.clientApi = clientApi;
     this.elementId = elementId;
-
-    if (name != null && type != null && type != "links") {
-      this.scopedObject = clientApi.findOLabObject(name, type);
-      this.id = name;
-    } else {
-      this.id = elementId;
-    }
+    this.id = elementId;
+    this.name = name;
 
     this.domElement = this.findDomObject(this.elementId);
+    this.olabObject = clientApi.findOLabObject(this.elementId, type);
   }
 
   // find an HTML DOM object by id attribute
@@ -50,18 +46,18 @@ export class OLabApiObject {
   }
 
   isHidden() {
-    return !this.scopedObject.visible;
+    return !this.olabObject.visible;
   }
 
   hide() {
-    this.scopedObject.visible = false;
-    let obj = { ...this.scopedObject };
+    this.olabObject.visible = false;
+    let obj = { ...this.olabObject };
     this.clientApi.updateObject(obj);
   }
 
   show() {
-    this.scopedObject.visible = true;
-    let obj = { ...this.scopedObject };
+    this.olabObject.visible = true;
+    let obj = { ...this.olabObject };
     this.clientApi.updateObject(obj);
   }
 }

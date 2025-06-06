@@ -1,16 +1,16 @@
 ﻿// "use strict";
-import { OLabApiObject } from "../OLabApiObject";
+import { OLabApiScopedObject } from "./OLabApiScopedObject";
 
-export class OLabApiConstant extends OLabApiObject {
+export class OLabApiConstant extends OLabApiScopedObject {
   constructor(clientApi, id) {
     super(clientApi, "CONST:" + id, id, "constants");
   }
 
   get value() {
-    return this.scopedObject.value;
+    return this.olabObject.value;
   }
 
   set value(value) {
-    this.scopedObject.value = value;
+    this.olabObject.value = value;
   }
 }

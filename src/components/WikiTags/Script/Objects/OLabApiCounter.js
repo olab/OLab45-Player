@@ -1,19 +1,13 @@
 ﻿// "use strict";
-import { OLabApiObject } from "../OLabApiObject";
+import { OLabApiScopedObject } from "./OLabApiScopedObject";
 import { putCounterValue } from "../../../../services/api";
 import log from "loglevel";
 
-export class OLabApiCounter extends OLabApiObject {
+export class OLabApiCounter extends OLabApiScopedObject {
   constructor(clientApi, id) {
     super(clientApi, "CR:" + id, id, "counters");
     // this.target = this.clientApi.player.getCounter(this.params.id);
     // this.setProgressObject("progressSpinner");
-  }
-
-  #getElement() {
-    const elementId = this.scopedObject.htmlIdBase;
-    const element = document.getElementById(elementId);
-    return element;
   }
 
   updateDynamicObject(newDynamicObject) {
@@ -27,18 +21,18 @@ export class OLabApiCounter extends OLabApiObject {
     // if (this.target == null) {
     //   throw "Object '" + params.id + "' not found.";
     // }
-    return this.scopedObject.value;
+    return this.olabObject.value;
   }
 
   set value(value) {
-    let element = this.#getElement();
+    let element = this.getElement();
     element.textContent = value;
-    this.scopedObject.value = value;
+    this.olabObject.value = value;
 
     try {
-      log.debug("Setting counter " + this.scopedObject.id + " = " + value);
+      log.debug("Setting counter " + this.olabObject.id + " = " + value);
 
-      putCounterValue(this.clientApi.props, this.scopedObject).then((result) =>
+      putCounterValue(this.clientApi.props, this.olabObject).then((result) =>
         this.updateDynamicObject(result.data)
       );
     } catch (e) {
@@ -117,51 +111,45 @@ export class OLabApiCounter extends OLabApiObject {
     }
   }
 
-  isHidden() {
-    return this.domElement.style.display == "none";
-  }
-
   hide(callback = null) {
-    let element = this.#getElement();
+    let element = this.getElement();
     element.style.display = "none";
-    this.scopedObject.visible = false;
+    this.olabObject.visible = false;
 
     try {
       log.debug(
         "Setting counter " +
-          this.scopedObject.id +
+          this.olabObject.id +
           " visibility " +
           element.style.display
       );
 
-      putCounterValue(this.clientApi.props, this.scopedObject).then(
-        (result) => {
-          this.updateDynamicObject(result.data);
+      putCounterValue(this.clientApi.props, this.olabObject).then((result) => {
+        this.updateDynamicObject(result.data);
 
-          if (callback != null) {
-            callback();
-          }
+        if (callback != null) {
+          callback();
         }
-      );
+      });
     } catch (e) {
       alert(e.message);
     }
   }
 
   show() {
-    let element = this.#getElement();
+    let element = this.getElement();
     element.style.display = "inline";
-    this.scopedObject.visible = false;
+    this.olabObject.visible = false;
 
     try {
       log.debug(
         "Setting counter " +
-          this.scopedObject.id +
+          this.olabObject.id +
           " visibility " +
           element.style.display
       );
 
-      putCounterValue(this.clientApi.props, this.scopedObject).then((result) =>
+      putCounterValue(this.clientApi.props, this.olabObject).then((result) =>
         this.updateDynamicObject(result.data)
       );
     } catch (e) {

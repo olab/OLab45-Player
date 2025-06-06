@@ -6,11 +6,15 @@ export class OLabApiLink extends OLabApiObject {
     super(clientApi, "LINK:" + id, id, "links");
   }
 
-  get text() {
-    return this.scopedObject.value;
+  hide() {
+    this.olabObject.visible = false;
+    let obj = { ...this.olabObject };
+    this.clientApi.updateObject(obj);
   }
 
-  set text(value) {
-    this.scopedObject.value = value;
+  show() {
+    this.olabObject.visible = true;
+    let obj = { ...this.olabObject };
+    this.clientApi.updateObject(obj);
   }
 }
