@@ -9,7 +9,7 @@ import JsxParser from "react-jsx-parser";
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
-import { getQuestion, getDisplay } from "../../WikiUtils";
+import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
 
 class OlabDragAndDropQuestion extends OlabTag {
@@ -130,7 +130,7 @@ class OlabDragAndDropQuestion extends OlabTag {
         );
       }
 
-      const visibility = getDisplay(olabObject);
+      const visibility = this.getDisplayStyle(olabObject);
       const divStyle = {
         display: visibility,
       };

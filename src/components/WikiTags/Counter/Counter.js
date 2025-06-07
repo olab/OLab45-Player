@@ -1,14 +1,11 @@
 // @flow
-import React from "react";
 import parse from "html-react-parser";
 import log from "loglevel";
-
-import { getCounter, getDisplay } from "../WikiUtils";
 import OlabTag from "../OlabTag";
 
 class OlabCounterTag extends OlabTag {
   constructor(props) {
-    let olabObject = getCounter(props.name, props.props.dynamicObjects);
+    let olabObject = props.props.dynamicObject.getCounter(props.name);
     super(props, olabObject);
   }
 
@@ -37,7 +34,7 @@ class OlabCounterTag extends OlabTag {
         olabObject.value = "";
       }
 
-      const visibility = getDisplay(olabObject);
+      const visibility = this.getDisplayStyle(olabObject);
 
       return (
         <div id={olabObject.htmlIdBase} style={{ display: visibility }}>

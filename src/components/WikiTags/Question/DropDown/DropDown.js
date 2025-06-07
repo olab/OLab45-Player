@@ -17,7 +17,7 @@ import log from "loglevel";
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
-import { getQuestion, getDisplay } from "../../WikiUtils";
+import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
 
 class OlabDropDownQuestion extends OlabTag {
@@ -137,7 +137,7 @@ class OlabDropDownQuestion extends OlabTag {
 
       var responses = this.buildQuestionResponses(olabObject, id);
       var disabled = olabObject.disabled == 0 ? false : true;
-      const visibility = getDisplay(olabObject);
+      const visibility = this.getDisplayStyle(olabObject);
       const divStyle = {
         display: visibility,
       };

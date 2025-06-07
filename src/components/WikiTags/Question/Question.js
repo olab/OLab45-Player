@@ -2,7 +2,7 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 
-import { getQuestion, getDisplay } from "../WikiUtils";
+import { getQuestion } from "../WikiUtils";
 import { postQuestionValue } from "../../../services/api";
 import styles from "../styles.module.css";
 import OlabMultilineTextQuestion from "./MultilineText/MultilineText";
@@ -91,7 +91,7 @@ class OlabQuestionTag extends React.Component {
   render() {
     const { debug, question, customId } = this.state;
     const { name } = this.props;
-    const visibility = getDisplay(question);
+    const visibility = this.getDisplayStyle(question);
 
     const divStyle = {
       paddingTop: "10px",

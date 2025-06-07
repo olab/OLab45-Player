@@ -22,7 +22,7 @@ class OlabTag extends React.Component {
     };
 
     this.player = props.props.player;
-
+    this.dynamicObject = props.props.dynamicObject;
     this.setInProgress = this.setInProgress.bind(this);
   }
 
@@ -64,6 +64,13 @@ class OlabTag extends React.Component {
 
     this.setInProgress(false);
   };
+
+  getDisplayStyle() {
+    if (this.state.olabObject.hasOwnProperty("visible")) {
+      return this.state.olabObject.visible ? "" : "none";
+    }
+    return "inline";
+  }
 
   errorJsx = (id, error) => {
     log.error(`[[${id}]] error ${error.message}`);

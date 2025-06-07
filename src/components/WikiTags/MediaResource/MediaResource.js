@@ -3,7 +3,7 @@ import React from "react";
 
 import styles from "../styles.module.css";
 import siteStyles from "../site.module.css";
-import { getFile, getDisplay } from "../WikiUtils";
+import { getFile } from "../WikiUtils";
 import { getDownload } from "../../../services/api";
 import log from "loglevel";
 import BrokenImageIcon from "@material-ui/icons/BrokenImage";

@@ -4,6 +4,7 @@ import { FormControl } from "@material-ui/core";
 import JsxParser from "react-jsx-parser";
 import log from "loglevel";
 const playerState = require("../../utils/PlayerState").PlayerState;
+import { DynamicObject } from "../../utils/DynamicObject";
 
 import ErrorPopup from "../ErrorPopup/ErrorPopup";
 import {
@@ -70,6 +71,7 @@ class Player extends PureComponent {
     this.state = {
       ...this.state,
       ...persistedState,
+      dynamicObject: new DynamicObject(),
       errorFound: false,
       errorMessage: null,
     };
@@ -202,7 +204,7 @@ class Player extends PureComponent {
   };
 
   getNode = async (props) => {
-    let { mapId, nodeId, dynamicObjects, node, disableCache } = this.state;
+    let { mapId, nodeId, dynamicObject, node, disableCache } = this.state;
 
     // reset nodes visited if entering map via 'root node'
     if (nodeId == 0) {
@@ -218,25 +220,16 @@ class Player extends PureComponent {
       }
     }
 
-    // if no dynamic objects yet, initialize an object
-    if (!dynamicObjects) {
-      dynamicObjects = {
-        map: null,
-        node: null,
-        server: null,
-      };
-    }
-
     // do a check if the first node played, based
     // on if there was a previous node in local storage
     const newPlay = nodeId == 0;
-    dynamicObjects.newPlay = newPlay;
+    dynamicObject.newPlay = newPlay;
 
     const { data: nodeData } = await getMapNode(
       props,
       mapId,
       nodeId,
-      dynamicObjects
+      dynamicObject
     );
 
     const { data: scopedObjectsData } = await getNodeScopedObjects(
@@ -248,7 +241,7 @@ class Player extends PureComponent {
 
     // extract and delete the all-scope dynamic objects that
     // piggy-back on the node object
-    dynamicObjects = nodeData.dynamicObjects;
+    let newDynamicObject = new DynamicObject(nodeData.dynamicObjects);
     delete nodeData.dynamicObjects;
 
     // if new play, should be new contextId from server,
@@ -264,7 +257,7 @@ class Player extends PureComponent {
     this.setState({
       contextId: nodeData.contextId,
       node: nodeData,
-      dynamicObjects: dynamicObjects,
+      dynamicObject: newDynamicObject,
       scopedObjects: {
         map: scopedObjects.map,
         node: scopedObjectsData,
@@ -274,7 +267,7 @@ class Player extends PureComponent {
 
     if (!this.state.disableCache) {
       playerState.SetNode(this.state.node);
-      playerState.SetDynamicObjects(this.state.dynamicObjects);
+      playerState.SetDynamicObjects(newDynamicObject);
       playerState.SetNodeStatic(this.state.scopedObjects.node);
     }
 
@@ -294,11 +287,12 @@ class Player extends PureComponent {
         state.nodeId
       );
 
+      var dynamicObject = new DynamicObject(scopedObjectsData);
       this.setState({
-        dynamicObjects: scopedObjectsData,
+        dynamicObject: dynamicObject,
       });
 
-      playerState.SetDynamicObjects(this.state.dynamicObjects);
+      playerState.SetDynamicObjects(dynamicObject.data);
 
       log.debug("read dynamic data");
     } catch (error) {
@@ -401,19 +395,11 @@ class Player extends PureComponent {
   }
 
   onUpdateDynamicObjects = (dynamicObject) => {
-    // Make a shallow copy of the items
-    let newCounters = dynamicObject.counters;
-
-    const newDynamicObjects = {
-      dynamicObjects: {
-        ...this.state.dynamicObjects,
-        counters: newCounters,
-        checksum: dynamicObject.checksum,
-      },
-    };
-
-    this.setState(newDynamicObjects);
-    playerState.SetDynamicObjects(this.state.dynamicObjects);
+    this.setState({
+      ...this.state,
+      dynamicObject: dynamicObject,
+    });
+    playerState.SetDynamicObjects(dynamicObject);
   };
 
   getScopedObjectsForType(newObject) {
@@ -443,7 +429,7 @@ class Player extends PureComponent {
       node,
       nodesVisited,
       scopedObjects,
-      dynamicObjects,
+      dynamicObject,
       urlParam,
       contextId,
       errorFound,
@@ -486,7 +472,7 @@ class Player extends PureComponent {
               bindings={{
                 props: {
                   contextId,
-                  dynamicObjects,
+                  dynamicObject,
                   history,
                   map,
                   node,
@@ -530,7 +516,7 @@ class Player extends PureComponent {
               bindings={{
                 props: {
                   contextId,
-                  dynamicObjects,
+                  dynamicObject,
                   history,
                   map,
                   node,
@@ -574,7 +560,7 @@ class Player extends PureComponent {
               props: {
                 authActions,
                 contextId,
-                dynamicObjects,
+                dynamicObject,
                 history,
                 map,
                 node,

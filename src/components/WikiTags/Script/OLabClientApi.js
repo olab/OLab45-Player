@@ -7,6 +7,7 @@ import { OLabApiMultipleChoiceQuestion } from "./Objects/Question/OLabApiMultipl
 import { OLabApiSingleChoiceQuestion } from "./Objects/Question/OLabApiSingleChoiceQuestion";
 import { OLabApiSliderQuestion } from "./Objects/Question/OLabApiSliderQuestion";
 import { OLabApiTextQuestion } from "./Objects/Question/OLabApiTextQuestion";
+import { DynamicObject } from "../../../utils/DynamicObject";
 
 import log from "loglevel";
 import { OLabApiCounter } from "./Objects/OLabApiCounter";
@@ -16,7 +17,7 @@ export class OLabClientApi {
   timers = {};
   events = {};
   component;
-  dynamicObjects;
+  dynamicObject;
   scopedObjects;
   state;
 
@@ -24,7 +25,7 @@ export class OLabClientApi {
     var vm = this;
 
     this.component = component;
-    this.dynamicObjects = vm.component.state.dynamicObjects;
+    this.dynamicObject = vm.component.state.dynamicObject;
     this.scopedObjects = vm.component.state.scopedObjects;
     this.timers = vm.timers;
     this.events = vm.events;
@@ -73,16 +74,7 @@ export class OLabClientApi {
   // of a certain type by id or name
   findOLabObject(elementId, type) {
     if (type === "counters") {
-      if (this.dynamicObjects.counters) {
-        var obj = this.#searchCollection(
-          this.dynamicObjects.counters,
-          elementId
-        );
-        if (obj != null) {
-          return { ...obj };
-        }
-        return null;
-      }
+      return this.dynamicObject.getCounter(elementId);
     }
 
     if (type === "links") {

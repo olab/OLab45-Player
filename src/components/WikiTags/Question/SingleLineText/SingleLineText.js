@@ -7,7 +7,7 @@ import JsxParser from "react-jsx-parser";
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
-import { getQuestion, getDisplay } from "../../WikiUtils";
+import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
 const playerState = require("../../../../utils/PlayerState").PlayerState;
 
@@ -98,7 +98,7 @@ class OlabSinglelineTextQuestion extends OlabTag {
         );
       }
 
-      const visibility = getDisplay(olabObject);
+      const visibility = this.getDisplayStyle(olabObject);
       const divStyle = {
         display: visibility,
       };

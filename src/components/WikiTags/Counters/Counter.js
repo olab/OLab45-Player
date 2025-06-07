@@ -1,6 +1,4 @@
 // @flow
-import React from "react";
-import parse from "html-react-parser";
 import log from "loglevel";
 
 import {
@@ -14,7 +12,7 @@ import {
   TableBody,
 } from "@material-ui/core";
 
-import { getCounters, getDisplay } from "../WikiUtils";
+import { getCounters } from "../WikiUtils";
 import OlabTag from "../OlabTag";
 
 class OlabCountersTag extends OlabTag {

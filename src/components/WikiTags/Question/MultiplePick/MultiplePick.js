@@ -18,7 +18,7 @@ import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 import Spinner from "../../../../shared/assets/loading_med.gif";
 
-import { getQuestion, getDisplay } from "../../WikiUtils";
+import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
 const playerState = require("../../../../utils/PlayerState").PlayerState;
 
@@ -274,7 +274,7 @@ class OlabMultiPickQuestion extends OlabTag {
 
       let row = olabObject.layoutType === 1 ? true : false;
       var disabled = olabObject.disabled == 0 ? false : true;
-      const visibility = getDisplay(olabObject);
+      const visibility = this.getDisplayStyle(olabObject);
       const divStyle = {
         display: visibility,
       };

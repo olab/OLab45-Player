@@ -218,13 +218,6 @@ const combineStyles = (...styles) => {
   };
 };
 
-const getDisplay = (olabObject) => {
-  if (olabObject.hasOwnProperty("visible")) {
-    return olabObject.visible ? "" : "none";
-  }
-  return "inline";
-};
-
 const translateTypeToObject = (type) => {
   switch (type) {
     case "question":
@@ -270,7 +263,6 @@ export {
   getConstant,
   getCounter,
   getCounters,
-  getDisplay,
   getFile,
   getQuestion,
   getScript,
