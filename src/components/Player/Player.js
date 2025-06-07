@@ -400,39 +400,15 @@ class Player extends PureComponent {
     this.setState(newState);
   }
 
-  onUpdateDynamicObjects = (newObject) => {
-    let orgObjects = this.state.dynamicObjects;
-
-    // 1. Make a shallow copy of the items
-    let orgCounters = [...orgObjects.counters];
-
-    for (let index = 0; index < orgCounters.length; index++) {
-      // 2. Make a shallow copy of the item you want to mutate
-      let orgCounter = { ...orgCounters[index] };
-      let newCounter = newObject.counters[index];
-
-      if (orgCounter.id != newCounter.id) {
-        continue;
-      }
-
-      if (orgCounter.value != newCounter.value) {
-        log.debug(
-          `counter ${orgCounter.name}: ${orgCounter.value} => ${newCounter.value}`
-        );
-        orgCounter.value = newCounter.value;
-        orgCounter.updatedat = newCounter.updatedat;
-
-        // 4. Put it back into our array. N.B. we *are* mutating the array here,
-        //    but that's why we made a copy first
-        orgCounters[index] = orgCounter;
-      }
-    }
+  onUpdateDynamicObjects = (dynamicObject) => {
+    // Make a shallow copy of the items
+    let newCounters = dynamicObject.counters;
 
     const newDynamicObjects = {
       dynamicObjects: {
         ...this.state.dynamicObjects,
-        counters: orgCounters,
-        checksum: newObject.checksum,
+        counters: newCounters,
+        checksum: dynamicObject.checksum,
       },
     };
 

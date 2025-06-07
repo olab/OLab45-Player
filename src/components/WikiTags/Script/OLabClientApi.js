@@ -167,8 +167,8 @@ export class OLabClientApi {
     this.component.updateObject(newObject);
   }
 
-  updateDynamicObject(newObject) {
-    this.component.updateDynamicObject(newObject);
+  updateDynamicObject(newCounters) {
+    this.component.updateDynamicObject(newCounters);
   }
 
   createTimer(key, callback, frequencyMs) {

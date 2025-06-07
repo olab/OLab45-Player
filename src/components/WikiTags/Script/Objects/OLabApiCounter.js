@@ -124,13 +124,13 @@ export class OLabApiCounter extends OLabApiScopedObject {
           element.style.display
       );
 
-      putCounterValue(this.clientApi.props, this.olabObject).then((result) => {
-        this.updateDynamicObject(result.data);
+      // putCounterValue(this.clientApi.props, this.olabObject).then((result) => {
+      //   this.updateDynamicObject(result.data);
 
-        if (callback != null) {
-          callback();
-        }
-      });
+      //   if (callback != null) {
+      //     callback();
+      //   }
+      // });
     } catch (e) {
       alert(e.message);
     }
@@ -149,9 +149,9 @@ export class OLabApiCounter extends OLabApiScopedObject {
           element.style.display
       );
 
-      putCounterValue(this.clientApi.props, this.olabObject).then((result) =>
-        this.updateDynamicObject(result.data)
-      );
+      // putCounterValue(this.clientApi.props, this.olabObject).then((result) =>
+      //   this.updateDynamicObject(result.data)
+      // );
     } catch (e) {
       alert(e.message);
     }
