@@ -8,7 +8,7 @@ class DynamicObject {
     if (dynamicObject == null) {
       dynamicObject = {
         checksum: null,
-        newPlay: false,
+        newPlay: true,
         counters: [],
         nodesVisitedList: [],
         updatedAt: null,
@@ -24,7 +24,7 @@ class DynamicObject {
   }
 
   clone() {
-    return { ...data };
+    return { ...this.data };
   }
 
   update(dynamicObject) {
@@ -68,6 +68,26 @@ class DynamicObject {
     }
 
     return counters;
+  }
+
+  addCounters(scopeObjects) {
+    if (!scopeObjects.hasOwnProperty("counters")) {
+      return;
+    }
+
+    const counters = scopeObjects.counters;
+
+    if (!counters || !Array.isArray(counters)) {
+      return;
+    }
+
+    for (const counter of counters) {
+      var existingCounter = this.getCounter(counter.id);
+      if (existingCounter) {
+        existingCounter = counter;
+      }
+      this.data.counters.push(counter);
+    }
   }
 
   getChecksum() {

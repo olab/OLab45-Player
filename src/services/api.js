@@ -213,7 +213,7 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
 
 async function getNodeScopedObjects(props, nodeId) {
   let token = props.authActions.getToken();
-  let url = `${config.API_URL}/nodes/${nodeId}/scopedObjects`;
+  let url = `${config.API_URL}/nodes/${nodeId}/scopedobjects`;
 
   const data = await internetJsonFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
@@ -243,7 +243,7 @@ async function getDynamicScopedObjects(props, mapId, nodeId) {
 
 async function getServerScopedObjects(props, serverId) {
   let token = props.authActions.getToken();
-  let url = `${config.API_URL}/servers/${serverId}/scopedObjects`;
+  let url = `${config.API_URL}/servers/${serverId}/scopedobjects`;
 
   const data = await internetJsonFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
@@ -428,12 +428,27 @@ async function putCounterValue(props, counter) {
   let token = props.authActions.getToken();
   const payload = {
     counter: counter,
-    dynamicObjects: props.dynamicObjects,
+    dynamicObjects: props.dynamicObject.data,
   };
 
   const data = await internetJsonFetch("PUT", url, payload, {
     Authorization: `Bearer ${token}`,
   });
+
+  return data;
+}
+
+async function getServerDynamicObjects(props, serverId) {
+  let token = props.authActions.getToken();
+  let url = `${config.API_URL}/servers/${serverId}/dynamicobjects`;
+
+  const data = await internetJsonFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  if (data.error_code != 200) {
+    throw new Error(`Error retrieving server scoped: ${serverId}`);
+  }
 
   return data;
 }
@@ -458,4 +473,5 @@ export {
   postQuestionValue,
   putCounterValue,
   getMapSessions,
+  getServerDynamicObjects,
 };

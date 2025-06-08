@@ -66,7 +66,7 @@ class PlayerState {
     const debug = this.GetDebug();
     const logLevel = this.GetLogLevel();
     const contextId = this.GetContextId();
-    const dynamicObjects = this.GetDynamicObjects();
+    // const dynamicObjects = this.GetDynamicObjects();
     const map = this.GetMap();
     const mapStatic = this.GetMapStatic();
     const node = this.GetNode();
@@ -81,7 +81,7 @@ class PlayerState {
       debug: debug,
       logLevel: logLevel,
       contextId: contextId,
-      dynamicObjects: dynamicObjects,
+      // dynamicObjects: dynamicObjects,
       map: map,
       mapId: map ? map.id : null,
       node: node,

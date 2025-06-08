@@ -74,6 +74,9 @@ class Player extends PureComponent {
       dynamicObject: new DynamicObject(),
       errorFound: false,
       errorMessage: null,
+      isMounted: false,
+      mapId: this.props.params.mapId,
+      nodeId: this.props.params.nodeId,
     };
 
     // eslint-disable-next-line
@@ -92,15 +95,27 @@ class Player extends PureComponent {
   };
 
   async componentDidMount() {
-    this.setState({ mapId: this.props.params.mapId });
-    this.setState({ nodeId: this.props.params.nodeId });
-
     try {
-      await this.getServer(this.props, 1);
-      await this.getMap(this.props);
-      await this.getNode(this.props);
+      const { serverScopedObjects } = await this.getServer(this.props, 1);
+      const { map, mapScopedObjects } = await this.getMap(this.props);
+      const { node, nodeScopedObjects } = await this.getNode(this.props);
 
-      this.setState({ isMounted: true });
+      let dynamicObject = new DynamicObject(node.dynamicObjects);
+
+      this.setState({
+        isMounted: true,
+        mapId: map.id,
+        nodeId: node.id,
+        node: node,
+        map: map,
+        contextId: node.contextId,
+        scopedObjects: {
+          server: serverScopedObjects,
+          map: mapScopedObjects,
+          node: nodeScopedObjects,
+        },
+        dynamicObject: dynamicObject,
+      });
     } catch (error) {
       this.showError(error.message);
     }
@@ -138,140 +153,121 @@ class Player extends PureComponent {
   };
 
   getServer = async (props, id) => {
-    // test if already have server loaded
-    var {
-      scopedObjects: { server },
-      disableCache,
-    } = this.state;
+    try {
+      // test if already have server scoped objects loaded
+      var {
+        scopedObjects: { server: serverScopedObjects },
+        disableCache,
+      } = this.state;
 
-    if (server && !disableCache) {
-      this.setState({ isServerFetched: true });
-      log.debug("using cached server data");
-      return;
+      if (!serverScopedObjects || disableCache) {
+        log.debug("loading server scoped objects");
+        const { data: scopedObjectsData } = await getServerScopedObjects(
+          props,
+          id
+        );
+        serverScopedObjects = scopedObjectsData;
+        playerState.SetServerStatic(serverScopedObjects);
+      } else {
+        log.debug("using cached server scoped objects");
+        serverScopedObjects = null;
+      }
+
+      return { serverScopedObjects };
+    } catch (error) {
+      this.showError(error.message);
     }
-
-    const { data: scopedObjectsData } = await getServerScopedObjects(props, id);
-
-    const { scopedObjects } = this.state;
-
-    this.setState({
-      scopedObjects: {
-        map: scopedObjects.map,
-        node: scopedObjects.node,
-        server: scopedObjectsData,
-      },
-    });
-
-    if (!this.state.disableCache) {
-      playerState.SetServerStatic(this.state.scopedObjects.server);
-    }
-
-    log.debug("read server data");
   };
 
   getMap = async (props) => {
-    // test if already have map loaded (and it's the same one)
-    var { map, disableCache } = this.state;
-    let { mapId: id } = this.state;
+    try {
+      const mapId = props.params.mapId;
 
-    if (map && !disableCache) {
-      if (Number(id) === map.id) {
-        this.setState({ isMapFetched: true });
+      // test if already have map scoped objects loaded
+      var {
+        map,
+        scopedObjects: { map: mapScopedObjects },
+        disableCache,
+      } = this.state;
+
+      if (!map || disableCache) {
+        log.debug("loading map");
+        const { data: objData } = await getMap(props, mapId);
+        map = objData;
+        playerState.SetMap(map);
+      } else {
         log.debug("using cached map data");
-        return;
       }
+
+      if (!mapScopedObjects || disableCache) {
+        log.debug("loading map scoped objects");
+        const { data: objData } = await getMapScopedObjects(props, mapId);
+        mapScopedObjects = objData;
+        playerState.SetMapStatic(mapScopedObjects);
+      } else {
+        log.debug("using cached map scoped objects");
+      }
+
+      return { map, mapScopedObjects };
+    } catch (error) {
+      this.showError(error.message);
     }
-
-    const { data: objData } = await getMap(props, id);
-    const { data: scopedObjectsData } = await getMapScopedObjects(props, id);
-    const { scopedObjects } = this.state;
-
-    this.setState({
-      map: objData,
-      scopedObjects: {
-        map: scopedObjectsData,
-        node: scopedObjects.node,
-        server: scopedObjects.server,
-      },
-    });
-
-    if (!this.state.disableCache) {
-      playerState.SetMapStatic(this.state.scopedObjects.map);
-      playerState.SetMap(this.state.map);
-    }
-
-    log.debug("read map data");
   };
 
   getNode = async (props) => {
-    let { mapId, nodeId, dynamicObject, node, disableCache } = this.state;
+    try {
+      const mapId = props.params.mapId;
+      let nodeId = props.params.nodeId;
 
-    // reset nodes visited if entering map via 'root node'
-    if (nodeId == 0) {
-      this.setState({ nodesVisited: [] });
-      playerState.SetNodesVisited([]);
-    }
+      // test if already have node scoped objects loaded
+      var {
+        node,
+        scopedObjects: { node: nodeScopedObjects },
+        disableCache,
+        dynamicObject,
+      } = this.state;
 
-    // test if already have node loaded (and it's the same one)
-    if (node && !disableCache) {
-      if (Number(nodeId) === node.id) {
+      // do a check if the first node played, based
+      // on if there was a previous node in local storage
+      const newPlay = nodeId == 0;
+      dynamicObject.newPlay = newPlay;
+
+      if (!node || disableCache) {
+        log.debug("loading node");
+        const { data: objData } = await getMapNode(
+          props,
+          mapId,
+          nodeId,
+          dynamicObject
+        );
+        node = objData;
+        nodeId = node.id;
+        playerState.SetNode(node);
+      } else {
         log.debug("using cached node data");
-        return;
       }
+
+      // if new play, should be new contextId from server,
+      // otherwise get it out of local state
+      if (newPlay) {
+        playerState.SetContextId(node.contextId);
+      } else {
+        node.contextId = playerState.GetContextId();
+      }
+
+      if (!nodeScopedObjects || disableCache) {
+        log.debug("loading node scoped objects");
+        const { data: objData } = await getNodeScopedObjects(props, nodeId);
+        nodeScopedObjects = objData;
+        playerState.SetNodeStatic(nodeScopedObjects);
+      } else {
+        log.debug("using cached node scoped objects");
+      }
+
+      return { node, nodeScopedObjects };
+    } catch (error) {
+      this.showError(error.message);
     }
-
-    // do a check if the first node played, based
-    // on if there was a previous node in local storage
-    const newPlay = nodeId == 0;
-    dynamicObject.newPlay = newPlay;
-
-    const { data: nodeData } = await getMapNode(
-      props,
-      mapId,
-      nodeId,
-      dynamicObject
-    );
-
-    const { data: scopedObjectsData } = await getNodeScopedObjects(
-      props,
-      nodeData.id
-    );
-
-    const { scopedObjects } = this.state;
-
-    // extract and delete the all-scope dynamic objects that
-    // piggy-back on the node object
-    let newDynamicObject = new DynamicObject(nodeData.dynamicObjects);
-    delete nodeData.dynamicObjects;
-
-    // if new play, should be new contextId from server,
-    // otherwise get it out of local state
-    if (newPlay) {
-      playerState.SetContextId(nodeData.contextId);
-    } else {
-      nodeData.contextId = playerState.GetContextId();
-    }
-
-    log.info(`contextId: ${nodeData.contextId}`);
-
-    this.setState({
-      contextId: nodeData.contextId,
-      node: nodeData,
-      dynamicObject: newDynamicObject,
-      scopedObjects: {
-        map: scopedObjects.map,
-        node: scopedObjectsData,
-        server: scopedObjects.server,
-      },
-    });
-
-    if (!this.state.disableCache) {
-      playerState.SetNode(this.state.node);
-      playerState.SetDynamicObjects(newDynamicObject);
-      playerState.SetNodeStatic(this.state.scopedObjects.node);
-    }
-
-    log.debug("read node data");
   };
 
   setCounterChange = (state) => {
