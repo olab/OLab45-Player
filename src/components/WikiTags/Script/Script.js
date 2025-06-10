@@ -35,7 +35,7 @@ class OlabScriptTag extends OlabTag {
     this.player.onUpdateScopedObjects(newObject);
   }
 
-  updateDynamicObject(newCounters) {
+  updateDynamicObjects(newCounters) {
     log.debug(`updating dynamic counters`);
     this.player.onUpdateDynamicObjects(newCounters);
   }

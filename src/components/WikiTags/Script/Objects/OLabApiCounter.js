@@ -21,8 +21,10 @@ export class OLabApiCounter extends OLabApiScopedObject {
       log.debug("Setting counter " + this.olabObject.id + " = " + value);
 
       putCounterValue(this.clientApi.props, this.olabObject).then((result) => {
-        this.clientApi.updateDynamicObject(result.data);
-        if (callback != null) callback(this.olabObject.value);
+        this.clientApi.updateDynamicObjects(result.data);
+        if (callback != null) {
+          callback(this.olabObject.value);
+        }
       });
     } catch (e) {
       alert(e.message);
@@ -31,9 +33,11 @@ export class OLabApiCounter extends OLabApiScopedObject {
 
   hide() {
     this.olabObject.visible = false;
+    this.clientApi.updateDynamicObject(this.olabObject);
   }
 
   show() {
-    this.olabObject.visible = false;
+    this.olabObject.visible = true;
+    this.clientApi.updateDynamicObject(this.olabObject);
   }
 }

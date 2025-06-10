@@ -104,8 +104,6 @@ class Player extends PureComponent {
       this.setState({ loadProgress: "server" });
 
       const { map, mapScopedObjects } = await this.getMap(this.props);
-      this.setState({ loadProgress: `map '${map.name}'` });
-
       const { node, nodeScopedObjects } = await this.getNode(this.props);
 
       var originalDynamicObjects = playerState.GetDynamicObjects();
@@ -216,6 +214,8 @@ class Player extends PureComponent {
         log.debug("using cached map data");
       }
 
+      this.setState({ loadProgress: `map '${map.name}'` });
+
       let mapScopedObjects = scopedObject.getMap();
 
       if (!mapScopedObjects || disableCache) {
@@ -227,6 +227,8 @@ class Player extends PureComponent {
       } else {
         log.debug("using cached map scoped objects");
       }
+
+      this.setState({ loadProgress: `map '${map.name}' objects` });
 
       return { map, mapScopedObjects };
     } catch (error) {
@@ -266,6 +268,8 @@ class Player extends PureComponent {
         log.debug("using cached node data");
       }
 
+      this.setState({ loadProgress: `node '${node.title}'` });
+
       nodeId = node.id;
 
       // if new play, should be new contextId from server,
@@ -287,6 +291,8 @@ class Player extends PureComponent {
       } else {
         log.debug("using cached node scoped objects");
       }
+
+      this.setState({ loadProgress: `node '${node.title}' objects` });
 
       return { node, nodeScopedObjects };
     } catch (error) {

@@ -70,6 +70,11 @@ class DynamicObject {
     return counters;
   }
 
+  setCounter(counter) {
+    let orgCounter = this.getCounter(counter.id);
+    orgCounter = counter;
+  }
+
   addCounters(scopeObjects) {
     if (!scopeObjects.hasOwnProperty("counters")) {
       return;
