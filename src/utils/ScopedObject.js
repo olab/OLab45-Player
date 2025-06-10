@@ -6,6 +6,16 @@ class ScopedObject {
   static NODE = "node";
   static MAP = "map";
   static SERVER = "server";
+  static CONSTANTS = "constants";
+  static COUNTERS = "counters";
+  static QUESTIONS = "questions";
+  static FILES = "files";
+  static SCRIPTS = "scripts";
+  static CONSTANT = "constant";
+  static COUNTER = "counter";
+  static QUESTION = "question";
+  static FILE = "file";
+  static SCRIPT = "script";
 
   #scopedObject = null;
 
@@ -54,6 +64,36 @@ class ScopedObject {
     return obj;
   }
 
+  #findInList = (list, name) => {
+    let match = null;
+
+    for (let element of list) {
+      if (
+        element.name === name ||
+        element.id === Number(name) ||
+        element?.htmlIdBase == name
+      ) {
+        match = element;
+        break;
+      }
+    }
+
+    return match;
+  };
+
+  getObjects(type) {
+    return [
+      ...this.getNode()[type],
+      ...this.getMap()[type],
+      ...this.getServer()[type],
+    ];
+  }
+
+  getObject(type, name) {
+    const objs = this.getObjects(type);
+    return this.#findInList(objs, name);
+  }
+
   getNode(copy = false) {
     return this.#getType(this.data, ScopedObject.NODE, copy);
   }
@@ -92,6 +132,75 @@ class ScopedObject {
   setServerObjects(obj) {
     this.data[ScopedObject.SERVER] = obj;
   }
+
+  updateScopedObject(newObject) {
+    // 1. Make a shallow copy of the items
+    let { items, objectType, scopeLevel } = this.#getArrayForObject(newObject);
+
+    for (let index = 0; index < items.length; index++) {
+      // 2. Make a shallow copy of the item to mutate
+      let item = { ...items[index] };
+
+      if (item.id === newObject.id) {
+        log.debug(`${item.type} object '${item.name}': changed}`);
+        items[index] = newObject;
+        break;
+      }
+    }
+
+    this.save();
+  }
+
+  #getArrayForObject(scopedObject, copy = false) {
+    let objectType = ScopedObject.translateTypeToObject(scopedObject.type);
+    let scopeLevel = ScopedObject.translateLevelToObject(
+      scopedObject.scopeLevel
+    );
+
+    let items = copy
+      ? [...this.data[scopeLevel][objectType]]
+      : this.data[scopeLevel][objectType];
+    return { items, objectType, scopeLevel };
+  }
+
+  static translateTypeToObject = (type) => {
+    switch (type) {
+      case ScopedObject.QUESTION:
+        type = ScopedObject.QUESTIONS;
+        break;
+      case ScopedObject.CONSTANT:
+        type = ScopedObject.CONSTANTS;
+        break;
+      case ScopedObject.COUNTER:
+        type = ScopedObject.COUNTERS;
+        break;
+      case ScopedObject.FILE:
+        type = ScopedObject.FILES;
+        break;
+      default:
+        break;
+    }
+
+    return type;
+  };
+
+  static translateLevelToObject = (level) => {
+    switch (level) {
+      case "Maps":
+        level = ScopedObject.MAP;
+        break;
+      case "Nodes":
+        level = ScopedObject.NODE;
+        break;
+      case "Servers":
+        level = ScopedObject.SERVER;
+        break;
+      default:
+        break;
+    }
+
+    return level;
+  };
 }
 
 export { ScopedObject };

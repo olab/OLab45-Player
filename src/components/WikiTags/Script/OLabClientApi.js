@@ -7,10 +7,10 @@ import { OLabApiMultipleChoiceQuestion } from "./Objects/Question/OLabApiMultipl
 import { OLabApiSingleChoiceQuestion } from "./Objects/Question/OLabApiSingleChoiceQuestion";
 import { OLabApiSliderQuestion } from "./Objects/Question/OLabApiSliderQuestion";
 import { OLabApiTextQuestion } from "./Objects/Question/OLabApiTextQuestion";
-import { DynamicObject } from "../../../utils/DynamicObject";
 
 import log from "loglevel";
 import { OLabApiCounter } from "./Objects/OLabApiCounter";
+import { ScopedObject } from "../../../utils/ScopedObject";
 
 // main view class
 export class OLabClientApi {
@@ -26,7 +26,7 @@ export class OLabClientApi {
 
     this.component = component;
     this.dynamicObject = vm.component.state.dynamicObject;
-    this.scopedObjects = vm.component.state.scopedObjects;
+    this.scopedObject = vm.component.state.scopedObject;
     this.timers = vm.timers;
     this.events = vm.events;
     this.state = vm.component.state;
@@ -72,14 +72,14 @@ export class OLabClientApi {
 
   // find and return a copy of an OLab scoped object
   // of a certain type by id or name
-  findOLabObject(elementId, type) {
+  findOLabObject(id, type) {
     if (type === "counters") {
-      return this.dynamicObject.getCounter(elementId);
+      return this.dynamicObject.getCounter(id);
     }
 
     if (type === "links") {
       if (this.props.node.links) {
-        var obj = this.#searchCollection(this.props.node.links, elementId);
+        var obj = this.#searchCollection(this.props.node.links, id);
         if (obj != null) {
           return { ...obj };
         }
@@ -87,34 +87,12 @@ export class OLabClientApi {
       }
     }
 
-    if (this.scopedObjects.server[type]) {
-      var obj = this.#searchCollection(
-        this.scopedObjects.server[type],
-        elementId
-      );
-      if (obj != null) {
-        return { ...obj };
-      }
+    obj = this.scopedObject.getObject(type, id);
+    if (obj != null) {
+      return { ...obj };
     }
 
-    if (this.scopedObjects.map[type]) {
-      var obj = this.#searchCollection(this.scopedObjects.map[type], elementId);
-      if (obj != null) {
-        return { ...obj };
-      }
-    }
-
-    if (this.scopedObjects.node[type]) {
-      var obj = this.#searchCollection(
-        this.scopedObjects.node[type],
-        elementId
-      );
-      if (obj != null) {
-        return { ...obj };
-      }
-    }
-
-    throw new Error(`unknown ${type} scopedObject with id '${elementId}'`);
+    throw new Error(`unknown ${type} scopedObject with id '${id}'`);
   }
 
   findWikiInList(list, wiki) {
@@ -244,17 +222,8 @@ export class OLabClientApi {
   }
 
   getScript(name) {
-    let item = null;
-
     try {
-      const array = [
-        ...this.scopedObjects.node?.scripts,
-        ...this.scopedObjects.map?.scripts,
-        ...this.scopedObjects.server?.scripts,
-      ];
-
-      item = this.findWikiInList(array, name);
-
+      let item = this.scopedObject.getObject(ScopedObject.SCRIPTS, name);
       if (item == null) {
         log.error(`Could not find script '${name}'`);
       }

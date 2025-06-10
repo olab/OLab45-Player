@@ -20,27 +20,22 @@ import OlabReportTag from "./Report/Report";
 import OlabScriptTag from "./Script/Script";
 import OlabSessionTag from "./Session/Session";
 import log from "loglevel";
+import { ScopedObject } from "../../utils/ScopedObject";
+import { DynamicObject } from "../../utils/DynamicObject";
 
-const findWikiInList = (list, wiki) => {
-  let match = null;
-
-  for (let element of list) {
-    if (element.name === wiki || element.id === Number(wiki)) {
-      match = element;
-      break;
-    }
-  }
-
-  if (match == null) {
-    throw new Error(`object '${wiki}' not found`);
-  }
-  return match;
-};
-
-const getCounters = (nodeId, mapCounters, counterActions) => {
+const getCounters = (nodeId, props) => {
   let items = [];
 
   try {
+    const {
+      props: { scopedObject, dynamicObject },
+    } = props;
+
+    let mapCounters = dynamicObject.getCounters(nodeId, props);
+    let counterActions = scopedObject.getMap().counterActions
+      ? scopedObject.getMap().counterActions
+      : [];
+
     for (const mapCounter of mapCounters) {
       if (mapCounter.scopeLevel != "Maps") {
         continue;
@@ -70,14 +65,10 @@ const getFile = (name, props) => {
 
   try {
     const {
-      props: {
-        scopedObjects: { map, node, server },
-      },
+      props: { scopedObject },
     } = props;
 
-    const array = [...node?.files, ...map?.files, ...server?.files];
-
-    item = findWikiInList(array, name);
+    item = scopedObject.getObject(ScopedObject.FILES, name);
 
     if (item.name != null) {
       item.htmlIdBase = `FILE:${item.name}`;
@@ -91,13 +82,15 @@ const getFile = (name, props) => {
   return item;
 };
 
-const getCounter = (name, dynamicObjects) => {
+const getCounter = (name, props) => {
   let item = null;
 
   try {
-    const { counters } = dynamicObjects;
+    const {
+      props: { dynamicObject },
+    } = props;
 
-    item = findWikiInList(counters, name);
+    item = dynamicObject.getCounter(name);
 
     if (item.name != null) {
       item.htmlIdBase = `CR:${item.name}`;
@@ -116,15 +109,10 @@ const getQuestion = (name, props) => {
 
   try {
     const {
-      props: {
-        scopedObjects: { map, node, server },
-      },
+      props: { scopedObject },
     } = props;
 
-    item = findWikiInList(
-      [...node?.questions, ...map?.questions, ...server?.questions],
-      name
-    );
+    item = scopedObject.getObject(ScopedObject.QUESTIONS, name);
 
     if (item.questionType !== 3 && item.questionType !== 2) {
       if (item.value === null) {
@@ -157,15 +145,10 @@ const getConstant = (name, props) => {
 
   try {
     const {
-      props: {
-        scopedObjects: { map, node, server },
-      },
+      props: { scopedObject },
     } = props;
 
-    item = findWikiInList(
-      [...node?.constants, ...map?.constants, ...server?.constants],
-      name
-    );
+    item = scopedObject.getObject(ScopedObject.CONSTANTS, name);
 
     if (item.name != null) {
       item.htmlIdBase = `CONST:${item.name}`;
@@ -184,14 +167,10 @@ const getScript = (name, props) => {
 
   try {
     const {
-      props: {
-        scopedObjects: { map, node, server },
-      },
+      props: { scopedObject },
     } = props;
 
-    const array = [...node?.scripts, ...map?.scripts, ...server?.scripts];
-
-    item = findWikiInList(array, name);
+    item = scopedObject.getObject(ScopedObject.SCRIPTS, name);
 
     if (item == null) {
       log.error(`Could not find script '${name}'`);
@@ -218,48 +197,47 @@ const combineStyles = (...styles) => {
   };
 };
 
-const translateTypeToObject = (type) => {
-  switch (type) {
-    case "question":
-      type = "questions";
-      break;
-    case "constant":
-      type = "constants";
-      break;
-    case "counter":
-      type = "counters";
-      break;
-    case "file":
-      type = "files";
-      break;
-    default:
-      break;
-  }
+// const translateTypeToObject = (type) => {
+//   switch (type) {
+//     case "question":
+//       type = "questions";
+//       break;
+//     case "constant":
+//       type = "constants";
+//       break;
+//     case "counter":
+//       type = "counters";
+//       break;
+//     case "file":
+//       type = "files";
+//       break;
+//     default:
+//       break;
+//   }
 
-  return type;
-};
+//   return type;
+// };
 
-const translateLevelToObject = (level) => {
-  switch (level) {
-    case "Maps":
-      level = "map";
-      break;
-    case "Nodes":
-      level = "node";
-      break;
-    case "Servers":
-      level = "server";
-      break;
-    default:
-      break;
-  }
+// const translateLevelToObject = (level) => {
+//   switch (level) {
+//     case "Maps":
+//       level = "map";
+//       break;
+//     case "Nodes":
+//       level = "node";
+//       break;
+//     case "Servers":
+//       level = "server";
+//       break;
+//     default:
+//       break;
+//   }
 
-  return level;
-};
+//   return level;
+// };
 
 export {
   combineStyles,
-  findWikiInList,
   getConstant,
   getCounter,
   getCounters,
@@ -284,6 +262,6 @@ export {
   OlabReportTag,
   OlabScriptTag,
   OlabSessionTag,
-  translateLevelToObject,
-  translateTypeToObject,
+  // translateLevelToObject,
+  // translateTypeToObject,
 };

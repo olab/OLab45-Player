@@ -27,8 +27,8 @@ import {
   OlabSliderQuestion,
   OlabAttendeeTag,
   OlabModeratorTag,
-  translateLevelToObject,
-  translateTypeToObject,
+  // translateLevelToObject,
+  // translateTypeToObject,
 } from "../WikiTags/WikiUtils";
 
 import { withParams } from "../ComponentWrapper";
@@ -73,7 +73,7 @@ class Player extends PureComponent {
       ...this.state,
       ...persistedState,
       dynamicObject: new DynamicObject(),
-      scopedObjects: new ScopedObject().data,
+      scopedObject: new ScopedObject(),
       errorFound: false,
       errorMessage: null,
       isMounted: false,
@@ -108,6 +108,11 @@ class Player extends PureComponent {
       }
 
       let dynamicObject = new DynamicObject(originalDynamicObjects);
+      let scopedObject = new ScopedObject({
+        map: mapScopedObjects,
+        node: nodeScopedObjects,
+        server: serverScopedObjects,
+      });
 
       this.setState({
         isMounted: true,
@@ -116,11 +121,12 @@ class Player extends PureComponent {
         node: node,
         map: map,
         contextId: node.contextId,
-        scopedObjects: {
-          server: serverScopedObjects,
-          map: mapScopedObjects,
-          node: nodeScopedObjects,
-        },
+        scopedObject: scopedObject,
+        // scopedObjects: {
+        //   server: serverScopedObjects,
+        //   map: mapScopedObjects,
+        //   node: nodeScopedObjects,
+        // },
         dynamicObject: dynamicObject,
       });
     } catch (error) {
@@ -132,9 +138,10 @@ class Player extends PureComponent {
     let theme = null;
 
     try {
-      const {
-        scopedObjects: { map, server },
-      } = this.state;
+      const { scopedObject } = this.state;
+
+      const map = scopedObject.getMap();
+      const server = scopedObject.getServer();
 
       if (server != null && server.themes != null) {
         if (server.themes.length > 0) {
@@ -163,9 +170,11 @@ class Player extends PureComponent {
     try {
       // test if already have server scoped objects loaded
       var {
-        scopedObjects: { server: serverScopedObjects },
+        scopedObject, //s: { server: serverScopedObjects },
         disableCache,
       } = this.state;
+
+      let serverScopedObjects = scopedObject.getServer();
 
       if (!serverScopedObjects || disableCache) {
         log.debug("loading server scoped objects");
@@ -174,7 +183,8 @@ class Player extends PureComponent {
           id
         );
         serverScopedObjects = scopedObjectsData;
-        playerState.SetServerStatic(serverScopedObjects);
+        scopedObject.setServerObjects(serverScopedObjects);
+        // playerState.SetServerStatic(serverScopedObjects);
       } else {
         log.debug("using cached server scoped objects");
       }
@@ -192,7 +202,7 @@ class Player extends PureComponent {
       // test if already have map scoped objects loaded
       var {
         map,
-        scopedObjects: { map: mapScopedObjects },
+        scopedObject, // s: { map: mapScopedObjects },
         disableCache,
       } = this.state;
 
@@ -205,11 +215,14 @@ class Player extends PureComponent {
         log.debug("using cached map data");
       }
 
+      let mapScopedObjects = scopedObject.getMap();
+
       if (!mapScopedObjects || disableCache) {
         log.debug("loading map scoped objects");
         const { data: objData } = await getMapScopedObjects(props, mapId);
         mapScopedObjects = objData;
-        playerState.SetMapStatic(mapScopedObjects);
+        scopedObject.setMapObjects(mapScopedObjects);
+        // playerState.SetMapStatic(mapScopedObjects);
       } else {
         log.debug("using cached map scoped objects");
       }
@@ -228,7 +241,7 @@ class Player extends PureComponent {
       // test if already have node scoped objects loaded
       var {
         node,
-        scopedObjects: { node: nodeScopedObjects },
+        scopedObject, // s: { node: nodeScopedObjects },
         disableCache,
         dynamicObject,
       } = this.state;
@@ -247,11 +260,12 @@ class Player extends PureComponent {
           dynamicObject
         );
         node = objData;
-        nodeId = node.id;
         playerState.SetNode(node);
       } else {
         log.debug("using cached node data");
       }
+
+      nodeId = node.id;
 
       // if new play, should be new contextId from server,
       // otherwise get it out of local state
@@ -261,11 +275,14 @@ class Player extends PureComponent {
         node.contextId = playerState.GetContextId();
       }
 
+      let nodeScopedObjects = scopedObject.getNode();
+
       if (!nodeScopedObjects || disableCache) {
         log.debug("loading node scoped objects");
         const { data: objData } = await getNodeScopedObjects(props, nodeId);
         nodeScopedObjects = objData;
-        playerState.SetNodeStatic(nodeScopedObjects);
+        scopedObject.setNodeObjects(nodeScopedObjects);
+        // playerState.SetNodeStatic(nodeScopedObjects);
       } else {
         log.debug("using cached node scoped objects");
       }
@@ -370,31 +387,15 @@ class Player extends PureComponent {
   }
 
   onUpdateScopedObjects(newObject) {
-    // 1. Make a shallow copy of the items
-    let { items, objectType, scopeLevel } =
-      this.getScopedObjectsForType(newObject);
+    const { scopedObject } = this.state;
 
-    for (let index = 0; index < items.length; index++) {
-      // 2. Make a shallow copy of the item to mutate
-      let item = { ...items[index] };
-
-      if (item.id === newObject.id) {
-        log.debug(`${item.type} object '${item.name}': changed}`);
-        items[index] = newObject;
-        break;
-      }
-    }
+    scopedObject.updateScopedObject(newObject);
 
     const newState = {
       ...this.state,
-      scopedObjects: {
-        ...this.state.scopedObjects, // Copy other fields
-      },
+      scopedObject: new ScopedObject(scopedObject.clone()),
     };
 
-    newState.scopedObjects[scopeLevel][objectType] = items;
-
-    playerState.SetScopedObjects(newState.scopedObjects);
     this.setState(newState);
   }
 
@@ -407,13 +408,18 @@ class Player extends PureComponent {
     playerState.SetDynamicObjects(dynamicObjects);
   };
 
-  getScopedObjectsForType(newObject) {
-    let objectType = translateTypeToObject(newObject.type);
-    let scopeLevel = translateLevelToObject(newObject.scopeLevel);
+  // getScopedObjectsForType(newObject) {
 
-    let items = [...this.state.scopedObjects[scopeLevel][objectType]];
-    return { items, objectType, scopeLevel };
-  }
+  //   const {
+  //     scopedObject
+  //   } = this.state;
+
+  //   let objectType = translateTypeToObject(newObject.type);
+  //   let scopeLevel = translateLevelToObject(newObject.scopeLevel);
+
+  //   let items = [...this.state.scopedObjects[scopeLevel][objectType]];
+  //   return { items, objectType, scopeLevel };
+  // }
 
   onJsxParseError(arg) {
     const t = arg;
@@ -433,7 +439,7 @@ class Player extends PureComponent {
       map,
       node,
       nodesVisited,
-      scopedObjects,
+      scopedObject,
       dynamicObject,
       urlParam,
       contextId,
@@ -482,7 +488,7 @@ class Player extends PureComponent {
                   map,
                   node,
                   nodesVisited,
-                  scopedObjects,
+                  scopedObject,
                   urlParam,
                   onNavigateToNode,
                 },
@@ -526,7 +532,7 @@ class Player extends PureComponent {
                   map,
                   node,
                   nodesVisited,
-                  scopedObjects,
+                  scopedObject,
                   urlParam,
                   onNavigateToNode,
                 },
@@ -574,7 +580,7 @@ class Player extends PureComponent {
                 onUpdateScopedObjects,
                 onUpdateObjects,
                 player,
-                scopedObjects,
+                scopedObject,
                 urlParam,
                 onNavigateToNode,
               },

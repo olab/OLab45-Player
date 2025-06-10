@@ -2,10 +2,11 @@
 import parse from "html-react-parser";
 import log from "loglevel";
 import OlabTag from "../OlabTag";
+import { getCounter } from "../WikiUtils";
 
 class OlabCounterTag extends OlabTag {
   constructor(props) {
-    let olabObject = props.props.dynamicObject.getCounter(props.name);
+    let olabObject = getCounter(props.name, props);
     super(props, olabObject);
   }
 
