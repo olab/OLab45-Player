@@ -48,10 +48,11 @@ class Home extends PureComponent {
       mapDetails: {},
       mapId: null,
       mapInfoDlgOpen: false,
-      maps: [],
+      maps: [], // playerState.GetMaps(),
       mapsFiltered: [],
       nodeId: null,
       sessionId: null,
+      disableCache: debug.disableCache,
     };
 
     log.debug(`${this.constructor["name"]} ${JSON.stringify(this.state)}`);
@@ -154,12 +155,21 @@ class Home extends PureComponent {
   }
 
   async componentDidMount() {
+    this.setState({
+      isMapsFetching: true,
+    });
+
+    // let maps = playerState.GetMaps();
+    // if (maps.length == 0 || this.state.disableCache) {
     const { data: objData } = await getMaps(this.props);
+    const maps = objData;
+    //   playerState.SetMaps(maps);
+    // }
 
     this.setState({
       isMapsFetching: false,
-      maps: objData,
-      mapsFiltered: objData,
+      maps: maps,
+      mapsFiltered: maps,
     });
 
     playerState.ClearMap();

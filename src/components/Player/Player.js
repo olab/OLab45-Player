@@ -79,6 +79,8 @@ class Player extends PureComponent {
       isMounted: false,
       mapId: this.props.params.mapId,
       nodeId: this.props.params.nodeId,
+      disableCache: persistedState.debug.disableCache,
+      loadProgress: null,
     };
 
     // eslint-disable-next-line
@@ -99,7 +101,11 @@ class Player extends PureComponent {
   async componentDidMount() {
     try {
       const { serverScopedObjects } = await this.getServer(this.props, 1);
+      this.setState({ loadProgress: "server" });
+
       const { map, mapScopedObjects } = await this.getMap(this.props);
+      this.setState({ loadProgress: `map '${map.name}'` });
+
       const { node, nodeScopedObjects } = await this.getNode(this.props);
 
       var originalDynamicObjects = playerState.GetDynamicObjects();
@@ -122,11 +128,6 @@ class Player extends PureComponent {
         map: map,
         contextId: node.contextId,
         scopedObject: scopedObject,
-        // scopedObjects: {
-        //   server: serverScopedObjects,
-        //   map: mapScopedObjects,
-        //   node: nodeScopedObjects,
-        // },
         dynamicObject: dynamicObject,
       });
     } catch (error) {
@@ -445,6 +446,7 @@ class Player extends PureComponent {
       contextId,
       errorFound,
       errorMessage,
+      loadProgress,
     } = this.state;
 
     const { history, authActions } = this.props;
@@ -636,7 +638,7 @@ class Player extends PureComponent {
         );
       }
     } else {
-      return <>Loading...</>;
+      return <center>Loading {loadProgress}...</center>;
     }
   }
 }

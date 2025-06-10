@@ -53,12 +53,14 @@ class PlayerState {
     const contextId = this.GetContextId();
     const sessionInfo = this.GetSessionInfo();
     const debugInfo = this.GetDebug();
+    let maps = this.GetMaps();
 
     persistantStorage.clear(this.storageKey);
 
     this.SetContextId(contextId);
     this.SetSessionInfo(sessionInfo);
     this.SetDebug(debugInfo);
+    this.SetMaps(maps);
   }
 
   // Get all settings as object
@@ -182,8 +184,8 @@ class PlayerState {
     );
   }
 
-  static SetMaps(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.MAPS, obj);
+  static SetMaps(maps) {
+    persistantStorage.save(this.storageKey, KeyConstants.MAPS, maps);
   }
 
   static GetMaps(defaultValue = []) {
@@ -194,8 +196,8 @@ class PlayerState {
     );
   }
 
-  static SetMap(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.MAP, obj);
+  static SetMap(map) {
+    persistantStorage.save(this.storageKey, KeyConstants.MAP, map);
   }
 
   static GetMap(defaultValue = null) {
