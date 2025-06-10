@@ -66,13 +66,9 @@ class PlayerState {
     const debug = this.GetDebug();
     const logLevel = this.GetLogLevel();
     const contextId = this.GetContextId();
-    // const dynamicObjects = this.GetDynamicObjects();
     const map = this.GetMap();
-    const mapStatic = this.GetMapStatic();
     const node = this.GetNode();
-    const nodeStatic = this.GetNodeStatic();
     const server = persistantStorage.get(KeyConstants.SERVER);
-    const serverStatic = this.GetServerStatic();
     const sessionInfo = this.GetSessionInfo();
     const visitOnceList = this.GetNodesVisited();
     const clickOnceList = this.GetLinksClicked();
@@ -81,17 +77,11 @@ class PlayerState {
       debug: debug,
       logLevel: logLevel,
       contextId: contextId,
-      // dynamicObjects: dynamicObjects,
       map: map,
       mapId: map ? map.id : null,
       node: node,
       nodeId: node ? node.id : null,
       server: server,
-      scopedObjects: {
-        map: mapStatic,
-        node: nodeStatic,
-        server: serverStatic,
-      },
       nodesVisited: visitOnceList,
       linksClicked: clickOnceList,
       sessionInfo: sessionInfo,
@@ -317,6 +307,12 @@ class PlayerState {
       KeyConstants.CLICK_ONCE_LINK_LIST,
       defaultValue
     );
+  }
+
+  static SetScopedObjects(scopedObjects) {
+    this.SetServerStatic(scopedObjects.server);
+    this.SetMapStatic(scopedObjects.map);
+    this.SetNodeStatic(scopedObjects.node);
   }
 }
 

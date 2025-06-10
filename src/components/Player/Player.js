@@ -5,6 +5,7 @@ import JsxParser from "react-jsx-parser";
 import log from "loglevel";
 const playerState = require("../../utils/PlayerState").PlayerState;
 import { DynamicObject } from "../../utils/DynamicObject";
+import { ScopedObject } from "../../utils/ScopedObject";
 
 import ErrorPopup from "../ErrorPopup/ErrorPopup";
 import {
@@ -72,6 +73,7 @@ class Player extends PureComponent {
       ...this.state,
       ...persistedState,
       dynamicObject: new DynamicObject(),
+      scopedObjects: new ScopedObject().data,
       errorFound: false,
       errorMessage: null,
       isMounted: false,
@@ -100,7 +102,12 @@ class Player extends PureComponent {
       const { map, mapScopedObjects } = await this.getMap(this.props);
       const { node, nodeScopedObjects } = await this.getNode(this.props);
 
-      let dynamicObject = new DynamicObject(node.dynamicObjects);
+      var originalDynamicObjects = playerState.GetDynamicObjects();
+      if (originalDynamicObjects == null) {
+        originalDynamicObjects = node.dynamicObjects;
+      }
+
+      let dynamicObject = new DynamicObject(originalDynamicObjects);
 
       this.setState({
         isMounted: true,
@@ -170,7 +177,6 @@ class Player extends PureComponent {
         playerState.SetServerStatic(serverScopedObjects);
       } else {
         log.debug("using cached server scoped objects");
-        serverScopedObjects = null;
       }
 
       return { serverScopedObjects };
@@ -359,6 +365,7 @@ class Player extends PureComponent {
       },
     };
 
+    playerState.SetNode(newState.node);
     this.setState(newState);
   }
 
@@ -387,15 +394,17 @@ class Player extends PureComponent {
 
     newState.scopedObjects[scopeLevel][objectType] = items;
 
+    playerState.SetScopedObjects(newState.scopedObjects);
     this.setState(newState);
   }
 
-  onUpdateDynamicObjects = (dynamicObject) => {
-    this.setState({
+  onUpdateDynamicObjects = (dynamicObjects) => {
+    let newState = {
       ...this.state,
-      dynamicObject: dynamicObject,
-    });
-    playerState.SetDynamicObjects(dynamicObject);
+      dynamicObject: new DynamicObject(dynamicObjects),
+    };
+    this.setState(newState);
+    playerState.SetDynamicObjects(dynamicObjects);
   };
 
   getScopedObjectsForType(newObject) {

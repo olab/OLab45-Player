@@ -4,9 +4,9 @@ import { config } from "../config";
 class DynamicObject {
   #dynamicObject = null;
 
-  constructor(dynamicObject = null) {
-    if (dynamicObject == null) {
-      dynamicObject = {
+  constructor(obj = null) {
+    if (obj == null) {
+      obj = {
         checksum: null,
         newPlay: true,
         counters: [],
@@ -15,7 +15,7 @@ class DynamicObject {
       };
     }
 
-    this.#dynamicObject = dynamicObject;
+    this.#dynamicObject = obj;
     this.#decorateCounters();
   }
 
@@ -27,8 +27,8 @@ class DynamicObject {
     return { ...this.data };
   }
 
-  update(dynamicObject) {
-    this.#dynamicObject = dynamicObject;
+  update(obj) {
+    this.#dynamicObject = obj;
     this.#decorateCounters();
   }
 

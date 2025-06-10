@@ -261,7 +261,7 @@ async function postQuestionValue(state) {
     map,
     node,
     authActions,
-    dynamicObjects,
+    dynamicObject,
     olabObject,
     responseId,
     value,
@@ -289,7 +289,7 @@ async function postQuestionValue(state) {
     previousResponseId: olabObject.previousResponseId,
     value: olabObject.valueOverride ?? olabObject.value,
     previousValue: olabObject.previousValue,
-    dynamicObjects: dynamicObjects,
+    dynamicObjects: dynamicObject.data,
   };
 
   const data = await internetJsonFetch("POST", url, body, {

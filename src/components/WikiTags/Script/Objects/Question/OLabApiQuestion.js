@@ -1,5 +1,6 @@
 ﻿// "use strict";
 import { OLabApiScopedObject } from "../OLabApiScopedObject";
+import log from "loglevel";
 
 export class OLabApiQuestion extends OLabApiScopedObject {
   constructor(clientApi, name) {
@@ -17,23 +18,17 @@ export class OLabApiQuestion extends OLabApiScopedObject {
     this.onEvent("change", callback);
   }
 
-  update() {
-    // get and make a copy of the scoped object
-    // let obj = { ...this.findOLabObject(this.scopedObject.id, "questions") };
-    let obj = { ...this.olabObject };
-    this.clientApi.updateObject(obj);
-  }
-
   get stem() {
     let stemElement = this.#getStemElement();
     return stemElement.textContent;
   }
 
   set stem(value) {
+    log.debug(`changing question ${this.olabObject.name} stem ${value}`);
     let stemElement = this.#getStemElement();
     stemElement.textContent = value;
     this.olabObject.stem = value;
-    this.update(this.olabObject);
+    this.clientApi.updateScopedObject(this.olabObject);
   }
 
   getResponses() {
