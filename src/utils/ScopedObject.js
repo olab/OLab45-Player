@@ -24,6 +24,7 @@ class ScopedObject {
       obj = this.load();
     }
     this.#scopedObject = obj;
+    this.save();
   }
 
   get data() {

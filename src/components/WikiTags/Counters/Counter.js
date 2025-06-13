@@ -17,11 +17,7 @@ import OlabTag from "../OlabTag";
 
 class OlabCountersTag extends OlabTag {
   constructor(props) {
-    const olabObject = getCounters(
-      props.props.node.id,
-      props.props.dynamicObjects.counters,
-      props.props.scopedObjects.map.counteractions
-    );
+    const olabObject = getCounters(props.props.node.id, props);
     super(props, olabObject);
   }
 
