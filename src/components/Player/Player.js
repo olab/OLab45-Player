@@ -251,7 +251,6 @@ class Player extends PureComponent {
 
       if (!node || disableCache || node.id != nodeId) {
         log.debug("loading node");
-        this.setState({ loadProgress: `node '${node.title}'` });
         const { data: objData } = await getMapNode(
           props,
           mapId,
@@ -260,6 +259,7 @@ class Player extends PureComponent {
         );
         node = objData;
         playerState.SetNode(node);
+        this.setState({ loadProgress: `node '${node.title}'` });
       } else {
         log.debug("using cached node data");
       }
