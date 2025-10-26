@@ -65,9 +65,9 @@ class OlabTag extends React.Component {
     this.setInProgress(false);
   };
 
-  getDisplayStyle() {
-    if (this.state.olabObject.hasOwnProperty("visible")) {
-      return this.state.olabObject.visible ? "" : "none";
+  getDisplayStyle(olabObject) {
+    if (olabObject.hasOwnProperty("visible")) {
+      return olabObject.visible ? "" : "none";
     }
     return "inline";
   }

@@ -16,14 +16,16 @@ import OlabAttendeeTag from "./TurkTalk/Turkee/Turkee";
 import OlabModeratorTag from "./TurkTalk/Turker/Turker";
 const playerState = require("../../../utils/PlayerState").PlayerState;
 import log from "loglevel";
+import OlabTag from "../OlabTag";
 
-class OlabQuestionTag extends React.Component {
+class OlabQuestionTag extends OlabTag {
   constructor(props) {
     super(props);
 
     log.debug(`${this.constructor["name"]} ctor`);
 
     let question = getQuestion(this.props.name, this.props);
+
     const debug = playerState.GetDebug();
 
     if (question != null) {

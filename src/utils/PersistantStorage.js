@@ -35,7 +35,7 @@ class PersistantStorage {
     var fullKey = `${keyPrefix}${key}`;
     var value = localStorage.getItem(fullKey);
 
-    if (value == null && defaultValue != null) {
+    if ((value == null || value == "null") && defaultValue != null) {
       this.save(keyPrefix, key, defaultValue);
       // log.debug(
       //   `get '${fullKey}' = '${JSON.stringify(defaultValue)}' (default)`

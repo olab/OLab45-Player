@@ -153,11 +153,13 @@ class PlayerState {
   static GetConnectionInfo(
     defaultValue = { authInfo: { expires: 0, token: null } }
   ) {
-    return persistantStorage.get(
+    let value = persistantStorage.get(
       this.storageKey,
       KeyConstants.CONNECTION_INFO,
       defaultValue
     );
+
+    return value;
   }
 
   static SetSessionInfo(obj) {
