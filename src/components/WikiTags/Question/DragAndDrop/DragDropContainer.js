@@ -1,6 +1,5 @@
 import React from "react";
 import { Card } from "./Card";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
 
 class DragDropContainer extends React.Component {

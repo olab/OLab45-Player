@@ -2,7 +2,6 @@
 import * as React from "react";
 import { Grid } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../../utils/Logger";
 import log from "loglevel";
 import styles from "../../../styles.module.css";
 import { connect } from "formik";

@@ -3,43 +3,49 @@ import { Button } from "@material-ui/core";
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import log from "loglevel";
+import JsxParser from "react-jsx-parser";
 
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 import Spinner from "../../../../shared/assets/loading_med.gif";
 
-class OlabMultilineTextQuestion extends React.Component {
+import { getQuestion } from "../../WikiUtils";
+import OlabTag from "../../OlabTag";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
+
+class OlabMultilineTextQuestion extends OlabTag {
   constructor(props) {
-    super(props);
+    let olabObject = getQuestion(props.name, props);
+    super(props, olabObject);
+
+    const debug = playerState.GetDebug();
+
     this.state = {
-      onSubmitResponse: props.props.onSubmitResponse,
       showProgressSpinner: false,
       disabled: false,
       contentsChanged: false,
+      debug,
+      olabObject,
       ...props.props,
     };
 
     // Binding this keyword
     this.setInProgress = this.setInProgress.bind(this);
     this.onSubmitClicked = this.onSubmitClicked.bind(this);
-  }
-
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
+    this.transmitResponse = this.transmitResponse.bind(this);
   }
 
   onSubmitClicked = (event) => {
-    const question = this.state.question;
-    const value = question.value;
+    const olabObject = this.state.olabObject;
+    const value = olabObject.value;
     let disabled = this.state.disabled;
 
     // test if only one respond allowed.  Disable control
     // if this is the case
-    if (question.numTries === -1 || question.numTries === 1) {
+    if (olabObject.numTries === -1 || olabObject.numTries === 1) {
       this.setState({ disabled: true });
       log.debug(
-        `OlabMultilineTextQuestion disabled question '${question.id}' value = '${value}'.`
+        `${this.constructor["name"]} disabled question '${olabObject.id}' value = '${value}'.`
       );
     }
 
@@ -49,8 +55,7 @@ class OlabMultilineTextQuestion extends React.Component {
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -62,9 +67,7 @@ class OlabMultilineTextQuestion extends React.Component {
       setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
+    this.onSubmitResponse(responseState);
   }
 
   onFocus = (event) => {
@@ -73,21 +76,22 @@ class OlabMultilineTextQuestion extends React.Component {
 
   onTextChanged = (event) => {
     const value = event.target.value;
-    const question = this.state.question;
+    const olabObject = this.state.olabObject;
 
-    question.value = value;
+    olabObject.value = value;
 
     // set the question value in trackable state
     this.setState({
-      question: question,
+      olabObject: olabObject,
       contentsChanged: true,
     });
   };
 
   render() {
-    const { id, name, question, contentsChanged, disabled } = this.state;
+    const { debug, olabObject, contentsChanged, disabled } = this.state;
+    const { id, name } = this.props;
 
-    log.debug(`OlabMultilineTextQuestion render '${name}'`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
       let progressButtonHtml = "";
@@ -101,28 +105,48 @@ class OlabMultilineTextQuestion extends React.Component {
         );
       }
 
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({olabObject.id})
+            </b>
+          </>
+        );
+      }
+
       let valueClasses = [];
       valueClasses.push(styles["qumultiline-value"]);
-      if (question.numTries === -1) {
+      if (olabObject.numTries === -1) {
         valueClasses.push(styles["qumultiline-required"]);
       }
+
+      const visibility = this.getDisplayStyle(olabObject);
+      const divStyle = {
+        display: visibility,
+      };
 
       return (
         <div
           className={`${styles["qumultiline"]} ${siteStyles[id]}`}
-          id={`${id}`}
+          id={olabObject.htmlIdBase}
+          olabid={olabObject.id}
+          style={divStyle}
         >
-          <div id={`${id}-label`} className={`${styles["qumultiline-label"]}`}>
-            {question.stem}
+          <div
+            id={`${olabObject.htmlIdBase}::stem`}
+            className={`${styles["qumultiline-stem"]}`}
+          >
+            <JsxParser jsx={olabObject.stem} />
           </div>
-          <div className={`${styles["qumultiline-value-container"]}`}>
+          <div className={`${styles["qumultiline-value"]}`}>
             <textarea
-              rows={`${question.height}`}
-              cols={`${question.width}`}
-              placeholder={`${question.prompt}`}
+              rows={`${olabObject.height}`}
+              cols={`${olabObject.width}`}
+              placeholder={`${olabObject.prompt}`}
               className={`${valueClasses.join(" ")}`}
-              id={`${id}-value`}
-              value={question.value}
+              id={`${olabObject.htmlIdBase}::value`}
+              value={olabObject.value}
               disabled={disabled}
               onChange={this.onTextChanged}
               onFocus={this.onFocus}
@@ -143,13 +167,7 @@ class OlabMultilineTextQuestion extends React.Component {
         </div>
       );
     } catch (error) {
-      return (
-        <>
-          <b>
-            [[QU:{id}]] "{error.message}"
-          </b>
-        </>
-      );
+      return this.errorJsx(id, error);
     }
   }
 }

@@ -1,4 +1,3 @@
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
 import Participant from "../../../../helpers/participant";
 import SlotInfo from "../../../../helpers/SlotInfo";
@@ -89,9 +88,9 @@ class SlotManager {
         if (item.connectionId === connectionId) return item;
       }
 
-      LogError(`could not find chat info for connection Id ${connectionId}`);
+      log.error(`could not find chat info for connection Id ${connectionId}`);
     } catch (error) {
-      LogError(`getSlotByConnectionId exception: ${error.message}`);
+      log.error(`getSlotByConnectionId exception: ${error.message}`);
     }
 
     return null;
@@ -104,9 +103,9 @@ class SlotManager {
         if (item.userId === userId) return item;
       }
 
-      LogError(`could not find chat info for userId ${userId}`);
+      log.error(`could not find chat info for userId ${userId}`);
     } catch (error) {
-      LogError(`getSlotByUserId exception: ${error.message}`);
+      log.error(`getSlotByUserId exception: ${error.message}`);
     }
 
     return null;
@@ -119,9 +118,9 @@ class SlotManager {
         if (item.key === key) return item;
       }
 
-      LogError(`could not find chat info for key ${key}`);
+      log.error(`could not find chat info for key ${key}`);
     } catch (error) {
-      LogError(`getSlotByKey exception: ${error.message}`);
+      log.error(`getSlotByKey exception: ${error.message}`);
     }
 
     return null;
@@ -145,7 +144,7 @@ class SlotManager {
         }
       }
     } catch (error) {
-      LogError(`getOpenInfoSlot exception: ${error.message}`);
+      log.error(`getOpenInfoSlot exception: ${error.message}`);
     }
 
     return null;

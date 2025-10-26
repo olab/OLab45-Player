@@ -13,10 +13,7 @@ import {
   Snackbar,
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
-import { Log, LogInfo, LogError } from "../../utils/Logger";
-import log from "loglevel";
 import styles from "./styles";
-import { config } from "../../config";
 import { ReactComponent as LogoIcon } from "../../shared/assets/icons/olab4_logo.svg";
 import { loginUserAsync } from "../../services/api";
 var constants = require("../../services/constants");
@@ -125,7 +122,7 @@ const Login = ({ setCredentials, message, authActions, classes }) => {
                   onChange={(e) => setUserName(e.target.value)}
                 />
               </FormControl>
-              <FormControl margin="normal" required fullWidth>
+              <FormControl margin="normal" fullWidth>
                 <InputLabel htmlFor="password">Password</InputLabel>
                 <Input
                   name="password"

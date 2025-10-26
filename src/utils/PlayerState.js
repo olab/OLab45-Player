@@ -1,3 +1,4 @@
+import log from "loglevel";
 import { config } from "../config";
 
 const persistantStorage = require("./PersistantStorage").PersistantStorage;
@@ -9,6 +10,8 @@ const KeyConstants = {
   DEBUG: "debug",
   DYNAMIC_OBJECTS: "dynamic-objects",
   GLOBAL: null,
+  IMPERSONATE_MODE: "impersonateMode",
+  LOG_LEVEL: "logLevel",
   MAP_STATIC: "map-static",
   MAP: "map",
   MAPS: "maps",
@@ -18,6 +21,7 @@ const KeyConstants = {
   SERVER: "server",
   SESSION_INFO: "session-info",
   VISIT_ONCE_NODE_LIST: "visit-once-node-list",
+  CLICK_ONCE_LINK_LIST: "click-once-link-list",
   WATCH_PROFILE: "watchProfile",
 };
 
@@ -35,52 +39,66 @@ class PlayerState {
   }
 
   static clear() {
+    // persist debug settings
+    let debug = this.GetDebug();
+    let logLevel = this.GetLogLevel();
+
     persistantStorage.clear(this.storageKey);
+
+    this.SetDebug(debug);
+    this.SetLogLevel(logLevel);
   }
 
   static ClearMap() {
     const contextId = this.GetContextId();
     const sessionInfo = this.GetSessionInfo();
     const debugInfo = this.GetDebug();
+    let maps = this.GetMaps();
 
     persistantStorage.clear(this.storageKey);
 
     this.SetContextId(contextId);
     this.SetSessionInfo(sessionInfo);
     this.SetDebug(debugInfo);
+    this.SetMaps(maps);
   }
 
   // Get all settings as object
   static Get() {
     const debug = this.GetDebug();
+    const logLevel = this.GetLogLevel();
     const contextId = this.GetContextId();
-    const dynamicObjects = this.GetDynamicObjects();
     const map = this.GetMap();
-    const mapStatic = this.GetMapStatic();
     const node = this.GetNode();
-    const nodeStatic = this.GetNodeStatic();
     const server = persistantStorage.get(KeyConstants.SERVER);
-    const serverStatic = this.GetServerStatic();
     const sessionInfo = this.GetSessionInfo();
     const visitOnceList = this.GetNodesVisited();
+    const clickOnceList = this.GetLinksClicked();
 
     return {
       debug: debug,
+      logLevel: logLevel,
       contextId: contextId,
-      dynamicObjects: dynamicObjects,
       map: map,
       mapId: map ? map.id : null,
       node: node,
       nodeId: node ? node.id : null,
       server: server,
-      scopedObjects: {
-        map: mapStatic,
-        node: nodeStatic,
-        server: serverStatic,
-      },
       nodesVisited: visitOnceList,
+      linksClicked: clickOnceList,
       sessionInfo: sessionInfo,
     };
+  }
+
+  static GetLogLevel() {
+    let debug = this.GetDebug();
+    return debug[KeyConstants.LOG_LEVEL];
+  }
+
+  static SetLogLevel(obj) {
+    let debug = this.GetDebug();
+    debug[KeyConstants.LOG_LEVEL] = obj;
+    this.SetDebug(debug);
   }
 
   static SetDebug(obj) {
@@ -88,8 +106,11 @@ class PlayerState {
   }
 
   static GetDebug(
-    userId = null,
-    defaultValue = { disableWikiRendering: false, disableCache: false }
+    defaultValue = {
+      disableWikiRendering: false,
+      disableCache: false,
+      logLevel: "error",
+    }
   ) {
     return persistantStorage.get(
       this.storageKey,
@@ -99,17 +120,18 @@ class PlayerState {
   }
 
   static GetWatchProfile(
+    storageKey,
     defaultValue = { autoAssign: false, watchedLearners: [] }
   ) {
     return persistantStorage.get(
-      this.storageKey,
+      storageKey,
       KeyConstants.WATCH_PROFILE,
       defaultValue
     );
   }
 
-  static SetWatchProfile(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.WATCH_PROFILE, obj);
+  static SetWatchProfile(storageKey, obj) {
+    persistantStorage.save(storageKey, KeyConstants.WATCH_PROFILE, obj);
   }
 
   static GetAtrium(defaultValue = { roomName: "" }) {
@@ -131,11 +153,13 @@ class PlayerState {
   static GetConnectionInfo(
     defaultValue = { authInfo: { expires: 0, token: null } }
   ) {
-    return persistantStorage.get(
+    let value = persistantStorage.get(
       this.storageKey,
       KeyConstants.CONNECTION_INFO,
       defaultValue
     );
+
+    return value;
   }
 
   static SetSessionInfo(obj) {
@@ -162,8 +186,8 @@ class PlayerState {
     );
   }
 
-  static SetMaps(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.MAPS, obj);
+  static SetMaps(maps) {
+    persistantStorage.save(this.storageKey, KeyConstants.MAPS, maps);
   }
 
   static GetMaps(defaultValue = []) {
@@ -174,8 +198,8 @@ class PlayerState {
     );
   }
 
-  static SetMap(obj) {
-    persistantStorage.save(this.storageKey, KeyConstants.MAP, obj);
+  static SetMap(map) {
+    persistantStorage.save(this.storageKey, KeyConstants.MAP, map);
   }
 
   static GetMap(defaultValue = null) {
@@ -208,6 +232,17 @@ class PlayerState {
       KeyConstants.NODE,
       defaultValue
     );
+  }
+
+  static SetImpersonateMode(value) {
+    let sessionInfo = this.GetSessionInfo();
+    sessionInfo[IMPERSONATE_MODE] = value;
+    this.SetSessionInfo(sessionInfo);
+  }
+
+  static GetImpersonateMode() {
+    let sessionInfo = this.GetSessionInfo();
+    return sessionInfo[IMPERSONATE_MODE];
   }
 
   static SetNodeStatic(obj) {
@@ -260,6 +295,28 @@ class PlayerState {
       KeyConstants.VISIT_ONCE_NODE_LIST,
       defaultValue
     );
+  }
+
+  static SetLinksClicked(obj) {
+    persistantStorage.save(
+      this.storageKey,
+      KeyConstants.CLICK_ONCE_LINK_LIST,
+      obj
+    );
+  }
+
+  static GetLinksClicked(defaultValue = []) {
+    return persistantStorage.get(
+      this.storageKey,
+      KeyConstants.CLICK_ONCE_LINK_LIST,
+      defaultValue
+    );
+  }
+
+  static SetScopedObjects(scopedObjects) {
+    this.SetServerStatic(scopedObjects.server);
+    this.SetMapStatic(scopedObjects.map);
+    this.SetNodeStatic(scopedObjects.node);
   }
 }
 

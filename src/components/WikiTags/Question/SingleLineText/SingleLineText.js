@@ -1,23 +1,28 @@
 // @flow
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
+import JsxParser from "react-jsx-parser";
 
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
-class OlabSinglelineTextQuestion extends React.Component {
+import { getQuestion } from "../../WikiUtils";
+import OlabTag from "../../OlabTag";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
+
+class OlabSinglelineTextQuestion extends OlabTag {
   constructor(props) {
-    super(props);
+    let olabObject = getQuestion(props.name, props);
+    super(props, olabObject);
+
+    const debug = playerState.GetDebug();
 
     this.state = {
-      // id: props.props.id,
-      // name: props.props.name,
-      // question: props.props.question,
-      // dynamicObjects: props.props.dynamicObjects,
       showProgressSpinner: false,
       disabled: false,
+      debug,
+      olabObject,
       ...props.props,
     };
 
@@ -28,17 +33,17 @@ class OlabSinglelineTextQuestion extends React.Component {
   }
 
   setValue = (event, setInProgress) => {
-    const question = this.state.question;
-    const value = question.value;
+    const olabObject = this.state.olabObject;
+    const value = olabObject.value;
     let disabled = this.state.disabled;
 
     // test if only one respond allowed.  Disable control
     // if this is the case
-    if (question.numTries === -1 || question.numTries === 1) {
+    if (olabObject.numTries === -1 || olabObject.numTries === 1) {
       this.setState((state) => {
         disabled = true;
         log.debug(
-          `OlabSinglelineTextQuestion disabled question '${question.id}' value = '${value}'.`
+          `${this.constructor["name"]} disabled question '${olabObject.id}' value = '${value}'.`
         );
         return { disabled };
       });
@@ -50,8 +55,7 @@ class OlabSinglelineTextQuestion extends React.Component {
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -63,64 +67,66 @@ class OlabSinglelineTextQuestion extends React.Component {
       setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
-  }
-
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
-  }
-
-  setIsDisabled(disabled) {
-    this.setState({ disabled: disabled });
-    log.debug(`set disabled: ${disabled}`);
+    this.onSubmitResponse(responseState);
   }
 
   handleChange = (event) => {
     const value = event.target.value;
-    const question = this.state.question;
+    const olabObject = this.state.olabObject;
 
-    // set the question value in trackable state
+    // set the olabObject value in trackable state
     this.setState((state) => {
-      question.value = value;
-      return { question };
+      olabObject.value = value;
+      return { olabObject };
     });
   };
 
   render() {
-    const {
-      id,
-      name,
-      question,
-      // disabled
-    } = this.state;
+    const { debug, olabObject } = this.state;
+    const { id, name } = this.props;
 
-    log.debug(`OlabSinglePickQuestion render '${name}'`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({olabObject.id})
+            </b>
+          </>
+        );
+      }
+
+      const visibility = this.getDisplayStyle(olabObject);
+      const divStyle = {
+        display: visibility,
+      };
+
       return (
         <>
           <div
             className={`${styles["qusingleline"]} ${siteStyles[id]}`}
-            id={`${id}`}
+            id={olabObject.htmlIdBase}
+            olabid={olabObject.id}
+            style={divStyle}
           >
             <div
-              id={`${id}-label`}
-              className={`${styles["qusingleline-label"]}  ${siteStyles[id]}`}
+              id={`${olabObject.htmlIdBase}::stem`}
+              className={`${styles["qusingleline-stem"]}`}
             >
-              {question.stem}
+              <JsxParser jsx={olabObject.stem} />
             </div>
-            <div className={`${styles["qusingleline-value-container"]}`}>
+
+            <div className={`${styles["qusingleline-value"]}`}>
               <form
                 onSubmit={(event) => this.setValue(event, this.setInProgress)}
               >
                 <input
                   className={`${styles["qusingleline-value"]}`}
-                  id={`${id}-value`}
-                  value={question.value}
-                  placeholder={`${question.prompt}`}
+                  id={`${olabObject.htmlIdBase}::value`}
+                  value={olabObject.value}
+                  placeholder={`${olabObject.prompt}`}
                   onChange={this.handleChange}
                 ></input>
                 <input type="submit" hidden />
@@ -130,13 +136,7 @@ class OlabSinglelineTextQuestion extends React.Component {
         </>
       );
     } catch (error) {
-      return (
-        <>
-          <b>
-            [[QU:{id}]] "{error.message}"
-          </b>
-        </>
-      );
+      return this.errorJsx(id, error);
     }
   }
 }

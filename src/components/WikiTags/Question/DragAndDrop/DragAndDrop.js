@@ -1,37 +1,29 @@
 // @flow
-import React, { Component } from "react";
-import ReactDOM from "react-dom";
+import React from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-
+import { FormLabel } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
+import JsxParser from "react-jsx-parser";
 
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
-class OlabDragAndDropQuestion extends React.Component {
-  constructor(props) {
-    super(props);
+import { getQuestion } from "../../WikiUtils";
+import OlabTag from "../../OlabTag";
 
-    this.state = {
-      ...props.props,
-    };
+class OlabDragAndDropQuestion extends OlabTag {
+  constructor(props) {
+    let olabObject = getQuestion(props.name, props);
+    super(props, olabObject);
 
     this.grid = 8;
 
-    // Binding this keyword
-    this.setInProgress = this.setInProgress.bind(this);
     this.onDragEnd = this.onDragEnd.bind(this);
   }
 
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
-  }
-
   setValue = (responses) => {
-    const question = this.state.question;
+    const { debug, olabObject } = this.state;
     log.debug(`responses`);
 
     let values = [];
@@ -41,27 +33,26 @@ class OlabDragAndDropQuestion extends React.Component {
       values.push(iterator.id);
     }
 
-    if (typeof question.previousValue == "undefined") {
-      question.previousValue = null;
+    if (typeof olabObject.previousValue == "undefined") {
+      olabObject.previousValue = null;
     } else {
-      question.previousValue = question.value;
+      olabObject.previousValue = olabObject.value;
     }
 
-    question.value = values.join(",");
+    olabObject.value = values.join(",");
 
     log.debug(
-      `OlabSinglePickQuestion set question '${question.id}' value = '${question.value}'.`
+      `OlabSinglePickQuestion set question '${olabObject.id}' value = '${olabObject.value}'.`
     );
 
-    question.responses = responses;
+    olabObject.responses = responses;
 
-    this.setState({ question });
+    this.setState({ olabObject });
     this.transmitResponse();
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -69,13 +60,11 @@ class OlabDragAndDropQuestion extends React.Component {
       map,
       node,
       contextId,
-      setInProgress: this.setInProgress,
       setIsDisabled: this.setIsDisabled,
+      setInProgress: this.setInProgress,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
+    this.onSubmitResponse(responseState);
   }
 
   // a little function to help us with reordering the result
@@ -102,7 +91,7 @@ class OlabDragAndDropQuestion extends React.Component {
   getListStyle = (isDraggingOver) => ({
     background: "lightgrey",
     padding: this.grid,
-    width: this.state.question.width ? this.state.question.width : 450,
+    width: this.state.olabObject.width ? this.state.olabObject.width : 450,
   });
 
   onDragEnd(result) {
@@ -114,7 +103,7 @@ class OlabDragAndDropQuestion extends React.Component {
     }
 
     const responses = this.reorder(
-      this.state.question.responses,
+      this.state.olabObject.responses,
       result.source.index,
       result.destination.index
     );
@@ -125,14 +114,37 @@ class OlabDragAndDropQuestion extends React.Component {
   // Normally you would want to split things out into separate components.
   // But in this example everything is just done in one place for simplicity
   render() {
-    const { id, name, question } = this.state;
+    const { debug, olabObject } = this.state;
+    const { id, name } = this.props;
 
-    log.debug(`OlabDragAndDropQuestion render '${name}'`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({olabObject.id})
+            </b>
+          </>
+        );
+      }
+
+      const visibility = this.getDisplayStyle(olabObject);
+      const divStyle = {
+        display: visibility,
+      };
+
       return (
-        <>
-          <p>{question.stem}</p>
+        <div
+          className={`${styles["qudraganddrop"]} ${siteStyles[id]}`}
+          id={olabObject.htmlIdBase}
+          olabid={olabObject.id}
+          style={divStyle}
+        >
+          <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="legend">
+            <JsxParser jsx={olabObject.stem} />
+          </FormLabel>
           <DragDropContext onDragEnd={this.onDragEnd}>
             <Droppable droppableId="droppable">
               {(provided, snapshot) => (
@@ -141,7 +153,7 @@ class OlabDragAndDropQuestion extends React.Component {
                   ref={provided.innerRef}
                   style={this.getListStyle()}
                 >
-                  {question.responses.map((item, index) => (
+                  {olabObject.responses.map((item, index) => (
                     <Draggable
                       key={item.id}
                       draggableId={item.name}
@@ -149,6 +161,9 @@ class OlabDragAndDropQuestion extends React.Component {
                     >
                       {(provided, snapshot) => (
                         <div
+                          id={`QR:${item.id}`}
+                          parentid={olabObject.htmlIdBase}
+                          name={item.name}
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
@@ -167,16 +182,10 @@ class OlabDragAndDropQuestion extends React.Component {
               )}
             </Droppable>
           </DragDropContext>
-        </>
+        </div>
       );
     } catch (error) {
-      return (
-        <>
-          <b>
-            [[QU:{id}]] "{error.message}"
-          </b>
-        </>
-      );
+      return this.errorJsx(id, error);
     }
   }
 }

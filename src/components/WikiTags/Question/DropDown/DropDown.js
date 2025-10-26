@@ -8,78 +8,72 @@ import {
   MenuItem,
 } from "@material-ui/core";
 
-import CloseIcon from "@material-ui/icons/Close";
-import CheckIcon from "@material-ui/icons/Check";
+import Spinner from "../../../../shared/assets/loading_med.gif";
+import JsxParser from "react-jsx-parser";
 
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
 
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
-class OlabDropDownQuestion extends React.Component {
+import { getQuestion } from "../../WikiUtils";
+import OlabTag from "../../OlabTag";
+
+class OlabDropDownQuestion extends OlabTag {
   constructor(props) {
-    super(props);
-
-    this.state = {
-      ...props.props,
-    };
-
-    // Binding this keyword
-    this.setInProgress = this.setInProgress.bind(this);
-    this.setValue = this.setValue.bind(this);
-    this.transmitResponse = this.transmitResponse.bind(this);
+    let olabObject = getQuestion(props.name, props);
+    super(props, olabObject);
   }
 
   setValue = (event, setInProgress, setIsDisabled) => {
+    const { debug, olabObject } = this.state;
+
     const value = Number(event.target.value);
-    const question = this.state.question;
 
     this.setState((state) => {
-      question.value = value;
+      olabObject.value = value;
       log.debug(
-        `OlabDropDownQuestion set question '${question.id}' value = '${value}'.`
+        `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'.`
       );
-      return { question };
+      return { olabObject };
     });
 
     let response = null;
 
-    for (let index = 0; index < this.state.question.responses.length; index++) {
-      response = this.state.question.responses[index];
+    for (let index = 0; index < olabObject.responses.length; index++) {
+      response = olabObject.responses[index];
       if (response.id === value) {
         break;
       }
     }
 
-    if (typeof question.responseId == "undefined")
-      question.previousResponseId = null;
-    else question.previousResponseId = question.responseId;
+    if (typeof olabObject.responseId == "undefined")
+      olabObject.previousResponseId = null;
+    else olabObject.previousResponseId = olabObject.responseId;
 
-    question.responseId = response.id;
-    question.value = question.responseId;
+    olabObject.responseId = response.id;
+    olabObject.value = olabObject.responseId;
 
     log.debug(
-      `OlabSinglePickQuestion set question '${question.id}' value = '${value}'`
+      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'`
     );
 
     // if single try question, disabled it
-    if (question.numTries > 0) {
-      question.disabled = true;
+    if (olabObject.numTries > 0) {
+      olabObject.disabled = true;
     }
 
     // first attempt to answer, so show answer
     // indicators, if called on
-    question.showAnswerIndicators = true;
+    olabObject.showAnswerIndicators = true;
 
-    this.setState({ question });
+    this.setState({ olabObject });
     this.transmitResponse();
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -91,27 +85,19 @@ class OlabDropDownQuestion extends React.Component {
       setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
+    this.onSubmitResponse(responseState);
   }
 
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
-  }
-
-  setIsDisabled(disabled) {
-    this.setState({ disabled: disabled });
-    log.debug(`set disabled: ${disabled}`);
-  }
-
-  buildQuestionResponses(question) {
+  buildQuestionResponses(olabObject, id) {
     let responses = [];
     let key = 0;
-    for (const response of question.responses) {
+    for (const response of olabObject.responses) {
       var item = (
-        <MenuItem key={key++} value={Number(response.id)}>
+        <MenuItem
+          id={`${id}::QR:${response.id}`}
+          key={key++}
+          value={Number(response.id)}
+        >
           {response.response}
         </MenuItem>
       );
@@ -122,9 +108,11 @@ class OlabDropDownQuestion extends React.Component {
   }
 
   render() {
-    const { id, name, question } = this.state;
+    const { debug, olabObject } = this.state;
+    const { id, name } = this.props;
 
-    log.debug(`OlabDropDownQuestion render '${name}'`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
+
     try {
       let progressButtonHtml = "";
       if (this.state.showProgressSpinner) {
@@ -137,20 +125,41 @@ class OlabDropDownQuestion extends React.Component {
         );
       }
 
-      var responses = this.buildQuestionResponses(question);
-      var disabled = question.disabled == 0 ? false : true;
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({olabObject.id})
+            </b>
+          </>
+        );
+      }
+
+      var responses = this.buildQuestionResponses(olabObject, id);
+      var disabled = olabObject.disabled == 0 ? false : true;
+      const visibility = this.getDisplayStyle(olabObject);
+      const divStyle = {
+        display: visibility,
+      };
 
       return (
         <div
           className={`${styles["quddropdown"]} ${siteStyles[id]}`}
-          id={`${id}`}
+          id={olabObject.htmlIdBase}
+          olabid={olabObject.id}
+          style={divStyle}
         >
-          <Box width={question.width}>
+          <Box width={olabObject.width}>
             <FormControl fullWidth disabled={disabled}>
-              <InputLabel id={`${id}-label`}>{question.stem}</InputLabel>
+              <div
+                id={`${olabObject.name}::stem`}
+                className={`${styles["qumultiline-stem"]}`}
+              >
+                <JsxParser jsx={olabObject.stem} />
+              </div>
               <Select
-                id={`${id}-select`}
-                value={question.value}
+                id={`${olabObject.name}::value`}
+                value={olabObject.value}
                 onChange={(event) =>
                   this.setValue(event, this.setInProgress, this.setIsDisabled)
                 }
@@ -165,13 +174,7 @@ class OlabDropDownQuestion extends React.Component {
         </div>
       );
     } catch (error) {
-      return (
-        <>
-          <b>
-            [[QU:{id}]] "{error.message}"
-          </b>
-        </>
-      );
+      return this.errorJsx(id, error);
     }
   }
 }

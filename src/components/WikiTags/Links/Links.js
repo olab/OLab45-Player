@@ -6,28 +6,27 @@ import log from "loglevel";
 const playerState = require("../../../utils/PlayerState").PlayerState;
 import { config } from "../../../config";
 
-class OlabLinksTag extends React.Component {
+import OlabTag from "../OlabTag";
+
+class OlabLinksTag extends OlabTag {
   constructor(props) {
     super(props);
-
-    const debug = playerState.GetDebug();
-
-    this.state = { debug };
   }
 
-  onNavigateToNode = (mapId, nodeId, urlParam) => {
-    let url = `${config.APP_BASEPATH}/${mapId}/${nodeId}`;
-    if (urlParam) {
-      url += `/${urlParam}`;
+  onNavigateToNode = (link, mapId, nodeId, urlParam) => {
+    if (link.followOnce) {
+      var newLinksClicked = playerState.GetLinksClicked();
+      newLinksClicked.push(link.id);
+      playerState.SetLinksClicked(newLinksClicked);
     }
 
-    log.debug(`navigating to ${url}`);
-
-    window.location.href = url;
+    this.props.props.onNavigateToNode(mapId, nodeId, urlParam);
   };
 
   render() {
-    log.debug("OlabLinksTag render");
+    log.debug(`${this.constructor["name"]} render`);
+
+    var linksClicked = playerState.GetLinksClicked();
 
     const { debug } = this.state;
 
@@ -41,9 +40,25 @@ class OlabLinksTag extends React.Component {
       },
     } = this.props;
 
+    // decorate link with name based on link text
+    for (let index = links.length - 1; index >= 0; index--) {
+      let link = links[index];
+      link.htmlIdBase =
+        "LINK:" + link.linkText.toLowerCase().replace(/[\W_]/g, "");
+    }
+
+    // remove link based on visit-once nodes
     for (let index = links.length - 1; index >= 0; index--) {
       const link = links[index];
       if (nodesVisited.includes(link.destinationId)) {
+        links.splice(index, 1);
+      }
+    }
+
+    // remove link based on click-once links
+    for (let index = links.length - 1; index >= 0; index--) {
+      const link = links[index];
+      if (linksClicked.includes(link.id)) {
         links.splice(index, 1);
       }
     }
@@ -59,9 +74,15 @@ class OlabLinksTag extends React.Component {
           >
             {links.map((link) => (
               <Button
+                id={link.htmlIdBase}
                 key={link.id}
                 onClick={() => {
-                  this.onNavigateToNode(mapId, link.destinationId, urlParam);
+                  this.onNavigateToNode(
+                    link,
+                    mapId,
+                    link.destinationId,
+                    urlParam
+                  );
                 }}
               >
                 {link.destinationTitle} (id: {link.id} -&gt;{" "}
@@ -82,10 +103,19 @@ class OlabLinksTag extends React.Component {
           >
             {links.map((link) => (
               <Button
+                id={link.htmlIdBase}
                 key={link.id}
-                style={{ textTransform: "none" }}
+                style={{
+                  textTransform: "none",
+                  display: link.visible ? "inline" : "none",
+                }}
                 onClick={() => {
-                  this.onNavigateToNode(mapId, link.destinationId, urlParam);
+                  this.onNavigateToNode(
+                    link,
+                    mapId,
+                    link.destinationId,
+                    urlParam
+                  );
                 }}
               >
                 {link.linkText}

@@ -2,26 +2,37 @@
 import React from "react";
 import { Box, Typography, Slider } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
+import JsxParser from "react-jsx-parser";
 
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
 
-class OlabSliderQuestion extends React.Component {
+import { getQuestion } from "../../WikiUtils";
+import OlabTag from "../../OlabTag";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
+
+class OlabSliderQuestion extends OlabTag {
   constructor(props) {
-    super(props);
+    let olabObject = getQuestion(props.name, props);
+    super(props, olabObject);
+
+    const debug = playerState.GetDebug();
 
     this.state = {
+      debug,
+      olabObject,
       ...props.props,
     };
 
     // post initial value to server if initializine
     // question value
-    if (typeof this.state.question.previousValue == "undefined") {
+    if (typeof this.state.olabObject.previousValue == "undefined") {
       // eslint-disable-next-line
-      const settings = JSON.parse(this.state.question.settings);
-      this.state.question.value = Number(settings.defaultValue);
+      const settings = JSON.parse(this.state.olabObject.settings);
+      if (typeof settings.defaultValue != "undefined") {
+        this.state.olabObject.value = Number(settings.defaultValue);
+      }
     }
 
     // Binding this keyword
@@ -31,25 +42,24 @@ class OlabSliderQuestion extends React.Component {
   }
 
   setValue = (event, value) => {
-    const question = this.state.question;
+    const olabObject = this.state.olabObject;
     log.debug(
-      `OlabSliderQuestion set question '${question.id}' value = '${value}'`
+      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'`
     );
 
     this.setState(
       (state) => {
-        question.previousValue = question.value;
-        question.value = value;
+        olabObject.previousValue = olabObject.value;
+        olabObject.value = value;
 
-        return { question };
+        return { olabObject };
       },
       () => this.transmitResponse()
     );
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -61,59 +71,72 @@ class OlabSliderQuestion extends React.Component {
       setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
-  }
-
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
+    this.onSubmitResponse(responseState);
   }
 
   render() {
-    const {
-      id,
-      name,
-      question,
-      // disabled
-    } = this.state;
+    const { debug, olabObject } = this.state;
+    const { id, name } = this.props;
 
-    log.debug(`OlabSliderQuestion render '${name}'`);
+    const visibility = this.getDisplayStyle(olabObject);
+    const divStyle = {
+      display: visibility,
+    };
+
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
       // eslint-disable-next-line
-      const settings = JSON.parse(question.settings);
-      question.width = 200; // use fixed width - @see https://olabrats.atlassian.net/browse/OD-28
+      const settings = JSON.parse(olabObject.settings);
+      olabObject.width = 200; // use fixed width - @see https://olabrats.atlassian.net/browse/OD-28
+
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({olabObject.id})
+            </b>
+          </>
+        );
+      }
 
       return (
-        <div className={`${styles["quslider"]} ${siteStyles[id]}`} id={`${id}`}>
+        <div
+          className={`${styles["quslider"]} ${siteStyles[id]}`}
+          id={olabObject.htmlIdBase}
+          olabid={olabObject.id}
+          style={divStyle}
+        >
           <Box
-            width={question.width}
+            width={olabObject.width}
             className={
               "hor" != settings.orientation
                 ? styles["quslider_box_vertical"]
                 : ""
             }
           >
-            <Typography id={`${id}-stem`} component="div" gutterBottom>
-              {question.stem}
+            <Typography
+              id={`${olabObject.htmlIdBase}::stem`}
+              component="span"
+              gutterBottom
+            >
+              <JsxParser jsx={olabObject.stem} />
             </Typography>
             <input
               readOnly
               className={`${styles["quslider-value"]}`}
-              id={`${id}-value`}
-              value={question.value}
+              id={`${olabObject.htmlIdBase}::input`}
+              value={olabObject.value}
             ></input>
             <Slider
-              defaultValue={question.value}
+              defaultValue={olabObject.value}
               onChangeCommitted={(event, value) => this.setValue(event, value)}
               step={Number(settings.stepValue)}
               orientation={
                 "hor" != settings.orientation ? "vertical" : "horizontal"
               }
               marks
-              name={`${id}-slider`}
+              name={`${olabObject.htmlIdBase}::slider`}
               min={Number(settings.minValue)}
               max={Number(settings.maxValue)}
               track={false}
@@ -123,13 +146,7 @@ class OlabSliderQuestion extends React.Component {
         </div>
       );
     } catch (error) {
-      return (
-        <>
-          <b>
-            [[QU:{id}]] "{error.message}"
-          </b>
-        </>
-      );
+      return this.errorJsx(id, error);
     }
   }
 }

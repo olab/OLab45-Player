@@ -1,10 +1,8 @@
 // @flow
-import React from "react";
+import log from "loglevel";
+
 import {
   Box,
-  List,
-  ListItem,
-  ListItemText,
   Paper,
   TableContainer,
   Table,
@@ -13,65 +11,40 @@ import {
   TableCell,
   TableBody,
 } from "@material-ui/core";
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
-import log from "loglevel";
-import { getCounters } from "../WikiTags";
-import { config } from "../../../config";
 
-const playerState = require("../../../utils/PlayerState").PlayerState;
+import { getCounters } from "../WikiUtils";
+import OlabTag from "../OlabTag";
 
-class OlabCountersTag extends React.Component {
+class OlabCountersTag extends OlabTag {
   constructor(props) {
-    super(props);
-
-    const debug = playerState.GetDebug();
-
-    this.state = {
-      id: props.props.id,
-      name: props.props.name,
-      question: props.props.question,
-      authActions: props.props.authActions,
-      onSubmitResponse: props.props.onSubmitResponse,
-      showProgressSpinner: false,
-      disabled: false,
-      map: props.props.map,
-      node: props.props.node,
-      counterActions: props.props.scopedObjects.map.counteractions,
-      debug,
-    };
+    const olabObject = getCounters(props.props.node.id, props);
+    super(props, olabObject);
   }
 
   render() {
-    log.debug(`OlabCountersTag render`);
+    const { olabObject, debug } = this.state;
+
+    log.debug(`${this.constructor["name"]} render`);
 
     try {
-      const { counterActions, node, debug } = this.state;
-
-      let counters = getCounters(
-        node.id,
-        this.props.props.dynamicObjects.map.counters,
-        counterActions
-      );
-
       if (debug.disableWikiRendering) {
         return (
           <>
             <b>[[COUNTERS]]</b>
             <Box width="300px;">
-              {counters.map((counter) => (
-                <p>
-                  &nbsp;
+              {olabObject.map((counter) => (
+                <div key={counter.id}>
                   <b>
-                    [[CR:{counter.name}]]: {counter.value}
+                    -&gt; [[CR:{counter.name}]]: {counter.value}
                   </b>
-                </p>
+                </div>
               ))}
             </Box>
           </>
         );
       }
 
-      if (counters.length > 0) {
+      if (olabObject.length > 0) {
         return (
           <TableContainer component={Paper}>
             <Table aria-label="simple table">
@@ -84,8 +57,8 @@ class OlabCountersTag extends React.Component {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {counters.map((row) => (
-                  <TableRow key={row.name}>
+                {olabObject.map((row) => (
+                  <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
                       {row.scopeLevel} ({row.parentId})
                     </TableCell>
@@ -100,31 +73,11 @@ class OlabCountersTag extends React.Component {
             </Table>
           </TableContainer>
         );
-        // return (
-        //   <div className={`${styles['counters']} ${siteStyles['counters']}`}>
-        //     <Box width="300px;">
-        //       <List component="span" dense={true}>
-        //         {counters.map((counter) => (
-        //           <ListItem>
-        //             <ListItemText
-        //               primary={`${counter.name}: ${counter.value}`}
-        //             />
-        //           </ListItem>
-        //         ))}
-        //       </List>
-        //     </Box>
-        //   </div>
-        // );
       }
 
       return <></>;
     } catch (error) {
-      LogError(`OlabMediaResourceTag render error: ${error}`);
-      return (
-        <>
-          <b>[[COUNTERS]] "{error.message}"</b>
-        </>
-      );
+      return this.errorJsx("COUNTERS", error);
     }
   }
 }

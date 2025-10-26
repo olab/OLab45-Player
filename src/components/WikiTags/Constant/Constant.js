@@ -1,51 +1,47 @@
 // @flow
 import React from "react";
 import parse from "html-react-parser";
-import { getConstant } from "../WikiTags";
-const playerState = require("../../../utils/PlayerState").PlayerState;
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
-import { config } from "../../../config";
 
-class OlabConstantTag extends React.Component {
+import { getConstant } from "../WikiUtils";
+import OlabTag from "../OlabTag";
+
+class OlabConstantTag extends OlabTag {
   constructor(props) {
-    super(props);
-
-    const debug = playerState.GetDebug();
-    this.state = { debug };
+    let olabObject = getConstant(props.name, props);
+    super(props, olabObject);
   }
 
   render() {
-    const { debug } = this.state;
+    const { debug, olabObject } = this.state;
+    const { id, name } = this.props;
 
-    const { name } = this.props;
-
-    log.debug(`OlabConstantTag render '${name}'`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
-      let item = getConstant(name, this.props);
-
-      if (item != null) {
-        if (debug.disableWikiRendering) {
-          return (
-            <>
-              <b>
-                [[CONST:{name}]] "{item.value}"
-              </b>
-            </>
-          );
-        }
-
-        return <>{parse(item.value)}</>;
+      if (olabObject == null) {
+        throw new Error(`'${name}' not found`);
       }
-    } catch (error) {
+
+      const visibility = this.getDisplayStyle(olabObject);
+
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[CONST:{id}]] ({olabObject.id}) "{parse(olabObject.value)}"
+            </b>
+          </>
+        );
+      }
+
       return (
-        <>
-          <b>
-            [[CONST:{name}]] "{error.message}"
-          </b>
-        </>
+        <span id={`CONST:${name}`} style={{ display: visibility }}>
+          {parse(olabObject.value)}
+        </span>
       );
+    } catch (error) {
+      return this.errorJsx(id, error);
     }
   }
 }

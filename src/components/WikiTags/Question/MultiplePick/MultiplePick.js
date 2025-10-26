@@ -8,20 +8,30 @@ import {
   FormControl,
 } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
-import { Log, LogInfo, LogError } from "../../../../utils/Logger";
 import log from "loglevel";
+import JsxParser from "react-jsx-parser";
 
 import CloseIcon from "@material-ui/icons/Close";
 import CheckIcon from "@material-ui/icons/Check";
 
 import styles from "../../styles.module.css";
 import siteStyles from "../../site.module.css";
+import Spinner from "../../../../shared/assets/loading_med.gif";
 
-class OlabMultiPickQuestion extends React.Component {
+import { getQuestion } from "../../WikiUtils";
+import OlabTag from "../../OlabTag";
+const playerState = require("../../../../utils/PlayerState").PlayerState;
+
+class OlabMultiPickQuestion extends OlabTag {
   constructor(props) {
-    super(props);
+    let olabObject = getQuestion(props.name, props);
+    super(props, olabObject);
+
+    const debug = playerState.GetDebug();
 
     this.state = {
+      debug,
+      olabObject,
       ...props.props,
       hasInitialAnswer: false,
     };
@@ -53,7 +63,7 @@ class OlabMultiPickQuestion extends React.Component {
   }
 
   setValue = (event, choiceArray, choiceId) => {
-    const question = this.state.question;
+    const olabObject = this.state.olabObject;
 
     if (choiceArray == null) {
       choiceArray = [];
@@ -66,7 +76,7 @@ class OlabMultiPickQuestion extends React.Component {
 
     if (checked && choiceArray.length === 0) {
       value = choiceId;
-      valueOverride = question.responses.find(
+      valueOverride = olabObject.responses.find(
         (res) => res.id == choiceId
       )?.response;
     } else {
@@ -81,31 +91,31 @@ class OlabMultiPickQuestion extends React.Component {
 
       value = this.createValueFromArray(choiceArray);
       valueOverride = this.createValueFromArray(
-        question.responses
+        olabObject.responses
           .filter((res) => choiceArray.map((n) => +n).includes(res.id))
           .map((res) => res.response)
       );
     }
 
     log.debug(
-      `OlabMultiPickQuestion set question '${question.id}' value = '${value}'`
+      `${this.constructor["name"]} set question '${olabObject.id}' value = '${value}'`
     );
 
     // if single try question, disabled it
-    if (question.numTries > 0) {
-      question.disabled = true;
+    if (olabObject.numTries > 0) {
+      olabObject.disabled = true;
     }
 
     // first attempt to answer, so show answer
     // indicators, if called on
-    question.showAnswerIndicators = true;
+    olabObject.showAnswerIndicators = true;
 
     this.setState(
       (state) => {
-        question.previousValue = question.value;
-        question.value = value;
-        question.valueOverride = valueOverride;
-        return { question };
+        olabObject.previousValue = olabObject.value;
+        olabObject.value = value;
+        olabObject.valueOverride = valueOverride;
+        return { olabObject };
       },
       () => this.transmitResponse()
     );
@@ -119,8 +129,7 @@ class OlabMultiPickQuestion extends React.Component {
   };
 
   transmitResponse() {
-    const { onSubmitResponse, authActions, map, node, contextId } =
-      this.props.props;
+    const { authActions, map, node, contextId } = this.props.props;
 
     let responseState = {
       ...this.state,
@@ -132,45 +141,46 @@ class OlabMultiPickQuestion extends React.Component {
       setIsDisabled: this.setIsDisabled,
     };
 
-    if (typeof onSubmitResponse !== "undefined") {
-      onSubmitResponse(responseState);
-    }
+    this.onSubmitResponse(responseState);
   }
 
-  setInProgress(inProgress) {
-    this.setState({ showProgressSpinner: inProgress });
-    log.debug(`set progress spinner: ${inProgress}`);
-  }
-
-  setIsDisabled(disabled) {
-    this.setState({ disabled: disabled });
-    log.debug(`set disabled: ${disabled}`);
-  }
-
-  buildQuestionResponses(question, currentChoices) {
+  buildQuestionResponses(olabObject, id, currentChoices) {
     let responses = [];
     let selectedIndexStrings = [];
 
-    if (this.state.question.value) {
-      selectedIndexStrings = this.state.question.value.split(",");
+    if (olabObject.value) {
+      selectedIndexStrings = olabObject.value.split(",");
     }
 
     let selectedIndexes = selectedIndexStrings.map((item) => Number(item));
 
-    for (const response of question.responses) {
-      let responseHtml = this.buildQuestionResponse(
-        question,
-        response,
-        currentChoices,
-        selectedIndexes
+    for (const response of olabObject.responses) {
+      const baseHtmlId = `QR:${response.name}`;
+
+      var item = (
+        <div id={baseHtmlId} parentid={olabObject.htmlIdBase} key={response.id}>
+          {this.buildQuestionResponse(
+            olabObject,
+            baseHtmlId,
+            response,
+            currentChoices,
+            selectedIndexes
+          )}
+        </div>
       );
-      responses.push(responseHtml);
+      responses.push(item);
     }
 
     return responses;
   }
 
-  buildQuestionResponse(question, response, currentChoices, responseIndexes) {
+  buildQuestionResponse(
+    olabObject,
+    baseHtmlId,
+    response,
+    currentChoices,
+    responseIndexes
+  ) {
     let correctnessIndicator = <>{response.response}</>;
     let feedback = null;
 
@@ -178,12 +188,12 @@ class OlabMultiPickQuestion extends React.Component {
       feedback = response.feedback;
     }
 
-    if (question.showAnswer) {
+    if (olabObject.showAnswer) {
       // check if response is selected, meaning we display
       // is_correct and feedback.
       if (currentChoices.includes(`${response.id}`)) {
         // test for 'correct' answer
-        if (response.isCorrect == 1 && question.showAnswerIndicators) {
+        if (response.isCorrect == 1 && olabObject.showAnswerIndicators) {
           correctnessIndicator = (
             <>
               {response.response}
@@ -194,7 +204,7 @@ class OlabMultiPickQuestion extends React.Component {
         }
 
         // test for 'incorrect' answer
-        if (response.isCorrect == -1 && question.showAnswerIndicators) {
+        if (response.isCorrect == -1 && olabObject.showAnswerIndicators) {
           correctnessIndicator = (
             <>
               {response.response}
@@ -208,11 +218,17 @@ class OlabMultiPickQuestion extends React.Component {
 
     let responseHtml = (
       <FormControlLabel
+        id={`${baseHtmlId}::label`}
         onChange={(event) =>
           this.setValue(event, currentChoices, response.id.toString())
         }
         key={response.id}
-        control={<Checkbox name={`qr-${response.id}`} />}
+        control={
+          <Checkbox
+            id={`QR:${response.name}::input`}
+            name={`${response.response.replace(/\W/g, "")}`}
+          />
+        }
         label={correctnessIndicator}
         checked={currentChoices.includes(response.id.toString())}
       />
@@ -222,36 +238,67 @@ class OlabMultiPickQuestion extends React.Component {
   }
 
   render() {
-    const { id, name, question } = this.state;
+    const { debug, olabObject } = this.state;
+    const { id, name } = this.props;
 
-    log.debug(`OlabMultiPickQuestion render '${name}'`);
+    log.debug(`${this.constructor["name"]} '${name}' render`);
 
     try {
-      let row = question.layoutType === 1 ? true : false;
-      let currentChoices = this.createArrayFromValue(question.value);
+      let progressButtonHtml = "";
+      if (this.state.showProgressSpinner) {
+        progressButtonHtml = (
+          <img
+            style={{ float: "left", width: 40, height: 40 }}
+            src={Spinner}
+            alt=""
+          />
+        );
+      }
 
-      var responses = this.buildQuestionResponses(question, currentChoices);
-      var disabled = question.disabled == 0 ? false : true;
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({olabObject.id})
+            </b>
+          </>
+        );
+      }
+
+      let currentChoices = this.createArrayFromValue(olabObject.value);
+      var responses = this.buildQuestionResponses(
+        olabObject,
+        this.props.props.id,
+        currentChoices
+      );
+
+      let row = olabObject.layoutType === 1 ? true : false;
+      var disabled = olabObject.disabled == 0 ? false : true;
+      const visibility = this.getDisplayStyle(olabObject);
+      const divStyle = {
+        display: visibility,
+      };
 
       return (
         <div
           className={`${styles["qumultichoice"]} ${siteStyles[id]}`}
-          id={`${id}`}
+          id={olabObject.htmlIdBase}
+          olabid={olabObject.id}
+          style={divStyle}
         >
           <FormControl component="fieldset" disabled={disabled}>
-            <FormLabel component="legend">{question.stem}</FormLabel>
-            <FormGroup row={row}>{responses}</FormGroup>
+            <FormLabel id={`${olabObject.htmlIdBase}::stem`} component="span">
+              <JsxParser jsx={olabObject.stem} />
+            </FormLabel>
+            <FormGroup id={`${olabObject.htmlIdBase}::responses`} row={row}>
+              {responses}
+            </FormGroup>
+            {progressButtonHtml}
           </FormControl>
         </div>
       );
     } catch (error) {
-      return (
-        <>
-          <b>
-            [[QU:{id}]] "{error.message}"
-          </b>
-        </>
-      );
+      return this.errorJsx(id, error);
     }
   }
 }

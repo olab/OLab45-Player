@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { withStyles } from "@material-ui/core/styles";
-import styles from "../styles";
+import { styles } from "../styles";
 
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
@@ -8,23 +8,34 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import log from "loglevel";
 
-class MapDetail extends PureComponent {
+class ImpersonateDlg extends PureComponent {
   constructor(props) {
     super(props);
 
+    log.debug(`${this.constructor["name"]} ctor`);
+
     this.state = {
       open: this.props.open,
-      data: this.props.data,
+      data: { userName: "olab4s", title: "Impersonate User" },
     };
   }
 
   handleClose = () => {
     this.setState({ open: false });
+    this.props.close();
   };
 
+  open = () => {
+    this.setState({ open: true });
+  };
   render() {
     const { open, data } = this.state;
+
+    log.debug(
+      `${this.constructor["name"]} render ${JSON.stringify(this.state)}`
+    );
 
     return (
       <div>
@@ -34,28 +45,16 @@ class MapDetail extends PureComponent {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">{data.name}</DialogTitle>
+          <DialogTitle id="alert-dialog-title">{data.title}</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              <b>Id:&nbsp;</b>
-              {data.id}
-              <br />
-              <b>Author:&nbsp;</b>
-              {data.author}
-              <br />
-              <b>Nodes:&nbsp;</b>
-              {data.nodeCount}
-              <br />
-              <b>Links:&nbsp;</b>
-              {data.nodeLinkCount}
-              <br />
-              <b>Created:&nbsp;</b>
-              {data.createdAt}
+            <DialogContentText id="alert-dialog-description" autoFocus>
+              <b>User to Impersonate:&nbsp;</b>
+              {data.userName}
               <br />
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.handleClose} color="primary" autoFocus>
+            <Button onClick={this.handleClose} color="primary">
               OK
             </Button>
           </DialogActions>
@@ -65,4 +64,4 @@ class MapDetail extends PureComponent {
   }
 }
 
-export default withStyles(styles)(MapDetail);
+export default withStyles(styles)(ImpersonateDlg);

@@ -8,6 +8,34 @@ if (config?.API_RETRY_COUNT) {
   retryCount = Number(config.API_RETRY_COUNT);
 }
 
+var policies = [
+  // Referer will never be set.
+  "no-referrer",
+
+  // Referer will not be set when navigating from HTTPS to HTTP.
+  "no-referrer-when-downgrade",
+
+  // Full Referer for same-origin requests, and no Referer for cross-origin requests.
+  "same-origin",
+
+  // Referer will be set to just the origin, omitting the URL's path and search.
+  "origin",
+
+  // Referer will be set to just the origin except when navigating from HTTPS to HTTP,
+  // in which case no Referer is sent.
+  "strict-origin",
+
+  // Full Referer for same-origin requests, and bare origin for cross-origin requests.
+  "origin-when-cross-origin",
+
+  // Full Referer for same-origin requests, and bare origin for cross-origin requests
+  // except when navigating from HTTPS to HTTP, in which case no Referer is sent.
+  "strict-origin-when-cross-origin",
+
+  // Full Referer for all requests, whether same- or cross-origin.
+  "unsafe-url",
+];
+
 async function internetJsonFetch(
   method,
   url,
@@ -30,13 +58,41 @@ async function internetJsonFetch(
 
   if (payload) {
     settings.body = JSON.stringify(payload);
-    log.debug(`URL: ${url} payload: ${settings.body})`);
+    // log.debug(`URL: ${url} payload: ${settings.body})`);
   }
 
   while (tries++ < retryCount) {
     try {
       settings.signal = AbortSignal.timeout(30000);
+      settings = { ...settings, referrerPolicy: "no-referrer-when-downgrade" };
       const response = await fetch(url, settings);
+
+      if (response.status === 401) {
+        log.error(`URL '${url}': access denied`);
+        return {
+          data: "Access Denied",
+          error_code: response.status,
+          message: `${URL}: access denied`,
+        };
+      }
+
+      if (response.status === 404) {
+        log.error(`URL '${url}': not found`);
+        return {
+          data: "Not Found",
+          error_code: response.status,
+          message: `${URL}: not found`,
+        };
+      }
+
+      if (response.status === 500) {
+        log.error(`URL '${url}': server error`);
+        return {
+          data: "Server Error",
+          error_code: response.status,
+          message: `${URL}: server error`,
+        };
+      }
 
       let data = {};
 
@@ -45,16 +101,6 @@ async function internetJsonFetch(
         data.error_code = 200;
       } else {
         data = await response.json();
-      }
-
-      if (data.error_code === 401) {
-        log.error(`URL '${url}': access denied ${JSON.stringify(data)}`);
-        return data;
-      }
-
-      if (data.error_code === 500) {
-        log.error(`URL '${url}': server error ${JSON.stringify(data)}`);
-        return data;
       }
 
       if (data.error_code !== 200) {
@@ -75,7 +121,7 @@ async function internetJsonFetch(
 
   return {
     data: "max retries exceeded",
-    errorCode: 500,
+    error_code: 500,
     message: `${URL}: server error`,
   };
 }
@@ -88,6 +134,17 @@ async function loginUserAsync(credentials) {
   let url = `${config.API_URL}/auth/login`;
 
   return await internetJsonFetch("POST", url, payload);
+}
+
+async function impersonateUserAsync(credentials) {
+  var payload = {
+    UserName: credentials.username,
+  };
+  let url = `${config.API_URL}/auth/login`;
+
+  return await internetJsonFetch("POST", url, payload, {
+    Authorization: `Bearer ${credentials.token}`,
+  });
 }
 
 async function loginExternalUserAsync(token) {
@@ -156,7 +213,7 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
 
 async function getNodeScopedObjects(props, nodeId) {
   let token = props.authActions.getToken();
-  let url = `${config.API_URL}/nodes/${nodeId}/scopedObjects`;
+  let url = `${config.API_URL}/nodes/${nodeId}/scopedobjects`;
 
   const data = await internetJsonFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
@@ -186,7 +243,7 @@ async function getDynamicScopedObjects(props, mapId, nodeId) {
 
 async function getServerScopedObjects(props, serverId) {
   let token = props.authActions.getToken();
-  let url = `${config.API_URL}/servers/${serverId}/scopedObjects`;
+  let url = `${config.API_URL}/servers/${serverId}/scopedobjects`;
 
   const data = await internetJsonFetch("GET", url, null, {
     Authorization: `Bearer ${token}`,
@@ -204,8 +261,8 @@ async function postQuestionValue(state) {
     map,
     node,
     authActions,
-    dynamicObjects,
-    question,
+    dynamicObject,
+    olabObject,
     responseId,
     value,
     setInProgress,
@@ -213,10 +270,10 @@ async function postQuestionValue(state) {
   } = state;
 
   let token = authActions.getToken();
-  let url = `${config.API_URL}/response/${question.id}`;
+  let url = `${config.API_URL}/response/${olabObject.id}`;
 
   log.debug(
-    `postQuestionValue(${question.id}, ${responseId}, ${value}, [func]) url: ${url})`
+    `postQuestionValue(${olabObject.id}, ${responseId}, ${value}, [func]) url: ${url})`
   );
 
   // signal to caller that we are starting the work
@@ -227,12 +284,12 @@ async function postQuestionValue(state) {
   let body = {
     mapId: map.id,
     nodeId: node.id,
-    questionId: question.id,
-    responseId: question.responseId,
-    previousResponseId: question.previousResponseId,
-    value: question.valueOverride ?? question.value,
-    previousValue: question.previousValue,
-    dynamicObjects: dynamicObjects,
+    questionId: olabObject.id,
+    responseId: olabObject.responseId,
+    previousResponseId: olabObject.previousResponseId,
+    value: olabObject.valueOverride ?? olabObject.value,
+    previousValue: olabObject.previousValue,
+    dynamicObjects: dynamicObject.data,
   };
 
   const data = await internetJsonFetch("POST", url, body, {
@@ -366,6 +423,36 @@ async function getUserSession(props, payload) {
   return data;
 }
 
+async function putCounterValue(props, counter) {
+  let url = `${config.API_URL}/counters/update/${counter.id}`;
+  let token = props.authActions.getToken();
+  const payload = {
+    counter: counter,
+    dynamicObjects: props.dynamicObject.data,
+  };
+
+  const data = await internetJsonFetch("PUT", url, payload, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  return data;
+}
+
+async function getServerDynamicObjects(props, serverId) {
+  let token = props.authActions.getToken();
+  let url = `${config.API_URL}/servers/${serverId}/dynamicobjects`;
+
+  const data = await internetJsonFetch("GET", url, null, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  if (data.error_code != 200) {
+    throw new Error(`Error retrieving server scoped: ${serverId}`);
+  }
+
+  return data;
+}
+
 export {
   getDownload,
   getUserSession,
@@ -381,7 +468,10 @@ export {
   getNodeScopedObjects,
   getServerScopedObjects,
   getSessionReport,
+  impersonateUserAsync,
   importer,
   postQuestionValue,
+  putCounterValue,
   getMapSessions,
+  getServerDynamicObjects,
 };

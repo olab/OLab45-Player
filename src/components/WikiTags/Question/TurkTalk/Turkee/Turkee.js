@@ -6,117 +6,116 @@ import { withStyles } from "@material-ui/core/styles";
 import { Table, TableBody, TableRow, Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 
-import TurkeeService from "../../../../../services/TurkeeService";
+import Turkee from "../../../../../services/turkee";
 import styles from "../../../styles.module.css";
-import ChatCell from "../ChatCell/ChatCell";
-import Popup from "../Popup/Popup";
+import ChatCell from "../../../../ChatCell/ChatCell";
+import SlotInfo from "../../../../../helpers/SlotInfo";
+import SlotManager from "../SlotManager";
+import Session from "../../../../../services/session";
+
 var constants = require("../../../../../services/constants");
 const playerState = require("../../../../../utils/PlayerState").PlayerState;
-import { config } from "../../../../../config";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 class OlabAttendeeTag extends React.Component {
   constructor(props) {
     super(props);
 
+    this.slotManager = new SlotManager(1);
+    // this makes the chat and status bar
+    // components visible
+    this.slotManager.RemoteSlots()[0].show = true;
+
+    let session = new Session(props.props);
     const debug = playerState.GetDebug();
 
     this.state = {
-      connection: null,
-      connectionStatus: null,
       debug,
-      inAtrium: false,
-      progressMessage: "Loading...",
-      popupMessage: null,
-      popupShow: null,
-      popupSeverity: "info",
-      inRoom: false,
-      localInfo: null,
+      connectionStatus: null,
+      index: 0,
+      infoOpen: null,
+      localInfo: new SlotInfo({ connectionId: "???" }),
       maxHeight: 200,
-      remoteInfo: null,
-      seatNumber: 0,
-      userName: null,
+      remoteInfo: new SlotInfo(),
+      session: session,
+      slotInfos: this.slotManager.RemoteSlots(),
+      userName: props.props.authActions.getUserName(),
       width: "100%",
     };
 
-    this.onAuthenticated = this.onAuthenticated.bind(this);
-    this.onNavigateToNode = this.onNavigateToNode.bind(this);
-    this.onAtriumAccepted = this.onAtriumAccepted.bind(this);
+    this.turkee = new Turkee(this);
+    this.signalr = this.turkee.signalr;
+
+    this.turkee.connect(this.state.userName);
+    this.connection = this.turkee.connection;
+    this.connectionId = "";
+
+    this.handleInfoClose = this.handleInfoClose.bind(this);
+    this.onAtriumAssigned = this.onAtriumAssigned.bind(this);
     this.onJumpNode = this.onJumpNode.bind(this);
     this.onServerMessage = this.onServerMessage.bind(this);
-    this.onRoomAccepted = this.onRoomAccepted.bind(this);
-    this.handleInfoClose = this.handlePopupClose.bind(this);
-    this.displayErrorPopup = this.displayErrorPopup.bind(this);
-    this.displayInfoPopup = this.displayInfoPopup.bind(this);
-    this.dumpConnectionState = this.dumpConnectionState.bind(this);
 
-    this.turkeeService = new TurkeeService(this);
+    var turkeeSelf = this;
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
+      turkeeSelf.onCommand(payload);
+    });
   }
 
   dumpConnectionState() {
-    let { connection } = this.state;
-
     var infoState = { localInfo: this.state.localInfo, remoteInfo: null };
     log.debug(
-      `'${
-        connection.connectionId
-      }' dumpConnectionState localInfo = ${JSON.stringify(infoState, null, 2)}]`
+      `'${this.connectionId}' dumpConnectionState localInfo = ${JSON.stringify(
+        infoState,
+        null,
+        2
+      )}]`
     );
   }
 
-  handlePopupClose(event, reason) {
+  handleInfoClose(event, reason) {
     if (reason === "clickaway") {
       return;
     }
-    this.setState({ popupShow: false });
+    this.setState({ infoOpen: false });
   }
 
-  // display info message in popup
-  displayInfoPopup(message) {
-    this.setState({
-      popupShow: true,
-      popupMessage: message,
-      popupSeverity: "info",
-    });
-  }
-
-  // display error message in popup
-  displayErrorPopup(message) {
-    this.setState({
-      popupShow: true,
-      popupMessage: message,
-      popupSeverity: "error",
-    });
-  }
-
-  // handle learner authorized event
-  onAuthenticated() {
-    // initialize learner-specific flags
-    this.turkeeService.localInfo.isModerator = false;
-    this.turkeeService.localInfo.SeatNumber = null;
-
-    this.setState({
-      connection: this.turkeeService.connection,
-      connectionStatus: this.turkeeService.connection._connectionState,
-      progressMessage: `${this.turkeeService.connection._connectionState}, waiting for assignment.`,
-      localInfo: this.turkeeService.localInfo,
-    });
-  }
-
-  // jump to new url
-  onNavigateToNode = (mapId, nodeId, urlParam = null) => {
-    let url = `${config.APP_BASEPATH}/${mapId}/${nodeId}`;
-    if (urlParam) {
-      url += `/${urlParam}`;
+  onCommand(payload) {
+    try {
+      if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
+        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
+        this.onRoomAssigned(payload.data);
+      } else if (payload.command === constants.SIGNALCMD_ATRIUMASSIGNED) {
+        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
+        this.onAtriumAssigned(payload.data);
+      } else if (payload.command === constants.SIGNALCMD_JUMP_NODE) {
+        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
+        this.onJumpNode(payload);
+      } else if (payload.command === constants.SIGNALCMD_SERVER_ERROR) {
+        log.debug(`'${this.connectionId}' onCommand: ${payload.command}`);
+        this.onServerMessage(payload);
+      }
+    } catch (error) {
+      LogError(
+        `'${this.connectionId}' onTurkeeCommandCallback exception: ${error.message}`
+      );
     }
-
-    log.debug(`navigating to ${url}`);
-
-    window.location.href = url;
-  };
+  }
 
   // system is sending a message to turkee
   onServerMessage(payload) {
-    this.displayInfoPopup(payload.data);
+    try {
+      this.setState({
+        infoOpen: true,
+        infoMessage: payload.data,
+      });
+    } catch (error) {
+      LogError(
+        `'${this.connectionId}' onServerMessage exception: ${error.message}`
+      );
+    }
   }
 
   // moderator is sending the learner to a new node
@@ -124,75 +123,76 @@ class OlabAttendeeTag extends React.Component {
     try {
       let { mapId, nodeId, nodeName } = payload.data;
 
-      this.displayInfoPopup(`Moderator is sending you to '${nodeName}'`);
+      this.setState({
+        infoOpen: true,
+        infoMessage: `Moderator is sending you to '${nodeName}'`,
+      });
 
       // pause for 5 seconds
       await new Promise((r) => setTimeout(r, 4000));
 
-      this.onNavigateToNode(mapId, nodeId);
+      this.props.props.onNavigateToNode(mapId, nodeId);
     } catch (error) {
       LogError(`'${this.connectionId}' onJumpNode exception: ${error.message}`);
     }
   }
 
   // learner has been assigned to an atrium
-  onAtriumAccepted(payload) {
+  onAtriumAssigned(payload) {
     try {
-      let { localInfo } = this.state;
+      let { userName } = this.state;
 
       log.debug(
-        `onAtriumAccepted user '${localInfo.userId}' ${JSON.stringify(payload)}`
+        `onAtriumAssigned message for '${userName}' ${JSON.stringify(payload)}`
       );
 
-      let progressMessage = `Waiting for moderator...`;
-      if (payload.ModeratorPresent) {
-        progressMessage = `Waiting to be accepted into room...`;
-      }
+      payload.isModerator = false;
+      payload.show = true;
+      payload.connectionId = payload.connectionId.slice(-3);
+
+      this.slotManager.assignLocalInfo(payload);
+      var localInfo = this.slotManager.LocalSlots()[0];
 
       this.setState({
-        inAtrium: true,
-        inRoom: false,
-        progressMessage: progressMessage,
+        localInfo: localInfo,
+        remoteInfo: null,
       });
 
       this.dumpConnectionState();
     } catch (error) {
       LogError(
-        `'${connection.connectionId}' onAtriumAccepted exception: ${error.message}`
+        `'${this.connectionId}' onAtriumAssigned exception: ${error.message}`
       );
     }
   }
 
-  // learner has been assigned to a room
-  onRoomAccepted(payload) {
+  onRoomAssigned(payload) {
     try {
-      let { localInfo } = this.state;
+      let { userName } = this.state;
 
       log.debug(
-        `onRoomAccepted user '${localInfo.userId}' ${JSON.stringify(payload)}`
+        `onRoomAssigned message for '${userName}' ${JSON.stringify(payload)}`
       );
 
-      // update seat number from server
-      localInfo.SeatNumber = payload.SeatNumber;
+      const { localInfo } = this.state;
+      this.slotManager.assignLearner(localInfo, payload.remote);
 
       this.setState({
-        inRoom: true,
-        inAtrium: false,
-        remoteInfo: payload.Moderator,
-        localInfo,
+        showChatGrid: true,
+        localInfo: this.slotManager.LocalSlots()[0],
+        remoteInfo: this.slotManager.remoteSlots[0],
       });
 
       this.dumpConnectionState();
     } catch (error) {
       LogError(
-        `'${this.connection.connectionId}' onRoomAccepted exception: ${error.message}`
+        `'${this.connectionId}' onRoomAssigned exception: ${error.message}`
       );
     }
   }
 
   componentDidMount() {
     this.componentMounted = true;
-    this.turkeeService.connect();
   }
 
   async componentWillUnmount() {
@@ -200,10 +200,19 @@ class OlabAttendeeTag extends React.Component {
 
     this.componentMounted = false;
 
-    if (this.turkeeService) {
-      await this.turkeeService.onDisconnecting();
-      this.turkeeService = null;
+    if (this.turkee) {
+      await this.turkee.disconnect();
+      this.turkee = null;
     }
+  }
+
+  // the contextId has changed
+  oncontextIdChanged(Id) {
+    let { chatInfo } = this.state;
+
+    chatInfo.Id = Id;
+
+    this.setState({ chatInfo });
   }
 
   // applies changes to connection status
@@ -221,63 +230,62 @@ class OlabAttendeeTag extends React.Component {
 
   render() {
     const {
-      connection,
+      index,
       debug,
-      inAtrium,
-      popupMessage,
-      progressMessage,
-      popupShow,
-      popupSeverity,
-      inRoom,
-      localInfo,
       remoteInfo,
-      seatNumber,
+      localInfo,
+      userName,
+      session,
+      infoOpen,
+      infoMessage,
     } = this.state;
 
+    const tableStyle = {
+      border: "2px solid black",
+      backgroundColor: "#3333",
+      width: "100%",
+    };
     const chatCellStyle = { width: "100%" };
     const stemStyle = { paddingBottom: "5px" };
+
+    log.debug(`'${localInfo.connectionId}' OlabTurkeeTag render '${userName}'`);
 
     try {
       if (debug.disableWikiRendering) {
         return <>[[QU:{this.props.props.question.id}]]</>;
       }
 
-      const divLayout = {
-        width: "100%",
-        border: "2px solid black",
-        backgroundColor: "#3333",
-      };
-
       return (
         <>
           <div style={stemStyle}>{this.props.props.question.stem}</div>
-
-          {!inAtrium && !inRoom && (
-            <div name="chat" style={divLayout}>
-              <center>
-                <p>
-                  <b>Loading...</b>
-                </p>
-              </center>
-            </div>
+          <Table style={tableStyle}>
+            <TableBody>
+              <TableRow>
+                <ChatCell
+                  index={index}
+                  isModerator={localInfo.isModerator}
+                  style={chatCellStyle}
+                  localInfo={localInfo}
+                  senderInfo={remoteInfo}
+                  session={session}
+                  playerProps={this.props.props}
+                  connection={this.connection}
+                  signalr={this.signalr}
+                />
+              </TableRow>
+            </TableBody>
+          </Table>
+          {infoOpen === true && (
+            <Snackbar
+              open={infoOpen}
+              autoHideDuration={3000}
+              onClose={this.handleInfoClose}
+            >
+              <Alert onClose={this.handleInfoClose} severity="info">
+                {infoMessage}
+              </Alert>
+            </Snackbar>
           )}
-
-          {(inAtrium || inRoom) && (
-            <ChatCell
-              seatNumber={seatNumber}
-              style={chatCellStyle}
-              localInfo={localInfo}
-              remoteInfo={remoteInfo}
-              connection={connection}
-              progressMessage={progressMessage}
-            />
-          )}
-
-          <Popup
-            open={popupShow}
-            message={popupMessage}
-            level={popupSeverity}
-          />
         </>
       );
     } catch (error) {

@@ -1,0 +1,28 @@
+﻿<div id="scriptTest">
+  <div id="currentTime"></div>
+
+  <script>
+    try {
+      let olab = this.state;
+
+      function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        document.getElementById("TimeNow").textContent = timeString;
+      }
+
+      setInterval(updateTime, 1000);
+      updateTime(); // Initial call to display the time immediately
+
+      olab.olabClientApi.onEvent("hellolink", "click", function (event) {
+        event.preventDefault(); // Prevents the default link behavior
+        alert(`Link clicked!`);
+        let domObject = olab.olabClientApi.getDomObject("hellolink");
+        domObject.hide();
+      });
+    } catch (error) {
+      console.error(`an error occurred ${error.message}`);
+      console.log(error.stack);
+    }
+  </script>
+</div>

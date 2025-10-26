@@ -10,24 +10,30 @@ function processUrl() {
   let accessToken = null;
 
   const urlParts = window.location.pathname.split("/");
-  if (urlParts.length == 4) {
-    mapId = urlParts[2];
+  let partsCount = urlParts.length;
+
+  if (window.location.pathname == "/") {
+    partsCount = 0;
+  }
+
+  if (partsCount >= 2) {
+    mapId = urlParts[partsCount - 2];
     if (isNaN(mapId)) {
       mapId = null;
     } else {
       mapId = Number(mapId);
     }
 
-    nodeId = urlParts[3];
+    nodeId = urlParts[partsCount - 1];
     if (isNaN(nodeId)) {
       nodeId = null;
     } else {
       nodeId = Number(nodeId);
     }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    accessToken = urlParams.get("token");
   }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  accessToken = urlParams.get("token");
 
   return [mapId, nodeId, accessToken];
 }

@@ -2,20 +2,35 @@ import React, { PureComponent } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { FormControl } from "@material-ui/core";
 import JsxParser from "react-jsx-parser";
-import { Log, LogInfo, LogError, LogEnable } from "../../utils/Logger";
 import log from "loglevel";
+const playerState = require("../../utils/PlayerState").PlayerState;
+import { DynamicObject } from "../../utils/DynamicObject";
+import { ScopedObject } from "../../utils/ScopedObject";
 
 import ErrorPopup from "../ErrorPopup/ErrorPopup";
-import OlabConstantTag from "../WikiTags/Constant/Constant";
-import OlabCountersTag from "../WikiTags/Counters/Counter";
-import OlabCounterTag from "../WikiTags/Counter/Counter";
-import OlabSessionTag from "../WikiTags/Session/Session";
-import OlabLinksTag from "../WikiTags/Links/Links";
-import OlabReportTag from "../WikiTags/Report/Report";
-import OlabMediaResourceTag from "../WikiTags/MediaResource/MediaResource";
-import OlabQuestionTag from "../WikiTags/Question/Question";
-import OlabAttendeeTag from "../WikiTags/Question/TurkTalk/Turkee/Turkee";
-import OlabModeratorTag from "../WikiTags/Question/TurkTalk/Turker/Turker";
+import {
+  OlabConstantTag,
+  OlabCountersTag,
+  OlabCounterTag,
+  OlabSessionTag,
+  OlabLinksTag,
+  OlabReportTag,
+  OlabMediaResourceTag,
+  OlabScriptTag,
+  OlabQuestionTag,
+  OlabDragAndDropQuestion,
+  OlabDropDownQuestion,
+  OlabMultilineTextQuestion,
+  OlabMultiPickQuestion,
+  OlabSinglelineTextQuestion,
+  OlabSinglePickQuestion,
+  OlabSliderQuestion,
+  OlabAttendeeTag,
+  OlabModeratorTag,
+  // translateLevelToObject,
+  // translateTypeToObject,
+} from "../WikiTags/WikiUtils";
+
 import { withParams } from "../ComponentWrapper";
 import { config } from "../../config";
 
@@ -29,16 +44,12 @@ import {
   getDynamicScopedObjects,
 } from "../../services/api";
 
-const playerState = require("../../utils/PlayerState").PlayerState;
-
 class Player extends PureComponent {
   constructor(props) {
     super(props);
 
-    LogEnable();
-
     const { mapId, nodeId } = arguments[0].params;
-    LogInfo(`playing map ${mapId}, node ${nodeId}`);
+    log.info(`playing map ${mapId}, node ${nodeId}`);
 
     this.state = {
       isMounted: false,
@@ -52,20 +63,25 @@ class Player extends PureComponent {
     this.onErrorDismissed = this.onErrorDismissed.bind(this);
 
     this.onUpdateDynamicObjects = this.onUpdateDynamicObjects.bind(this);
+    this.onUpdateObjects = this.onUpdateObjects.bind(this);
+    this.onUpdateScopedObjects = this.onUpdateScopedObjects.bind(this);
+    this.searchCollection = this.searchCollection.bind(this);
 
-    if (this.state.disableCache) {
-      LogInfo(`disabled cache`);
-      playerState.clear();
-    } else {
-      const persistedState = playerState.Get();
+    const persistedState = playerState.Get();
 
-      this.state = {
-        ...this.state,
-        ...persistedState,
-        errorFound: false,
-        errorMessage: null,
-      };
-    }
+    this.state = {
+      ...this.state,
+      ...persistedState,
+      dynamicObject: new DynamicObject(),
+      scopedObject: new ScopedObject(),
+      errorFound: false,
+      errorMessage: null,
+      isMounted: false,
+      mapId: this.props.params.mapId,
+      nodeId: this.props.params.nodeId,
+      disableCache: persistedState.debug.disableCache,
+      loadProgress: null,
+    };
 
     // eslint-disable-next-line
     window.addEventListener("popstate", function (event) {
@@ -75,13 +91,6 @@ class Player extends PureComponent {
     });
   }
 
-  // handleClose = (event, reason) => {
-  //   if (reason === "clickaway") {
-  //     return;
-  //   }
-  //   setOpen(false);
-  // };
-
   showError = (message) => {
     this.setState({
       errorFound: true,
@@ -90,15 +99,33 @@ class Player extends PureComponent {
   };
 
   async componentDidMount() {
-    this.setState({ mapId: this.props.params.mapId });
-    this.setState({ nodeId: this.props.params.nodeId });
-
     try {
-      await this.getServer(this.props, 1);
-      await this.getMap(this.props);
-      await this.getNode(this.props);
+      const { serverScopedObjects } = await this.getServer(this.props, 1);
+      const { map, mapScopedObjects } = await this.getMap(this.props);
+      const { node, nodeScopedObjects } = await this.getNode(this.props);
 
-      this.setState({ isMounted: true });
+      var originalDynamicObjects = playerState.GetDynamicObjects();
+      if (originalDynamicObjects == null) {
+        originalDynamicObjects = node.dynamicObjects;
+      }
+
+      let dynamicObject = new DynamicObject(originalDynamicObjects);
+      let scopedObject = new ScopedObject({
+        map: mapScopedObjects,
+        node: nodeScopedObjects,
+        server: serverScopedObjects,
+      });
+
+      this.setState({
+        isMounted: true,
+        mapId: map.id,
+        nodeId: node.id,
+        node: node,
+        map: map,
+        contextId: node.contextId,
+        scopedObject: scopedObject,
+        dynamicObject: dynamicObject,
+      });
     } catch (error) {
       this.showError(error.message);
     }
@@ -108,19 +135,24 @@ class Player extends PureComponent {
     let theme = null;
 
     try {
-      const {
-        scopedObjects: { map, server },
-      } = this.state;
+      const { scopedObject } = this.state;
 
-      if (server.themes.length > 0) {
-        theme = server.themes[0];
+      const map = scopedObject.getMap();
+      const server = scopedObject.getServer();
+
+      if (server != null && server.themes != null) {
+        if (server.themes.length > 0) {
+          theme = server.themes[0];
+        }
       }
 
-      if (map.themes.length > 0) {
-        theme = map.themes[0];
+      if (map != null && map.themes != null) {
+        if (map.themes.length > 0) {
+          theme = map.themes[0];
+        }
       }
     } catch (error) {
-      LogError(error);
+      log.error(error);
     }
 
     if (theme) {
@@ -132,149 +164,132 @@ class Player extends PureComponent {
   };
 
   getServer = async (props, id) => {
-    // test if already have server loaded
-    var {
-      scopedObjects: { server },
-      disableCache,
-    } = this.state;
+    try {
+      // test if already have server scoped objects loaded
+      var {
+        scopedObject, //s: { server: serverScopedObjects },
+        disableCache,
+      } = this.state;
 
-    if (server && !disableCache) {
-      this.setState({ isServerFetched: true });
-      log.debug("using cached server data");
-      return;
+      let serverScopedObjects = scopedObject.getServer();
+
+      if (!serverScopedObjects || disableCache) {
+        log.debug("loading server scoped objects");
+        const { data: scopedObjectsData } = await getServerScopedObjects(
+          props,
+          id
+        );
+        serverScopedObjects = scopedObjectsData;
+        scopedObject.setServerObjects(serverScopedObjects);
+        this.setState({ loadProgress: "server" });
+      } else {
+        log.debug("using cached server scoped objects");
+      }
+
+      return { serverScopedObjects };
+    } catch (error) {
+      this.showError(error.message);
     }
-
-    const { data: scopedObjectsData } = await getServerScopedObjects(props, id);
-
-    const { scopedObjects } = this.state;
-
-    this.setState({
-      scopedObjects: {
-        map: scopedObjects.map,
-        node: scopedObjects.node,
-        server: scopedObjectsData,
-      },
-    });
-
-    if (!this.state.disableCache) {
-      playerState.SetServerStatic(this.state.scopedObjects.server);
-    }
-
-    log.debug("read server data");
   };
 
   getMap = async (props) => {
-    // test if already have map loaded (and it's the same one)
-    var { map, disableCache } = this.state;
-    let { mapId: id } = this.state;
+    try {
+      const mapId = props.params.mapId;
 
-    if (map && !disableCache) {
-      if (Number(id) === map.id) {
-        this.setState({ isMapFetched: true });
+      // test if already have map scoped objects loaded
+      var {
+        map,
+        scopedObject, // s: { map: mapScopedObjects },
+        disableCache,
+      } = this.state;
+
+      if (!map || disableCache) {
+        log.debug("loading map");
+        const { data: objData } = await getMap(props, mapId);
+        map = objData;
+        playerState.SetMap(map);
+        this.setState({ loadProgress: `map '${map.name}'` });
+      } else {
         log.debug("using cached map data");
-        return;
       }
+
+      let mapScopedObjects = scopedObject.getMap();
+
+      if (!mapScopedObjects || disableCache) {
+        log.debug("loading map scoped objects");
+        const { data: objData } = await getMapScopedObjects(props, mapId);
+        mapScopedObjects = objData;
+        scopedObject.setMapObjects(mapScopedObjects);
+        this.setState({ loadProgress: `map '${map.name}' objects` });
+      } else {
+        log.debug("using cached map scoped objects");
+      }
+
+      return { map, mapScopedObjects };
+    } catch (error) {
+      this.showError(error.message);
     }
-
-    const { data: objData } = await getMap(props, id);
-    const { data: scopedObjectsData } = await getMapScopedObjects(props, id);
-    const { scopedObjects } = this.state;
-
-    this.setState({
-      map: objData,
-      scopedObjects: {
-        map: scopedObjectsData,
-        node: scopedObjects.node,
-        server: scopedObjects.server,
-      },
-    });
-
-    if (!this.state.disableCache) {
-      playerState.SetMapStatic(this.state.scopedObjects.map);
-      playerState.SetMap(this.state.map);
-    }
-
-    log.debug("read map data");
   };
 
   getNode = async (props) => {
-    let { mapId, nodeId, dynamicObjects, node, disableCache } = this.state;
+    try {
+      const mapId = props.params.mapId;
+      let nodeId = props.params.nodeId;
 
-    // reset nodes visited if entering map via 'root node'
-    if (nodeId == 0) {
-      this.setState({ nodesVisited: [] });
-      playerState.SetNodesVisited([]);
-    }
+      // test if already have node scoped objects loaded
+      var {
+        node,
+        scopedObject, // s: { node: nodeScopedObjects },
+        disableCache,
+        dynamicObject,
+      } = this.state;
 
-    // test if already have node loaded (and it's the same one)
-    if (node && !disableCache) {
-      if (Number(nodeId) === node.id) {
+      // do a check if the first node played, based
+      // on if there was a previous node in local storage
+      const newPlay = nodeId == 0;
+      dynamicObject.newPlay = newPlay;
+
+      if (!node || disableCache || node.id != nodeId) {
+        log.debug("loading node");
+        const { data: objData } = await getMapNode(
+          props,
+          mapId,
+          nodeId,
+          dynamicObject
+        );
+        node = objData;
+        playerState.SetNode(node);
+        this.setState({ loadProgress: `node '${node.title}'` });
+      } else {
         log.debug("using cached node data");
-        return;
       }
+
+      nodeId = node.id;
+
+      // if new play, should be new contextId from server,
+      // otherwise get it out of local state
+      if (newPlay) {
+        playerState.SetContextId(node.contextId);
+      } else {
+        node.contextId = playerState.GetContextId();
+      }
+
+      let nodeScopedObjects = scopedObject.getNode();
+
+      if (!nodeScopedObjects || disableCache) {
+        log.debug("loading node scoped objects");
+        const { data: objData } = await getNodeScopedObjects(props, nodeId);
+        nodeScopedObjects = objData;
+        scopedObject.setNodeObjects(nodeScopedObjects);
+        this.setState({ loadProgress: `node '${node.title}' objects` });
+      } else {
+        log.debug("using cached node scoped objects");
+      }
+
+      return { node, nodeScopedObjects };
+    } catch (error) {
+      this.showError(error.message);
     }
-
-    // if no dynamic objects yet, initialize an object
-    if (!dynamicObjects) {
-      dynamicObjects = {
-        map: null,
-        node: null,
-        server: null,
-      };
-    }
-
-    // do a check if the first node played, based
-    // on if there was a previous node in local storage
-    const newPlay = nodeId == 0;
-    dynamicObjects.newPlay = newPlay;
-
-    const { data: nodeData } = await getMapNode(
-      props,
-      mapId,
-      nodeId,
-      dynamicObjects
-    );
-
-    const { data: scopedObjectsData } = await getNodeScopedObjects(
-      props,
-      nodeData.id
-    );
-
-    const { scopedObjects } = this.state;
-
-    // delete the dynamic objects that piggy-back
-    // on the node object
-    dynamicObjects = nodeData.dynamicObjects;
-    delete nodeData.dynamicObjects;
-
-    // if new play, should be new contextId from server,
-    // otherwise get it out of local state
-    if (newPlay) {
-      playerState.SetContextId(nodeData.contextId);
-    } else {
-      nodeData.contextId = playerState.GetContextId();
-    }
-
-    LogInfo(`contextId: ${nodeData.contextId}`);
-
-    this.setState({
-      contextId: nodeData.contextId,
-      node: nodeData,
-      dynamicObjects: dynamicObjects,
-      scopedObjects: {
-        map: scopedObjects.map,
-        node: scopedObjectsData,
-        server: scopedObjects.server,
-      },
-    });
-
-    if (!this.state.disableCache) {
-      playerState.SetNode(this.state.node);
-      playerState.SetDynamicObjects(this.state.dynamicObjects);
-      playerState.SetNodeStatic(this.state.scopedObjects.node);
-    }
-
-    log.debug("read node data");
   };
 
   setCounterChange = (state) => {
@@ -290,15 +305,16 @@ class Player extends PureComponent {
         state.nodeId
       );
 
+      var dynamicObject = new DynamicObject(scopedObjectsData);
       this.setState({
-        dynamicObjects: scopedObjectsData,
+        dynamicObject: dynamicObject,
       });
 
-      playerState.SetDynamicObjects(this.state.dynamicObjects);
+      playerState.SetDynamicObjects(dynamicObject.data);
 
       log.debug("read dynamic data");
     } catch (error) {
-      LogError(error);
+      log.error(error);
     }
   };
 
@@ -316,14 +332,97 @@ class Player extends PureComponent {
     window.location.href = url;
   };
 
+  searchCollection(array, elementId) {
+    if (!Array.isArray(array)) {
+      return null;
+    }
+    for (const obj of array) {
+      if (obj.htmlIdBase === elementId) {
+        log.debug(`found '${elementId}'`);
+        return { ...obj };
+      }
+    }
+    return null;
+  }
+
+  onUpdateObjects(newObject) {
+    let obj = null;
+
+    if (newObject.type === "link") {
+      if (this.state.node.links) {
+        obj = this.searchCollection(
+          this.state.node.links,
+          newObject.htmlIdBase
+        );
+      }
+    }
+
+    if (obj == null) {
+      log.error(`could not find ${newObject.type} object`);
+      return;
+    }
+
+    let items = this.state.node.links;
+    for (let index = 0; index < items.length; index++) {
+      // 2. Make a shallow copy of the item to mutate
+      let item = { ...items[index] };
+
+      if (item.id === newObject.id) {
+        log.debug(`${item.type} object '${item.name}': changed}`);
+        items[index] = newObject;
+        break;
+      }
+    }
+
+    const newState = {
+      ...this.state,
+      node: {
+        ...this.state.node,
+      },
+    };
+
+    playerState.SetNode(newState.node);
+    this.setState(newState);
+  }
+
+  onUpdateScopedObjects(newObject) {
+    const { scopedObject } = this.state;
+
+    scopedObject.updateScopedObject(newObject);
+
+    const newState = {
+      ...this.state,
+      scopedObject: new ScopedObject(scopedObject.clone()),
+    };
+
+    this.setState(newState);
+  }
+
   onUpdateDynamicObjects = (dynamicObjects) => {
-    this.setState({ dynamicObjects: dynamicObjects });
-    playerState.SetDynamicObjects(this.state.dynamicObjects);
+    let newState = {
+      ...this.state,
+      dynamicObject: new DynamicObject(dynamicObjects),
+    };
+    this.setState(newState);
+    playerState.SetDynamicObjects(dynamicObjects);
   };
+
+  // getScopedObjectsForType(newObject) {
+
+  //   const {
+  //     scopedObject
+  //   } = this.state;
+
+  //   let objectType = translateTypeToObject(newObject.type);
+  //   let scopeLevel = translateLevelToObject(newObject.scopeLevel);
+
+  //   let items = [...this.state.scopedObjects[scopeLevel][objectType]];
+  //   return { items, objectType, scopeLevel };
+  // }
 
   onJsxParseError(arg) {
     const t = arg;
-    LogError(t);
+    log.error(t);
     alert(`Renderer error: ${t}`);
   }
 
@@ -339,15 +438,17 @@ class Player extends PureComponent {
       map,
       node,
       nodesVisited,
-      scopedObjects,
-      dynamicObjects,
+      scopedObject,
+      dynamicObject,
       urlParam,
       contextId,
       errorFound,
       errorMessage,
+      loadProgress,
     } = this.state;
 
     const { history, authActions } = this.props;
+    let player = this;
 
     // paint an error box
     if (errorFound) {
@@ -363,15 +464,17 @@ class Player extends PureComponent {
     }
 
     if (isMounted) {
-      const linkHandler = this.onNavigateToNode;
+      const onNavigateToNode = this.onNavigateToNode;
       const onUpdateDynamicObjects = this.onUpdateDynamicObjects;
+      const onUpdateScopedObjects = this.onUpdateScopedObjects;
+      const onUpdateObjects = this.onUpdateObjects;
       const theme = this.lookupTheme();
       const haveTheme = theme != null;
 
       document.title = node.title;
       this.setPageTitle(map.name, node.title);
 
-      let header = (
+      const header = (
         <div id="olabHeader">
           {haveTheme && (
             <JsxParser
@@ -380,14 +483,14 @@ class Player extends PureComponent {
               bindings={{
                 props: {
                   contextId,
-                  dynamicObjects,
+                  dynamicObject,
                   history,
-                  linkHandler,
                   map,
                   node,
                   nodesVisited,
-                  scopedObjects,
+                  scopedObject,
                   urlParam,
+                  onNavigateToNode,
                 },
               }}
               components={{
@@ -399,6 +502,14 @@ class Player extends PureComponent {
                 OlabMediaResourceTag,
                 OlabReportTag,
                 OlabQuestionTag,
+                OlabDragAndDropQuestion,
+                OlabDropDownQuestion,
+                OlabMultilineTextQuestion,
+                OlabMultiPickQuestion,
+                OlabSinglelineTextQuestion,
+                OlabSinglePickQuestion,
+                OlabSliderQuestion,
+                OlabScriptTag,
               }}
               jsx={theme?.header}
               onError={(arg) => this.onJsxParseError(arg)}
@@ -407,7 +518,7 @@ class Player extends PureComponent {
         </div>
       );
 
-      let footer = (
+      const footer = (
         <div id="olabFooter">
           {haveTheme && (
             <JsxParser
@@ -416,14 +527,14 @@ class Player extends PureComponent {
               bindings={{
                 props: {
                   contextId,
-                  dynamicObjects,
+                  dynamicObject,
                   history,
-                  linkHandler,
                   map,
                   node,
                   nodesVisited,
-                  scopedObjects,
+                  scopedObject,
                   urlParam,
+                  onNavigateToNode,
                 },
               }}
               components={{
@@ -435,6 +546,14 @@ class Player extends PureComponent {
                 OlabMediaResourceTag,
                 OlabReportTag,
                 OlabQuestionTag,
+                OlabDragAndDropQuestion,
+                OlabDropDownQuestion,
+                OlabMultilineTextQuestion,
+                OlabMultiPickQuestion,
+                OlabSinglelineTextQuestion,
+                OlabSinglePickQuestion,
+                OlabSliderQuestion,
+                OlabScriptTag,
               }}
               jsx={theme?.footer}
               onError={(arg) => this.onJsxParseError(arg)}
@@ -443,7 +562,7 @@ class Player extends PureComponent {
         </div>
       );
 
-      let body = (
+      const body = (
         <div id="olabNodeHtml">
           <JsxParser
             autoCloseVoidElements
@@ -451,16 +570,19 @@ class Player extends PureComponent {
             bindings={{
               props: {
                 authActions,
-                linkHandler,
-                onUpdateDynamicObjects,
+                contextId,
+                dynamicObject,
                 history,
                 map,
                 node,
-                scopedObjects,
-                dynamicObjects,
-                urlParam,
                 nodesVisited,
-                contextId,
+                onUpdateDynamicObjects,
+                onUpdateScopedObjects,
+                onUpdateObjects,
+                player,
+                scopedObject,
+                urlParam,
+                onNavigateToNode,
               },
             }}
             components={{
@@ -474,26 +596,20 @@ class Player extends PureComponent {
               OlabModeratorTag,
               OlabReportTag,
               OlabQuestionTag,
+              OlabDragAndDropQuestion,
+              OlabDropDownQuestion,
+              OlabMultilineTextQuestion,
+              OlabMultiPickQuestion,
+              OlabSinglelineTextQuestion,
+              OlabSinglePickQuestion,
+              OlabSliderQuestion,
+              OlabScriptTag,
             }}
             jsx={node.text}
             onError={(arg) => this.onJsxParseError(arg)}
           />
         </div>
       );
-
-      // if node is 'visit once', save it to list in storage
-      if (this.state.node.visitOnce) {
-        nodesVisited.push(this.state.node.id);
-
-        // remove any duplicates.
-        var newNodesVisited = [...new Set(nodesVisited)];
-        this.setState({ nodesVisited: newNodesVisited });
-
-        log.debug(`saving visited node id: ${this.state.node.id}`);
-        playerState.SetNodesVisited(newNodesVisited);
-
-        log.debug(`Added node id ${this.state.node.id} to visitOnce list`);
-      }
 
       if (debug.disableWikiRendering) {
         return (
@@ -503,11 +619,11 @@ class Player extends PureComponent {
             {footer}
             <h3>Raw node</h3>
             <h4>Header</h4>
-            <p>{theme?.header}</p>
+            <div>{theme?.header}</div>
             <h4>Node Text</h4>
-            <p>{node.text}</p>
+            <div>{node.text}</div>
             <h4>Footer</h4>
-            <p>{theme?.footer}</p>
+            <div>{theme?.footer}</div>
           </FormControl>
         );
       } else {
@@ -520,7 +636,7 @@ class Player extends PureComponent {
         );
       }
     } else {
-      return <>Loading...</>;
+      return <center>Loading {loadProgress}...</center>;
     }
   }
 }

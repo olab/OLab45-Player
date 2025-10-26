@@ -68,7 +68,7 @@ class Turker extends TurkTalk {
     // get room name from persistant storage in case
     // user refreshes the window
     let roomName = this.penName;
-    let moderator = playerState.GetConnectionInfo(null);
+    let moderator = playerState.GetConnectionInfo(null, null);
     if (moderator != null) {
       if (moderator.roomName) {
         roomName = moderator.roomName;

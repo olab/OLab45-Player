@@ -1,6 +1,7 @@
 import { PureComponent } from "react";
 import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
+import queryString from "query-string";
 import "./App.css";
 import Home from "../Home/Home";
 import Header from "../Header/Header";
@@ -24,8 +25,15 @@ class App extends PureComponent {
   constructor(props) {
     super(props);
 
+    this.homeRef = React.createRef();
+
+    // check for any debug query string overrides
+    this.processDebugQueryString();
+
+    log.debug(`${this.constructor["name"]} ctor`);
+
     this.reactVersion = process.env.REACT_APP_VERSION;
-    log.debug(JSON.stringify(process.env));
+    console.log(JSON.stringify(process.env));
 
     const [mapId, nodeId, accessToken] = processUrl();
     const directPlay = mapId != null && nodeId != null;
@@ -55,17 +63,41 @@ class App extends PureComponent {
     }
 
     this.state = {
+      anonymousPlay: tokenType == constants.TOKEN_TYPE_ANONYMOUS,
       authActions: authActions,
+      directPlay: directPlay,
+      directPlayError: null,
+      externalPlay: tokenType == constants.TOKEN_TYPE_EXTERNAL,
+      impersonateUserOpen: false,
+      isMounted: false,
       token: authActions.getToken(),
       tokenType: authActions.getTokenType(),
-      externalPlay: tokenType == constants.TOKEN_TYPE_EXTERNAL,
-      anonymousPlay: tokenType == constants.TOKEN_TYPE_ANONYMOUS,
-      directPlayError: null,
-      directPlay: directPlay,
-      isMounted: false,
     };
 
     this.setCredentials = this.setCredentials.bind(this);
+  }
+
+  processDebugQueryString() {
+    const debug = playerState.GetDebug();
+    const queryParams = queryString.parse(window.location.search);
+
+    if (queryParams.render != null) {
+      debug.disableWikiRendering = queryParams.render == "0";
+    }
+
+    if (queryParams.log != null) {
+      debug.logLevel = queryParams.log;
+    }
+
+    if (queryParams.cache != null) {
+      debug.disableCache = queryParams.cache == "0";
+    }
+
+    playerState.SetDebug(debug);
+  }
+
+  componentWillUnmount() {
+    log.debug(`${this.constructor["name"]} componentWillUnmount`);
   }
 
   anonymousMapCheck = (data) => {
@@ -148,7 +180,11 @@ class App extends PureComponent {
       anonymousPlay,
       tokenType,
       directPlayError,
+      impersonateUserOpen,
     } = this.state;
+
+    log.debug(`${this.constructor["name"]} render`);
+
     const isExpired = authActions.isExpiredSession();
 
     if (!token || isExpired) {
@@ -213,15 +249,18 @@ class App extends PureComponent {
             version={this.reactVersion}
             authActions={authActions}
             externalPlay={externalPlay}
+            setCredentials={this.setCredentials}
           />
           <Routes>
             <Route
               path={`${config.APP_BASEPATH}`}
-              element={<Home authActions={authActions} />}
-            />
-            <Route
-              path={`${config.APP_BASEPATH}/home`}
-              element={<Home authActions={authActions} />}
+              element={
+                <Home
+                  authActions={authActions}
+                  impersonateUserOpen={impersonateUserOpen}
+                  ref={this.homeRef}
+                />
+              }
             />
             <Route
               path={`${config.APP_BASEPATH}/:mapId/sessions`}

@@ -1,13 +1,9 @@
 // @flow
 import React from "react";
-import parse from "html-react-parser";
-import { getConstant } from "../WikiTags";
 const playerState = require("../../../utils/PlayerState").PlayerState;
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 import { Grid, TextField, Select, MenuItem, Button } from "@material-ui/core";
 import { getUserSession } from "../../../services/api";
-import { config } from "../../../config";
 import FileSaver from "file-saver";
 
 class OlabSessionTag extends React.Component {

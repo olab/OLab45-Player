@@ -153,7 +153,7 @@ class ListWithSearch extends PureComponent {
 
             {!list.length && (
               <ListItem classes={{ root: classes.listItem }}>
-                <Typography component="span" align="right" variant="caption">
+                <Typography component={"span"} align="right" variant="caption">
                   Empty list...
                 </Typography>
               </ListItem>

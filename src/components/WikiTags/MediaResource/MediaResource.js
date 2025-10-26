@@ -3,21 +3,19 @@ import React from "react";
 
 import styles from "../styles.module.css";
 import siteStyles from "../site.module.css";
-import { getFile } from "../WikiTags";
+import { getFile } from "../WikiUtils";
 import { getDownload } from "../../../services/api";
-const playerState = require("../../../utils/PlayerState").PlayerState;
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
 import BrokenImageIcon from "@material-ui/icons/BrokenImage";
 import { Tooltip } from "@material-ui/core";
-import { config } from "../../../config";
+const playerState = require("../../../utils/PlayerState").PlayerState;
 
-class OlabMediaResourceTag extends React.Component {
+import OlabTag from "../OlabTag";
+
+class OlabMediaResourceTag extends OlabTag {
   constructor(props) {
-    super(props);
-
-    const debug = playerState.GetDebug();
-    this.state = { debug };
+    let olabObject = getFile(props.name, props);
+    super(props, olabObject);
   }
 
   downloadFile(item) {
@@ -41,16 +39,13 @@ class OlabMediaResourceTag extends React.Component {
   }
 
   render() {
-    const { debug } = this.state;
+    const { debug, olabObject } = this.state;
+    const { id, name } = this.props;
 
-    const { name } = this.props;
-
-    log.debug(`OlabMediaResourceTag render '${name}'`);
+    log.debug(`${this.constructor["name"]} render`);
 
     try {
-      let item = getFile(name, this.props);
-
-      if (!item) {
+      if (!olabObject) {
         const toolTip = `Unknown MR: '${name}'`;
         return (
           <Tooltip placement="top" title={toolTip}>
@@ -59,29 +54,27 @@ class OlabMediaResourceTag extends React.Component {
         );
       }
 
-      log.debug(`file object: '${JSON.stringify(item, null, 2)}'`);
-
       let sizeProps = {};
 
-      if (item.height !== 0) {
-        sizeProps.height = item.height;
+      if (olabObject.height !== 0) {
+        sizeProps.height = olabObject.height;
       }
-      if (item.width !== 0) {
-        sizeProps.width = item.width;
+      if (olabObject.width !== 0) {
+        sizeProps.width = olabObject.width;
       }
 
       if (debug.disableWikiRendering) {
         return (
           <>
             <b>
-              [[MR:{name}]] "{item.path}"
+              [[{id}]] ({olabObject.id}) "{olabObject.path}"
             </b>
           </>
         );
       }
 
-      if (!item.originUrl) {
-        const toolTip = `${item.scopeLevel}(${item.parentId}): '${item.name}'`;
+      if (!olabObject.originUrl) {
+        const toolTip = `${olabObject.scopeLevel}(${olabObject.parentid}): '${olabObject.name}'`;
         return (
           <Tooltip placement="top" title={toolTip}>
             <BrokenImageIcon color="error" fontSize="large" />
@@ -89,80 +82,69 @@ class OlabMediaResourceTag extends React.Component {
         );
       }
 
-      if (this.isAudioType(item.mime)) {
+      // handle case if file store is not on same host as website
+      if (olabObject.hostName != null) {
+        olabObject.originUrl = `${olabObject.hostName}${olabObject.originUrl}`;
+      }
+
+      if (this.isAudioType(olabObject.mime)) {
         return (
           <div
-            className={`${styles["mraudio"]} ${siteStyles[item.id]}`}
-            id={`${item.id}`}
+            className={`${styles["mraudio"]} ${siteStyles[olabObject.id]}`}
+            id={`${olabObject.id}`}
           >
             <audio
-              alt={item.fileName}
-              type={item.mime}
+              alt={olabObject.fileName}
+              type={olabObject.mime}
               autoPlay="autoplay"
               autobuffer=""
               controls
             >
-              <source src={item.originUrl} />
+              <source src={olabObject.originUrl} />
             </audio>
           </div>
         );
-      } else if (this.isImageType(item.mime)) {
+      } else if (this.isImageType(olabObject.mime)) {
         return (
           <div
-            className={`${styles["mrimage"]} ${siteStyles[item.id]}`}
-            id={`${item.id}`}
+            className={`${styles["mrimage"]} ${siteStyles[olabObject.id]}`}
+            id={`${olabObject.id}`}
           >
-            <img {...sizeProps} alt={item.fileName} src={item.originUrl} />
+            <img
+              {...sizeProps}
+              alt={olabObject.fileName}
+              src={olabObject.originUrl}
+            />
           </div>
         );
-      } else if (this.isVideoType(item.mime)) {
+      } else if (this.isVideoType(olabObject.mime)) {
         return (
           <div
-            className={`${styles["mrvideo"]} ${siteStyles[item.id]}`}
-            id={`${item.id}`}
+            className={`${styles["mrvideo"]} ${siteStyles[olabObject.id]}`}
+            id={`${olabObject.id}`}
           >
             <video controls>
-              <source type={item.mime} src={item.originUrl} />
+              <source type={olabObject.mime} src={olabObject.originUrl} />
             </video>
           </div>
         );
-      }
-
-      // else if (item.isEmbedded === 1) {
-
-      //   // handle special case of PDF file
-      //   if (item.mime === "application/pdf") {
-      //     return (
-      //       <embed src={url} width="500" height="375" type='application/pdf' />
-      //     );
-      //   }
-      // }
-      else {
+      } else {
         return (
           <>
             <div>
               <a
-                id={`file-link-${item.id}`}
-                download={item.fileName}
-                href={item.originUrl}
+                id={`${id}`}
+                download={olabObject.fileName}
+                href={olabObject.originUrl}
               >
-                {item.fileName}
+                {olabObject.fileName}
               </a>
             </div>
           </>
         );
       }
     } catch (error) {
-      LogError(
-        `OlabMediaResourceTag render error: ${JSON.stringify(error, null, 2)}`
-      );
-      return (
-        <>
-          <b>
-            [[MR:{name}]] "{error.message}"
-          </b>
-        </>
-      );
+      return this.errorJsx(id, error);
     }
   }
 }

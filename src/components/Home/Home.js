@@ -7,12 +7,11 @@ import {
   PauseSharp as MapResumeIcon,
 } from "@material-ui/icons";
 import { ButtonGroup, Grid, Button, Tooltip } from "@material-ui/core";
-import { Log, LogInfo, LogError } from "../../utils/Logger";
 import log from "loglevel";
 
 import styles from "./styles";
 import ListWithSearch from "../ListWithSearch/ListWithSearch";
-import MapDetail from "./MapDetail/MapDetail";
+import MapDetailDlg from "./MapDetailDlg/MapDetailDlg";
 import styled from "styled-components";
 import { PAGE_TITLES } from "../config";
 import filterByName from "../../helpers/filterByName";
@@ -35,19 +34,28 @@ class Home extends PureComponent {
 
     const debug = playerState.GetDebug();
 
+    const logLevel = playerState.GetLogLevel();
+    log.setLevel(logLevel);
+
+    log.debug(`${this.constructor["name"]} ctor`);
+
     this.state = {
-      error: null,
-      mapId: null,
-      nodeId: null,
-      maps: [],
-      mapsFiltered: [],
-      mapDetails: {},
-      isButtonsDisabled: false,
-      isMapsFetching: true,
-      isMapInfoFetched: false,
-      sessionId: null,
       debug,
+      error: null,
+      isButtonsDisabled: false,
+      isMapInfoFetched: false,
+      isMapsFetching: true,
+      mapDetails: {},
+      mapId: null,
+      mapInfoDlgOpen: false,
+      maps: [], // playerState.GetMaps(),
+      mapsFiltered: [],
+      nodeId: null,
+      sessionId: null,
+      disableCache: debug.disableCache,
     };
+
+    log.debug(`${this.constructor["name"]} ${JSON.stringify(this.state)}`);
 
     this.listWithSearchRef = React.createRef();
     this.setPageTitle();
@@ -70,9 +78,9 @@ class Home extends PureComponent {
     }));
   };
 
-  handleMapItemClick = (scopeLevel) => {};
+  onItemClicked = (scopeLevel) => {};
 
-  handleMapPlayClick = (map, nodeId) => {
+  onMapPlayClicked = (map, nodeId) => {
     this.setState({ mapId: map.id, nodeId: nodeId });
 
     const url = `${config.APP_BASEPATH}/${map.id}/${nodeId}`;
@@ -81,20 +89,24 @@ class Home extends PureComponent {
     window.location.href = url;
   };
 
-  handleMapInfoClick = async (map) => {
+  onMapInfoClicked = async (map) => {
+    log.debug(`${this.constructor["name"]} onMapInfoClicked`);
+
     this.setState({ isMapInfoFetched: false });
     const { data } = await getMap(this.props, map.id);
 
     this.setState({
-      mapInfoOpen: true,
+      mapInfoDlgOpen: true,
       isMapInfoFetched: true,
       mapDetails: data,
     });
   };
 
-  mapInfoHandleClose = () => {
+  onMapInfoClosed = () => {
+    log.debug(`${this.constructor["name"]} onMapInfoClosed`);
+
     this.setState({
-      mapInfoOpen: false,
+      mapInfoDlgOpen: false,
     });
   };
 
@@ -112,7 +124,7 @@ class Home extends PureComponent {
     this.setState({ mapsFiltered });
   };
 
-  clearSearchInput = () => {
+  onSearchClearClicked = () => {
     const { maps: mapsFiltered } = this.state;
     this.setState({ mapsFiltered });
   };
@@ -143,12 +155,21 @@ class Home extends PureComponent {
   }
 
   async componentDidMount() {
+    this.setState({
+      isMapsFetching: true,
+    });
+
+    // let maps = playerState.GetMaps();
+    // if (maps.length == 0 || this.state.disableCache) {
     const { data: objData } = await getMaps(this.props);
+    const maps = objData;
+    //   playerState.SetMaps(maps);
+    // }
 
     this.setState({
       isMapsFetching: false,
-      maps: objData,
-      mapsFiltered: objData,
+      maps: maps,
+      mapsFiltered: maps,
     });
 
     playerState.ClearMap();
@@ -167,7 +188,7 @@ class Home extends PureComponent {
               <Button>
                 <MapInfoIcon
                   onClick={() => {
-                    this.handleMapInfoClick(scopedObject);
+                    this.onMapInfoClicked(scopedObject);
                   }}
                 />
               </Button>
@@ -176,7 +197,7 @@ class Home extends PureComponent {
               <Button>
                 <MapPlayIcon
                   onClick={() => {
-                    this.handleMapPlayClick(scopedObject, 0);
+                    this.onMapPlayClicked(scopedObject, 0);
                   }}
                 />
               </Button>
@@ -199,16 +220,18 @@ class Home extends PureComponent {
 
   render() {
     const {
+      isButtonsDisabled,
+      isMapInfoFetched,
+      isMapsFetching,
+      mapDetails,
+      mapInfoDlgOpen,
       maps,
       mapsFiltered,
-      isMapsFetching,
-      isButtonsDisabled,
-      mapDetails,
-      isMapInfoFetched,
-      mapInfoOpen,
     } = this.state;
 
-    var role = this.props.authActions.getRole();
+    log.debug(`${this.constructor["name"]} render`);
+
+    var isSuperUser = this.props.authActions.isSuperUser();
 
     return (
       <>
@@ -223,8 +246,8 @@ class Home extends PureComponent {
                 isItemsFetching={isMapsFetching}
                 label="Search for map by keyword or index"
                 list={mapsFiltered}
-                onClear={this.clearSearchInput}
-                onItemClick={this.handleMapItemClick}
+                onClear={this.onSearchClearClicked}
+                onItemClick={this.onItemClicked}
                 onSearch={this.handleItemsSearch}
                 isWithSpinner={this.isMapsFetching}
               />
@@ -236,15 +259,14 @@ class Home extends PureComponent {
               &nbsp;maps.
             </Grid>
           </Grid>
-          {role === "olab:superuser" && <Import props={this.props} />}
+          {isSuperUser && <Import props={this.props} />}
           {isMapInfoFetched && mapDetails && mapDetails.id !== null && (
-            <MapDetail
-              open={mapInfoOpen}
-              onClose={this.mapInfoHandleClose}
+            <MapDetailDlg
+              open={mapInfoDlgOpen}
+              close={this.onMapInfoClosed}
               data={mapDetails}
             />
           )}
-          ;
         </HomeWrapper>
       </>
     );

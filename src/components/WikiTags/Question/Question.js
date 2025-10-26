@@ -2,57 +2,76 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 
-import { getQuestion } from "../WikiTags";
+import { getQuestion } from "../WikiUtils";
 import { postQuestionValue } from "../../../services/api";
 import styles from "../styles.module.css";
 import OlabMultilineTextQuestion from "./MultilineText/MultilineText";
 import OlabSinglelineTextQuestion from "./SingleLineText/SingleLineText";
-import OlabSinglePickQuestion from "./SingleChoice/SingleChoice";
-import OlabMultiPickQuestion from "./MultiChoice/MultiChoice";
+import OlabSinglePickQuestion from "./SinglePick/SinglePick";
+import OlabMultiPickQuestion from "./MultiplePick/MultiplePick";
 import OlabSliderQuestion from "./Slider/Slider";
 import OlabDropDownQuestion from "./DropDown/DropDown";
 import OlabDragAndDropQuestion from "./DragAndDrop/DragAndDrop";
 import OlabAttendeeTag from "./TurkTalk/Turkee/Turkee";
 import OlabModeratorTag from "./TurkTalk/Turker/Turker";
-import { config } from "../../../config";
-
 const playerState = require("../../../utils/PlayerState").PlayerState;
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
+import OlabTag from "../OlabTag";
 
-class OlabQuestionTag extends React.Component {
+class OlabQuestionTag extends OlabTag {
   constructor(props) {
     super(props);
 
+    log.debug(`${this.constructor["name"]} ctor`);
+
     let question = getQuestion(this.props.name, this.props);
+
     const debug = playerState.GetDebug();
 
-    if (question.questionType !== 3 && question.questionType !== 2) {
-      if (question.value === null) {
-        question.value = 0;
+    if (question != null) {
+      if (question.questionType !== 3 && question.questionType !== 2) {
+        if (question.value === null) {
+          question.value = 0;
+        }
+      } else {
+        if (question.value === null) {
+          question.value = "";
+        }
       }
-    } else {
-      if (question.value === null) {
-        question.value = "";
+
+      if (question.width === 0) {
+        question.width = 300;
       }
     }
 
-    if (question.width === 0) {
-      question.width = 300;
-    }
+    const customId = OlabQuestionTag.getQuestionId(question);
 
     this.state = {
+      debug,
       question,
       ...props.props,
-      debug,
+      customId,
     };
 
     // Binding this keyword
     this.onSubmitResponse = this.onSubmitResponse.bind(this);
   }
 
+  componentWillUnmount() {
+    log.debug(
+      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+    );
+  }
+
   static getQuestionId(question) {
-    return "QU-" + question.id;
+    if (question == null) {
+      return null;
+    }
+
+    if (question.name != null) {
+      return "QU:" + question.name;
+    }
+    return "QU:" + question.id;
   }
 
   sleep = (ms) => {
@@ -72,106 +91,116 @@ class OlabQuestionTag extends React.Component {
   };
 
   render() {
-    const { debug } = this.state;
-    const questionDivStyle = {
+    const { debug, question, customId } = this.state;
+    const { name } = this.props;
+    const visibility = this.getDisplayStyle(question);
+
+    const divStyle = {
       paddingTop: "10px",
       paddingBottom: "10px",
+      display: visibility,
     };
 
-    log.debug(
-      `rendering question '${this.state.question.name}' typeid: ${this.state.question.questionType}`
-    );
-
-    if (this.state.question != null) {
-      if (debug.disableWikiRendering) {
-        return (
-          <>
-            <b>
-              {this.state.question.wiki} type {this.state.question.questionType}{" "}
-              "{this.state.question.stem}"
-            </b>
-          </>
+    try {
+      if (question != null) {
+        log.debug(
+          `rendering question '${question.name}' typeid: ${question.questionType}`
         );
+
+        if (debug.disableWikiRendering) {
+          return (
+            <>
+              <b>
+                {question.wiki} type {question.questionType} "{question.stem}"
+              </b>
+            </>
+          );
+        }
+
+        let props = {
+          authActions: this.props.props.authActions,
+          id: customId,
+          name: this.props.name,
+          onSubmitResponse: this.onSubmitResponse,
+          question: this.state.question,
+          map: this.state.map,
+          node: this.state.node,
+          dynamicObjects: this.state.dynamicObjects,
+          contextId: this.props.props.contextId,
+          onNavigateToNode: this.props.props.onNavigateToNode,
+        };
+
+        let questionType = props.question.questionType;
+
+        switch (questionType) {
+          case 1:
+            return (
+              <div style={divStyle}>
+                <OlabSinglelineTextQuestion props={props} />
+              </div>
+            );
+          case 2:
+            return (
+              <div style={divStyle}>
+                <OlabMultilineTextQuestion props={props} />
+              </div>
+            );
+          case 3:
+            return (
+              <div style={divStyle}>
+                <OlabMultiPickQuestion props={props} />
+              </div>
+            );
+          case 4:
+            return (
+              <div style={divStyle}>
+                <OlabSinglePickQuestion props={props} />
+              </div>
+            );
+          case 5:
+            return (
+              <div style={divStyle}>
+                <OlabSliderQuestion props={props} />
+              </div>
+            );
+          case 6:
+            return (
+              <div style={divStyle}>
+                <OlabDragAndDropQuestion props={props} />
+              </div>
+            );
+          case 11:
+            return (
+              <div style={divStyle}>
+                <OlabModeratorTag props={props} />
+              </div>
+            );
+          case 12:
+            return (
+              <div style={divStyle}>
+                <OlabDropDownQuestion props={props} />
+              </div>
+            );
+          case 15:
+            return (
+              <div style={divStyle}>
+                <OlabAttendeeTag props={props} />
+              </div>
+            );
+          default:
+            throw new Error(`Unimplemented question type '${questionType}'`);
+        }
       }
 
-      const customId = OlabQuestionTag.getQuestionId(this.state.question);
-
-      let props = {
-        authActions: this.props.props.authActions,
-        id: customId,
-        name: this.props.name,
-        onSubmitResponse: this.onSubmitResponse,
-        question: this.state.question,
-        map: this.state.map,
-        node: this.state.node,
-        dynamicObjects: this.state.dynamicObjects,
-        contextId: this.props.props.contextId,
-      };
-
-      let questionType = props.question.questionType;
-
-      switch (questionType) {
-        case 1:
-          return (
-            <div style={questionDivStyle}>
-              <OlabSinglelineTextQuestion props={props} />
-            </div>
-          );
-        case 2:
-          return (
-            <div style={questionDivStyle}>
-              <OlabMultilineTextQuestion props={props} />
-            </div>
-          );
-        case 3:
-          return (
-            <div style={questionDivStyle}>
-              <OlabMultiPickQuestion props={props} />
-            </div>
-          );
-        case 4:
-          return (
-            <div style={questionDivStyle}>
-              <OlabSinglePickQuestion props={props} />
-            </div>
-          );
-        case 5:
-          return (
-            <div style={questionDivStyle}>
-              <OlabSliderQuestion props={props} />
-            </div>
-          );
-        case 6:
-          return (
-            <div style={questionDivStyle}>
-              <OlabDragAndDropQuestion props={props} />
-            </div>
-          );
-        case 11:
-          return (
-            <div style={questionDivStyle}>
-              <OlabModeratorTag props={props} />
-            </div>
-          );
-        case 12:
-          return (
-            <div style={questionDivStyle}>
-              <OlabDropDownQuestion props={props} />
-            </div>
-          );
-        case 15:
-          return (
-            <div style={questionDivStyle}>
-              <OlabAttendeeTag props={props} />
-            </div>
-          );
-        default:
-          return (
-            <div>
-              <b>Error:</b> Unimplemented question type '{questionType}'
-            </div>
-          );
-      }
+      throw new Error(`'${this.props.name}' not found`);
+    } catch (error) {
+      return (
+        <>
+          <b>
+            [[QU:{name}]] "{error.message}"
+          </b>
+        </>
+      );
     }
 
     return "";

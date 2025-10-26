@@ -16,7 +16,6 @@ const persistantStorage =
   require("../../../../../utils/PersistantStorage").PersistantStorage;
 
 var constants = require("../../../../../services/constants");
-import { config } from "../../../../../config";
 
 class TurkerChatCellGrid extends React.Component {
   constructor(props) {
@@ -129,7 +128,7 @@ class TurkerChatCellGrid extends React.Component {
       });
 
       // update the slot state in storage
-      persistantStorage.save("slotState", {
+      persistantStorage.save(null, "slotState", {
         remoteSlots: this.slotManager.RemoteSlots(),
         localSlots: this.slotManager.LocalSlots(),
       });
@@ -157,7 +156,7 @@ class TurkerChatCellGrid extends React.Component {
       });
 
       // update the slot state in storage
-      persistantStorage.save("slotState", {
+      persistantStorage.save(null, "slotState", {
         remoteSlots: remoteSlots,
         localSlots: localSlots,
       });

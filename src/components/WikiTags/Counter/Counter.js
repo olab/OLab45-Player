@@ -1,58 +1,50 @@
 // @flow
-import React from "react";
 import parse from "html-react-parser";
-import { Log, LogInfo, LogError } from "../../../utils/Logger";
 import log from "loglevel";
-import { getCounter } from "../WikiTags";
-const playerState = require("../../../utils/PlayerState").PlayerState;
-import { config } from "../../../config";
+import OlabTag from "../OlabTag";
+import { getCounter } from "../WikiUtils";
 
-class OlabCounterTag extends React.Component {
+class OlabCounterTag extends OlabTag {
   constructor(props) {
-    super(props);
-
-    const debug = playerState.GetDebug();
-    this.state = { debug };
+    let olabObject = getCounter(props.name, props);
+    super(props, olabObject);
   }
 
   render() {
-    const { debug } = this.state;
+    const { debug, olabObject } = this.state;
+    const { id, name } = this.props;
 
-    const { name } = this.props;
-
-    log.debug(`OlabConstantTag render '${name}'`);
+    log.debug(`${this.constructor["name"]} render`);
 
     try {
-      let item = getCounter(name, this.props.props.dynamicObjects);
-
-      if (item != null) {
-        if (debug.disableWikiRendering) {
-          return (
-            <>
-              <b>
-                [[CR:{name}]] "{item.value}"
-              </b>
-            </>
-          );
-        }
-
-        if (item.value == null) {
-          item.value = "";
-        }
-
-        return <>{parse(item.value)}</>;
+      if (olabObject == null) {
+        throw new Error(`'${name}' not found`);
       }
-    } catch (error) {
-      return (
-        <>
-          <b>
-            [[CR:{name}]] "{error.message}"
-          </b>
-        </>
-      );
-    }
 
-    return "";
+      if (debug.disableWikiRendering) {
+        return (
+          <>
+            <b>
+              [[{id}]] ({olabObject.id}) "{olabObject.value}"
+            </b>
+          </>
+        );
+      }
+
+      if (olabObject.value == null) {
+        olabObject.value = "";
+      }
+
+      const visibility = this.getDisplayStyle(olabObject);
+
+      return (
+        <div id={olabObject.htmlIdBase} style={{ display: visibility }}>
+          {parse(olabObject.value.toString())}
+        </div>
+      );
+    } catch (error) {
+      return this.errorJsx(id, error);
+    }
   }
 }
 
