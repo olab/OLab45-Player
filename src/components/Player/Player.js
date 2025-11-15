@@ -274,17 +274,13 @@ class Player extends PureComponent {
         node.contextId = playerState.GetContextId();
       }
 
-      let nodeScopedObjects = scopedObject.getNode();
+      let nodeScopedObjects = {};
 
-      if (!nodeScopedObjects || disableCache) {
-        log.debug("loading node scoped objects");
-        const { data: objData } = await getNodeScopedObjects(props, nodeId);
-        nodeScopedObjects = objData;
-        scopedObject.setNodeObjects(nodeScopedObjects);
-        this.setState({ loadProgress: `node '${node.title}' objects` });
-      } else {
-        log.debug("using cached node scoped objects");
-      }
+      log.debug("loading node scoped objects");
+      const { data: objData } = await getNodeScopedObjects(props, nodeId);
+      nodeScopedObjects = objData;
+      scopedObject.setNodeObjects(nodeScopedObjects);
+      this.setState({ loadProgress: `node '${node.title}' objects` });
 
       return { node, nodeScopedObjects };
     } catch (error) {
