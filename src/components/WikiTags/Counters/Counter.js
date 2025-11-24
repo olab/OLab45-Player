@@ -35,7 +35,8 @@ class OlabCountersTag extends OlabTag {
               {olabObject.map((counter) => (
                 <div key={counter.id}>
                   <b>
-                    -&gt; [[CR:{counter.name}]]: {counter.value}
+                    -&gt; [[CR:{counter.name}]]: {counter.value} visible:{" "}
+                    {counter.visible}
                   </b>
                 </div>
               ))}
@@ -57,18 +58,20 @@ class OlabCountersTag extends OlabTag {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {olabObject.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell component="th" scope="row">
-                      {row.scopeLevel} ({row.parentId})
-                    </TableCell>
-                    <TableCell align="right">
-                      {row.name} ({row.id})
-                    </TableCell>
-                    <TableCell align="right">{row.value}</TableCell>
-                    <TableCell align="right">{row.updatedat}</TableCell>
-                  </TableRow>
-                ))}
+                {olabObject
+                  .filter((row) => row.visible) // only keep rows where visible = true
+                  .map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell component="th" scope="row">
+                        {row.scopeLevel} ({row.parentId})
+                      </TableCell>
+                      <TableCell align="right">
+                        {row.name} ({row.id})
+                      </TableCell>
+                      <TableCell align="right">{row.value}</TableCell>
+                      <TableCell align="right">{row.updatedat}</TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>
