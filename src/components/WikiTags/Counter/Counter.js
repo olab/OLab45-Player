@@ -35,10 +35,8 @@ class OlabCounterTag extends OlabTag {
         olabObject.value = "";
       }
 
-      const visibility = this.getDisplayStyle(olabObject);
-
       return (
-        <div id={olabObject.htmlIdBase} style={{ display: visibility }}>
+        <div id={olabObject.htmlIdBase}>
           {parse(olabObject.value.toString())}
         </div>
       );
