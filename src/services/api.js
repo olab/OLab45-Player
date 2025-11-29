@@ -214,8 +214,10 @@ async function getMapNode(props, mapId, nodeId, dynamicObjects) {
 async function getNodeScopedObjects(props, nodeId) {
   let token = props.authActions.getToken();
   let url = `${config.API_URL}/nodes/${nodeId}/scopedobjects`;
+  let contextId = playerState.GetContextId();
 
   const data = await internetJsonFetch("GET", url, null, {
+    OLabSessionId: contextId,
     Authorization: `Bearer ${token}`,
   });
 
