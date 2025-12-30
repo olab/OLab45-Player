@@ -19,7 +19,7 @@ import {
 } from "@material-ui/core";
 import PrintIcon from "@material-ui/icons/Print";
 import DownloadIcon from "@material-ui/icons/GetApp";
-import { json2csvAsync } from "json-2-csv";
+import { json2csv } from "json-2-csv";
 
 const reportTableRef = React.createRef();
 const reportHeaderRef = React.createRef();
@@ -33,8 +33,8 @@ export default class OlabReportContents extends React.Component {
   async exportCsvData(rows, documentName) {
     if (0 == rows.length) return;
 
-    const csvdata = await json2csvAsync(rows).catch(
-      (error) => void log.error("json2csvAsync error", error) || ""
+    const csvdata = await json2csv(rows).catch(
+      (error) => void log.error("json2csv error", error) || "",
     );
 
     if (0 == String(csvdata).trim().length) return;
@@ -68,7 +68,7 @@ export default class OlabReportContents extends React.Component {
 
     return this.exportCsvData(
       [Object.assign({}, ...rows)],
-      "Learner Report.csv"
+      "Learner Report.csv",
     );
   }
 

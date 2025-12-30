@@ -1,5 +1,5 @@
 import { useState } from "react";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import log from "loglevel";
 const playerState = require("../../utils/PlayerState").PlayerState;
 import { config } from "../../config";
@@ -61,7 +61,7 @@ class useToken {
   saveToken = (loginInfo, tokenType) => {
     let authInfo = loginInfo.authInfo;
 
-    var decoded = jwt_decode(authInfo.token);
+    var decoded = jwtDecode(authInfo.token);
     log.debug(`Token decoded: ${JSON.stringify(decoded, null, 2)}`);
 
     let sessionInfo = playerState.GetSessionInfo();
