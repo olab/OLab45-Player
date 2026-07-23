@@ -47,9 +47,9 @@ class OlabAttendeeTag extends React.Component {
     };
 
     this.turkee = new Turkee(this);
+    this.turkee.connect(this.state.userName);
     this.signalr = this.turkee.signalr;
 
-    this.turkee.connect(this.state.userName);
     this.connection = this.turkee.connection;
     this.connectionId = "";
 
@@ -64,14 +64,31 @@ class OlabAttendeeTag extends React.Component {
     });
   }
 
+  componentDidMount() {
+    this.componentMounted = true;
+  }
+
+  componentWillUnmount() {
+    log.debug(`'${this.connectionId}' OlabAttendeeTag unmounting`);
+
+    this.componentMounted = false;
+
+    if (this.turkee) {
+      this.turkee.disconnect().catch((err) => {
+        log.error("Error executing disconnect chain during unmount:", err);
+      });
+      this.turkee = null;
+    }
+  }
+
   dumpConnectionState() {
     var infoState = { localInfo: this.state.localInfo, remoteInfo: null };
     log.debug(
       `'${this.connectionId}' dumpConnectionState localInfo = ${JSON.stringify(
         infoState,
         null,
-        2
-      )}]`
+        2,
+      )}]`,
     );
   }
 
@@ -99,7 +116,7 @@ class OlabAttendeeTag extends React.Component {
       }
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onTurkeeCommandCallback exception: ${error.message}`
+        `'${this.connectionId}' onTurkeeCommandCallback exception: ${error.message}`,
       );
     }
   }
@@ -113,7 +130,7 @@ class OlabAttendeeTag extends React.Component {
       });
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onServerMessage exception: ${error.message}`
+        `'${this.connectionId}' onServerMessage exception: ${error.message}`,
       );
     }
   }
@@ -143,7 +160,7 @@ class OlabAttendeeTag extends React.Component {
       let { userName } = this.state;
 
       log.debug(
-        `onAtriumAssigned message for '${userName}' ${JSON.stringify(payload)}`
+        `onAtriumAssigned message for '${userName}' ${JSON.stringify(payload)}`,
       );
 
       payload.isModerator = false;
@@ -161,7 +178,7 @@ class OlabAttendeeTag extends React.Component {
       this.dumpConnectionState();
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onAtriumAssigned exception: ${error.message}`
+        `'${this.connectionId}' onAtriumAssigned exception: ${error.message}`,
       );
     }
   }
@@ -171,7 +188,7 @@ class OlabAttendeeTag extends React.Component {
       let { userName } = this.state;
 
       log.debug(
-        `onRoomAssigned message for '${userName}' ${JSON.stringify(payload)}`
+        `onRoomAssigned message for '${userName}' ${JSON.stringify(payload)}`,
       );
 
       const { localInfo } = this.state;
@@ -186,23 +203,8 @@ class OlabAttendeeTag extends React.Component {
       this.dumpConnectionState();
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onRoomAssigned exception: ${error.message}`
+        `'${this.connectionId}' onRoomAssigned exception: ${error.message}`,
       );
-    }
-  }
-
-  componentDidMount() {
-    this.componentMounted = true;
-  }
-
-  async componentWillUnmount() {
-    log.debug(`'${this.connectionId}' OlabAttendeeTag unmounting`);
-
-    this.componentMounted = false;
-
-    if (this.turkee) {
-      await this.turkee.disconnect();
-      this.turkee = null;
     }
   }
 
