@@ -58,10 +58,10 @@ class OlabAttendeeTag extends React.Component {
     this.onJumpNode = this.onJumpNode.bind(this);
     this.onServerMessage = this.onServerMessage.bind(this);
 
-    var turkeeSelf = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
-      turkeeSelf.onCommand(payload);
-    });
+    // var turkeeSelf = this;
+    // this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
+    //   turkeeSelf.onCommand(payload);
+    // });
   }
 
   componentDidMount() {

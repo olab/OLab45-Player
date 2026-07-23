@@ -70,10 +70,23 @@ class OlabModeratorTag extends React.Component {
     this.connection = this.turker.connection;
     this.connectionId = "";
 
-    var turkerSelf = this;
-    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
-      turkerSelf.onCommand(payload);
-    });
+    // var turkerSelf = this;
+    // this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
+    //   turkerSelf.onCommand(payload);
+    // });
+  }
+
+  componentWillUnmount() {
+    log.debug(`'${this.connectionId}' OlabAttendeeTag unmounting`);
+
+    this.componentMounted = false;
+
+    if (this.turker) {
+      this.turker.disconnect().catch((err) => {
+        log.error("Error executing disconnect chain during unmount:", err);
+      });
+      this.turker = null;
+    }
   }
 
   onCommand(payload) {
@@ -82,18 +95,18 @@ class OlabModeratorTag extends React.Component {
     try {
       if (payload.command === constants.SIGNALCMD_TURKER_ASSIGNED) {
         log.debug(
-          `'${localInfo.connectionId}' onCommand: ${JSON.stringify(payload)}`
+          `'${localInfo.connectionId}' onCommand: ${JSON.stringify(payload)}`,
         );
         this.onModeratorAssigned(payload.data);
       } else if (payload.command === constants.SIGNALCMD_SERVER_ERROR) {
         log.debug(
-          `'${localInfo.connectionId}' onCommand: ${JSON.stringify(payload)}`
+          `'${localInfo.connectionId}' onCommand: ${JSON.stringify(payload)}`,
         );
         this.onServerError(payload.data);
       }
     } catch (error) {
       LogError(
-        `'${localInfo.connectionId}' onTurkerCommandCallback exception: ${error.message}`
+        `'${localInfo.connectionId}' onTurkerCommandCallback exception: ${error.message}`,
       );
     }
   }
@@ -130,19 +143,19 @@ class OlabModeratorTag extends React.Component {
       log.debug(
         `'${
           localInfo.connectionId
-        }' onModeratorAssigned localInfo = ${JSON.stringify(payload, null, 2)}]`
+        }' onModeratorAssigned localInfo = ${JSON.stringify(payload, null, 2)}]`,
       );
 
       playerState.SetConnectionInfo(null, localInfo);
     } catch (error) {
       LogError(
-        `'${localInfo.connectionId}' onModeratorAssigned exception: ${error.message}`
+        `'${localInfo.connectionId}' onModeratorAssigned exception: ${error.message}`,
       );
     }
   }
 
   onAtriumLearnerSelected(event) {
-    let { localInfo } = this.state;
+    // let { localInfo } = this.state;
 
     try {
       let { selectedLearnerUserId, atriumLearners, localInfo } = this.state;
@@ -150,7 +163,7 @@ class OlabModeratorTag extends React.Component {
       // test for valid turkee selected from available list
       if (event.target.value !== "0") {
         log.debug(
-          `'${localInfo.connectionId}' onAtriumLearnerSelected: ${event.target.value}`
+          `'${localInfo.connectionId}' onAtriumLearnerSelected: ${event.target.value}`,
         );
 
         // find learner in atrium list
@@ -166,7 +179,7 @@ class OlabModeratorTag extends React.Component {
       }
     } catch (error) {
       LogError(
-        `'${localInfo.connectionId}' onAtriumLearnerSelected exception: ${error.message}`
+        `'${localInfo.connectionId}' onAtriumLearnerSelected exception: ${error.message}`,
       );
     }
   }
@@ -175,7 +188,7 @@ class OlabModeratorTag extends React.Component {
     const { localInfo } = this.state;
 
     log.debug(
-      `'${localInfo.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`
+      `'${localInfo.connectionId}' onCloseClicked: room = '${localInfo.roomName}'`,
     );
 
     // signal server to close out this room
@@ -183,10 +196,10 @@ class OlabModeratorTag extends React.Component {
   }
 
   onAssignClicked(event) {
-    let { localInfo } = this.state;
+    // let { localInfo } = this.state;
 
     try {
-      const { selectedLearnerUserId } = this.state;
+      const { selectedLearnerUserId, localInfo } = this.state;
       let selectedLearner = null;
 
       if (selectedLearnerUserId == undefined || selectedLearnerUserId == "0") {
@@ -202,11 +215,11 @@ class OlabModeratorTag extends React.Component {
 
       if (!selectedLearner) {
         throw new Error(
-          `Unable to find unassigned learner ${selectedLearnerUserId}`
+          `Unable to find unassigned learner ${selectedLearnerUserId}`,
         );
       }
 
-      let { localInfo } = this.state;
+      // let { localInfo } = this.state;
 
       log.debug(
         `'${
@@ -214,8 +227,8 @@ class OlabModeratorTag extends React.Component {
         }' onAssignClicked: learner = '${JSON.stringify(
           selectedLearner,
           null,
-          2
-        )}' `
+          2,
+        )}' `,
       );
 
       // signal server with assignment of turkee to this room
@@ -223,14 +236,14 @@ class OlabModeratorTag extends React.Component {
         constants.SIGNALCMD_ASSIGNTURKEE,
         selectedLearner,
         localInfo.roomName,
-        0
+        0,
       );
 
       // save atrium state to local storage
       this.updateAtriumState();
     } catch (error) {
       LogError(
-        `'${localInfo.connectionId}' onAssignClicked exception: ${error.message}`
+        `'${localInfo.connectionId}' onAssignClicked exception: ${error.message}`,
       );
     }
   }
@@ -248,7 +261,7 @@ class OlabModeratorTag extends React.Component {
       playerState.SetAtrium(state);
     } catch (error) {
       LogError(
-        `'${localInfo.connectionId}' updateAtriumState exception: ${error.message}`
+        `'${localInfo.connectionId}' updateAtriumState exception: ${error.message}`,
       );
     }
   }
@@ -265,7 +278,7 @@ class OlabModeratorTag extends React.Component {
       });
     } catch (error) {
       LogError(
-        `'${connectionInfo.connectionId}' onConnectionChanged exception: ${error.message}`
+        `'${connectionInfo.connectionId}' onConnectionChanged exception: ${error.message}`,
       );
     }
   }

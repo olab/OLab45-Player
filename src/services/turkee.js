@@ -167,11 +167,17 @@ class Turkee extends TurkTalk {
         }
 
         return true;
-      } else {
-        log.debug(
-          `'${this.connectionId}' onCommand unknown command: '${payload.command}'`,
-        );
       }
+
+      // 3. Fallback: Forward any other specific messages straight to the UI component's handler
+      if (this.component && typeof this.component.onCommand === "function") {
+        this.component.onCommand(payload);
+        return true;
+      }
+
+      log.debug(
+        `'${this.connectionId}' onCommand unknown command: '${payload.command}'`,
+      );
     } catch (error) {
       LogError(`'${this.connectionId}' onCommand exception: ${error.message}`);
     }

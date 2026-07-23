@@ -104,6 +104,8 @@ class TurkTalk {
       if (this.component.onSessionIdChanged) {
         this.component.onSessionIdChanged(Id);
       }
+
+      return true;
     }
 
     return false;
