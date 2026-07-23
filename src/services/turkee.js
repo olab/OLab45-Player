@@ -147,6 +147,7 @@ class Turkee extends TurkTalk {
 
   async disconnect() {
     window.removeEventListener("pageshow", this.handlePageShow);
+    log.debug("removing pageshow");
     await super.disconnect();
   }
 

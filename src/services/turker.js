@@ -28,6 +28,7 @@ class Turker extends TurkTalk {
 
     this.handlePageShow = this.handlePageShow.bind(this);
     window.addEventListener("pageshow", this.handlePageShow);
+    log.debug("added pageshow");
 
     this.bindConnectionMessage();
   }
@@ -156,6 +157,7 @@ class Turker extends TurkTalk {
   async disconnect() {
     window.removeEventListener("pageshow", this.handlePageShow);
     await super.disconnect();
+    log.debug("removing pageshow");
   }
 
   // *****
