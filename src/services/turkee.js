@@ -18,6 +18,18 @@ class Turkee extends TurkTalk {
     this.bindConnectionMessage(this.connection);
     this.onDisconnected = this.onDisconnected.bind(this);
     this.playerState = component.props.props;
+
+    this.handlePageShow = this.handlePageShow.bind(this);
+    window.addEventListener("pageshow", this.handlePageShow);
+  }
+
+  handlePageShow(event) {
+    if (event.persisted && this.connection.state === "Disconnected") {
+      log.debug(
+        `'${this.connectionId}' restored from bfcache. Reconnecting...`,
+      );
+      this.connect(this.username);
+    }
   }
 
   // *****
@@ -39,7 +51,7 @@ class Turkee extends TurkTalk {
   // *****
   onConnected() {
     LogInfo(
-      `'${this.connection.connectionId}' onConnected: connection succeeded`
+      `'${this.connection.connectionId}' onConnected: connection succeeded`,
     );
 
     this.connectionId = this.connection.connectionId.slice(-3);
@@ -71,8 +83,8 @@ class Turkee extends TurkTalk {
       `'${this.connectionId}' registering turkee for session: ${JSON.stringify(
         this.session,
         null,
-        1
-      )}`
+        1,
+      )}`,
     );
 
     this.signalr.send(constants.SIGNALCMD_REGISTERLEARNER, this.session);
@@ -90,7 +102,7 @@ class Turkee extends TurkTalk {
       }
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onReconnecting exception: ${error.message}`
+        `'${this.connectionId}' onReconnecting exception: ${error.message}`,
       );
     }
   }
@@ -128,9 +140,14 @@ class Turkee extends TurkTalk {
       }
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onDisconnected exception: ${error.message}`
+        `'${this.connectionId}' onDisconnected exception: ${error.message}`,
       );
     }
+  }
+
+  async disconnect() {
+    window.removeEventListener("pageshow", this.handlePageShow);
+    await super.disconnect();
   }
 
   // *****
@@ -151,7 +168,7 @@ class Turkee extends TurkTalk {
         return true;
       } else {
         log.debug(
-          `'${this.connectionId}' onCommand unknown command: '${payload.command}'`
+          `'${this.connectionId}' onCommand unknown command: '${payload.command}'`,
         );
       }
     } catch (error) {

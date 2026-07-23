@@ -26,7 +26,19 @@ class Turker extends TurkTalk {
     this.onCommand = this.onCommand.bind(this);
     this.onDisconnected = this.onDisconnected.bind(this);
 
+    this.handlePageShow = this.handlePageShow.bind(this);
+    window.addEventListener("pageshow", this.handlePageShow);
+
     this.bindConnectionMessage();
+  }
+
+  handlePageShow(event) {
+    if (event.persisted && this.connection.state === "Disconnected") {
+      log.debug(
+        `'${this.connectionId}' restored from bfcache. Reconnecting Turker...`,
+      );
+      this.connect(this.username);
+    }
   }
 
   // *****
@@ -48,7 +60,7 @@ class Turker extends TurkTalk {
   // *****
   onConnected() {
     LogInfo(
-      `'${this.connection.connectionId}' onConnected: connection succeeded`
+      `'${this.connection.connectionId}' onConnected: connection succeeded`,
     );
 
     this.connectionId = this.connection.connectionId.slice(-3);
@@ -76,7 +88,7 @@ class Turker extends TurkTalk {
     }
 
     log.debug(
-      `'${this.connectionId}' registering turker for room name: ${roomName}`
+      `'${this.connectionId}' registering turker for room name: ${roomName}`,
     );
 
     this.signalr.send(
@@ -84,7 +96,7 @@ class Turker extends TurkTalk {
       this.component.props.props.map.id,
       this.component.props.props.node.id,
       roomName,
-      false
+      false,
     );
   }
 
@@ -102,7 +114,7 @@ class Turker extends TurkTalk {
       }
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onDisconnected exception: ${error.message}`
+        `'${this.connectionId}' onDisconnected exception: ${error.message}`,
       );
     }
   }
@@ -119,7 +131,7 @@ class Turker extends TurkTalk {
       }
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onReconnecting exception: ${error.message}`
+        `'${this.connectionId}' onReconnecting exception: ${error.message}`,
       );
     }
   }
@@ -136,9 +148,14 @@ class Turker extends TurkTalk {
       }
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onReconnected exception: ${error.message}`
+        `'${this.connectionId}' onReconnected exception: ${error.message}`,
       );
     }
+  }
+
+  async disconnect() {
+    window.removeEventListener("pageshow", this.handlePageShow);
+    await super.disconnect();
   }
 
   // *****
@@ -151,12 +168,12 @@ class Turker extends TurkTalk {
         return;
       } else {
         log.debug(
-          `'${this.connectionId}' turker.js onCommand unknown command: '${payload.command}'`
+          `'${this.connectionId}' turker.js onCommand unknown command: '${payload.command}'`,
         );
       }
     } catch (error) {
       LogError(
-        `'${this.connectionId}' turker.js onCommand exception: ${error.message}`
+        `'${this.connectionId}' turker.js onCommand exception: ${error.message}`,
       );
     }
   }

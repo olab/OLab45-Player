@@ -19,7 +19,7 @@ class TurkTalk {
     log.debug(`turk talk url: ${url}`);
 
     this.questionSettings = JSON.parse(
-      this.component.props.props.question.settings
+      this.component.props.props.question.settings,
     );
     this.penName = `${component.props.props.map.name}|${this.questionSettings.roomName}`;
 
@@ -39,20 +39,32 @@ class TurkTalk {
 
     if (config?.SIGNALR_TIMEOUT_MS) {
       this.connection.serverTimeoutInMilliseconds = Number(
-        config?.SIGNALR_TIMEOUT_MS
+        config?.SIGNALR_TIMEOUT_MS,
       );
     }
 
     this.signalr = new SignalRWrapper({ connection: this.connection });
 
     this.connections = [];
+
+    this.handlePageHide = this.handlePageHide.bind(this);
+    window.addEventListener("pagehide", this.handlePageHide);
+  }
+
+  handlePageHide() {
+    try {
+      // Direct call to stop() skips framework overhead to complete before context dies
+      this.connection.stop();
+    } catch (err) {
+      log.error("Failed to disconnect SignalR on navigation:", err);
+    }
   }
 
   // *****
   bindConnectionMessage() {
     this.connection.on(
       constants.SIGNALCMD_BROADCAST,
-      this.broadcastMessageCallback
+      this.broadcastMessageCallback,
     );
   }
 
@@ -61,6 +73,8 @@ class TurkTalk {
   }
 
   async disconnect() {
+    window.removeEventListener("pagehide", this.handlePageHide);
+
     await this.connection.stop();
     log.debug("disconnection");
   }
