@@ -18,6 +18,18 @@ class Turkee extends TurkTalk {
     this.bindConnectionMessage(this.connection);
     this.onDisconnected = this.onDisconnected.bind(this);
     this.playerState = component.props.props;
+
+    this.handlePageShow = this.handlePageShow.bind(this);
+    window.addEventListener("pageshow", this.handlePageShow);
+  }
+
+  handlePageShow(event) {
+    if (event.persisted && this.connection.state !== "Connected") {
+      log.debug(
+        `'${this.connectionId}' restored from bfcache. Reconnecting...`,
+      );
+      this.connect(this.username);
+    }
   }
 
   // *****
@@ -131,6 +143,12 @@ class Turkee extends TurkTalk {
         `'${this.connectionId}' onDisconnected exception: ${error.message}`,
       );
     }
+  }
+
+  async disconnect() {
+    window.removeEventListener("pageshow", this.handlePageShow);
+    log.debug("removing pageshow");
+    await super.disconnect();
   }
 
   // *****

@@ -26,7 +26,18 @@ class Turker extends TurkTalk {
     this.onCommand = this.onCommand.bind(this);
     this.onDisconnected = this.onDisconnected.bind(this);
 
+    this.handlePageShow = this.handlePageShow.bind(this);
+    window.addEventListener("pageshow", this.handlePageShow);
+    LogInfo("added pageshow");
+
     this.bindConnectionMessage();
+  }
+
+  handlePageShow(event) {
+    if (event.persisted && this.connection.state !== "Connected") {
+      LogInfo(`'${this.connectionId}' restored from bfcache. Reconnecting...`);
+      this.connect(this.username);
+    }
   }
 
   // *****
@@ -139,6 +150,12 @@ class Turker extends TurkTalk {
         `'${this.connectionId}' onReconnected exception: ${error.message}`,
       );
     }
+  }
+
+  async disconnect() {
+    window.removeEventListener("pageshow", this.handlePageShow);
+    await super.disconnect();
+    log.debug("removing pageshow");
   }
 
   // *****

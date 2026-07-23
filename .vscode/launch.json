@@ -13,7 +13,7 @@
       "name": "General",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:3000/player",
+      "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}"
     },
     {
