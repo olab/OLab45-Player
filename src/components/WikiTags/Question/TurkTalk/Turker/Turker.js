@@ -70,23 +70,10 @@ class OlabModeratorTag extends React.Component {
     this.connection = this.turker.connection;
     this.connectionId = "";
 
-    // var turkerSelf = this;
-    // this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
-    //   turkerSelf.onCommand(payload);
-    // });
-  }
-
-  componentWillUnmount() {
-    log.debug(`'${this.connectionId}' OlabAttendeeTag unmounting`);
-
-    this.componentMounted = false;
-
-    if (this.turker) {
-      this.turker.disconnect().catch((err) => {
-        log.error("Error executing disconnect chain during unmount:", err);
-      });
-      this.turker = null;
-    }
+    var turkerSelf = this;
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
+      turkerSelf.onCommand(payload);
+    });
   }
 
   onCommand(payload) {
@@ -155,7 +142,7 @@ class OlabModeratorTag extends React.Component {
   }
 
   onAtriumLearnerSelected(event) {
-    // let { localInfo } = this.state;
+    let { localInfo } = this.state;
 
     try {
       let { selectedLearnerUserId, atriumLearners, localInfo } = this.state;
@@ -196,10 +183,10 @@ class OlabModeratorTag extends React.Component {
   }
 
   onAssignClicked(event) {
-    // let { localInfo } = this.state;
+    let { localInfo } = this.state;
 
     try {
-      const { selectedLearnerUserId, localInfo } = this.state;
+      const { selectedLearnerUserId } = this.state;
       let selectedLearner = null;
 
       if (selectedLearnerUserId == undefined || selectedLearnerUserId == "0") {
@@ -219,7 +206,7 @@ class OlabModeratorTag extends React.Component {
         );
       }
 
-      // let { localInfo } = this.state;
+      let { localInfo } = this.state;
 
       log.debug(
         `'${

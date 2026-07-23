@@ -18,18 +18,6 @@ class Turkee extends TurkTalk {
     this.bindConnectionMessage(this.connection);
     this.onDisconnected = this.onDisconnected.bind(this);
     this.playerState = component.props.props;
-
-    this.handlePageShow = this.handlePageShow.bind(this);
-    window.addEventListener("pageshow", this.handlePageShow);
-  }
-
-  handlePageShow(event) {
-    if (event.persisted && this.connection.state !== "Connected") {
-      log.debug(
-        `'${this.connectionId}' restored from bfcache. Reconnecting...`,
-      );
-      this.connect(this.username);
-    }
   }
 
   // *****
@@ -145,12 +133,6 @@ class Turkee extends TurkTalk {
     }
   }
 
-  async disconnect() {
-    window.removeEventListener("pageshow", this.handlePageShow);
-    log.debug("removing pageshow");
-    await super.disconnect();
-  }
-
   // *****
   onCommand(payload) {
     try {
@@ -167,17 +149,11 @@ class Turkee extends TurkTalk {
         }
 
         return true;
+      } else {
+        log.debug(
+          `'${this.connectionId}' onCommand unknown command: '${payload.command}'`,
+        );
       }
-
-      // 3. Fallback: Forward any other specific messages straight to the UI component's handler
-      if (this.component && typeof this.component.onCommand === "function") {
-        this.component.onCommand(payload);
-        return true;
-      }
-
-      log.debug(
-        `'${this.connectionId}' onCommand unknown command: '${payload.command}'`,
-      );
     } catch (error) {
       LogError(`'${this.connectionId}' onCommand exception: ${error.message}`);
     }

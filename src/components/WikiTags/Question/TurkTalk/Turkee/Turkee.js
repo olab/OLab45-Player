@@ -47,9 +47,9 @@ class OlabAttendeeTag extends React.Component {
     };
 
     this.turkee = new Turkee(this);
-    this.turkee.connect(this.state.userName);
     this.signalr = this.turkee.signalr;
 
+    this.turkee.connect(this.state.userName);
     this.connection = this.turkee.connection;
     this.connectionId = "";
 
@@ -58,27 +58,10 @@ class OlabAttendeeTag extends React.Component {
     this.onJumpNode = this.onJumpNode.bind(this);
     this.onServerMessage = this.onServerMessage.bind(this);
 
-    // var turkeeSelf = this;
-    // this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
-    //   turkeeSelf.onCommand(payload);
-    // });
-  }
-
-  componentDidMount() {
-    this.componentMounted = true;
-  }
-
-  componentWillUnmount() {
-    log.debug(`'${this.connectionId}' OlabAttendeeTag unmounting`);
-
-    this.componentMounted = false;
-
-    if (this.turkee) {
-      this.turkee.disconnect().catch((err) => {
-        log.error("Error executing disconnect chain during unmount:", err);
-      });
-      this.turkee = null;
-    }
+    var turkeeSelf = this;
+    this.connection.on(constants.SIGNALCMD_COMMAND, (payload) => {
+      turkeeSelf.onCommand(payload);
+    });
   }
 
   dumpConnectionState() {
@@ -205,6 +188,21 @@ class OlabAttendeeTag extends React.Component {
       LogError(
         `'${this.connectionId}' onRoomAssigned exception: ${error.message}`,
       );
+    }
+  }
+
+  componentDidMount() {
+    this.componentMounted = true;
+  }
+
+  async componentWillUnmount() {
+    log.debug(`'${this.connectionId}' OlabAttendeeTag unmounting`);
+
+    this.componentMounted = false;
+
+    if (this.turkee) {
+      await this.turkee.disconnect();
+      this.turkee = null;
     }
   }
 
