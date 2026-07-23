@@ -34,9 +34,9 @@ class Turker extends TurkTalk {
   }
 
   handlePageShow(event) {
-    if (event.persisted && this.connection.state === "Disconnected") {
+    if (event.persisted && this.connection.state !== "Connected") {
       log.debug(
-        `'${this.connectionId}' restored from bfcache. Reconnecting Turker...`,
+        `'${this.connectionId}' restored from bfcache. Reconnecting...`,
       );
       this.connect(this.username);
     }
