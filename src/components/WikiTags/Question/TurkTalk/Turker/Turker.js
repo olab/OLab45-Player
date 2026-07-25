@@ -142,7 +142,7 @@ class OlabModeratorTag extends React.Component {
   }
 
   onAtriumLearnerSelected(event) {
-    let { localInfo } = this.state;
+    // let { localInfo } = this.state;
 
     try {
       let { selectedLearnerUserId, atriumLearners, localInfo } = this.state;
@@ -183,10 +183,10 @@ class OlabModeratorTag extends React.Component {
   }
 
   onAssignClicked(event) {
-    let { localInfo } = this.state;
+    // let { localInfo } = this.state;
 
     try {
-      const { selectedLearnerUserId } = this.state;
+      const { selectedLearnerUserId, localInfo } = this.state;
       let selectedLearner = null;
 
       if (selectedLearnerUserId == undefined || selectedLearnerUserId == "0") {
@@ -206,7 +206,7 @@ class OlabModeratorTag extends React.Component {
         );
       }
 
-      let { localInfo } = this.state;
+      // let { localInfo } = this.state;
 
       log.debug(
         `'${

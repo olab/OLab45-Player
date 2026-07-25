@@ -46,20 +46,6 @@ class TurkTalk {
     this.signalr = new SignalRWrapper({ connection: this.connection });
 
     this.connections = [];
-
-    this.handlePageHide = this.handlePageHide.bind(this);
-    window.addEventListener("pagehide", this.handlePageHide);
-    log.debug("added pageHide");
-  }
-
-  handlePageHide() {
-    try {
-      // Direct call to stop() skips framework overhead to complete before context dies
-      this.connection.stop();
-      log.debug(`page hide: stopping connection`);
-    } catch (err) {
-      log.error("Failed to disconnect SignalR on navigation:", err);
-    }
   }
 
   // *****
@@ -75,10 +61,8 @@ class TurkTalk {
   }
 
   async disconnect() {
-    window.removeEventListener("pagehide", this.handlePageHide);
-
     await this.connection.stop();
-    log.debug("removing pageHide");
+    log.debug("disconnection");
   }
 
   // *****

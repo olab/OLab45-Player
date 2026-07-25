@@ -47,9 +47,9 @@ class OlabAttendeeTag extends React.Component {
     };
 
     this.turkee = new Turkee(this);
+    this.turkee.connect(this.state.userName);
     this.signalr = this.turkee.signalr;
 
-    this.turkee.connect(this.state.userName);
     this.connection = this.turkee.connection;
     this.connectionId = "";
 
