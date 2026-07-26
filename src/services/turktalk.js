@@ -117,7 +117,6 @@ class TurkTalk {
 
     log.debug(`[TurkTalk] gracefulDisconnect triggered by: ${reason}`);
 
-    // No controller/beacon: rely on heartbeat + OnDisconnectedAsync + cleanup service
     this.stopConnection()
       .then(() => log.debug("[TurkTalk] gracefulDisconnect stop completed"))
       .catch((err) =>
