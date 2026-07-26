@@ -49,6 +49,7 @@
     "prepare": "husky install",
     "start:azure": "env-cmd -f .env.azure npm start",
     "start:azure:dev": "env-cmd -f .env.azure.dev npm start",
+    "start:azure:local": "env-cmd -f .env.azure.local npm start",
     "start:local": "env-cmd -f .env.local npm start",
     "start": "react-scripts start",
     "test": "react-scripts test",

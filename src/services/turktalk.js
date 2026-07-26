@@ -154,14 +154,33 @@ class TurkTalk {
     log.debug("[TurkTalk] SignalR reconnecting:", error);
   }
 
+  // ⭐ NEW: Chrome-safe instant disconnect beacon
   registerBrowserLifecycleHandlers() {
-    window.addEventListener("pagehide", () =>
-      this.gracefulDisconnect("pagehide"),
-    );
+    window.addEventListener("pagehide", () => {
+      try {
+        const data = new FormData();
+        data.append("connectionId", this.connection.connectionId);
 
-    window.addEventListener("beforeunload", () =>
-      this.gracefulDisconnect("beforeunload"),
-    );
+        navigator.sendBeacon("/olab/api/v3/turktalk/disconnect", data);
+      } catch (err) {
+        log.error("[TurkTalk] Beacon disconnect failed:", err);
+      }
+
+      this.gracefulDisconnect("pagehide");
+    });
+
+    window.addEventListener("beforeunload", () => {
+      try {
+        const data = new FormData();
+        data.append("connectionId", this.connection.connectionId);
+
+        navigator.sendBeacon("/olab/api/v3/turktalk/disconnect", data);
+      } catch (err) {
+        log.error("[TurkTalk] Beacon disconnect failed:", err);
+      }
+
+      this.gracefulDisconnect("beforeunload");
+    });
   }
 
   startHeartbeat() {
