@@ -41,6 +41,7 @@ import {
   getMapNode,
   getNodeScopedObjects,
   getServerScopedObjects,
+  getServerDynamicObjects,
   getDynamicScopedObjects,
 } from "../../services/api";
 
@@ -157,7 +158,7 @@ class Player extends PureComponent {
 
     if (theme) {
       log.debug(
-        `found theme: '${theme.name}' (${theme.id}). parent: '${theme.imagetype}' (${theme.parentId})`
+        `found theme: '${theme.name}' (${theme.id}). parent: '${theme.imagetype}' (${theme.parentId})`,
       );
     }
     return theme;
@@ -166,10 +167,7 @@ class Player extends PureComponent {
   getServer = async (props, id) => {
     try {
       // test if already have server scoped objects loaded
-      var {
-        scopedObject, //s: { server: serverScopedObjects },
-        disableCache,
-      } = this.state;
+      var { scopedObject, disableCache } = this.state;
 
       let serverScopedObjects = scopedObject.getServer();
 
@@ -177,13 +175,33 @@ class Player extends PureComponent {
         log.debug("loading server scoped objects");
         const { data: scopedObjectsData } = await getServerScopedObjects(
           props,
-          id
+          id,
         );
         serverScopedObjects = scopedObjectsData;
         scopedObject.setServerObjects(serverScopedObjects);
         this.setState({ loadProgress: "server" });
       } else {
         log.debug("using cached server scoped objects");
+      }
+
+      const { data: dynamicObjectsData } = await getServerDynamicObjects(
+        props,
+        id,
+      );
+
+      if (
+        Array.isArray(serverScopedObjects.counters) &&
+        Array.isArray(dynamicObjectsData.counters)
+      ) {
+        dynamicObjectsData.counters.forEach((dynamicCounter) => {
+          const counterIndex = serverScopedObjects.counters.findIndex(
+            (serverCounter) => serverCounter.id === dynamicCounter.id,
+          );
+
+          if (counterIndex !== -1) {
+            serverScopedObjects.counters[counterIndex] = dynamicCounter;
+          }
+        });
       }
 
       return { serverScopedObjects };
@@ -197,11 +215,7 @@ class Player extends PureComponent {
       const mapId = props.params.mapId;
 
       // test if already have map scoped objects loaded
-      var {
-        map,
-        scopedObject, // s: { map: mapScopedObjects },
-        disableCache,
-      } = this.state;
+      var { map, scopedObject, disableCache } = this.state;
 
       if (!map || disableCache) {
         log.debug("loading map");
@@ -237,12 +251,7 @@ class Player extends PureComponent {
       let nodeId = props.params.nodeId;
 
       // test if already have node scoped objects loaded
-      var {
-        node,
-        scopedObject, // s: { node: nodeScopedObjects },
-        disableCache,
-        dynamicObject,
-      } = this.state;
+      var { node, scopedObject, disableCache, dynamicObject } = this.state;
 
       // do a check if the first node played, based
       // on if there was a previous node in local storage
@@ -255,7 +264,7 @@ class Player extends PureComponent {
           props,
           mapId,
           nodeId,
-          dynamicObject
+          dynamicObject,
         );
         node = objData;
         playerState.SetNode(node);
@@ -298,7 +307,7 @@ class Player extends PureComponent {
       const { data: scopedObjectsData } = await getDynamicScopedObjects(
         props,
         state.mapId,
-        state.nodeId
+        state.nodeId,
       );
 
       var dynamicObject = new DynamicObject(scopedObjectsData);
@@ -348,7 +357,7 @@ class Player extends PureComponent {
       if (this.state.node.links) {
         obj = this.searchCollection(
           this.state.node.links,
-          newObject.htmlIdBase
+          newObject.htmlIdBase,
         );
       }
     }
