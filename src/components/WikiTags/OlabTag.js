@@ -21,7 +21,7 @@ class OlabTag extends React.Component {
       disabled: false,
     };
 
-    this.player = props.props.player;
+    this.olabPlayer = props.props.player;
     this.dynamicObject = props.props.dynamicObject;
     this.setInProgress = this.setInProgress.bind(this);
   }
@@ -35,7 +35,7 @@ class OlabTag extends React.Component {
     const { name } = this.props;
     this.setState({ showProgressSpinner: inProgress });
     log.debug(
-      `${this.constructor["name"]}: '${name}' set progress spinner: ${inProgress}`
+      `${this.constructor["name"]}: '${name}' set progress spinner: ${inProgress}`,
     );
   }
 
@@ -43,7 +43,7 @@ class OlabTag extends React.Component {
     const { name } = this.props;
     this.setState({ disabled: disabled });
     log.debug(
-      `${this.constructor["name"]}: '${name}' set disabled: ${disabled}`
+      `${this.constructor["name"]}: '${name}' set disabled: ${disabled}`,
     );
   }
 

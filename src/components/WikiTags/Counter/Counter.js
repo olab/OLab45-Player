@@ -36,7 +36,7 @@ class OlabCounterTag extends OlabTag {
       }
 
       return (
-        <div id={olabObject.htmlIdBase}>
+        <div id={olabObject.htmlIdBase} style={{ display: "inline" }}>
           {parse(olabObject.value.toString())}
         </div>
       );

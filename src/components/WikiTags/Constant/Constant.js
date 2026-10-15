@@ -29,7 +29,7 @@ class OlabConstantTag extends OlabTag {
         return (
           <>
             <b>
-              [[CONST:{id}]] ({olabObject.id}) "{parse(olabObject.value)}"
+              [[{id}]] ({olabObject.id}) "{parse(olabObject.value)}"
             </b>
           </>
         );
