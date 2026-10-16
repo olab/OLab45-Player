@@ -40,7 +40,9 @@ export class OLabClientApi {
 
   hello() {
     try {
-      let message = "hello from OLabClientApi.";
+      let message =
+        "hello from OLabClientApi. timers active: " +
+        Object.keys(this.timers).length;
       log.debug(message);
       return message;
     } catch (error) {
@@ -51,19 +53,36 @@ export class OLabClientApi {
 
   shutdown() {
     try {
-      log.debug("shutdown OLabClientApi.");
+      this.#destroyAllTimers();
+      this.#destroyAllEventHandlers();
 
+      log.debug("shutdown OLabClientApi.");
+    } catch (error) {
+      log.error(`shutdown failed: ${error}`);
+      throw error;
+    }
+  }
+
+  #destroyAllTimers() {
+    try {
       var keys = Object.keys(this.timers);
       for (let key of keys) {
         this.destroyTimer(key);
       }
+    } catch (error) {
+      log.error(`destroyAllTimers failed: ${error}`);
+      throw error;
+    }
+  }
 
-      keys = Object.keys(this.events);
+  #destroyAllEventHandlers() {
+    try {
+      var keys = Object.keys(this.events);
       for (let key of keys) {
         this.destroyEventHandler(key);
       }
     } catch (error) {
-      log.error(`shutdown failed: ${error}`);
+      log.error(`destroyAllEventHandlers failed: ${error}`);
       throw error;
     }
   }
@@ -374,6 +393,7 @@ export class OLabClientApi {
   }
 
   jumpToNode(nodeId) {
+    this.shutdown();
     log.debug(`jumpToNode(${nodeId})`);
     this.props.onNavigateToNode(1470, nodeId, "");
   }

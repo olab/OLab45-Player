@@ -37,7 +37,7 @@ class OlabScriptTag extends OlabTag {
       );
       runScript(olabClientApi, document, this.olabPlayer);
     } catch (error) {
-      log.error(`Script '${this.props.name}' failed:`, error);
+      log.error(`Script '${olabObject.name}(${olabObject.id})' failed:`, error);
     }
   }
 
