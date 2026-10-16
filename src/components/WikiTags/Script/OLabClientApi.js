@@ -283,4 +283,9 @@ export class OLabClientApi {
     var obj = new OLabApiSingleChoiceQuestion(this, id);
     return obj;
   }
+
+  jumpToNode(nodeId) {
+    log.debug(`jumpToNode(${nodeId})`);
+    this.props.onNavigateToNode(1470, nodeId, "");
+  }
 }
