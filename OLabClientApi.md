@@ -21,15 +21,15 @@ Timers are tracked by key so they can be queried and cleaned up.
 
 | Method                                        | Description                                                                                                                |
 | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `createOneShotTimer(timeMs, callback)`        | Calls `callback` once after `timeMs` ms, then destroys the timer. Returns the timer key.                                   |
-| `createRecurringTimer(callback, frequencyMs)` | Calls `callback` immediately, then every `frequencyMs` ms. The callback receives `(api, document)`. Returns the timer key. |
+| `createOneShotTimer(frequencyMs, callback)`   | Calls `callback` once after `frequencyMs` ms, then destroys the timer. Returns the timer key.                              |
+| `createRecurringTimer(frequencyMs, callback)` | Calls `callback` immediately, then every `frequencyMs` ms. The callback receives `(api, document)`. Returns the timer key. |
 | `destroyTimer(key)`                           | Cancels a timer and removes its metadata. No-op if the key is unknown.                                                     |
 | `getTimerStatus(key)`                         | Returns `{ elapsedMs, sinceLastCallMs, remainingMs }`, or `null` if the timer doesn't exist (or a one-shot already fired). |
 
 `remainingMs` is the time until the next callback invocation.
 
 ```js
-const key = api.createRecurringTimer(() => console.log("tick"), 5000);
+const key = api.createRecurringTimer(5000, () => console.log("tick"));
 api.getTimerStatus(key); // { elapsedMs: 1200, sinceLastCallMs: 1200, remainingMs: 3800 }
 api.destroyTimer(key);
 ```

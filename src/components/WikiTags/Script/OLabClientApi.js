@@ -15,6 +15,7 @@ import { ScopedObject } from "../../../utils/ScopedObject";
 // main view class
 export class OLabClientApi {
   timers = {};
+  timerInfo = {};
   events = {};
   component;
   dynamicObject;
@@ -146,11 +147,38 @@ export class OLabClientApi {
     this.component.updateDynamicObjects(newCounters);
   }
 
-  createTimer(key, callback, frequencyMs) {
+  createOneShotTimer(frequencyMs, callback) {
+    const key = `oneshot-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    this.timerInfo[key] = {
+      startedAt: Date.now(),
+      lastFiredAt: null,
+      periodMs: frequencyMs,
+    };
+    this.timers[key] = setTimeout(() => {
+      // destroy first so the timer is removed even if the callback throws
+      this.destroyTimer(key);
+      callback();
+    }, frequencyMs);
+    log.debug(`created one-shot timer '${key}' in ${frequencyMs} ms`);
+    return key;
+  }
+
+  createRecurringTimer(frequencyMs, callback) {
     callback();
+    const key = `recurring-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     this.destroyTimer(key);
-    this.timers[key] = setInterval(callback, frequencyMs, this, document);
-    log.debug(`created timer '${key}' frequency ${frequencyMs} ms`);
+    const now = Date.now();
+    this.timerInfo[key] = {
+      startedAt: now,
+      lastFiredAt: now,
+      periodMs: frequencyMs,
+    };
+    this.timers[key] = setInterval(() => {
+      this.timerInfo[key].lastFiredAt = Date.now();
+      callback(this, document);
+    }, frequencyMs);
+    log.debug(`created recurring timer '${key}' frequency ${frequencyMs} ms`);
+    return key;
   }
 
   destroyTimer(key) {
@@ -159,9 +187,25 @@ export class OLabClientApi {
       clearInterval(this.timers[key]);
       this.timers[key] = null;
       delete this.timers[key];
+      delete this.timerInfo[key];
 
       log.debug(`destroyed timer '${key}'`);
     }
+  }
+
+  // returns null if the timer doesn't exist (or a one-shot already fired)
+  getTimerStatus(key) {
+    const info = this.timerInfo[key];
+    if (!info) {
+      return null;
+    }
+    const now = Date.now();
+    const sinceLastCallMs = now - (info.lastFiredAt ?? info.startedAt);
+    return {
+      elapsedMs: now - info.startedAt,
+      sinceLastCallMs,
+      remainingMs: Math.max(0, info.periodMs - sinceLastCallMs),
+    };
   }
 
   createEventHandler(id, eventName, callback) {
