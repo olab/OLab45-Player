@@ -10,7 +10,7 @@ const cfg = {
   LOG_LEVEL: process.env.REACT_APP_LOG_LEVEL || "info",
 };
 
-console.log(JSON.stringify(cfg));
+// console.log(JSON.stringify(cfg));
 // export const config = process.env.NODE_ENV === "development" ? dev : prod;
 
 export const config = cfg;

@@ -65,7 +65,7 @@ class Home extends PureComponent {
       this.state.mapsFiltered = this.state.maps;
     }
 
-    console.log(JSON.stringify(config));
+    // console.log(JSON.stringify(config));
   }
 
   setPageTitle = () => {
