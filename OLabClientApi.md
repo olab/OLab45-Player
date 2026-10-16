@@ -3,17 +3,19 @@
 `OLabClientApi` is the object exposed to node scripts. It wraps the player component's state and provides helpers for timers, DOM events, and OLab scoped objects (counters, constants, links, questions).
 
 ```js
-const api = new OLabClientApi(component);
+const api = new OLabClientApi(component, onCreateCallback);
 ```
 
 `component` must provide `state.dynamicObject`, `state.scopedObject`, `props.props` and the update methods (`updateScopedObject`, `updateObject`, `updateDynamicObjects`).
 
+`onCreateCallback` is optional. If provided, it is called with no arguments at the end of the constructor.
+
 ## Lifecycle
 
-| Method       | Description                                                                    |
-| ------------ | ------------------------------------------------------------------------------ |
-| `hello()`    | Logs and returns a greeting; useful as a sanity check.                         |
-| `shutdown()` | Destroys all timers and event handlers. Call when the script/node is unloaded. |
+| Method                         | Description                                                                                                                   |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `hello()`                      | Logs and returns a greeting that includes the number of active timers.                                                        |
+| `shutdown(onShutdownCallback)` | Destroys all timers and event handlers, then calls `onShutdownCallback()` if provided. Call when the script/node is unloaded. |
 
 ## Timers
 
@@ -74,6 +76,6 @@ api.destroyTimer(key);
 
 ## Navigation
 
-| Method               | Description                                               |
-| -------------------- | --------------------------------------------------------- |
-| `jumpToNode(nodeId)` | Navigates to the given node via `props.onNavigateToNode`. |
+| Method                                   | Description                                                                                                                          |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `jumpToNode(nodeId, onShutdownCallback)` | Calls `shutdown(onShutdownCallback)` to clean up timers and event handlers, then navigates to the node via `props.onNavigateToNode`. |

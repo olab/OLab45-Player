@@ -22,7 +22,7 @@ export class OLabClientApi {
   scopedObjects;
   state;
 
-  constructor(component) {
+  constructor(component, onCreateCallback = null) {
     var vm = this;
 
     this.component = component;
@@ -36,6 +36,10 @@ export class OLabClientApi {
 
     log.setLevel(log.levels.DEBUG);
     this.hello();
+
+    if (onCreateCallback != null) {
+      onCreateCallback();
+    }
   }
 
   hello() {
@@ -51,10 +55,14 @@ export class OLabClientApi {
     }
   }
 
-  shutdown() {
+  shutdown(onShutdownCallback = null) {
     try {
       this.#destroyAllTimers();
       this.#destroyAllEventHandlers();
+
+      if (onShutdownCallback != null) {
+        onShutdownCallback();
+      }
 
       log.debug("shutdown OLabClientApi.");
     } catch (error) {
@@ -392,8 +400,8 @@ export class OLabClientApi {
     return obj;
   }
 
-  jumpToNode(nodeId) {
-    this.shutdown();
+  jumpToNode(nodeId, onShutdownCallback = null) {
+    this.shutdown(onShutdownCallback);
     log.debug(`jumpToNode(${nodeId})`);
     this.props.onNavigateToNode(1470, nodeId, "");
   }
