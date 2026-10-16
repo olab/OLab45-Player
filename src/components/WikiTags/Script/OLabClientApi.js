@@ -39,22 +39,32 @@ export class OLabClientApi {
   }
 
   hello() {
-    let message = "hello from OLabClientApi.";
-    log.debug(message);
-    return message;
+    try {
+      let message = "hello from OLabClientApi.";
+      log.debug(message);
+      return message;
+    } catch (error) {
+      log.error(`hello failed: ${error}`);
+      throw error;
+    }
   }
 
   shutdown() {
-    log.debug("shutdown OLabClientApi.");
+    try {
+      log.debug("shutdown OLabClientApi.");
 
-    var keys = Object.keys(this.timers);
-    for (let key of keys) {
-      this.destroyTimer(key);
-    }
+      var keys = Object.keys(this.timers);
+      for (let key of keys) {
+        this.destroyTimer(key);
+      }
 
-    keys = Object.keys(this.events);
-    for (let key of keys) {
-      this.destroyEventHandler(key);
+      keys = Object.keys(this.events);
+      for (let key of keys) {
+        this.destroyEventHandler(key);
+      }
+    } catch (error) {
+      log.error(`shutdown failed: ${error}`);
+      throw error;
     }
   }
 
@@ -74,77 +84,112 @@ export class OLabClientApi {
   // find and return a copy of an OLab scoped object
   // of a certain type by id or name
   findOLabObject(id, type) {
-    if (type === "counters") {
-      return this.dynamicObject.getCounter(id);
-    }
-
-    if (type === "links") {
-      if (this.props.node.links) {
-        var obj = this.#searchCollection(this.props.node.links, id);
-        if (obj != null) {
-          return { ...obj };
-        }
-        return null;
+    try {
+      if (type === "counters") {
+        return this.dynamicObject.getCounter(id);
       }
-    }
 
-    obj = this.scopedObject.getObject(type, id);
-    if (obj != null) {
-      return { ...obj };
-    }
+      if (type === "links") {
+        if (this.props.node.links) {
+          var obj = this.#searchCollection(this.props.node.links, id);
+          if (obj != null) {
+            return { ...obj };
+          }
+          return null;
+        }
+      }
 
-    throw new Error(`unknown ${type} scopedObject with id '${id}'`);
+      obj = this.scopedObject.getObject(type, id);
+      if (obj != null) {
+        return { ...obj };
+      }
+
+      throw new Error(`unknown ${type} scopedObject with id '${id}'`);
+    } catch (error) {
+      log.error(`findOLabObject failed: ${error}`);
+      throw error;
+    }
   }
 
   findWikiInList(list, wiki) {
-    let match = null;
+    try {
+      let match = null;
 
-    for (let element of list) {
-      if (element.name === wiki || element.id === Number(wiki)) {
-        match = element;
-        break;
+      for (let element of list) {
+        if (element.name === wiki || element.id === Number(wiki)) {
+          match = element;
+          break;
+        }
       }
-    }
 
-    if (match == null) {
-      throw new Error(`object '${wiki}' not found`);
+      if (match == null) {
+        throw new Error(`object '${wiki}' not found`);
+      }
+      return match;
+    } catch (error) {
+      log.error(`findWikiInList failed: ${error}`);
+      throw error;
     }
-    return match;
   }
 
   // Function to load external HTML into current document
   loadExternalDiv(url, targetElementId) {
-    fetch(url)
-      .then((response) => response.text())
-      .then((data) => {
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = data;
-        const externalDiv = tempDiv.querySelector("div");
-        if (externalDiv) {
-          document.getElementById(targetElementId).innerHTML =
-            externalDiv.outerHTML;
-        } else {
-          console.error("No div found in external file.");
-        }
-      })
-      .catch((error) => console.error("Error loading external HTML:", error));
+    try {
+      fetch(url)
+        .then((response) => response.text())
+        .then((data) => {
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = data;
+          const externalDiv = tempDiv.querySelector("div");
+          if (externalDiv) {
+            document.getElementById(targetElementId).innerHTML =
+              externalDiv.outerHTML;
+          } else {
+            console.error("No div found in external file.");
+          }
+        })
+        .catch((error) => console.error("Error loading external HTML:", error));
+    } catch (error) {
+      log.error(`loadExternalDiv failed: ${error}`);
+      throw error;
+    }
   }
 
   updateScopedObject(newObject) {
-    this.component.updateScopedObject(newObject);
+    try {
+      this.component.updateScopedObject(newObject);
+    } catch (error) {
+      log.error(`updateScopedObject failed: ${error}`);
+      throw error;
+    }
   }
 
   updateObject(newObject) {
-    this.component.updateObject(newObject);
+    try {
+      this.component.updateObject(newObject);
+    } catch (error) {
+      log.error(`updateObject failed: ${error}`);
+      throw error;
+    }
   }
 
   updateDynamicObject(newCounter) {
-    this.dynamicObject.setCounter(newCounter);
-    this.component.updateDynamicObjects(this.dynamicObject.data);
+    try {
+      this.dynamicObject.setCounter(newCounter);
+      this.component.updateDynamicObjects(this.dynamicObject.data);
+    } catch (error) {
+      log.error(`updateDynamicObject failed: ${error}`);
+      throw error;
+    }
   }
 
   updateDynamicObjects(newCounters) {
-    this.component.updateDynamicObjects(newCounters);
+    try {
+      this.component.updateDynamicObjects(newCounters);
+    } catch (error) {
+      log.error(`updateDynamicObjects failed: ${error}`);
+      throw error;
+    }
   }
 
   createOneShotTimer(frequencyMs, callback) {

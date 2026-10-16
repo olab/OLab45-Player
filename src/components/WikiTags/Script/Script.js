@@ -41,6 +41,11 @@ class OlabScriptTag extends OlabTag {
     }
   }
 
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    this.state.olabClientApi.shutdown();
+  }
+
   render() {
     const { debug, olabObject } = this.state;
     const { id, name } = this.props;
