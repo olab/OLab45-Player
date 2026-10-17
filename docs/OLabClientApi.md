@@ -1,90 +1,267 @@
 # OLabClientApi
 
-`OLabClientApi` is the object exposed to node scripts. It wraps the player component's state and provides helpers for timers, DOM events, and OLab scoped objects (counters, constants, links, questions).
+`OLabClientApi` exposes the player component's script API. The descriptions and parameter/return details below are taken from the JSDoc comments in `src/components/WikiTags/Script/OLabClientApi.js`.
 
-```js
-const api = new OLabClientApi(component, onCreateCallback);
-```
+## Construction
 
-`component` must provide `state.dynamicObject`, `state.scopedObject`, `props.props` and the update methods (`updateScopedObject`, `updateObject`, `updateDynamicObjects`).
+### `new OLabClientApi(component, onCreateCallback = null)`
 
-`onCreateCallback` is optional. If provided, it is called with no arguments at the end of the constructor.
+Creates the script-facing API for a player component.
+
+- `component` (`object`): Player component providing state, props, and update methods.
+- `onCreateCallback` (`Function|null`, optional): Optional callback invoked after initialization.
 
 ## Lifecycle
 
-| Method                         | Description                                                                                                                   |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| `hello()`                      | Logs and returns a greeting that includes the number of active timers.                                                        |
-| `shutdown(onShutdownCallback)` | Destroys all timers and event handlers, then calls `onShutdownCallback()` if provided. Call when the script/node is unloaded. |
+### `hello()`
+
+Logs and returns a greeting with the current number of active timers.
+
+- **Returns** (`string`): Greeting message.
+- **Throws**: Rethrows errors encountered while creating or logging the message.
+
+### `shutdown(onShutdownCallback = null)`
+
+Destroys the current API instance.
+
+- `onShutdownCallback` (`Function|null`, optional): Callback invoked after cleanup.
+- **Throws**: Rethrows errors encountered during cleanup or in the callback.
+
+## Map And Node
+
+### `getMapName()`
+
+Gets the current map name.
+
+- **Returns** (`string|null`): Map name, or null if access fails.
+
+### `getMapId()`
+
+Gets the current map ID.
+
+- **Returns** (`number|string|null`): Map ID, or null if access fails.
+
+### `getNodeName()`
+
+Gets the current node name.
+
+- **Returns** (`string|null`): Node title, or null if access fails.
+
+### `getNodeId()`
+
+Gets the current node ID.
+
+- **Returns** (`number|string|null`): Node ID, or null if access fails.
+
+## Object Lookup
+
+### `findOLabObject(id, type)`
+
+Finds a wikitag object by ID or name.
+
+- `id` (`string|number`): Object ID or name to find.
+- `type` (`string`): Object type: `counters`, `links`, or a scoped-object type.
+- **Returns** (`object|null`): Matching object; links return null when no matching link exists.
+- **Throws** (`Error`): If a scoped object of the requested type cannot be found.
+
+### `findWikiInList(list, wiki)`
+
+Finds a list item whose name or numeric ID matches the supplied value.
+
+- `list` (`Array<object>`): Items to search.
+- `wiki` (`string|number`): Name or ID to match.
+- **Returns** (`object`): Matching list item.
+- **Throws** (`Error`): If no item matches.
+
+### `getScript(name)`
+
+Looks up a script in the scoped-object collection.
+
+- `name` (`string|number`): Script name or ID.
+- **Returns** (`object|null`): Matching script, or null if missing or lookup fails.
+
+### `getLink(id)`
+
+Looks up a link wikitag in the current node.
+
+- `id` (`string|number`): Link ID or name.
+- **Returns** (`OLabApiLink|null`): Link wrapper, or null if creation fails.
+
+### `getCounter(id)`
+
+Looks up a counter wikitag in the current node.
+
+- `id` (`string|number`): Counter ID or name.
+- **Returns** (`OLabApiCounter|null`): Counter wrapper, or null if creation fails.
+
+### `getConstant(id)`
+
+Looks up a constant wikitag in the current node.
+
+- `id` (`string|number`): Constant ID or name.
+- **Returns** (`OLabApiConstant|null`): Constant wrapper, or null if creation fails.
+
+### `getSliderQuestion(id)`
+
+Looks up a slider-question wikitag in the current node.
+
+- `id` (`string|number`): Question ID or name.
+- **Returns** (`OLabApiSliderQuestion|null`): Wrapper, or null if creation fails.
+
+### `getDropDownQuestion(id)`
+
+Looks up a dropdown-question wikitag in the current node.
+
+- `id` (`string|number`): Question ID or name.
+- **Returns** (`OLabApiDropdownQuestion|null`): Wrapper, or null if creation fails.
+
+### `getDragAndDropQuestion(id)`
+
+Looks up a drag-and-drop question wikitag in the current node.
+
+- `id` (`string|number`): Question ID or name.
+- **Returns** (`OLabApiDragAndDropQuestion|null`): Wrapper, or null if creation fails.
+
+### `getTextQuestion(id)`
+
+Looks up a text-question wikitag in the current node.
+
+- `id` (`string|number`): Question ID or name.
+- **Returns** (`OLabApiTextQuestion|null`): Wrapper, or null if creation fails.
+
+### `getMultipleChoiceQuestion(id)`
+
+Looks up a multiple-choice question wikitag in the current node.
+
+- `id` (`string|number`): Question ID or name.
+- **Returns** (`OLabApiMultipleChoiceQuestion|null`): Wrapper, or null if creation fails.
+
+### `getSingleChoiceQuestion(id)`
+
+Looks up a single-choice question wikitag in the current node.
+
+- `id` (`string|number`): Question ID or name.
+- **Returns** (`OLabApiSingleChoiceQuestion|null`): Wrapper, or null if creation fails.
+
+## State Updates
+
+### `updateScopedObject(newObject)`
+
+Passes a scoped-object update to the player component.
+
+- `newObject` (`object`): Updated scoped object.
+- **Throws**: Rethrows errors from the component update method.
+
+### `updateObject(newObject)`
+
+Passes an object update to the player component.
+
+- `newObject` (`object`): Updated object.
+- **Throws**: Rethrows errors from the component update method.
+
+### `updateDynamicObject(newCounter)`
+
+Updates one counter and refreshes the component's dynamic objects.
+
+- `newCounter` (`object`): Counter value to set.
+- **Throws**: Rethrows errors from updating the counter or component state.
+
+### `updateDynamicObjects(newCounters)`
+
+Passes updated dynamic objects to the player component.
+
+- `newCounters` (`Array<object>`): Dynamic-object data to apply.
+- **Throws**: Rethrows errors from the component update method.
 
 ## Timers
 
-Timers are tracked by key so they can be queried and cleaned up.
+### `createOneShotTimer(frequencyMs, callback)`
 
-| Method                                        | Description                                                                                                                |
-| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `createOneShotTimer(frequencyMs, callback)`   | Calls `callback` once after `frequencyMs` ms, then destroys the timer. Returns the timer key.                              |
-| `createRecurringTimer(frequencyMs, callback)` | Calls `callback` immediately, then every `frequencyMs` ms. The callback receives `(api, document)`. Returns the timer key. |
-| `destroyTimer(key)`                           | Cancels a timer and removes its metadata. No-op if the key is unknown.                                                     |
-| `getTimerStatus(key)`                         | Returns `{ elapsedMs, sinceLastCallMs, remainingMs }`, or `null` if the timer doesn't exist (or a one-shot already fired). |
+Schedules a callback once after the requested delay and removes the timer before invoking it.
 
-`remainingMs` is the time until the next callback invocation.
+- `frequencyMs` (`number`): Delay in milliseconds.
+- `callback` (`Function`): Function invoked when the timer expires.
+- **Returns** (`string`): Timer key usable with `getTimerStatus` or `destroyTimer`.
 
-```js
-const key = api.createRecurringTimer(5000, () => console.log("tick"));
-api.getTimerStatus(key); // { elapsedMs: 1200, sinceLastCallMs: 1200, remainingMs: 3800 }
-api.destroyTimer(key);
-```
+### `createRecurringTimer(frequencyMs, callback)`
 
-## DOM events
+Calls the callback immediately, then repeatedly at the requested interval. The immediate call receives no arguments; subsequent calls receive `(api, document)`.
 
-| Method                                        | Description                                                                                                                     |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `onClick(id, callback)`                       | Sets `onclick` on the element with the given id. Replaces any existing `onclick`.                                               |
-| `onEvent(id, eventName, callback)`            | Adds a listener for `eventName`. Throws if the element doesn't exist; ignored if the same `id:eventName` is already registered. |
-| `createEventHandler(id, eventName, callback)` | Implementation behind `onEvent`.                                                                                                |
-| `destroyEventHandler(key)`                    | Removes a handler by key (`"<id>:<eventName>"`).                                                                                |
-| `getDomObject(id)`                            | Returns an `OLabApiDomObject` for the element.                                                                                  |
-| `getOLabObjectList()`                         | Logs every element that has an `id` attribute.                                                                                  |
-| `loadExternalDiv(url, targetElementId)`       | Fetches `url` and inserts its first `<div>` into the target element.                                                            |
+- `frequencyMs` (`number`): Interval in milliseconds.
+- `callback` (`Function`): Function invoked immediately and on each interval.
+- **Returns** (`string`): Timer key usable with `getTimerStatus` or `destroyTimer`.
 
-## Current map and node
+### `destroyTimer(key)`
 
-| Method          | Description                                     |
-| --------------- | ----------------------------------------------- |
-| `getMapName()`  | Name of the current map (`props.map.name`).     |
-| `getMapId()`    | Id of the current map (`props.map.id`).         |
-| `getNodeName()` | Title of the current node (`props.node.title`). |
-| `getNodeId()`   | Id of the current node (`props.node.id`).       |
+Cancels a timer and removes its timer and status records.
 
-## Scoped objects
+- `key` (`string`): Timer key returned by a timer-creation method.
 
-| Method                          | Returns                                                                                                              |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `findOLabObject(id, type)`      | Copy of a scoped object by id/name. `type` is `"counters"`, `"links"`, or a scoped object type. Throws if not found. |
-| `findWikiInList(list, wiki)`    | Item in `list` matching `name` or numeric `id`. Throws if not found.                                                 |
-| `getScript(name)`               | Script scoped object.                                                                                                |
-| `getLink(id)`                   | `OLabApiLink`                                                                                                        |
-| `getCounter(id)`                | `OLabApiCounter`                                                                                                     |
-| `getConstant(id)`               | `OLabApiConstant`                                                                                                    |
-| `getSliderQuestion(id)`         | `OLabApiSliderQuestion`                                                                                              |
-| `getDropDownQuestion(id)`       | `OLabApiDropdownQuestion`                                                                                            |
-| `getDragAndDropQuestion(id)`    | `OLabApiDragAndDropQuestion`                                                                                         |
-| `getTextQuestion(id)`           | `OLabApiTextQuestion`                                                                                                |
-| `getMultipleChoiceQuestion(id)` | `OLabApiMultipleChoiceQuestion`                                                                                      |
-| `getSingleChoiceQuestion(id)`   | `OLabApiSingleChoiceQuestion`                                                                                        |
+### `getTimerStatus(key)`
 
-## State updates
+Gets elapsed time and time until the next callback for a timer.
 
-| Method                              | Description                                          |
-| ----------------------------------- | ---------------------------------------------------- |
-| `updateScopedObject(newObject)`     | Pushes a scoped object change to the component.      |
-| `updateObject(newObject)`           | Pushes an object change to the component.            |
-| `updateDynamicObject(newCounter)`   | Sets a single counter and refreshes dynamic objects. |
-| `updateDynamicObjects(newCounters)` | Replaces dynamic objects on the component.           |
+- `key` (`string`): Timer key returned by a timer-creation method.
+- **Returns** (`{elapsedMs: number, sinceLastCallMs: number, remainingMs: number}|null`): Status, or null if unknown or a one-shot has fired.
+
+## DOM
+
+### `loadDivFromUrl(url, targetElementId)`
+
+Fetches HTML and inserts its first `div` into the target element. Promise-chain errors are logged but not rethrown.
+
+- `url` (`string`): URL of the HTML document to load.
+- `targetElementId` (`string`): ID of the element that receives the `div`.
+
+### `createEventHandler(id, eventName, callback)`
+
+Registers and tracks a DOM event listener using the key `<id>:<eventName>`. Does nothing if that key is already registered.
+
+- `id` (`string`): ID of the DOM element.
+- `eventName` (`string`): DOM event name.
+- `callback` (`Function`): Event listener.
+- **Throws** (`Error`): If the element does not exist.
+
+### `destroyEventHandler(key)`
+
+Removes a tracked DOM event listener.
+
+- `key` (`string`): Listener key in the form `<id>:<eventName>`.
+
+### `onClick(id, callback)`
+
+Assigns a click handler to a DOM element, replacing its existing `onclick` handler. Does nothing if the element is not found.
+
+- `id` (`string`): ID of the DOM element.
+- `callback` (`Function`): Click handler.
+
+### `onEvent(id, eventName, callback)`
+
+Registers a tracked DOM event handler.
+
+- `id` (`string`): ID of the DOM element.
+- `eventName` (`string`): DOM event name.
+- `callback` (`Function`): Event listener.
+- **Throws** (`Error`): If the element does not exist.
+
+### `getOLabObjectList()`
+
+Logs the IDs of all DOM elements that have an `id` attribute.
+
+- **Returns** (`void|null`): Null if querying the document fails.
+
+### `getDomObject(id)`
+
+Creates a DOM-object wrapper for the element with the given ID.
+
+- `id` (`string`): ID of the DOM element.
+- **Returns** (`OLabApiDomObject|null`): Wrapper, or null if creation fails.
 
 ## Navigation
 
-| Method                                   | Description                                                                                                                                                                              |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `jumpToNode(nodeId, onShutdownCallback)` | Does nothing if `nodeId` is already the current node. Otherwise calls `shutdown(onShutdownCallback)` to clean up timers and event handlers, then navigates via `props.onNavigateToNode`. |
+### `jumpToNode(nodeId, onShutdownCallback = null)`
+
+Navigates to another node in the current map.
+
+- `nodeId` (`number|string`): Destination node ID.
+- `onShutdownCallback` (`Function|null`, optional): Optional callback invoked after cleanup.

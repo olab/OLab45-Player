@@ -22,6 +22,11 @@ export class OLabClientApi {
   scopedObjects;
   state;
 
+  /**
+   * Creates the script-facing API for a player component.
+   * @param {object} component Player component providing state, props, and update methods.
+   * @param {Function|null} [onCreateCallback=null] Optional callback invoked after initialization.
+   */
   constructor(component, onCreateCallback = null) {
     var vm = this;
 
@@ -42,6 +47,11 @@ export class OLabClientApi {
     }
   }
 
+  /**
+   * Logs and returns a greeting with the current number of active timers.
+   * @returns {string} Greeting message.
+   * @throws Rethrows errors encountered while creating or logging the message.
+   */
   hello() {
     try {
       let message =
@@ -55,6 +65,11 @@ export class OLabClientApi {
     }
   }
 
+  /**
+   * Destroys the current API instance.
+   * @param {Function|null} [onShutdownCallback=null] Callback invoked after cleanup.
+   * @throws Rethrows errors encountered during cleanup or in the callback.
+   */
   shutdown(onShutdownCallback = null) {
     try {
       this.#destroyAllTimers();
@@ -108,28 +123,65 @@ export class OLabClientApi {
     return null;
   }
 
-  // get current map name
+  /**
+   * Gets the current map name.
+   * @returns {string|null} Map name, or null if access fails.
+   */
   getMapName() {
-    return this.props.map.name;
+    try {
+      return this.props.map.name;
+    } catch (error) {
+      log.error(`getMapName failed: ${error}`);
+      return null;
+    }
   }
 
-  // get current mapId
+  /**
+   * Gets the current map ID.
+   * @returns {number|string|null} Map ID, or null if access fails.
+   */
   getMapId() {
-    return this.props.map.id;
+    try {
+      return this.props.map.id;
+    } catch (error) {
+      log.error(`getMapId failed: ${error}`);
+      return null;
+    }
   }
 
-  // get current node name
+  /**
+   * Gets the current node name.
+   * @returns {string|null} Node name, or null if access fails.
+   */
   getNodeName() {
-    return this.props.node.title;
+    try {
+      return this.props.node.title;
+    } catch (error) {
+      log.error(`getNodeName failed: ${error}`);
+      return null;
+    }
   }
 
-  // get current nodeId
+  /**
+   * Gets the current node ID.
+   * @returns {number|string|null} Node ID, or null if access fails.
+   */
   getNodeId() {
-    return this.props.node.id;
+    try {
+      return this.props.node.id;
+    } catch (error) {
+      log.error(`getNodeId failed: ${error}`);
+      return null;
+    }
   }
 
-  // find and return a copy of an OLab scoped object
-  // of a certain type by id or name
+  /**
+   * Finds a wikitag object by ID or name.
+   * @param {string|number} id Object ID or name to find.
+   * @param {string} type Object type: `counters`, `links`, or a scoped-object type.
+   * @returns {object|null} Matching object; links return null when no matching link exists.
+   * @throws {Error} If a scoped object of the requested type cannot be found.
+   */
   findOLabObject(id, type) {
     try {
       if (type === "counters") {
@@ -158,6 +210,13 @@ export class OLabClientApi {
     }
   }
 
+  /**
+   * Finds a list item whose name or numeric ID matches the supplied value.
+   * @param {Array<object>} list Items to search.
+   * @param {string|number} wiki Name or ID to match.
+   * @returns {object} Matching list item.
+   * @throws {Error} If no item matches.
+   */
   findWikiInList(list, wiki) {
     try {
       let match = null;
@@ -179,8 +238,13 @@ export class OLabClientApi {
     }
   }
 
-  // Function to load external HTML into current document
-  loadExternalDiv(url, targetElementId) {
+  /**
+   * Fetches HTML and inserts its first `div` into the target element.
+   * Promise-chain errors are logged but not rethrown.
+   * @param {string} url URL of the HTML document to load.
+   * @param {string} targetElementId ID of the element that receives the `div`.
+   */
+  loadDivFromUrl(url, targetElementId) {
     try {
       fetch(url)
         .then((response) => response.text())
@@ -202,6 +266,11 @@ export class OLabClientApi {
     }
   }
 
+  /**
+   * Passes a scoped-object update to the player component.
+   * @param {object} newObject Updated scoped object.
+   * @throws Rethrows errors from the component update method.
+   */
   updateScopedObject(newObject) {
     try {
       this.component.updateScopedObject(newObject);
@@ -211,6 +280,11 @@ export class OLabClientApi {
     }
   }
 
+  /**
+   * Passes an object update to the player component.
+   * @param {object} newObject Updated object.
+   * @throws Rethrows errors from the component update method.
+   */
   updateObject(newObject) {
     try {
       this.component.updateObject(newObject);
@@ -220,6 +294,11 @@ export class OLabClientApi {
     }
   }
 
+  /**
+   * Updates one counter and refreshes the component's dynamic objects.
+   * @param {object} newCounter Counter value to set.
+   * @throws Rethrows errors from updating the counter or component state.
+   */
   updateDynamicObject(newCounter) {
     try {
       this.dynamicObject.setCounter(newCounter);
@@ -230,6 +309,11 @@ export class OLabClientApi {
     }
   }
 
+  /**
+   * Passes updated dynamic objects to the player component.
+   * @param {Array<object>} newCounters Dynamic-object data to apply.
+   * @throws Rethrows errors from the component update method.
+   */
   updateDynamicObjects(newCounters) {
     try {
       this.component.updateDynamicObjects(newCounters);
@@ -239,6 +323,12 @@ export class OLabClientApi {
     }
   }
 
+  /**
+   * Schedules a callback once after the requested delay and removes the timer before invoking it.
+   * @param {number} frequencyMs Delay in milliseconds.
+   * @param {Function} callback Function invoked when the timer expires.
+   * @returns {string} Timer key usable with `getTimerStatus` or `destroyTimer`.
+   */
   createOneShotTimer(frequencyMs, callback) {
     const key = `oneshot-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     this.timerInfo[key] = {
@@ -255,6 +345,13 @@ export class OLabClientApi {
     return key;
   }
 
+  /**
+   * Calls the callback immediately, then repeatedly at the requested interval.
+   * The immediate call receives no arguments; subsequent calls receive `(api, document)`.
+   * @param {number} frequencyMs Interval in milliseconds.
+   * @param {Function} callback Function invoked immediately and on each interval.
+   * @returns {string} Timer key usable with `getTimerStatus` or `destroyTimer`.
+   */
   createRecurringTimer(frequencyMs, callback) {
     callback();
     const key = `recurring-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -273,6 +370,10 @@ export class OLabClientApi {
     return key;
   }
 
+  /**
+   * Cancels a timer and removes its timer and status records.
+   * @param {string} key Timer key returned by a timer-creation method.
+   */
   destroyTimer(key) {
     // test if timer exists
     if (this.timers.hasOwnProperty(key)) {
@@ -285,21 +386,38 @@ export class OLabClientApi {
     }
   }
 
-  // returns null if the timer doesn't exist (or a one-shot already fired)
+  /**
+   * Gets elapsed time and time until the next callback for a timer.
+   * @param {string} key Timer key returned by a timer-creation method.
+   * @returns {{elapsedMs: number, sinceLastCallMs: number, remainingMs: number}|null} Status, or null if unknown or a one-shot has fired.
+   */
   getTimerStatus(key) {
-    const info = this.timerInfo[key];
-    if (!info) {
+    try {
+      const info = this.timerInfo[key];
+      if (!info) {
+        return null;
+      }
+      const now = Date.now();
+      const sinceLastCallMs = now - (info.lastFiredAt ?? info.startedAt);
+      return {
+        elapsedMs: now - info.startedAt,
+        sinceLastCallMs,
+        remainingMs: Math.max(0, info.periodMs - sinceLastCallMs),
+      };
+    } catch (error) {
+      log.error(`getTimerStatus failed: ${error}`);
       return null;
     }
-    const now = Date.now();
-    const sinceLastCallMs = now - (info.lastFiredAt ?? info.startedAt);
-    return {
-      elapsedMs: now - info.startedAt,
-      sinceLastCallMs,
-      remainingMs: Math.max(0, info.periodMs - sinceLastCallMs),
-    };
   }
 
+  /**
+   * Registers and tracks a DOM event listener using the key `<id>:<eventName>`.
+   * Does nothing if that key is already registered.
+   * @param {string} id ID of the DOM element.
+   * @param {string} eventName DOM event name.
+   * @param {Function} callback Event listener.
+   * @throws {Error} If the element does not exist.
+   */
   createEventHandler(id, eventName, callback) {
     var element = document.getElementById(id);
     if (element != null) {
@@ -320,6 +438,10 @@ export class OLabClientApi {
     }
   }
 
+  /**
+   * Removes a tracked DOM event listener.
+   * @param {string} key Listener key in the form `<id>:<eventName>`.
+   */
   destroyEventHandler(key) {
     // test if handler exists
     if (this.events.hasOwnProperty(key)) {
@@ -331,7 +453,12 @@ export class OLabClientApi {
     }
   }
 
-  // add a click callback on a Dom element
+  /**
+   * Assigns a click handler to a DOM element, replacing its existing `onclick` handler.
+   * Does nothing if the element is not found.
+   * @param {string} id ID of the DOM element.
+   * @param {Function} callback Click handler.
+   */
   onClick(id, callback) {
     var element = document.getElementById(id);
     if (element != null) {
@@ -341,85 +468,198 @@ export class OLabClientApi {
     // this.onEvent(id, "click", callback);
   }
 
-  // add an event callback on a Dom element
+  /**
+   * Registers a tracked DOM event handler.
+   * @param {string} id ID of the DOM element.
+   * @param {string} eventName DOM event name.
+   * @param {Function} callback Event listener.
+   * @throws {Error} If the element does not exist.
+   */
   onEvent(id, eventName, callback) {
     this.createEventHandler(id, eventName, callback);
   }
 
-  // dump all elements with an 'id' attribute
-  // for reference purposes
+  /**
+   * Logs the IDs of all DOM elements that have an `id` attribute.
+   * @returns {void|null} Null if querying the document fails.
+   */
   getOLabObjectList() {
-    log.debug(`Id elements list:`);
+    try {
+      log.debug(`Id elements list:`);
 
-    var elements = document.querySelectorAll("*[id]");
-    elements.forEach((element) => {
-      log.debug(`  ${element.id}`);
-    });
+      var elements = document.querySelectorAll("*[id]");
+      elements.forEach((element) => {
+        log.debug(`  ${element.id}`);
+      });
+    } catch (error) {
+      log.error(`getOLabObjectList failed: ${error}`);
+      return null;
+    }
   }
 
+  /**
+   * Creates a DOM-object wrapper for the element with the given ID.
+   * @param {string} id ID of the DOM element.
+   * @returns {OLabApiDomObject|null} Wrapper, or null if creation fails.
+   */
   getDomObject(id) {
-    let apiDomObject = new OLabApiDomObject(this, id);
-    return apiDomObject;
+    try {
+      return new OLabApiDomObject(this, id);
+    } catch (error) {
+      log.error(`getDomObject failed for '${id}': ${error}`);
+      return null;
+    }
   }
 
+  /**
+   * Looks up a script in the scoped-object collection.
+   * @param {string|number} name Script name or ID.
+   * @returns {object|null} Matching script, or null if missing or lookup fails.
+   */
   getScript(name) {
     try {
-      let item = this.scopedObject.getObject(ScopedObject.SCRIPTS, name);
+      const item = this.scopedObject.getObject(ScopedObject.SCRIPTS, name);
       if (item == null) {
         log.error(`Could not find script '${name}'`);
       }
+      return item;
     } catch (error) {
-      log.error(`error looking up script ${name}: ${error}`);
+      log.error(`getScript failed for '${name}': ${error}`);
+      return null;
     }
-
-    return item;
   }
 
+  /**
+   * Looks up a link wikitag in the current node.
+   * @param {string|number} id Link ID or name.
+   * @returns {OLabApiLink|null} Link wrapper, or null if creation fails.
+   */
   getLink(id) {
-    var obj = new OLabApiLink(this, id);
-    return obj;
+    try {
+      return new OLabApiLink(this, id);
+    } catch (error) {
+      log.error(`getLink failed for '${id}': ${error}`);
+      return null;
+    }
   }
 
+  /**
+   * Looks up a counter wikitag in the current node.
+   * @param {string|number} id Counter ID or name.
+   * @returns {OLabApiCounter|null} Counter wrapper, or null if creation fails.
+   */
   getCounter(id) {
-    var obj = new OLabApiCounter(this, id);
-    return obj;
+    try {
+      return new OLabApiCounter(this, id);
+    } catch (error) {
+      log.error(`getCounter failed for '${id}': ${error}`);
+      return null;
+    }
   }
 
+  /**
+   * Looks up a constant wikitag in the current node.
+   * @param {string|number} id Constant ID or name.
+   * @returns {OLabApiConstant|null} Constant wrapper, or null if creation fails.
+   */
   getConstant(id) {
-    var obj = new OLabApiConstant(this, id);
-    return obj;
+    try {
+      return new OLabApiConstant(this, id);
+    } catch (error) {
+      log.error(`getConstant failed for '${id}': ${error}`);
+      return null;
+    }
   }
 
+  /**
+   * Looks up a slider-question wikitag in the current node.
+   * @param {string|number} id Question ID or name.
+   * @returns {OLabApiSliderQuestion|null} Wrapper, or null if creation fails.
+   */
   getSliderQuestion(id) {
-    var obj = new OLabApiSliderQuestion(this, id);
-    return obj;
+    try {
+      return new OLabApiSliderQuestion(this, id);
+    } catch (error) {
+      log.error(`getSliderQuestion failed for '${id}': ${error}`);
+      return null;
+    }
   }
 
+  /**
+   * Looks up a dropdown-question wikitag in the current node.
+   * @param {string|number} id Question ID or name.
+   * @returns {OLabApiDropdownQuestion|null} Wrapper, or null if creation fails.
+   */
   getDropDownQuestion(id) {
-    var obj = new OLabApiDropdownQuestion(this, id);
-    return obj;
+    try {
+      return new OLabApiDropdownQuestion(this, id);
+    } catch (error) {
+      log.error(`getDropDownQuestion failed for '${id}': ${error}`);
+      return null;
+    }
   }
 
+  /**
+   * Looks up a drag-and-drop question wikitag in the current node.
+   * @param {string|number} id Question ID or name.
+   * @returns {OLabApiDragAndDropQuestion|null} Wrapper, or null if creation fails.
+   */
   getDragAndDropQuestion(id) {
-    var obj = new OLabApiDragAndDropQuestion(this, id);
-    return obj;
+    try {
+      return new OLabApiDragAndDropQuestion(this, id);
+    } catch (error) {
+      log.error(`getDragAndDropQuestion failed for '${id}': ${error}`);
+      return null;
+    }
   }
 
+  /**
+   * Looks up a text-question wikitag in the current node.
+   * @param {string|number} id Question ID or name.
+   * @returns {OLabApiTextQuestion|null} Wrapper, or null if creation fails.
+   */
   getTextQuestion(id) {
-    var obj = new OLabApiTextQuestion(this, id);
-    return obj;
+    try {
+      return new OLabApiTextQuestion(this, id);
+    } catch (error) {
+      log.error(`getTextQuestion failed for '${id}': ${error}`);
+      return null;
+    }
   }
 
+  /**
+   * Looks up a multiple-choice question wikitag in the current node.
+   * @param {string|number} id Question ID or name.
+   * @returns {OLabApiMultipleChoiceQuestion|null} Wrapper, or null if creation fails.
+   */
   getMultipleChoiceQuestion(id) {
-    var obj = new OLabApiMultipleChoiceQuestion(this, id);
-    return obj;
+    try {
+      return new OLabApiMultipleChoiceQuestion(this, id);
+    } catch (error) {
+      log.error(`getMultipleChoiceQuestion failed for '${id}': ${error}`);
+      return null;
+    }
   }
 
+  /**
+   * Looks up a single-choice question wikitag in the current node.
+   * @param {string|number} id Question ID or name.
+   * @returns {OLabApiSingleChoiceQuestion|null} Wrapper, or null if creation fails.
+   */
   getSingleChoiceQuestion(id) {
-    var obj = new OLabApiSingleChoiceQuestion(this, id);
-    return obj;
+    try {
+      return new OLabApiSingleChoiceQuestion(this, id);
+    } catch (error) {
+      log.error(`getSingleChoiceQuestion failed for '${id}': ${error}`);
+      return null;
+    }
   }
 
+  /**
+   * Navigates to another node in the current map.
+   * @param {number|string} nodeId Destination node ID.
+   * @param {Function|null} [onShutdownCallback=null] Optional callback invoked after cleanup.
+   */
   jumpToNode(nodeId, onShutdownCallback = null) {
     const currentNodeId = this.getNodeId();
     if (currentNodeId === nodeId) {
