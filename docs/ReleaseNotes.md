@@ -1,60 +1,42 @@
 # Release Notes
 
-## 2026-10-17 (Vite migration)
-
-Branch: `dev` (Git committer times, UTC-06:00)
-
-- `ce1bb68` — 2026-10-17 09:01:46
-- `2243bd1` — 2026-10-17 09:28:15
-- `50d91b5` — 2026-10-17 09:49:50
-- `5cab8f4` — 2026-10-17 09:59:27
-- `d7848b8` — 2026-10-17 10:03:05
-
-### Build
-
-- Migrated from Create React App to Vite. `vite.config.mjs` handles JSX in `.js` files, Flow annotation stripping, SVG imports (`?react`) and the `build/` output layout (`static/js`, `static/media`).
-- `index.html` moved from `public/` to the project root and loads `/src/index.js` as a module.
-- Replaced `require()` calls with ES `import` and made `src/services/constants.js` an ES default export.
-- Env files converted to Vite modes: `REACT_APP_*` is now `VITE_*`, `PUBLIC_URL` is now `VITE_PUBLIC_URL`, and `.env.local`, `.env.azure.dev` and `.env.azure.local` were renamed to `.env.localhost`, `.env.azure-dev` and `.env.azure-local`.
-- npm scripts now call `vite` / `vite build --mode <name>`. `react-scripts`, `postcss-loader`, `react-dev-utils` and `env-cmd` were removed, and the `test` and `eject` scripts are gone.
-- Removed `build.sh` and `update.sh`.
-- Replaced `void ... ||` expressions in `Contents.js` and `AssigneeSearchableList.js` with explicit statements. Behavior is unchanged.
-
-### Documentation
-
-- `README.md` rewritten for the Vite setup: project description, configuration variables, modes and npm scripts.
-- `OLabClientApi.md` and `ReleaseNotes.md` moved to `docs/`.
-- Version set to `26.10.17-0`.
-
-## 2026-10-17 (CI And API Updates)
-
-Branch: `dev` (Git committer times, UTC-06:00)
-
-- `4408c13` — 2026-10-17 10:10:10
-- `44a79ac` — 2026-10-17 15:10:00
-
-### Build
-
-- Added `scripts/bump-version.mjs` and the `version:bump` npm script to set the package version to `YY.MM.DD-<build>`.
-- Azure Static Web Apps workflows use the GitHub Actions run number as the build number before compiling the Vite app.
-
-### OLabClientApi
-
-- Standardized `get*` methods to log errors and return `null` when access, lookup, or wrapper construction fails.
-- Renamed `loadExternalDiv` to `loadDivFromUrl` and updated the JSDoc descriptions for map/node access, wikitag lookups, shutdown, and navigation.
-- Regenerated `docs/OLabClientApi.md` from the source JSDoc comments.
-
 ## 2026-10-17
 
-Branch: `dev` (Git committer time, UTC-06:00)
+### Build And Deployment
 
-- `7b297dd` — 2026-10-17 08:55:22
+- Migrated the React app from Create React App to Vite, including Vite configuration for JSX in `.js` files, Flow type stripping, SVG React components, and CRA-compatible build output paths.
+- Moved `index.html` to the project root, converted source modules from `require()` to ES imports, and moved environment settings to Vite modes and `VITE_*` variables.
+- Updated npm scripts for Vite and removed CRA-specific dependencies and scripts, along with `build.sh` and `update.sh`.
+- Updated both Azure Static Web Apps workflows to build with Node 20 and deploy the prebuilt Vite output.
+- Added `scripts/bump-version.mjs` and `version:bump`; CI versions builds as `YY.MM.DD-<GitHub run number>`.
 
-### OLabClientApi
+### Player API And UI
 
-- Added `getMapName()`, `getMapId()`, `getNodeName()` and `getNodeId()` to read the current map and node from the player props.
-- `jumpToNode(nodeId, onShutdownCallback)` now does nothing when `nodeId` is already the current node.
+- Added current map and node getters to `OLabClientApi`; navigation now skips a request when the target is the current node.
+- Standardized API getters to log errors and return `null`, renamed `loadExternalDiv` to `loadDivFromUrl`, and regenerated API documentation from source JSDoc.
+- Updated the Header to display the build version without a `Version:` label.
+- Added `ListWithSearch` pagination, with 10 rows per page by default and options for 25 or 50; search resets to the first page.
+- Replaced two `void ... ||` expressions with explicit statements without changing behavior.
 
 ### Documentation
 
-- `OLabClientApi.md` updated with the new "Current map and node" section and the `jumpToNode` behaviour.
+- Rewrote the README for the Vite setup and moved `OLabClientApi.md` into `docs/`.
+- Set the package version to `26.10.17-0`.
+
+### Check-ins
+
+Git committer times on branch `dev` (UTC-06:00):
+
+| Commit    | Time     | Summary                                  |
+| --------- | -------- | ---------------------------------------- |
+| `7b297dd` | 08:55:22 | Map/node getters and navigation behavior |
+| `ce1bb68` | 09:01:46 | API docs and version update              |
+| `2243bd1` | 09:28:15 | Remove deployment shell scripts          |
+| `50d91b5` | 09:49:50 | Migrate from CRA to Vite                 |
+| `5cab8f4` | 09:59:27 | Rewrite README                           |
+| `d7848b8` | 10:03:05 | Update Azure workflows                   |
+| `4408c13` | 10:10:10 | Add build-time version bump              |
+| `44a79ac` | 15:10:00 | API error handling and documentation     |
+| `9a97422` | 15:19:06 | Display version in Header                |
+| `5f382c5` | 15:23:50 | Simplify Header version display          |
+| `643aa85` | 15:37:20 | Add list pagination                      |
