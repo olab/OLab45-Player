@@ -22,4 +22,6 @@ export type IListWithSearchProps = {
 
 export type IListWithSearchState = {
   query: string,
+  page: number,
+  rowsPerPage: number,
 };

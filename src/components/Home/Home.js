@@ -251,12 +251,6 @@ class Home extends PureComponent {
                 onSearch={this.handleItemsSearch}
                 isWithSpinner={this.isMapsFetching}
               />
-              <br />
-              Showing&nbsp;
-              {mapsFiltered.length}
-              &nbsp;of&nbsp;
-              {maps.length}
-              &nbsp;maps.
             </Grid>
           </Grid>
           {isSuperUser && <Import props={this.props} />}
