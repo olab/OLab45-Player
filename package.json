@@ -50,6 +50,7 @@
     "start:azure:local": "vite --mode azure-local",
     "start:local": "vite --mode localhost",
     "start": "vite",
+    "version:bump": "node scripts/bump-version.mjs",
     "version:full": "npm --no-git-tag-version version `date +%y.%m.%d-0`",
     "version:inc": "npm --no-git-tag-version version prerelease"
   },
