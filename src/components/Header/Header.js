@@ -140,7 +140,7 @@ const Header = ({
                 <VersionWrapper>
                   User: {authActions.getUserName()}
                   <br />
-                  Version: {version}
+                  {version}
                 </VersionWrapper>
               )}
 
