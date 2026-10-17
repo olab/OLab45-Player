@@ -1,4 +1,4 @@
-module.exports = Object.freeze({
+export default Object.freeze({
   BROADCAST_SENDER: "_BROADCAST_",
   TURKER_SENDER: "Turker",
 

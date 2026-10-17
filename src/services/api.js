@@ -1,7 +1,7 @@
 import { Log, LogInfo, LogError } from "../utils/Logger";
 import log from "loglevel";
 import { config } from "../config";
-const playerState = require("../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../utils/PlayerState";
 
 let retryCount = 10;
 if (config?.API_RETRY_COUNT) {
@@ -41,7 +41,7 @@ async function internetJsonFetch(
   url,
   payload,
   headerOverrides = null,
-  settingsOverrides = null
+  settingsOverrides = null,
 ) {
   let tries = 0;
 
@@ -105,14 +105,14 @@ async function internetJsonFetch(
 
       if (data.error_code !== 200) {
         log.error(
-          `URL '${url}': ${JSON.stringify(data)}. try ${tries} of ${retryCount}`
+          `URL '${url}': ${JSON.stringify(data)}. try ${tries} of ${retryCount}`,
         );
       } else {
         return data;
       }
     } catch (error) {
       log.error(
-        `URL '${url}': ${error.message}. try ${tries} of ${retryCount}`
+        `URL '${url}': ${error.message}. try ${tries} of ${retryCount}`,
       );
     }
   }
@@ -275,7 +275,7 @@ async function postQuestionValue(state) {
   let url = `${config.API_URL}/response/${olabObject.id}`;
 
   log.debug(
-    `postQuestionValue(${olabObject.id}, ${responseId}, ${value}, [func]) url: ${url})`
+    `postQuestionValue(${olabObject.id}, ${responseId}, ${value}, [func]) url: ${url})`,
   );
 
   // signal to caller that we are starting the work
@@ -419,7 +419,7 @@ async function getUserSession(props, payload) {
     url,
     payload,
     { Authorization: `Bearer ${token}` },
-    { responseType: "blob" }
+    { responseType: "blob" },
   );
 
   return data;

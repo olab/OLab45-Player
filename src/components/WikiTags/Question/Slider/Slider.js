@@ -10,7 +10,7 @@ import siteStyles from "../../site.module.css";
 
 import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
-const playerState = require("../../../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../../../utils/PlayerState";
 
 class OlabSliderQuestion extends OlabTag {
   constructor(props) {
@@ -44,7 +44,7 @@ class OlabSliderQuestion extends OlabTag {
   setValue = (event, value) => {
     const olabObject = this.state.olabObject;
     log.debug(
-      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'`
+      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'`,
     );
 
     this.setState(
@@ -54,7 +54,7 @@ class OlabSliderQuestion extends OlabTag {
 
         return { olabObject };
       },
-      () => this.transmitResponse()
+      () => this.transmitResponse(),
     );
   };
 

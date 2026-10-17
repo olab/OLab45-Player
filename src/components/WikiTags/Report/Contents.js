@@ -33,9 +33,10 @@ export default class OlabReportContents extends React.Component {
   async exportCsvData(rows, documentName) {
     if (0 == rows.length) return;
 
-    const csvdata = await json2csv(rows).catch(
-      (error) => void log.error("json2csv error", error) || "",
-    );
+    const csvdata = await json2csv(rows).catch((error) => {
+      log.error("json2csv error", error);
+      return "";
+    });
 
     if (0 == String(csvdata).trim().length) return;
 

@@ -21,7 +21,7 @@ import Spinner from "../../../../shared/assets/loading_med.gif";
 
 import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
-const playerState = require("../../../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../../../utils/PlayerState";
 
 class OlabSinglePickQuestion extends OlabTag {
   constructor(props) {
@@ -46,7 +46,7 @@ class OlabSinglePickQuestion extends OlabTag {
     let olabObject = this.state.olabObject;
 
     log.debug(
-      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'.`
+      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'.`,
     );
 
     let response = null;
@@ -72,7 +72,7 @@ class OlabSinglePickQuestion extends OlabTag {
     olabObject.valueOverride = response.response;
 
     log.debug(
-      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'`
+      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'`,
     );
 
     // if single try question, disabled it
@@ -89,7 +89,7 @@ class OlabSinglePickQuestion extends OlabTag {
         olabObject = olabObject;
         return { olabObject };
       },
-      () => this.transmitResponse()
+      () => this.transmitResponse(),
     );
 
     // this.setState({ question });
@@ -128,7 +128,7 @@ class OlabSinglePickQuestion extends OlabTag {
             olabObject,
             baseHtmlId,
             response,
-            selectedIndex
+            selectedIndex,
           )}
         </div>
       );

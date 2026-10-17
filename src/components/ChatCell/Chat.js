@@ -27,7 +27,7 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
 import SlotInfo from "../../helpers/SlotInfo";
 
-var constants = require("../../services/constants");
+import constants from "../../services/constants";
 
 class Chat extends React.Component {
   constructor(props) {
@@ -100,19 +100,19 @@ class Chat extends React.Component {
 
       if (payload.command === constants.SIGNALCMD_TURKER_ASSIGNED) {
         log.debug(
-          `'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`
+          `'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`,
         );
         this.onModeratorAssigned(payload.data);
       } else if (payload.command === constants.SIGNALCMD_ROOMASSIGNED) {
         this.onParticipantAssigned(payload);
       } else if (payload.command === constants.SIGNALCMD_LEARNER_UNASSIGNED) {
         log.debug(
-          `'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`
+          `'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`,
         );
         this.onParticipantUnassigned(payload);
       } else if (payload.command === constants.SIGNALCMD_TURKER_DISCONNECTED) {
         log.debug(
-          `'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`
+          `'onCommand[${this.props.index}] CMD: ${payload.command} CH: ${payload?.commandChannel} M:${isModerator} LOCAL: ${localInfo?.userId} -> REM: ${senderInfo?.userId}`,
         );
         this.onModeratorUnassigned(payload.data);
       }
@@ -128,7 +128,7 @@ class Chat extends React.Component {
       });
     } catch (error) {
       LogError(
-        `onModeratorAssigned[${this.props.index}] exception: ${error.message}`
+        `onModeratorAssigned[${this.props.index}] exception: ${error.message}`,
       );
     }
   }
@@ -147,8 +147,8 @@ class Chat extends React.Component {
         `'onAtriumAssigned[${this.props.index}] (${JSON.stringify(
           payload,
           null,
-          1
-        )})`
+          1,
+        )})`,
       );
 
       // only learners (non-moderators) get this waiting message
@@ -185,8 +185,8 @@ class Chat extends React.Component {
         `'onParticipantAssigned[${this.props.index}] (${JSON.stringify(
           payload,
           null,
-          1
-        )})`
+          1,
+        )})`,
       );
 
       if (isModerator) {
@@ -244,8 +244,8 @@ class Chat extends React.Component {
         `'onParticipantUnassigned[${this.props.index}] (${JSON.stringify(
           payload,
           null,
-          1
-        )})`
+          1,
+        )})`,
       );
 
       localInfo.assigned = false;
@@ -270,8 +270,8 @@ class Chat extends React.Component {
         `'onSystemMessage[${this.props.index}] (${JSON.stringify(
           payload,
           null,
-          1
-        )})`
+          1,
+        )})`,
       );
 
       payload.isSystemMessage = true;
@@ -292,7 +292,7 @@ class Chat extends React.Component {
       }
 
       LogInfo(
-        `'${localInfo.connectionId}' onMessage message for '${localInfo.commandChannel}' ${payload.data}`
+        `'${localInfo.connectionId}' onMessage message for '${localInfo.commandChannel}' ${payload.data}`,
       );
 
       // tri-ary flag:
@@ -314,7 +314,7 @@ class Chat extends React.Component {
       }
 
       conversation.push(
-        this.createData(conversation.length, payload.data, isLocal)
+        this.createData(conversation.length, payload.data, isLocal),
       );
 
       this.setState({ conversation: conversation });
@@ -479,7 +479,7 @@ class Chat extends React.Component {
       LogInfo(`'onMessageKeyDown[${this.props.index}] entering macro mode`);
     } else if (event.key === " " && inMacroMode) {
       LogInfo(
-        `'onMessageKeyDown[${this.props.index}] evaluating macro ${message}`
+        `'onMessageKeyDown[${this.props.index}] evaluating macro ${message}`,
       );
 
       this.setState({ inMacroMode: false });
@@ -748,7 +748,7 @@ class Chat extends React.Component {
     } catch (error) {
       LogException(
         `render[${this.props.index}]`,
-        JSON.stringify(error, null, 2)
+        JSON.stringify(error, null, 2),
       );
       return (
         <>

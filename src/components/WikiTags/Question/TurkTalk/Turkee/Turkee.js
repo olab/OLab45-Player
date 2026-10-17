@@ -13,8 +13,8 @@ import SlotInfo from "../../../../../helpers/SlotInfo";
 import SlotManager from "../SlotManager";
 import Session from "../../../../../services/session";
 
-var constants = require("../../../../../services/constants");
-const playerState = require("../../../../../utils/PlayerState").PlayerState;
+import constants from "../../../../../services/constants";
+import { PlayerState as playerState } from "../../../../../utils/PlayerState";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;

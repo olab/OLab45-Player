@@ -1,4 +1,4 @@
-const playerState = require("../../../../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../../../../utils/PlayerState";
 import log from "loglevel";
 
 class WatchedLearners {
@@ -11,7 +11,7 @@ class WatchedLearners {
       this.watchProfile = playerState.GetWatchProfile(this.watchProfileKey);
 
       log.debug(
-        `current watchProfile: ${JSON.stringify(this.watchProfile, null, 2)}`
+        `current watchProfile: ${JSON.stringify(this.watchProfile, null, 2)}`,
       );
     } catch (error) {
       log.error(`WatchedLearners ctor exception: ${error.message}`);
@@ -53,8 +53,8 @@ class WatchedLearners {
         `new watchedLearners: ${JSON.stringify(
           this.watchProfile.watchedLearners,
           null,
-          2
-        )}`
+          2,
+        )}`,
       );
     } catch (error) {
       log.error(`SetWatchedLearners exception: ${error.message}`);

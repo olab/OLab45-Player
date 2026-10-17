@@ -1,6 +1,6 @@
 // @flow
 import React from "react";
-const playerState = require("../../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../../utils/PlayerState";
 import log from "loglevel";
 import { Grid, TextField, Select, MenuItem, Button } from "@material-ui/core";
 import { getUserSession } from "../../../services/api";

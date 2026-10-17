@@ -18,7 +18,7 @@ import log from "loglevel";
 import { withStyles } from "@material-ui/core/styles";
 import styles from "../../../styles.module.css";
 
-var constants = require("../../../../../services/constants");
+import constants from "../../../../../services/constants";
 
 class Chat extends React.Component {
   constructor(props) {
@@ -64,7 +64,7 @@ class Chat extends React.Component {
       }
 
       LogInfo(
-        `'${localInfo.sessionId}' onMessage '${JSON.stringify(payload)}'`
+        `'${localInfo.sessionId}' onMessage '${JSON.stringify(payload)}'`,
       );
 
       // tri-ary flag:
@@ -80,7 +80,7 @@ class Chat extends React.Component {
       }
 
       conversation.push(
-        this.createData(conversation.length, payload, isLocalMessage)
+        this.createData(conversation.length, payload, isLocalMessage),
       );
 
       this.setState({ conversation: conversation });

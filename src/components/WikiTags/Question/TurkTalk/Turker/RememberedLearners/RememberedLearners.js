@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 import log from "loglevel";
 import localCss from "./RememberedLearners.module.css";
-var constants = require("../../../../../../services/constants");
+import constants from "../../../../../../services/constants";
 
 class RememberedLearners extends React.Component {
   constructor(props) {
@@ -39,7 +39,7 @@ class RememberedLearners extends React.Component {
 
       // find learner in atrium list
       const watchedLearner = this.watchedLearnerHelper.FindWatchedLearner(
-        event.target.value
+        event.target.value,
       );
 
       if (watchedLearner) {
@@ -64,7 +64,7 @@ class RememberedLearners extends React.Component {
       // signal watched learners change to parent
       if (this.props.onUpdateWatchedLearners) {
         this.props.onUpdateWatchedLearners(
-          this.watchedLearnerHelper.watchProfile.watchedLearners
+          this.watchedLearnerHelper.watchProfile.watchedLearners,
         );
       } else {
         throw new Error("onForgetClicked callback not set");

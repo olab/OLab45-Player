@@ -6,7 +6,7 @@ import { getSessionReport } from "../../../services/api";
 import OlabReportContents from "./Contents";
 import { config } from "../../../config";
 
-const playerState = require("../../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../../utils/PlayerState";
 
 class OlabReportTag extends React.Component {
   constructor(props) {

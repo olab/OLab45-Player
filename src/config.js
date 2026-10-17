@@ -1,13 +1,13 @@
 // Constants.js
 
 const cfg = {
-  API_RETRY_COUNT: process.env.REACT_APP_API_RETRY_COUNT,
-  API_URL: process.env.REACT_APP_API_URL,
-  APP_BASEPATH: process.env.REACT_APP_BASEPATH,
-  SIGNALR_TIMEOUT_MS: process.env.REACT_APP_SIGNALR_TIMEOUT_MS,
-  TTALK_HUB_URL: process.env.REACT_APP_TTALK_HUB_URL,
+  API_RETRY_COUNT: import.meta.env.VITE_API_RETRY_COUNT,
+  API_URL: import.meta.env.VITE_API_URL,
+  APP_BASEPATH: import.meta.env.VITE_BASEPATH,
+  SIGNALR_TIMEOUT_MS: import.meta.env.VITE_SIGNALR_TIMEOUT_MS,
+  TTALK_HUB_URL: import.meta.env.VITE_TTALK_HUB_URL,
   APPLICATION_ID: "PLAYER",
-  LOG_LEVEL: process.env.REACT_APP_LOG_LEVEL || "info",
+  LOG_LEVEL: import.meta.env.VITE_LOG_LEVEL || "info",
 };
 
 // console.log(JSON.stringify(cfg));

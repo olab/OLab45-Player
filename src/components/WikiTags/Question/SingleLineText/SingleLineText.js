@@ -9,7 +9,7 @@ import siteStyles from "../../site.module.css";
 
 import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
-const playerState = require("../../../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../../../utils/PlayerState";
 
 class OlabSinglelineTextQuestion extends OlabTag {
   constructor(props) {
@@ -43,7 +43,7 @@ class OlabSinglelineTextQuestion extends OlabTag {
       this.setState((state) => {
         disabled = true;
         log.debug(
-          `${this.constructor["name"]} disabled question '${olabObject.id}' value = '${value}'.`
+          `${this.constructor["name"]} disabled question '${olabObject.id}' value = '${value}'.`,
         );
         return { disabled };
       });

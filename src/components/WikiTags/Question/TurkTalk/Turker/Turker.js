@@ -12,8 +12,8 @@ import styles from "../../../styles.module.css";
 import TurkerChatCellGrid from "./TurkerChatCellGrid";
 import Participant from "../../../../../helpers/participant";
 import SlotInfo from "../../../../../helpers/SlotInfo";
-const playerState = require("../../../../../utils/PlayerState").PlayerState;
-var constants = require("../../../../../services/constants");
+import { PlayerState as playerState } from "../../../../../utils/PlayerState";
+import constants from "../../../../../services/constants";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;

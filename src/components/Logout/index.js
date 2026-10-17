@@ -9,8 +9,8 @@ export default (props) => {
       log.error("logout authActions.clearState() error", err.stack);
     }
 
-    log.debug(`logging out to URL ${process.env.PUBLIC_URL}`);
-    location.assign(process.env.PUBLIC_URL + "/");
+    log.debug(`logging out to URL ${import.meta.env.BASE_URL}`);
+    location.assign(import.meta.env.BASE_URL);
   }, []);
 
   return <></>;

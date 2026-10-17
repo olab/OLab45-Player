@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import log from "loglevel";
-const playerState = require("../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../utils/PlayerState";
 import { config } from "../../config";
 
 class useToken {
@@ -88,7 +88,7 @@ class useToken {
     this.#initializeState(true);
 
     if (redirect) {
-      let url = `${process.env.PUBLIC_URL}/`;
+      let url = import.meta.env.BASE_URL;
       window.location.href = url;
     }
   };

@@ -20,7 +20,7 @@ import Spinner from "../../../../shared/assets/loading_med.gif";
 
 import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
-const playerState = require("../../../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../../../utils/PlayerState";
 
 class OlabMultiPickQuestion extends OlabTag {
   constructor(props) {
@@ -77,7 +77,7 @@ class OlabMultiPickQuestion extends OlabTag {
     if (checked && choiceArray.length === 0) {
       value = choiceId;
       valueOverride = olabObject.responses.find(
-        (res) => res.id == choiceId
+        (res) => res.id == choiceId,
       )?.response;
     } else {
       if (!checked && alreadyContains) {
@@ -93,12 +93,12 @@ class OlabMultiPickQuestion extends OlabTag {
       valueOverride = this.createValueFromArray(
         olabObject.responses
           .filter((res) => choiceArray.map((n) => +n).includes(res.id))
-          .map((res) => res.response)
+          .map((res) => res.response),
       );
     }
 
     log.debug(
-      `${this.constructor["name"]} set question '${olabObject.id}' value = '${value}'`
+      `${this.constructor["name"]} set question '${olabObject.id}' value = '${value}'`,
     );
 
     // if single try question, disabled it
@@ -117,7 +117,7 @@ class OlabMultiPickQuestion extends OlabTag {
         olabObject.valueOverride = valueOverride;
         return { olabObject };
       },
-      () => this.transmitResponse()
+      () => this.transmitResponse(),
     );
 
     if (event.relatedTarget) {
@@ -164,7 +164,7 @@ class OlabMultiPickQuestion extends OlabTag {
             baseHtmlId,
             response,
             currentChoices,
-            selectedIndexes
+            selectedIndexes,
           )}
         </div>
       );
@@ -179,7 +179,7 @@ class OlabMultiPickQuestion extends OlabTag {
     baseHtmlId,
     response,
     currentChoices,
-    responseIndexes
+    responseIndexes,
   ) {
     let correctnessIndicator = <>{response.response}</>;
     let feedback = null;
@@ -269,7 +269,7 @@ class OlabMultiPickQuestion extends OlabTag {
       var responses = this.buildQuestionResponses(
         olabObject,
         this.props.props.id,
-        currentChoices
+        currentChoices,
       );
 
       let row = olabObject.layoutType === 1 ? true : false;

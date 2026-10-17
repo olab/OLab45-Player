@@ -1,6 +1,6 @@
 import log from "loglevel";
 import { config } from "../config";
-const PlayerState = require("./PlayerState").PlayerState;
+import { PlayerState } from "./PlayerState";
 
 class ScopedObject {
   static NODE = "node";
@@ -155,7 +155,7 @@ class ScopedObject {
   #getArrayForObject(scopedObject, copy = false) {
     let objectType = ScopedObject.translateTypeToObject(scopedObject.type);
     let scopeLevel = ScopedObject.translateLevelToObject(
-      scopedObject.scopeLevel
+      scopedObject.scopeLevel,
     );
 
     let items = copy

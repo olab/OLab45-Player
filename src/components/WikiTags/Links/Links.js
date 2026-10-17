@@ -3,7 +3,7 @@ import React from "react";
 // import { withStyles } from '@material-ui/core/styles';
 import { Button, ButtonGroup } from "@material-ui/core";
 import log from "loglevel";
-const playerState = require("../../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../../utils/PlayerState";
 import { config } from "../../../config";
 
 import OlabTag from "../OlabTag";
@@ -81,7 +81,7 @@ class OlabLinksTag extends OlabTag {
                     link,
                     mapId,
                     link.destinationId,
-                    urlParam
+                    urlParam,
                   );
                 }}
               >
@@ -114,7 +114,7 @@ class OlabLinksTag extends OlabTag {
                     link,
                     mapId,
                     link.destinationId,
-                    urlParam
+                    urlParam,
                   );
                 }}
               >

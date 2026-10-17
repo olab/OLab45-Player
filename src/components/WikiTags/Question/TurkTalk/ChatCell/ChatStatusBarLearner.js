@@ -6,7 +6,7 @@ import log from "loglevel";
 import styles from "../../../styles.module.css";
 import { connect } from "formik";
 import { LastPageOutlined } from "@material-ui/icons";
-var constants = require("../../../../../services/constants");
+import constants from "../../../../../services/constants";
 
 class ChatStatusBarLearner extends React.Component {
   constructor(props) {

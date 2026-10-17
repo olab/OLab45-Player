@@ -3,7 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { FormControl } from "@material-ui/core";
 import JsxParser from "react-jsx-parser";
 import log from "loglevel";
-const playerState = require("../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../utils/PlayerState";
 import { DynamicObject } from "../../utils/DynamicObject";
 import { ScopedObject } from "../../utils/ScopedObject";
 

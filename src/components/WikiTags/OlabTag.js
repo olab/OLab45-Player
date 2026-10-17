@@ -2,7 +2,7 @@
 import React from "react";
 import log from "loglevel";
 
-const playerState = require("../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../utils/PlayerState";
 import { postQuestionValue } from "../../services/api";
 
 class OlabTag extends React.Component {

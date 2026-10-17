@@ -11,7 +11,7 @@ import Spinner from "../../../../shared/assets/loading_med.gif";
 
 import { getQuestion } from "../../WikiUtils";
 import OlabTag from "../../OlabTag";
-const playerState = require("../../../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../../../utils/PlayerState";
 
 class OlabMultilineTextQuestion extends OlabTag {
   constructor(props) {
@@ -45,7 +45,7 @@ class OlabMultilineTextQuestion extends OlabTag {
     if (olabObject.numTries === -1 || olabObject.numTries === 1) {
       this.setState({ disabled: true });
       log.debug(
-        `${this.constructor["name"]} disabled question '${olabObject.id}' value = '${value}'.`
+        `${this.constructor["name"]} disabled question '${olabObject.id}' value = '${value}'.`,
       );
     }
 

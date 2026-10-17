@@ -1,7 +1,7 @@
 import log from "loglevel";
 import { config } from "../config";
 
-const persistantStorage = require("./PersistantStorage").PersistantStorage;
+import { PersistantStorage as persistantStorage } from "./PersistantStorage";
 
 const KeyConstants = {
   ATRIUM: "atrium",
@@ -110,23 +110,23 @@ class PlayerState {
       disableWikiRendering: false,
       disableCache: false,
       logLevel: "error",
-    }
+    },
   ) {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.DEBUG,
-      defaultValue
+      defaultValue,
     );
   }
 
   static GetWatchProfile(
     storageKey,
-    defaultValue = { autoAssign: false, watchedLearners: [] }
+    defaultValue = { autoAssign: false, watchedLearners: [] },
   ) {
     return persistantStorage.get(
       storageKey,
       KeyConstants.WATCH_PROFILE,
-      defaultValue
+      defaultValue,
     );
   }
 
@@ -138,7 +138,7 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.ATRIUM,
-      defaultValue
+      defaultValue,
     );
   }
 
@@ -151,12 +151,12 @@ class PlayerState {
   }
 
   static GetConnectionInfo(
-    defaultValue = { authInfo: { expires: 0, token: null } }
+    defaultValue = { authInfo: { expires: 0, token: null } },
   ) {
     let value = persistantStorage.get(
       this.storageKey,
       KeyConstants.CONNECTION_INFO,
-      defaultValue
+      defaultValue,
     );
 
     return value;
@@ -170,7 +170,7 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.SESSION_INFO,
-      defaultValue
+      defaultValue,
     );
   }
 
@@ -182,7 +182,7 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.CONTEXT_ID,
-      defaultValue
+      defaultValue,
     );
   }
 
@@ -194,7 +194,7 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.MAPS,
-      defaultValue
+      defaultValue,
     );
   }
 
@@ -206,7 +206,7 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.MAP,
-      defaultValue
+      defaultValue,
     );
   }
 
@@ -218,7 +218,7 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.MAP_STATIC,
-      defaultValue
+      defaultValue,
     );
   }
 
@@ -230,7 +230,7 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.NODE,
-      defaultValue
+      defaultValue,
     );
   }
 
@@ -253,7 +253,7 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.NODE_STATIC,
-      defaultValue
+      defaultValue,
     );
   }
 
@@ -265,7 +265,7 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.SERVER_STATIC,
-      defaultValue
+      defaultValue,
     );
   }
 
@@ -277,7 +277,7 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.DYNAMIC_OBJECTS,
-      defaultValue
+      defaultValue,
     );
   }
 
@@ -285,7 +285,7 @@ class PlayerState {
     persistantStorage.save(
       this.storageKey,
       KeyConstants.VISIT_ONCE_NODE_LIST,
-      obj
+      obj,
     );
   }
 
@@ -293,7 +293,7 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.VISIT_ONCE_NODE_LIST,
-      defaultValue
+      defaultValue,
     );
   }
 
@@ -301,7 +301,7 @@ class PlayerState {
     persistantStorage.save(
       this.storageKey,
       KeyConstants.CLICK_ONCE_LINK_LIST,
-      obj
+      obj,
     );
   }
 
@@ -309,7 +309,7 @@ class PlayerState {
     return persistantStorage.get(
       this.storageKey,
       KeyConstants.CLICK_ONCE_LINK_LIST,
-      defaultValue
+      defaultValue,
     );
   }
 

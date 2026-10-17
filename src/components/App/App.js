@@ -18,8 +18,8 @@ import Logout from "./../Logout/";
 import MapSessions from "../Sessions/Sessions";
 import { config } from "../../config";
 
-var constants = require("../../services/constants");
-const playerState = require("../../utils/PlayerState").PlayerState;
+import constants from "../../services/constants";
+import { PlayerState as playerState } from "../../utils/PlayerState";
 
 class App extends PureComponent {
   constructor(props) {
@@ -32,7 +32,7 @@ class App extends PureComponent {
 
     log.debug(`${this.constructor["name"]} ctor`);
 
-    this.reactVersion = process.env.REACT_APP_VERSION;
+    this.reactVersion = import.meta.env.VITE_APP_VERSION;
     // console.log(JSON.stringify(process.env));
 
     const [mapId, nodeId, accessToken] = processUrl();

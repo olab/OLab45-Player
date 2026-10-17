@@ -7,7 +7,7 @@ import {
   TextField,
   CircularProgress,
 } from "@material-ui/core";
-import { ReactComponent as LogoIcon } from "../../shared/assets/icons/olab4_logo.svg";
+import LogoIcon from "../../shared/assets/icons/olab4_logo.svg?react";
 import {
   Logo,
   HeaderWrapper,
@@ -22,7 +22,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import log from "loglevel";
 import { impersonateUserAsync } from "../../services/api";
-var constants = require("../../services/constants");
+import constants from "../../services/constants";
 
 const Header = ({
   version,
@@ -36,21 +36,21 @@ const Header = ({
 
   const [showError, toggleShowError] = React.useReducer(
     (state) => !state,
-    false
+    false,
   );
 
   const [inProgress, toggleInProgress] = React.useReducer(
     (state) => !state,
-    false
+    false,
   );
 
   const [logoutDialogOpen, toggleLogoutDialogOpen] = React.useReducer(
     (state) => !state,
-    false
+    false,
   );
   const [impersonateDialogOpen, toggleImpersonateDialogOpen] = React.useReducer(
     (state) => !state,
-    false
+    false,
   );
 
   const isSuperUser = authActions.isSuperUser();
@@ -112,7 +112,7 @@ const Header = ({
     <>
       <HeaderWrapper>
         <div>
-          <Link to={`${process.env.PUBLIC_URL}/`} className="route-link">
+          <Link to={import.meta.env.BASE_URL} className="route-link">
             <Logo>
               <LogoIcon />
               <h1>OLab4</h1>

@@ -1,8 +1,8 @@
 import TurkTalk from "./turktalk";
 import { Log, LogInfo, LogError } from "../utils/Logger";
 import log from "loglevel";
-var constants = require("./constants");
-const playerState = require("../utils/PlayerState").PlayerState;
+import constants from "./constants";
+import { PlayerState as playerState } from "../utils/PlayerState";
 
 class Turker extends TurkTalk {
   // *****

@@ -14,9 +14,9 @@ import {
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import styles from "./styles";
-import { ReactComponent as LogoIcon } from "../../shared/assets/icons/olab4_logo.svg";
+import LogoIcon from "../../shared/assets/icons/olab4_logo.svg?react";
 import { loginUserAsync } from "../../services/api";
-var constants = require("../../services/constants");
+import constants from "../../services/constants";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;

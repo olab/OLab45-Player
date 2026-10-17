@@ -14,7 +14,7 @@ import OlabDropDownQuestion from "./DropDown/DropDown";
 import OlabDragAndDropQuestion from "./DragAndDrop/DragAndDrop";
 import OlabAttendeeTag from "./TurkTalk/Turkee/Turkee";
 import OlabModeratorTag from "./TurkTalk/Turker/Turker";
-const playerState = require("../../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../../utils/PlayerState";
 import log from "loglevel";
 import OlabTag from "../OlabTag";
 
@@ -59,7 +59,7 @@ class OlabQuestionTag extends OlabTag {
 
   componentWillUnmount() {
     log.debug(
-      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`
+      `${this.constructor["name"]} '${this.state.question.name}' componentWillUnmount`,
     );
   }
 
@@ -104,7 +104,7 @@ class OlabQuestionTag extends OlabTag {
     try {
       if (question != null) {
         log.debug(
-          `rendering question '${question.name}' typeid: ${question.questionType}`
+          `rendering question '${question.name}' typeid: ${question.questionType}`,
         );
 
         if (debug.disableWikiRendering) {

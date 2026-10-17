@@ -1,6 +1,6 @@
 // @flow
 import React, { useEffect, useState } from "react";
-const playerState = require("../../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../../utils/PlayerState";
 import log from "loglevel";
 
 import { OLabClientApi } from "./OLabClientApi";

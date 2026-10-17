@@ -7,7 +7,7 @@ import log from "loglevel";
 import styles from "../../../styles.module.css";
 import { connect } from "formik";
 import { LastPageOutlined } from "@material-ui/icons";
-var constants = require("../../../../../services/constants");
+import constants from "../../../../../services/constants";
 
 class ChatStatusBarModerator extends React.Component {
   constructor(props) {
@@ -78,7 +78,7 @@ class ChatStatusBarModerator extends React.Component {
       if (!messageTimer) {
         messageTimer = setInterval(this.onMessageTimer, 5000);
         log.debug(
-          `'${this.connectionId}' setting timer ${messageTimer}. Room '${localInfo.commandChannel}'`
+          `'${this.connectionId}' setting timer ${messageTimer}. Room '${localInfo.commandChannel}'`,
         );
         this.setState({ messageTimer: messageTimer });
       }
@@ -96,7 +96,7 @@ class ChatStatusBarModerator extends React.Component {
       });
 
       log.debug(
-        `'${this.connectionId}' clearing timer. Room '${localInfo.commandChannel}'`
+        `'${this.connectionId}' clearing timer. Room '${localInfo.commandChannel}'`,
       );
     }
   }
@@ -122,7 +122,7 @@ class ChatStatusBarModerator extends React.Component {
     }
 
     log.debug(
-      `'${this.connectionId}'  timer ${messageTimer} fired.  Room '${localInfo.commandChannel}'. seconds: ${diffSeconds}`
+      `'${this.connectionId}'  timer ${messageTimer} fired.  Room '${localInfo.commandChannel}'. seconds: ${diffSeconds}`,
     );
 
     this.setState({ centerStatusString: centerStatusString });

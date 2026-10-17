@@ -21,7 +21,7 @@ import Import from "../Import/Import";
 import { getMaps } from "../../services/api";
 import { config } from "../../config";
 
-const playerState = require("../../utils/PlayerState").PlayerState;
+import { PlayerState as playerState } from "../../utils/PlayerState";
 
 const HomeWrapper = styled.div`
   padding: 1rem;

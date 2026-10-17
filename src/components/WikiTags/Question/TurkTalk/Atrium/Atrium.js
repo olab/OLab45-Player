@@ -4,8 +4,8 @@ import { LogError } from "../../../../../utils/Logger";
 import log from "loglevel";
 import SlotInfo from "../../../../../helpers/SlotInfo";
 import AssigneeSearchableList from "./AssigneeSearchableList/AssigneeSearchableList";
-const playerState = require("../../../../../utils/PlayerState").PlayerState;
-var constants = require("../../../../../services/constants");
+import { PlayerState as playerState } from "../../../../../utils/PlayerState";
+import constants from "../../../../../services/constants";
 
 class Atrium extends React.Component {
   constructor(props) {
@@ -39,7 +39,7 @@ class Atrium extends React.Component {
       }
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onAtriumCommandCallback exception: ${error.message}`
+        `'${this.connectionId}' onAtriumCommandCallback exception: ${error.message}`,
       );
     }
   }
@@ -67,8 +67,8 @@ class Atrium extends React.Component {
 
         log.debug(
           `'${this.connectionId}' onAtriumUpdate: refreshing: '${JSON.stringify(
-            atriumLearners
-          )}'`
+            atriumLearners,
+          )}'`,
         );
 
         if (this.props.onAtriumUpdate) {
@@ -101,7 +101,7 @@ class Atrium extends React.Component {
       }
     } catch (error) {
       LogError(
-        `'${this.connectionId}' onAtriumUpdate exception: ${error.message}`
+        `'${this.connectionId}' onAtriumUpdate exception: ${error.message}`,
       );
     }
   }
@@ -112,7 +112,7 @@ class Atrium extends React.Component {
 
       let { atriumLearners, watchedLearners } = this.state;
       const selectedLearner = atriumLearners.find(
-        (learner) => learner.userId == userId
+        (learner) => learner.userId == userId,
       );
 
       if (!selectedLearner) {
@@ -134,7 +134,7 @@ class Atrium extends React.Component {
       }
     } catch (error) {
       log.error(
-        `'${this.connectionId}' onAtriumAssignClicked exception: ${error.message}`
+        `'${this.connectionId}' onAtriumAssignClicked exception: ${error.message}`,
       );
     }
   }
@@ -160,7 +160,7 @@ class Atrium extends React.Component {
       playerState.SetAtrium(state);
     } catch (error) {
       log.error(
-        `'${this.connectionId}' updateAtriumState exception: ${error.message}`
+        `'${this.connectionId}' updateAtriumState exception: ${error.message}`,
       );
     }
   }
