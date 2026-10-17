@@ -1,70 +1,95 @@
-# Getting Started with Create React App
+# OLab Player
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React web client for playing OLab4/OLab6 maps. Learners log in, pick a map and work through its nodes, which can include links, counters, constants, questions, embedded scripts, media and TurkTalk chat sessions. It talks to the OLab REST API and, for TurkTalk, a SignalR hub.
 
-## Available Scripts
+The project is built with [Vite](https://vite.dev) (React 17).
 
-In the project directory, you can run:
+## Getting started
 
-### `npm start`
+```bash
+npm install
+npm run start:local
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The dev server runs at [http://localhost:3000](http://localhost:3000) (under the base path from `VITE_PUBLIC_URL`, for example `/player/`) and reloads on edits.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Configuration
 
-### `npm test`
+Settings come from Vite env files in the project root. Each `start:*` / `build:*` script runs Vite in a mode that loads `.env` plus the matching `.env.<mode>` file.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+| Variable                  | Purpose                                   |
+| ------------------------- | ----------------------------------------- |
+| `VITE_API_URL`            | Base URL of the OLab API                  |
+| `VITE_API_RETRY_COUNT`    | Number of API call retries                |
+| `VITE_BASEPATH`           | Application base path used by the player  |
+| `VITE_PUBLIC_URL`         | Path the app is served from (Vite `base`) |
+| `VITE_SIGNALR_TIMEOUT_MS` | SignalR timeout in milliseconds           |
+| `VITE_TTALK_HUB_URL`      | TurkTalk SignalR hub URL                  |
+| `VITE_LOG_LEVEL`          | Log level (defaults to `info`)            |
 
-### `npm run build`
+| Mode          | Env file           | Scripts                              |
+| ------------- | ------------------ | ------------------------------------ |
+| (default)     | `.env`             | `start`, `build`                     |
+| `localhost`   | `.env.localhost`   | `start:local`, `build:local`         |
+| `debug`       | `.env.debug`       | `build:debug`                        |
+| `release`     | `.env.release`     | `build:release`                      |
+| `azure`       | `.env.azure`       | `start:azure`, `build:azure`         |
+| `azure-dev`   | `.env.azure-dev`   | `start:azure:dev`, `build:azure:dev` |
+| `azure-local` | `.env.azure-local` | `start:azure:local`                  |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The app version (`import.meta.env.VITE_APP_VERSION`) is taken from `package.json`.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## npm scripts
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Development
 
-### `npm run eject`
+| Script              | Description                       |
+| ------------------- | --------------------------------- |
+| `start`             | Dev server using `.env` only.     |
+| `start:local`       | Dev server in `localhost` mode.   |
+| `start:azure`       | Dev server in `azure` mode.       |
+| `start:azure:dev`   | Dev server in `azure-dev` mode.   |
+| `start:azure:local` | Dev server in `azure-local` mode. |
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Build
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Builds go to `build/` (`static/js` and `static/media` subfolders) with sourcemaps.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+| Script            | Description                         |
+| ----------------- | ----------------------------------- |
+| `build`           | Production build using `.env` only. |
+| `build:local`     | Build in `localhost` mode.          |
+| `build:debug`     | Build in `debug` mode.              |
+| `build:release`   | Build in `release` mode.            |
+| `build:azure`     | Build in `azure` mode.              |
+| `build:azure:dev` | Build in `azure-dev` mode.          |
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Maintenance
 
-## Learn More
+| Script         | Description                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------------- |
+| `clean`        | Removes everything in `build/` and `node_modules/` (`rm -Rf`, needs a Unix-style shell).        |
+| `version:full` | Sets the version to today's date, `YY.MM.DD-0`, without creating a git tag.                     |
+| `version:inc`  | Increments the prerelease number (for example `26.10.17-0` to `26.10.17-1`), without a git tag. |
+| `prepare`      | Installs the husky git hooks. Runs automatically on `npm install`.                              |
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Code formatting
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+A husky pre-commit hook runs `lint-staged`, which formats staged files with Prettier.
 
-### Code Splitting
+## Deployment scripts
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+| Script      | Description                                                                                                                                                                |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `build.sh`  | `./build.sh release` or `./build.sh debug`. Pulls, links `build/` to the vhost folder, runs `npm install` and `npm run build:<arg>`, links `static/files`, restarts nginx. |
+| `update.sh` | Pulls, cleans, reinstalls and rebuilds. It calls `build:dev`, which is not defined in `package.json` and will fail until it is added or changed.                           |
 
-### Analyzing the Bundle Size
+Web server examples are in `apache/`, and Azure Static Web Apps routing is in `staticwebapp.config.json`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Script API
 
-### Making a Progressive Web App
+Scripts embedded in nodes receive an `olab` object (`OLabClientApi`) for timers, DOM events, counters and navigation. See [OLabClientApi.md](OLabClientApi.md).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Release notes
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+See [ReleaseNotes.md](ReleaseNotes.md).
