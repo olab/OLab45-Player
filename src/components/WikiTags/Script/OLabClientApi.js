@@ -108,6 +108,26 @@ export class OLabClientApi {
     return null;
   }
 
+  // get current map name
+  getMapName() {
+    return this.props.map.name;
+  }
+
+  // get current mapId
+  getMapId() {
+    return this.props.map.id;
+  }
+
+  // get current node name
+  getNodeName() {
+    return this.props.node.title;
+  }
+
+  // get current nodeId
+  getNodeId() {
+    return this.props.node.id;
+  }
+
   // find and return a copy of an OLab scoped object
   // of a certain type by id or name
   findOLabObject(id, type) {
@@ -401,6 +421,11 @@ export class OLabClientApi {
   }
 
   jumpToNode(nodeId, onShutdownCallback = null) {
+    const currentNodeId = this.getNodeId();
+    if (currentNodeId === nodeId) {
+      log.debug(`jumpToNode(${nodeId}) already at node. no action taken.`);
+      return;
+    }
     this.shutdown(onShutdownCallback);
     log.debug(`jumpToNode(${nodeId})`);
     this.props.onNavigateToNode(1470, nodeId, "");

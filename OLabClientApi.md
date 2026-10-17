@@ -48,6 +48,15 @@ api.destroyTimer(key);
 | `getOLabObjectList()`                         | Logs every element that has an `id` attribute.                                                                                  |
 | `loadExternalDiv(url, targetElementId)`       | Fetches `url` and inserts its first `<div>` into the target element.                                                            |
 
+## Current map and node
+
+| Method          | Description                                     |
+| --------------- | ----------------------------------------------- |
+| `getMapName()`  | Name of the current map (`props.map.name`).     |
+| `getMapId()`    | Id of the current map (`props.map.id`).         |
+| `getNodeName()` | Title of the current node (`props.node.title`). |
+| `getNodeId()`   | Id of the current node (`props.node.id`).       |
+
 ## Scoped objects
 
 | Method                          | Returns                                                                                                              |
@@ -76,6 +85,6 @@ api.destroyTimer(key);
 
 ## Navigation
 
-| Method                                   | Description                                                                                                                          |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `jumpToNode(nodeId, onShutdownCallback)` | Calls `shutdown(onShutdownCallback)` to clean up timers and event handlers, then navigates to the node via `props.onNavigateToNode`. |
+| Method                                   | Description                                                                                                                                                                              |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `jumpToNode(nodeId, onShutdownCallback)` | Does nothing if `nodeId` is already the current node. Otherwise calls `shutdown(onShutdownCallback)` to clean up timers and event handlers, then navigates via `props.onNavigateToNode`. |
