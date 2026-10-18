@@ -108,31 +108,6 @@ export class OLabClientApi {
     }
   }
 
-  #destroyAllEventHandlers() {
-    try {
-      var keys = Object.keys(this.events);
-      for (let key of keys) {
-        this.destroyEventHandler(key);
-      }
-    } catch (error) {
-      log.error(`destroyAllEventHandlers failed: ${error}`);
-      throw error;
-    }
-  }
-
-  #searchCollection(array, elementId) {
-    if (!Array.isArray(array)) {
-      return null;
-    }
-    for (const obj of array) {
-      if (obj.htmlIdBase === elementId) {
-        log.debug(`found '${elementId}'`);
-        return { ...obj };
-      }
-    }
-    return null;
-  }
-
   /**
    * Gets the current map name.
    * @returns {string|null} Map name, or null if access fails.
@@ -351,13 +326,15 @@ export class OLabClientApi {
     this.timers[key] = setTimeout(() => {
       try {
         log.debug(`one-shot timer '${key}' activation`);
-        this.destroyTimer(key);
+
         if (callback != null) {
           callback(this.timerInfo[key]);
         }
       } catch (error) {
         log.error(`one-shot timer '${key}' callback failed: ${error}`);
       }
+
+      this.destroyTimer(key);
     }, frequencyMs);
 
     log.debug(`created one-shot timer '${key}' in ${frequencyMs} ms`);
@@ -705,5 +682,30 @@ export class OLabClientApi {
     log.debug(`jumpToNode(${nodeId}), map ${currentMapId}`);
 
     this.props.onNavigateToNode(currentMapId, nodeId, "");
+  }
+
+  #destroyAllEventHandlers() {
+    try {
+      var keys = Object.keys(this.events);
+      for (let key of keys) {
+        this.destroyEventHandler(key);
+      }
+    } catch (error) {
+      log.error(`destroyAllEventHandlers failed: ${error}`);
+      throw error;
+    }
+  }
+
+  #searchCollection(array, elementId) {
+    if (!Array.isArray(array)) {
+      return null;
+    }
+    for (const obj of array) {
+      if (obj.htmlIdBase === elementId) {
+        log.debug(`found '${elementId}'`);
+        return { ...obj };
+      }
+    }
+    return null;
   }
 }
