@@ -1,5 +1,20 @@
 # Release Notes
 
+## 2026-10-18
+
+### Home And Navigation
+
+- Changed `HomeWrapper` padding from `1rem` to `0rem`.
+- Updated `OLabClientApi.jumpToNode()` to navigate using the current map ID instead of a hard-coded map ID, and include the map ID in its debug log.
+
+### Check-ins
+
+Git committer times on branch `dev` (UTC-06:00):
+
+| Commit    | Time     | Summary                                                   |
+| --------- | -------- | --------------------------------------------------------- |
+| `1f5fa45` | 09:23:47 | Adjust Home padding and fix map ID passed by `jumpToNode` |
+
 ## 2026-10-17
 
 ### Build And Deployment
