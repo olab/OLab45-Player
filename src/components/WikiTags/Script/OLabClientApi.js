@@ -666,8 +666,11 @@ export class OLabClientApi {
       log.debug(`jumpToNode(${nodeId}) already at node. no action taken.`);
       return;
     }
+    const currentMapId = this.getMapId();
     this.shutdown(onShutdownCallback);
-    log.debug(`jumpToNode(${nodeId})`);
-    this.props.onNavigateToNode(1470, nodeId, "");
+
+    log.debug(`jumpToNode(${nodeId}), map ${currentMapId}`);
+
+    this.props.onNavigateToNode(currentMapId, nodeId, "");
   }
 }

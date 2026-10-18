@@ -24,7 +24,7 @@ import { config } from "../../config";
 import { PlayerState as playerState } from "../../utils/PlayerState";
 
 const HomeWrapper = styled.div`
-  padding: 1rem;
+  padding: 0rem;
   width: 100%;
 `;
 
