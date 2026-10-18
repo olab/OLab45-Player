@@ -45,7 +45,7 @@ Gets the current map ID.
 
 Gets the current node name.
 
-- **Returns** (`string|null`): Node title, or null if access fails.
+- **Returns** (`string|null`): Node name, or null if access fails.
 
 ### `getNodeId()`
 
@@ -175,20 +175,29 @@ Passes updated dynamic objects to the player component.
 
 ## Timers
 
+### `TimerInfo`
+
+Timing metadata tracked for each timer.
+
+- `startedAt` (`number`): Time the timer was created, in epoch milliseconds.
+- `lastFiredAt` (`number|null`): Time the callback last fired, in epoch milliseconds; null until a one-shot timer fires.
+- `periodMs` (`number`): Delay (one-shot) or interval (recurring) in milliseconds.
+- `elapsedMs` (`number`): Time elapsed since the timer was created, in milliseconds.
+
 ### `createOneShotTimer(frequencyMs, callback)`
 
-Schedules a callback once after the requested delay and removes the timer before invoking it.
+Creates a one-shot timer that invokes the callback after the requested timeout.
 
 - `frequencyMs` (`number`): Delay in milliseconds.
-- `callback` (`Function`): Function invoked when the timer expires.
+- `callback` (`function(TimerInfo): void`): Function invoked when the timer expires.
 - **Returns** (`string`): Timer key usable with `getTimerStatus` or `destroyTimer`.
 
 ### `createRecurringTimer(frequencyMs, callback)`
 
-Calls the callback immediately, then repeatedly at the requested interval. The immediate call receives no arguments; subsequent calls receive `(api, document)`.
+Creates a recurring timer that invokes the callback at the requested interval.
 
 - `frequencyMs` (`number`): Interval in milliseconds.
-- `callback` (`Function`): Function invoked immediately and on each interval.
+- `callback` (`function(TimerInfo): void`): Function invoked immediately and on each interval.
 - **Returns** (`string`): Timer key usable with `getTimerStatus` or `destroyTimer`.
 
 ### `destroyTimer(key)`

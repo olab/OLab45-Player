@@ -12,9 +12,19 @@ import log from "loglevel";
 import { OLabApiCounter } from "./Objects/OLabApiCounter";
 import { ScopedObject } from "../../../utils/ScopedObject";
 
+/**
+ * Timing metadata tracked for each timer.
+ * @typedef {object} TimerInfo
+ * @property {number} startedAt Time the timer was created, in epoch milliseconds.
+ * @property {number|null} lastFiredAt Time the callback last fired, in epoch milliseconds; null until a one-shot timer fires.
+ * @property {number} periodMs Delay (one-shot) or interval (recurring) in milliseconds.
+ * @property {number} elapsedMs Time elapsed since the timer was created, in milliseconds.
+ */
+
 // main view class
 export class OLabClientApi {
   timers = {};
+  /** @type {Object<string, TimerInfo>} Timer info keyed by timer key. */
   timerInfo = {};
   events = {};
   component;
@@ -324,48 +334,71 @@ export class OLabClientApi {
   }
 
   /**
-   * Schedules a callback once after the requested delay and removes the timer before invoking it.
+   * Creates a one-shot timer that invokes the callback after the requested timeout.
    * @param {number} frequencyMs Delay in milliseconds.
-   * @param {Function} callback Function invoked when the timer expires.
+   * @param {function(TimerInfo): void} callback Function invoked when the timer expires.
    * @returns {string} Timer key usable with `getTimerStatus` or `destroyTimer`.
    */
   createOneShotTimer(frequencyMs, callback) {
     const key = `oneshot-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
     this.timerInfo[key] = {
       startedAt: Date.now(),
       lastFiredAt: null,
       periodMs: frequencyMs,
     };
+
     this.timers[key] = setTimeout(() => {
-      // destroy first so the timer is removed even if the callback throws
-      this.destroyTimer(key);
-      this.timerInfo[key].lastFiredAt = Date.now();
-      callback(this.timerInfo[key]);
+      try {
+        log.debug(`one-shot timer '${key}' activation`);
+        this.destroyTimer(key);
+        if (callback != null) {
+          callback(this.timerInfo[key]);
+        }
+      } catch (error) {
+        log.error(`one-shot timer '${key}' callback failed: ${error}`);
+      }
     }, frequencyMs);
+
     log.debug(`created one-shot timer '${key}' in ${frequencyMs} ms`);
     return key;
   }
 
   /**
-   * Calls the callback at the requested interval.
-   * The immediate call receives no arguments; subsequent calls receive `(api, document)`.
+   * Creates a recurring timer that invokes the callback at the requested interval.
    * @param {number} frequencyMs Interval in milliseconds.
-   * @param {Function} callback Function invoked immediately and on each interval.
+   * @param {function(TimerInfo): void} callback Function invoked immediately and on each interval.
    * @returns {string} Timer key usable with `getTimerStatus` or `destroyTimer`.
    */
   createRecurringTimer(frequencyMs, callback) {
     const key = `recurring-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
     this.destroyTimer(key);
     const now = Date.now();
+
     this.timerInfo[key] = {
       startedAt: now,
       lastFiredAt: now,
       periodMs: frequencyMs,
     };
-    this.timers[key] = setInterval(() => {
-      this.timerInfo[key].lastFiredAt = Date.now();
+
+    if (callback != null) {
       callback(this.timerInfo[key]);
+    }
+
+    this.timers[key] = setInterval(() => {
+      try {
+        log.debug(`recurring timer '${key}' activation`);
+        this.timerInfo[key].lastFiredAt = Date.now();
+
+        if (callback != null) {
+          callback(this.timerInfo[key]);
+        }
+      } catch (error) {
+        log.error(`recurring timer '${key}' callback failed: ${error}`);
+      }
     }, frequencyMs);
+
     log.debug(`created recurring timer '${key}' frequency ${frequencyMs} ms`);
     return key;
   }
