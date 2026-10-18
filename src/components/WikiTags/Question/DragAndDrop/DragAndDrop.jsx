@@ -42,7 +42,7 @@ class OlabDragAndDropQuestion extends OlabTag {
     olabObject.value = values.join(",");
 
     log.debug(
-      `OlabSinglePickQuestion set question '${olabObject.id}' value = '${olabObject.value}'.`
+      `OlabSinglePickQuestion set question '${olabObject.id}' value = '${olabObject.value}'.`,
     );
 
     olabObject.responses = responses;
@@ -105,7 +105,7 @@ class OlabDragAndDropQuestion extends OlabTag {
     const responses = this.reorder(
       this.state.olabObject.responses,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
 
     this.setValue(responses);
@@ -169,7 +169,7 @@ class OlabDragAndDropQuestion extends OlabTag {
                           {...provided.dragHandleProps}
                           style={this.getItemStyle(
                             snapshot.isDragging,
-                            provided.draggableProps.style
+                            provided.draggableProps.style,
                           )}
                         >
                           {item.response}

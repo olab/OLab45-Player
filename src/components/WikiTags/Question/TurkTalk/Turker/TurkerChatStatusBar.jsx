@@ -38,7 +38,7 @@ class TurkerChatStatusBar extends React.Component {
 
   render() {
     log.debug(
-      `TurkerChatStatusBar render. state = ${JSON.stringify(this.state)}`
+      `TurkerChatStatusBar render. state = ${JSON.stringify(this.state)}`,
     );
 
     try {

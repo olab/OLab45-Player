@@ -34,7 +34,7 @@ class ImpersonateDlg extends PureComponent {
     const { open, data } = this.state;
 
     log.debug(
-      `${this.constructor["name"]} render ${JSON.stringify(this.state)}`
+      `${this.constructor["name"]} render ${JSON.stringify(this.state)}`,
     );
 
     return (

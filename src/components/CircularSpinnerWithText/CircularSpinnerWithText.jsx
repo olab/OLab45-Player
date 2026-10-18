@@ -27,7 +27,7 @@ const CircularSpinnerWithText = ({
       variant="caption"
       className={classNames(
         classes.spinnerCaption,
-        centered && classes.centeredText
+        centered && classes.centeredText,
       )}
     >
       {text}

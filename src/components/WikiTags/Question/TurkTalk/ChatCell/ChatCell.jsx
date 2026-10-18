@@ -36,7 +36,7 @@ class ChatCell extends React.Component {
 
       let cellStyling = Object.assign(
         { padding: 0, width: "100%" },
-        this.props.style
+        this.props.style,
       );
 
       return (

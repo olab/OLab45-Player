@@ -15,7 +15,7 @@ class DragDropContainer extends React.Component {
     log.debug(
       `DragDropContainer swapping '${
         this.state.responses[dragIndex].response
-      }' -> position ${hoverIndex + 1}`
+      }' -> position ${hoverIndex + 1}`,
     );
 
     this.setState((state) => {

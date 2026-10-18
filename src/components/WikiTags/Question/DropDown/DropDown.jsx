@@ -34,7 +34,7 @@ class OlabDropDownQuestion extends OlabTag {
     this.setState((state) => {
       olabObject.value = value;
       log.debug(
-        `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'.`
+        `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'.`,
       );
       return { olabObject };
     });
@@ -56,7 +56,7 @@ class OlabDropDownQuestion extends OlabTag {
     olabObject.value = olabObject.responseId;
 
     log.debug(
-      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'`
+      `${this.constructor["name"]}  set question '${olabObject.id}' value = '${value}'`,
     );
 
     // if single try question, disabled it

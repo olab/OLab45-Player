@@ -178,8 +178,8 @@ export default (props) => {
                           {undefined === sessions
                             ? "Loading sessions..."
                             : !Array.isArray(sessions)
-                            ? "Error occurred while loading sessions."
-                            : "No sessions found."}
+                              ? "Error occurred while loading sessions."
+                              : "No sessions found."}
                         </em>
                       </small>
                     </p>
