@@ -339,21 +339,21 @@ export class OLabClientApi {
     this.timers[key] = setTimeout(() => {
       // destroy first so the timer is removed even if the callback throws
       this.destroyTimer(key);
-      callback();
+      this.timerInfo[key].lastFiredAt = Date.now();
+      callback(this.timerInfo[key]);
     }, frequencyMs);
     log.debug(`created one-shot timer '${key}' in ${frequencyMs} ms`);
     return key;
   }
 
   /**
-   * Calls the callback immediately, then repeatedly at the requested interval.
+   * Calls the callback at the requested interval.
    * The immediate call receives no arguments; subsequent calls receive `(api, document)`.
    * @param {number} frequencyMs Interval in milliseconds.
    * @param {Function} callback Function invoked immediately and on each interval.
    * @returns {string} Timer key usable with `getTimerStatus` or `destroyTimer`.
    */
   createRecurringTimer(frequencyMs, callback) {
-    callback();
     const key = `recurring-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     this.destroyTimer(key);
     const now = Date.now();
@@ -364,7 +364,7 @@ export class OLabClientApi {
     };
     this.timers[key] = setInterval(() => {
       this.timerInfo[key].lastFiredAt = Date.now();
-      callback(this, document);
+      callback(this.timerInfo[key]);
     }, frequencyMs);
     log.debug(`created recurring timer '${key}' frequency ${frequencyMs} ms`);
     return key;

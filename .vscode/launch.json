@@ -5,12 +5,12 @@
       "request": "launch",
       "reAttach": true,
       "name": "Firefox",
-      "url": "http://localhost:3000/player",
+      "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}"
     },
 
     {
-      "name": "General",
+      "name": "Chrome",
       "request": "launch",
       "type": "chrome",
       "url": "http://localhost:3000",
