@@ -184,8 +184,8 @@ class ListWithSearch extends PureComponent {
           page={currentPage}
           rowsPerPage={rowsPerPage}
           rowsPerPageOptions={[10, 25, 50]}
-          onChangePage={this.onPageChange}
-          onChangeRowsPerPage={this.onRowsPerPageChange}
+          onPageChange={this.onPageChange}
+          onRowsPerPageChange={this.onRowsPerPageChange}
         />
 
         {isShowSpinner && (

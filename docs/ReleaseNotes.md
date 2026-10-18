@@ -13,8 +13,12 @@
 
 ### Timers
 
-- `OLabClientApi.createOneShotTimer()` now passes its callback the timer info object (`startedAt`, `lastFiredAt`, `periodMs`), with `lastFiredAt` set to the time the timer fired.
-- `OLabClientApi.createRecurringTimer()` now passes the timer info object on every call instead of `(api, document)`, and no longer calls the callback immediately at creation; the first call happens after the first interval.
+- Added `TimerInfo` metadata for timers and status reporting through `OLabClientApi.getTimerStatus()`, including elapsed time, time since the last callback, and time remaining.
+- Timer callbacks now accept timer metadata; recurring callbacks run immediately and on each interval. Callback errors are logged, and one-shot timers are cleaned up before their callback runs.
+
+### List With Search
+
+- Updated pagination handler props to `onPageChange` and `onRowsPerPageChange` to match the Material UI `TablePagination` API.
 
 ### Tooling
 
@@ -32,6 +36,8 @@ Git committer times on branch `dev` (UTC-06:00):
 | `0e4ac34` | 09:54:45 | Update Vite HTML entry point to `index.jsx`               |
 | `e408ae7` | 09:58:35 | Update release notes for Vite source file changes         |
 | `03f8565` | 10:54:05 | Pass timer info to timer callbacks; update launch config  |
+| `f1cc756` | 10:56:35 | Update release notes for timer info and tooling changes   |
+| `9f61f19` | 16:05:13 | Enhance timer metadata and callback handling              |
 
 ## 2026-10-17
 
