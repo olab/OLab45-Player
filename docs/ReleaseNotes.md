@@ -11,6 +11,15 @@
 
 - Renamed JSX-bearing React source files from `.js` to `.jsx` and updated the Vite entry point to `/src/index.jsx`.
 
+### Timers
+
+- `OLabClientApi.createOneShotTimer()` now passes its callback the timer info object (`startedAt`, `lastFiredAt`, `periodMs`), with `lastFiredAt` set to the time the timer fired.
+- `OLabClientApi.createRecurringTimer()` now passes the timer info object on every call instead of `(api, document)`, and no longer calls the callback immediately at creation; the first call happens after the first interval.
+
+### Tooling
+
+- Updated `.vscode/launch.json`: the Firefox configuration now opens `http://localhost:3000`, and the `General` Chrome configuration was renamed to `Chrome`.
+
 ### Check-ins
 
 Git committer times on branch `dev` (UTC-06:00):
@@ -21,6 +30,8 @@ Git committer times on branch `dev` (UTC-06:00):
 | `1917e09` | 09:26:41 | Update release notes for Home and navigation changes      |
 | `0051720` | 09:53:53 | Rename React source modules from `.js` to `.jsx`          |
 | `0e4ac34` | 09:54:45 | Update Vite HTML entry point to `index.jsx`               |
+| `e408ae7` | 09:58:35 | Update release notes for Vite source file changes         |
+| `03f8565` | 10:54:05 | Pass timer info to timer callbacks; update launch config  |
 
 ## 2026-10-17
 
