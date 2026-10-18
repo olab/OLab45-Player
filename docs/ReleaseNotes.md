@@ -7,6 +7,10 @@
 - Changed `HomeWrapper` padding from `1rem` to `0rem`.
 - Updated `OLabClientApi.jumpToNode()` to navigate using the current map ID instead of a hard-coded map ID, and include the map ID in its debug log.
 
+### Vite Source Files
+
+- Renamed JSX-bearing React source files from `.js` to `.jsx` and updated the Vite entry point to `/src/index.jsx`.
+
 ### Check-ins
 
 Git committer times on branch `dev` (UTC-06:00):
@@ -14,6 +18,9 @@ Git committer times on branch `dev` (UTC-06:00):
 | Commit    | Time     | Summary                                                   |
 | --------- | -------- | --------------------------------------------------------- |
 | `1f5fa45` | 09:23:47 | Adjust Home padding and fix map ID passed by `jumpToNode` |
+| `1917e09` | 09:26:41 | Update release notes for Home and navigation changes      |
+| `0051720` | 09:53:53 | Rename React source modules from `.js` to `.jsx`          |
+| `0e4ac34` | 09:54:45 | Update Vite HTML entry point to `index.jsx`               |
 
 ## 2026-10-17
 
