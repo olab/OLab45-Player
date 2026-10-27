@@ -110,6 +110,8 @@ class Player extends PureComponent {
         originalDynamicObjects = node.dynamicObjects;
       }
 
+      originalDynamicObjects.counters = serverScopedObjects.counters;
+
       let dynamicObject = new DynamicObject(originalDynamicObjects);
       let scopedObject = new ScopedObject({
         map: mapScopedObjects,
